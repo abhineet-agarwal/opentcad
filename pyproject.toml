@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "opentcad"
+version = "0.1.0-dev"
+description = "Open-source TCAD framework for semiconductor process and device simulation"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "numpy>=1.24",
+    "scipy>=1.11",
+    "pyvista>=0.43",
+    "pydantic>=2.0",
+    "fipy>=3.4",
+    "gmsh>=4.11",
+    "devsim>=2.6",
+    "matplotlib>=3.7",
+    "pyyaml>=6.0",
+    "rich>=13.0",
+    "click>=8.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "pytest-cov>=4.1",
+    "ruff>=0.1",
+    "mypy>=1.5",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "slow: marks tests as slow",
+    "requires_devsim: requires devsim installation",
+    "requires_viennaps: requires ViennaPS installation",
+    "integration: full pipeline integration tests",
+]
+addopts = "-v --tb=short"
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
