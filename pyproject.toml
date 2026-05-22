@@ -8,6 +8,29 @@ version = "0.1.0-dev"
 description = "Open-source TCAD framework for semiconductor process and device simulation"
 readme = "README.md"
 requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Abhineet Agarwal", email = "iamabhineetagarwal@gmail.com" },
+]
+keywords = ["tcad", "semiconductor", "device-simulation", "process-simulation", "devsim", "gmsh"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: POSIX :: Linux",
+    "Operating System :: MacOS",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.urls]
+Homepage   = "https://github.com/abhineet-agarwal/opentcad"
+Repository = "https://github.com/abhineet-agarwal/opentcad"
+Issues     = "https://github.com/abhineet-agarwal/opentcad/issues"
+
 dependencies = [
     "numpy>=1.24",
     "scipy>=1.11",

@@ -24,3 +24,7 @@ htmlcov/
 *.vtu
 *.vtk
 *.msh
+
+CLAUDE.md
+**/CLAUDE.md
+.claude/
