@@ -54,6 +54,7 @@ class MaterialParams(BaseModel):
     """Validated material parameter set for one material."""
     material: str
     symbol: str
+    is_insulator: bool = False   # True for SiO2/Si3N4 (Poisson only, no carriers)
     band_structure: BandStructure = BandStructure()
     mobility_constant: MobilityConstant = MobilityConstant()
     recombination: Recombination = Recombination()
@@ -133,6 +134,7 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
     return MaterialParams(
         material=raw.get("material", symbol),
         symbol=raw.get("symbol", symbol),
+        is_insulator=bool(raw.get("is_insulator", False)),
         band_structure=band,
         mobility_constant=mob,
         recombination=rec,

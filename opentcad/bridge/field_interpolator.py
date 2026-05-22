@@ -44,12 +44,17 @@ def interpolate_doping_field(
     log_nd = np.log10(src_nd_s)
     log_na = np.log10(src_na_s)
 
+    # Strip dimensions with near-zero variance (e.g. 1D profiles given as 2D arrays
+    # with all x=0). RBFInterpolator requires the monomial matrix to have full column
+    # rank; degenerate dimensions cause a LinAlgError.
+    src_active, dst_active = _strip_degenerate_dims(src_points, dst_points)
+
     # Build RBF interpolators
     try:
-        rbf_nd = RBFInterpolator(src_points, log_nd,
+        rbf_nd = RBFInterpolator(src_active, log_nd,
                                   neighbors=min(rbf_neighbors, len(src_points)),
                                   smoothing=rbf_smoothing)
-        rbf_na = RBFInterpolator(src_points, log_na,
+        rbf_na = RBFInterpolator(src_active, log_na,
                                   neighbors=min(rbf_neighbors, len(src_points)),
                                   smoothing=rbf_smoothing)
     except Exception as e:
@@ -69,8 +74,8 @@ def interpolate_doping_field(
 
     bulk = ~near_jn
     if np.any(bulk):
-        log_dst_nd[bulk] = rbf_nd(dst_points[bulk]).ravel()
-        log_dst_na[bulk] = rbf_na(dst_points[bulk]).ravel()
+        log_dst_nd[bulk] = rbf_nd(dst_active[bulk]).ravel()
+        log_dst_na[bulk] = rbf_na(dst_active[bulk]).ravel()
     if np.any(near_jn):
         nn_nd = NearestNDInterpolator(src_points, log_nd)
         nn_na = NearestNDInterpolator(src_points, log_na)
@@ -82,6 +87,33 @@ def interpolate_doping_field(
     dst_nd = np.where(dst_nd <= FLOOR * 1.01, 0.0, dst_nd)
     dst_na = np.where(dst_na <= FLOOR * 1.01, 0.0, dst_na)
     return np.maximum(dst_nd, 0.0), np.maximum(dst_na, 0.0)
+
+
+def _strip_degenerate_dims(src: np.ndarray,
+                            dst: np.ndarray,
+                            tol: float = 1e-10) -> tuple[np.ndarray, np.ndarray]:
+    """Remove dimensions where src has near-zero variance.
+
+    RBFInterpolator requires the monomial matrix to have full column rank.
+    If all source points share the same x-coordinate (a 1D profile expressed
+    as a 2D array), the x column is constant and the matrix is singular.
+    Stripping those dimensions reduces the problem to its intrinsic dimensionality.
+
+    Args:
+        src: Source points, shape (N, D).
+        dst: Destination points, shape (M, D). Must have same D.
+        tol: Variance below this is considered degenerate.
+
+    Returns:
+        (src_active, dst_active): Arrays with degenerate columns removed.
+        Shape is (N, D') and (M, D') where D' <= D.
+    """
+    variances = np.var(src, axis=0)
+    active_dims = variances > tol
+    if not np.any(active_dims):
+        # Pathological case: all points identical. Keep first dim to avoid 0-D array.
+        active_dims[0] = True
+    return src[:, active_dims], dst[:, active_dims]
 
 
 def _find_junction_nodes(points: np.ndarray, net_doping: np.ndarray,

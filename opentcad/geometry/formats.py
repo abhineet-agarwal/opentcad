@@ -140,7 +140,7 @@ class MeshField:
             mat_counts[mid] = mat_counts.get(mid, 0) + 1
         lines.append("  Materials:")
         for mid, count in sorted(mat_counts.items()):
-            try: name = Material(mid).name
+            try: name = MATERIAL_NAMES.get(Material(mid), Material(mid).name)
             except ValueError: name = f"UNKNOWN({mid})"
             lines.append(f"    {name}: {count} cells")
         if self.has_doping:

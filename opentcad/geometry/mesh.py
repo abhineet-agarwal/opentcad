@@ -22,7 +22,8 @@ def build_2d_mesh(structure, mesh_size_um: float = 0.05) -> pv.UnstructuredGrid:
 
     Args:
         structure: A Structure instance with layers, regions, contacts defined.
-        mesh_size_um: Default element size [um].
+        mesh_size_um: Default element size [um]. Refinement to mesh_size_um/2
+                      is applied near layer interfaces.
 
     Returns:
         pyvista UnstructuredGrid with triangular elements, coordinates in um,
@@ -30,107 +31,143 @@ def build_2d_mesh(structure, mesh_size_um: float = 0.05) -> pv.UnstructuredGrid:
     """
     import gmsh
 
-    lc = mesh_size_um * 1e-3   # um → mm (gmsh works in mm by default)
-    lc_fine = lc / 2            # fine mesh at interfaces
+    lc = mesh_size_um * 1e-3   # um → mm
+    lc_fine = lc / 2
 
-    gmsh.initialize()
-    gmsh.option.setNumber("General.Verbosity", 0)
-    gmsh.model.add(structure.name)
+    if gmsh.isInitialized():
+        gmsh.clear()
+    else:
+        gmsh.initialize()
 
-    # Build layered geometry as stacked rectangles
-    # Use gmsh OCC kernel for boolean operations
-    gmsh.model.occ.synchronize()
+    try:
+        gmsh.option.setNumber("General.Verbosity", 0)
+        gmsh.model.add(structure.name)
 
-    surfaces = {}   # layer_name -> gmsh surface tag
-    y_offset_mm = 0.0
-    w_mm = structure.width_um * 1e-3
+        w_mm = structure.width_um * 1e-3
 
-    for layer in structure._layers:
-        h_mm = layer.thickness_um * 1e-3
-        tag = gmsh.model.occ.addRectangle(0, y_offset_mm, 0, w_mm, h_mm)
-        surfaces[layer.name] = tag
-        y_offset_mm += h_mm
+        rect_tags = []
+        layer_centroid_y_mm = []
+        y_offset_mm = 0.0
+        for layer in structure._layers:
+            h_mm = layer.thickness_um * 1e-3
+            tag = gmsh.model.occ.addRectangle(0.0, y_offset_mm, 0.0, w_mm, h_mm)
+            rect_tags.append(tag)
+            layer_centroid_y_mm.append(y_offset_mm + h_mm / 2)
+            y_offset_mm += h_mm
 
-    gmsh.model.occ.synchronize()
+        # Glue touching rectangles so the interface curves are shared
+        # (without this, adjacent rectangles have duplicated edges and the
+        # mesher won't produce coincident nodes across the interface).
+        if len(rect_tags) > 1:
+            obj = [(2, rect_tags[0])]
+            tools = [(2, t) for t in rect_tags[1:]]
+            gmsh.model.occ.fragment(obj, tools)
 
-    # Assign physical groups (material IDs)
-    for layer in structure._layers:
-        tag = surfaces[layer.name]
-        pg = gmsh.model.addPhysicalGroup(2, [tag])
-        gmsh.model.setPhysicalName(2, pg, layer.material.name)
-        # Store material ID as physical group number for retrieval
-        # We use a custom approach: tag physical group by material int ID
+        gmsh.model.occ.synchronize()
 
-    # Mesh size fields: coarser in bulk, finer at layer interfaces
-    field_id = 1
-    interface_y_mm = []
-    y = 0.0
-    for layer in structure._layers[:-1]:
-        y += layer.thickness_um
-        interface_y_mm.append(y * 1e-3)
+        # Map each post-fragment surface back to its layer by centroid y.
+        surf_to_layer = {}
+        for dim, stag in gmsh.model.getEntities(dim=2):
+            _, ymin, _, _, ymax, _ = gmsh.model.getBoundingBox(dim, stag)
+            cy = 0.5 * (ymin + ymax)
+            idx = min(range(len(layer_centroid_y_mm)),
+                      key=lambda i: abs(layer_centroid_y_mm[i] - cy))
+            surf_to_layer[stag] = structure._layers[idx]
 
-    if interface_y_mm:
-        gmsh.model.mesh.field.add("MathEval", field_id)
-        # Simple: use lc everywhere, refinement at interfaces handled by MeshAdapt
-        gmsh.model.mesh.field.setString(field_id, "F", f"{lc}")
-        gmsh.model.mesh.field.setAsBackgroundMesh(field_id)
+        # Physical groups: one per surface, named after the Material enum.
+        # Surfaces of the same material can share a group, but per-surface
+        # is simpler and lets the device layer distinguish layers later.
+        for stag, layer in surf_to_layer.items():
+            pg = gmsh.model.addPhysicalGroup(2, [stag])
+            gmsh.model.setPhysicalName(2, pg, layer.material.name)
 
-    # Generate mesh
-    gmsh.option.setNumber("Mesh.Algorithm", 6)   # Frontal-Delaunay
-    gmsh.option.setNumber("Mesh.CharacteristicLengthMin", lc_fine)
-    gmsh.option.setNumber("Mesh.CharacteristicLengthMax", lc)
-    gmsh.model.mesh.generate(2)
-    gmsh.model.mesh.optimize("Laplace2D")
+        # Identify horizontal interface curves (at y between adjacent layers).
+        interface_y_mm = []
+        y = 0.0
+        for layer in structure._layers[:-1]:
+            y += layer.thickness_um * 1e-3
+            interface_y_mm.append(y)
 
-    # Extract mesh into pyvista
-    grid = _gmsh_to_pyvista(structure)
+        # Horizontal curve: span-y ≲ a nanometer. Gmsh's getBoundingBox
+        # returns values with a ±1e-7 mm pad, so tolerances tighter than
+        # a few nm silently reject every real edge.
+        interface_curves = []
+        atol = 1e-6   # mm (= 1 nm)
+        for dim, ctag in gmsh.model.getEntities(dim=1):
+            _, ymin, _, _, ymax, _ = gmsh.model.getBoundingBox(dim, ctag)
+            if abs(ymax - ymin) > atol:
+                continue
+            cy = 0.5 * (ymin + ymax)
+            if any(abs(cy - iy) < atol for iy in interface_y_mm):
+                interface_curves.append(ctag)
 
-    gmsh.finalize()
+        # Distance + Threshold field: lc_fine within ~lc of an interface,
+        # ramping up to lc by 4*lc away. SizeMax acts as the bulk size.
+        if interface_curves:
+            dist_id, thresh_id = 1, 2
+            gmsh.model.mesh.field.add("Distance", dist_id)
+            gmsh.model.mesh.field.setNumbers(dist_id, "CurvesList", interface_curves)
+            gmsh.model.mesh.field.setNumber(dist_id, "Sampling", 100)
+
+            gmsh.model.mesh.field.add("Threshold", thresh_id)
+            gmsh.model.mesh.field.setNumber(thresh_id, "InField", dist_id)
+            gmsh.model.mesh.field.setNumber(thresh_id, "SizeMin", lc_fine)
+            gmsh.model.mesh.field.setNumber(thresh_id, "SizeMax", lc)
+            gmsh.model.mesh.field.setNumber(thresh_id, "DistMin", lc_fine)
+            gmsh.model.mesh.field.setNumber(thresh_id, "DistMax", 2 * lc)
+            gmsh.model.mesh.field.setAsBackgroundMesh(thresh_id)
+
+            # Let the field drive sizing exclusively.
+            gmsh.option.setNumber("Mesh.MeshSizeFromPoints", 0)
+            gmsh.option.setNumber("Mesh.MeshSizeFromCurvature", 0)
+            gmsh.option.setNumber("Mesh.MeshSizeExtendFromBoundary", 0)
+
+        gmsh.option.setNumber("Mesh.Algorithm", 6)   # Frontal-Delaunay
+        gmsh.option.setNumber("Mesh.CharacteristicLengthMin", lc_fine)
+        gmsh.option.setNumber("Mesh.CharacteristicLengthMax", lc)
+        gmsh.model.mesh.generate(2)
+        gmsh.model.mesh.optimize("Laplace2D")
+
+        grid = _gmsh_to_pyvista(surf_to_layer)
+    finally:
+        gmsh.finalize()
+
     return grid
 
 
-def _gmsh_to_pyvista(structure) -> pv.UnstructuredGrid:
+def _gmsh_to_pyvista(surf_to_layer: dict) -> pv.UnstructuredGrid:
     """Extract the current gmsh mesh into a pyvista UnstructuredGrid.
-    
-    Coordinates are converted from mm to um.
-    Material IDs are assigned from physical group names matching Material enum.
+
+    Coordinates are converted from mm to um. Material IDs come from the
+    layer associated with each surface entity, so every triangle gets the
+    correct Material enum value with no centroid-lookup ambiguity.
     """
     import gmsh
 
-    # Get nodes
     node_tags, coords, _ = gmsh.model.mesh.getNodes()
-    n_nodes = len(node_tags)
-    points = coords.reshape(-1, 3) * 1e3  # mm → um
-
-    # Reindex nodes: gmsh tags may not be 0-based
+    points = coords.reshape(-1, 3) * 1e3   # mm → um
     tag_to_idx = {int(t): i for i, t in enumerate(node_tags)}
 
-    # Get triangular elements (type 2)
-    elem_types, elem_tags, elem_conn = gmsh.model.mesh.getElements(dim=2)
+    all_cells: list[int] = []
+    all_mat_ids: list[int] = []
 
-    all_cells = []
-    all_mat_ids = []
+    for stag, layer in surf_to_layer.items():
+        elem_types, elem_tags, elem_conn = gmsh.model.mesh.getElements(dim=2, tag=stag)
+        mat_id = int(layer.material)
+        for et, etags, econn in zip(elem_types, elem_tags, elem_conn):
+            if et != 2:   # type 2 = 3-node triangle
+                continue
+            conn = econn.reshape(len(etags), 3)
+            for nodes in conn:
+                all_cells.append(3)
+                all_cells.extend(tag_to_idx[int(n)] for n in nodes)
+                all_mat_ids.append(mat_id)
 
-    for et, etags, econn in zip(elem_types, elem_tags, elem_conn):
-        if et != 2:   # only triangles (type 2)
-            continue
-        n_per = 3
-        n_elem = len(etags)
-        conn = econn.reshape(n_elem, n_per)
-
-        # Find material for each element via its physical group
-        for elem_idx, (etag, nodes) in enumerate(zip(etags, conn)):
-            # Get entity tag for this element
-            mat_id = _get_material_id_for_element(gmsh, etag, structure)
-            local_nodes = [tag_to_idx[int(n)] for n in nodes]
-            all_cells.extend([3] + local_nodes)
-            all_mat_ids.append(mat_id)
-
-    if not all_cells:
+    if not all_mat_ids:
         raise RuntimeError("No triangular elements found in mesh. "
                            "Check that gmsh generated 2D elements.")
 
-    cells = np.array(all_cells, dtype=int)
+    cells = np.array(all_cells, dtype=np.int64)
     celltypes = np.full(len(all_mat_ids), pv.CellType.TRIANGLE, dtype=np.uint8)
     mat_ids = np.array(all_mat_ids, dtype=np.int32)
 
@@ -139,23 +176,20 @@ def _gmsh_to_pyvista(structure) -> pv.UnstructuredGrid:
     return grid
 
 
-def _get_material_id_for_element(gmsh, elem_tag: int, structure) -> int:
-    """Return Material int ID for a given element tag using centroid lookup."""
-    # Get element centroid and check which layer y-range it falls in
-    _, coords, _ = gmsh.model.mesh.getNode(elem_tag)
-    # This is approximate; for production use physical group classification
-    # For now: use centroid y vs layer stack
-    # A more robust approach uses gmsh physical group membership
-    return int(Material.SI)   # placeholder — to be implemented properly
+def _get_material_id_for_element(elem_tag: int) -> int:
+    """Return Material int ID for a gmsh element by physical-group lookup.
 
-
-def add_interface_refinement(structure, mesh_size_um: float) -> None:
-    """Add Gmsh Distance + Threshold fields for refinement at interfaces.
-    
-    Call this before gmsh.model.mesh.generate().
-    Claude Code: implement using gmsh.model.mesh.field.add("Distance") 
-    targeting curves at layer interfaces.
+    Resolves the entity that owns the element, finds its physical group(s),
+    and maps the group name back to the Material enum. Falls back to VACUUM
+    if no recognized physical group is found.
     """
-    # TODO: implement proper interface refinement
-    # For now, global mesh size handles this
-    pass
+    import gmsh
+
+    _, _, dim, ent_tag = gmsh.model.mesh.getElement(elem_tag)
+    for pg in gmsh.model.getPhysicalGroupsForEntity(dim, ent_tag):
+        name = gmsh.model.getPhysicalName(dim, pg)
+        try:
+            return int(Material[name])
+        except KeyError:
+            continue
+    return int(Material.VACUUM)

@@ -140,10 +140,14 @@ class Structure:
         nd = np.zeros(grid.n_points)
         na = np.zeros(grid.n_points)
 
+        # First match wins. Layers iterate bottom-up, so a point exactly on
+        # an internal interface is claimed by the lower layer. The top-of-
+        # device boundary (y == total_height) needs <= on the upper bound,
+        # otherwise the top-contact nodes get zero doping and ohmic BCs fail.
         for i, pt in enumerate(pts):
             x, y_pt = pt[0], pt[1]
             for layer in self._layers:
-                if layer.y_bottom <= y_pt < layer.y_bottom + layer.thickness_um:
+                if layer.y_bottom <= y_pt <= layer.y_bottom + layer.thickness_um:
                     nd[i] = layer.doping_Nd
                     na[i] = layer.doping_Na
                     break

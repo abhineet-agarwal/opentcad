@@ -14,15 +14,9 @@ from opentcad.materials.database import load_material
 
 @pytest.fixture
 def simple_mf(simple_si_meshfield):
-    """Minimal MeshField with doping and contacts for solver tests."""
-    import numpy as np
-    from opentcad.geometry.formats import ContactTag
-    mf = simple_si_meshfield
-    mf.Nd = np.array([1e16]*4)
-    mf.Na = np.array([1e15]*4)
-    mf.add_contact(ContactTag("anode", np.array([0, 1])))
-    mf.add_contact(ContactTag("cathode", np.array([2, 3])))
-    return mf
+    """2D Si pn-junction MeshField — Nd/Na/contacts already set by the
+    Structure-based shared fixture."""
+    return simple_si_meshfield
 
 
 def test_solver_construction(simple_mf):
