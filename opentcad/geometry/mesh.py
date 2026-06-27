@@ -45,41 +45,64 @@ def build_2d_mesh(structure, mesh_size_um: float = 0.05) -> pv.UnstructuredGrid:
 
         w_mm = structure.width_um * 1e-3
 
-        rect_tags = []
+        layer_rect_tags = []
         layer_centroid_y_mm = []
         y_offset_mm = 0.0
         for layer in structure._layers:
             h_mm = layer.thickness_um * 1e-3
             tag = gmsh.model.occ.addRectangle(0.0, y_offset_mm, 0.0, w_mm, h_mm)
-            rect_tags.append(tag)
+            layer_rect_tags.append(tag)
             layer_centroid_y_mm.append(y_offset_mm + h_mm / 2)
             y_offset_mm += h_mm
 
-        # Glue touching rectangles so the interface curves are shared
-        # (without this, adjacent rectangles have duplicated edges and the
-        # mesher won't produce coincident nodes across the interface).
-        if len(rect_tags) > 1:
-            obj = [(2, rect_tags[0])]
-            tools = [(2, t) for t in rect_tags[1:]]
+        # Region rectangles get fragmented into the layer stack so cells
+        # inside the region can be assigned the region's material (not just
+        # the layer's). This is how add_region(material=...) takes effect.
+        region_rect_tags = []
+        for reg in structure._regions:
+            rx = reg.x_start * 1e-3
+            ry = reg.y_start * 1e-3
+            rw = (reg.x_end - reg.x_start) * 1e-3
+            rh = (reg.y_end - reg.y_start) * 1e-3
+            region_rect_tags.append(
+                gmsh.model.occ.addRectangle(rx, ry, 0.0, rw, rh))
+
+        # Glue layers and regions so all sub-surfaces share boundaries.
+        all_tags = layer_rect_tags + region_rect_tags
+        if len(all_tags) > 1:
+            obj = [(2, all_tags[0])]
+            tools = [(2, t) for t in all_tags[1:]]
             gmsh.model.occ.fragment(obj, tools)
 
         gmsh.model.occ.synchronize()
 
-        # Map each post-fragment surface back to its layer by centroid y.
+        # Map each post-fragment surface to a Material: region containment
+        # wins (last-region-wins to match Structure._resolve_contacts), else
+        # fall back to layer assignment by centroid y.
         surf_to_layer = {}
+        surf_to_material = {}
         for dim, stag in gmsh.model.getEntities(dim=2):
-            _, ymin, _, _, ymax, _ = gmsh.model.getBoundingBox(dim, stag)
+            xmin, ymin, _, xmax, ymax, _ = gmsh.model.getBoundingBox(dim, stag)
+            cx = 0.5 * (xmin + xmax)
             cy = 0.5 * (ymin + ymax)
             idx = min(range(len(layer_centroid_y_mm)),
                       key=lambda i: abs(layer_centroid_y_mm[i] - cy))
-            surf_to_layer[stag] = structure._layers[idx]
+            layer = structure._layers[idx]
+            surf_to_layer[stag] = layer
+            material = layer.material
+            for reg in structure._regions:
+                rx0 = reg.x_start * 1e-3; rx1 = reg.x_end * 1e-3
+                ry0 = reg.y_start * 1e-3; ry1 = reg.y_end * 1e-3
+                if rx0 <= cx <= rx1 and ry0 <= cy <= ry1:
+                    material = reg.material
+            surf_to_material[stag] = material
 
         # Physical groups: one per surface, named after the Material enum.
         # Surfaces of the same material can share a group, but per-surface
         # is simpler and lets the device layer distinguish layers later.
-        for stag, layer in surf_to_layer.items():
+        for stag, material in surf_to_material.items():
             pg = gmsh.model.addPhysicalGroup(2, [stag])
-            gmsh.model.setPhysicalName(2, pg, layer.material.name)
+            gmsh.model.setPhysicalName(2, pg, material.name)
 
         # Identify horizontal interface curves (at y between adjacent layers).
         interface_y_mm = []
@@ -128,19 +151,19 @@ def build_2d_mesh(structure, mesh_size_um: float = 0.05) -> pv.UnstructuredGrid:
         gmsh.model.mesh.generate(2)
         gmsh.model.mesh.optimize("Laplace2D")
 
-        grid = _gmsh_to_pyvista(surf_to_layer)
+        grid = _gmsh_to_pyvista(surf_to_material)
     finally:
         gmsh.finalize()
 
     return grid
 
 
-def _gmsh_to_pyvista(surf_to_layer: dict) -> pv.UnstructuredGrid:
+def _gmsh_to_pyvista(surf_to_material: dict) -> pv.UnstructuredGrid:
     """Extract the current gmsh mesh into a pyvista UnstructuredGrid.
 
     Coordinates are converted from mm to um. Material IDs come from the
-    layer associated with each surface entity, so every triangle gets the
-    correct Material enum value with no centroid-lookup ambiguity.
+    surface-to-material map (resolved by region containment, falling back
+    to layer), so every triangle gets the correct Material enum value.
     """
     import gmsh
 
@@ -151,9 +174,9 @@ def _gmsh_to_pyvista(surf_to_layer: dict) -> pv.UnstructuredGrid:
     all_cells: list[int] = []
     all_mat_ids: list[int] = []
 
-    for stag, layer in surf_to_layer.items():
+    for stag, material in surf_to_material.items():
         elem_types, elem_tags, elem_conn = gmsh.model.mesh.getElements(dim=2, tag=stag)
-        mat_id = int(layer.material)
+        mat_id = int(material)
         for et, etags, econn in zip(elem_types, elem_tags, elem_conn):
             if et != 2:   # type 2 = 3-node triangle
                 continue

@@ -30,22 +30,24 @@ prototyping. See [PHASES.md](PHASES.md) for the full roadmap.
 
 | Phase | Scope                                    | Status         |
 | ----- | ---------------------------------------- | -------------- |
-| 0     | Geometry DSL + DEVSIM device simulation  | **In progress**|
+| 0     | Geometry DSL + DEVSIM device simulation  | **Complete**   |
 | 1     | ViennaPS topography (etch / dep / oxide) | Planned        |
 | 2     | Implant + diffusion (FiPy)               | Planned        |
 | 3     | Materials calibration vs. SKY130 / IHP   | Planned        |
 
 What works today:
 - 2D geometry builder (`Structure` DSL) → Gmsh triangular mesh
-- Multi-region structures with material interfaces (e.g. Si/SiO₂)
+- Multi-region structures with material *and* doping overrides
+  (e.g. Si/SiO₂ stacks, n+ source/drain in a p-body)
 - Drift-diffusion + Poisson via DEVSIM with Scharfetter–Gummel flux
 - SRH recombination, constant mobility, ohmic and metal-on-insulator contacts
-- IV sweeps, MOS-capacitor regime analysis
+- IV sweeps, MOS-capacitor regime analysis, NMOS Id–Vgs
 - YAML-based material parameter database (with `pydantic` validation)
 
-Phase 0 exit criterion: p-n junction IV within 5% of Shockley
-(✓ achieved) and 2D MOSFET threshold behavior correct (✓ MOS capacitor;
-full MOSFET in progress).
+Phase 0 exit criteria met:
+- ✓ 1-D p-n junction IV within 5% of Shockley
+- ✓ 2-D MOS capacitor — three regimes, φ_s ≈ 2·φ_F at strong inversion
+- ✓ 2-D NMOS Id–Vgs — clean turn-on, on/off > 10¹⁰ at Vds = 50 mV
 
 ---
 
@@ -184,6 +186,44 @@ You can then sweep the gate bias and observe the three classical regimes
 (accumulation, depletion, strong inversion). A worked test that asserts
 the surface potential saturates near 2·φ_F at strong inversion is in
 [`tests/device/test_mos_capacitor.py`](tests/device/test_mos_capacitor.py).
+
+---
+
+## Tutorial 3 — A full 2-D NMOS Id–Vgs
+
+`add_region` overrides material (and doping) inside a rectangle, so n+
+source/drain wells can be poked through the gate-oxide layer to give the
+S/D contacts something ohmic to attach to. The result is a real
+four-terminal MOSFET:
+
+```python
+from opentcad.device.solver import DeviceSolver
+from opentcad.geometry.formats import Material
+from opentcad.geometry.structure import Structure
+from opentcad.materials.database import load_material
+
+W, L, T_OX = 2.0, 1.0, 0.005
+nmos = (Structure(width_um=W, name="nmos")
+    .add_substrate("p_body", 0.5,   Material.SI,   doping_Na=1e17)
+    .add_layer    ("oxide",  T_OX,  Material.SIO2)
+    .add_region   ("source", 0.0, 0.5, 0.4, 0.5 + T_OX, Material.SI, doping_Nd=1e20)
+    .add_region   ("drain",  W-0.5, W, 0.4, 0.5 + T_OX, Material.SI, doping_Nd=1e20)
+    .add_contact  ("source", 0.0, 0.5,             "oxide", surface="top")
+    .add_contact  ("drain",  W-0.5, W,             "oxide", surface="top")
+    .add_contact  ("gate",   0.5, 0.5+L,           "oxide", surface="top")
+    .add_contact  ("body",   0.0, W,               "p_body", surface="bottom"))
+
+mf     = nmos.to_meshfield(mesh_size_um=0.03)
+solver = DeviceSolver(mf, {"Silicon": load_material("Si"),
+                           "SiO2"   : load_material("SiO2")})
+solver.solve_equilibrium()
+# Set Vds = 50 mV, then sweep Vgs — see tests/device/test_nmos_idvg.py
+```
+
+Sweeping Vgs from 0 V to 1.5 V at Vds = 50 mV gives a textbook Id–Vgs
+curve with on/off ratio ≈ 10¹⁰, monotonic turn-on, and the threshold
+visible as a knee in the curve near ~0.7 V (matching the MOS-cap
+analytic Vth ≈ 0.85 V for Nₐ = 10¹⁷).
 
 ---
 
