@@ -40,7 +40,9 @@ What works today:
 - Multi-region structures with material *and* doping overrides
   (e.g. Si/SiO₂ stacks, n+ source/drain in a p-body)
 - Drift-diffusion + Poisson via DEVSIM with Scharfetter–Gummel flux
-- SRH recombination, constant mobility, ohmic and metal-on-insulator contacts
+- SRH recombination, ohmic and metal-on-insulator contacts
+- **Pluggable physics layer** (`PhysicsConfig`): swap mobility models
+  (`ConstantMobility`, `Klaassen` unified bulk) without touching the solver
 - IV sweeps, MOS-capacitor regime analysis, NMOS Id–Vgs
 - YAML-based material parameter database (with `pydantic` validation)
 
@@ -274,6 +276,35 @@ si  = load_material("Si")
 ox  = load_material("SiO2")
 print(si.mobility_constant.electron_cm2_Vs)   # 1350.0
 ```
+
+### Physics models
+
+`DeviceSolver` takes an optional `PhysicsConfig` that bundles the
+mobility, recombination, etc. models to use. The default
+`ConstantMobility` reproduces the original behavior; `Klaassen` adds
+doping-and-carrier-dependent bulk mobility (Klaassen 1992).
+
+```python
+from opentcad.device.physics import PhysicsConfig
+from opentcad.device.models import Klaassen
+
+solver = DeviceSolver(mf, mat_params,
+                      physics=PhysicsConfig(mobility=Klaassen()))
+```
+
+Klaassen's µ_n on uniformly-doped Si at 300 K:
+
+| Nd (cm⁻³) | µ_n (cm²/V/s) |
+|----------:|--------------:|
+| 10¹⁵      | 1359          |
+| 10¹⁶      | 1177          |
+| 10¹⁷      | 727           |
+| 10¹⁸      | 284           |
+| 10¹⁹      | 108           |
+
+Adding new physics is one new file under
+[`opentcad/device/models/`](opentcad/device/models/) that subclasses
+the relevant base in `opentcad/device/physics.py`.
 
 ---
 

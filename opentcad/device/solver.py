@@ -18,6 +18,7 @@ import numpy as np
 from scipy.spatial import cKDTree
 from ..geometry.formats import MATERIAL_NAMES, Material, MeshField
 from ..materials.database import MaterialParams
+from .physics import PhysicsConfig
 
 Q_C = 1.602176634e-19   # elementary charge [C]
 KB_J = 1.380649e-23     # Boltzmann [J/K]
@@ -44,10 +45,12 @@ class DeviceSolver:
 
     def __init__(self, meshfield: MeshField,
                  material_params: dict[str, MaterialParams],
-                 temperature_K: float = T_K_DEFAULT):
+                 temperature_K: float = T_K_DEFAULT,
+                 physics: PhysicsConfig | None = None):
         self.mf = meshfield
         self.mat_params = material_params
         self.T = float(temperature_K)
+        self.physics = physics if physics is not None else PhysicsConfig()
         base = meshfield.metadata.get("structure_name", "device")
         # DEVSIM keeps global mesh/device state — disambiguate per instance.
         DeviceSolver._instance_counter += 1
@@ -110,6 +113,12 @@ class DeviceSolver:
                                name="Electrons", init_from="IntrinsicElectrons")
             ds.set_node_values(device=self._device_name, region=region,
                                name="Holes", init_from="IntrinsicHoles")
+        # Attach mobility AFTER carriers are seeded — Klaassen needs sane
+        # Electrons/Holes values when its node models are first evaluated.
+        self._attach_mobility_models()
+        for region in self._region_materials:
+            if self._region_is_insulator.get(region, False):
+                continue
             ds.equation(device=self._device_name, region=region,
                         name="PotentialEquation", variable_name="Potential",
                         node_model="PotentialNodeCharge",
@@ -312,6 +321,18 @@ class DeviceSolver:
         for if_name, r0, r1 in self._interfaces:
             self._build_interface_continuity(if_name, "Potential")
 
+    def _attach_mobility_models(self) -> None:
+        """Register the configured mobility model on every semiconductor
+        region. Called after the equilibrium Poisson-only solve so the
+        Klaassen-style models (which reference Electrons/Holes seeded from
+        the equilibrium) see sane values."""
+        for region, mat in self._region_materials.items():
+            if self._region_is_insulator.get(region, False):
+                continue
+            params = self._params_for_region(mat)
+            self.physics.mobility.attach(
+                self._ds, self._device_name, region, params, self.T)
+
     def _params_for_region(self, mat: Material) -> MaterialParams:
         display = MATERIAL_NAMES.get(mat, mat.name)
         for key in (display, mat.name):
@@ -329,8 +350,6 @@ class DeviceSolver:
             "ElectronCharge": Q_C,
             "n_i": p.band_structure.ni_cm3_300K,
             "V_t": V_t,
-            "mu_n": p.mobility_constant.electron_cm2_Vs,
-            "mu_p": p.mobility_constant.hole_cm2_Vs,
             "taun": p.recombination.tau_n_s,
             "taup": p.recombination.tau_p_s,
             "n1": p.band_structure.ni_cm3_300K,
@@ -477,9 +496,19 @@ class DeviceSolver:
         ):
             ds.edge_model(device=device, region=region, name=name, equation=eq)
 
-        Jn = ("ElectronCharge*mu_n*EdgeInverseLength*V_t*"
+        # Mobility expressions come from self.physics.mobility — inlined
+        # into the current density (rather than wrapped in an edge_model)
+        # so the constant case reduces to the original solver expression
+        # exactly. Carrier-dependent models (Klaassen) need cross
+        # derivatives (J_n vs Holes, J_p vs Electrons); the constant case
+        # doesn't, and adding 0-valued cross terms perturbs the Jacobian.
+        mu_n_e = self.physics.mobility.mu_n_expr()
+        mu_p_e = self.physics.mobility.mu_p_expr()
+        coupled = self.physics.mobility.requires_carriers
+
+        Jn = (f"ElectronCharge*{mu_n_e}*EdgeInverseLength*V_t*"
               "(Electrons@n1*Bern10 - Electrons@n0*Bern01)")
-        for name, eq in (
+        jn_models = [
             ("ElectronCurrent", Jn),
             ("ElectronCurrent:Electrons@n0",
              f"simplify(diff({Jn}, Electrons@n0))"),
@@ -489,18 +518,34 @@ class DeviceSolver:
              f"simplify(diff({Jn}, Potential@n0))"),
             ("ElectronCurrent:Potential@n1",
              f"simplify(diff({Jn}, Potential@n1))"),
-        ):
+        ]
+        if coupled:
+            jn_models += [
+                ("ElectronCurrent:Holes@n0",
+                 f"simplify(diff({Jn}, Holes@n0))"),
+                ("ElectronCurrent:Holes@n1",
+                 f"simplify(diff({Jn}, Holes@n1))"),
+            ]
+        for name, eq in jn_models:
             ds.edge_model(device=device, region=region, name=name, equation=eq)
 
-        Jp = ("-ElectronCharge*mu_p*EdgeInverseLength*V_t*"
+        Jp = (f"-ElectronCharge*{mu_p_e}*EdgeInverseLength*V_t*"
               "(Holes@n1*Bern01 - Holes@n0*Bern10)")
-        for name, eq in (
+        jp_models = [
             ("HoleCurrent", Jp),
             ("HoleCurrent:Holes@n0", f"simplify(diff({Jp}, Holes@n0))"),
             ("HoleCurrent:Holes@n1", f"simplify(diff({Jp}, Holes@n1))"),
             ("HoleCurrent:Potential@n0", f"simplify(diff({Jp}, Potential@n0))"),
             ("HoleCurrent:Potential@n1", f"simplify(diff({Jp}, Potential@n1))"),
-        ):
+        ]
+        if coupled:
+            jp_models += [
+                ("HoleCurrent:Electrons@n0",
+                 f"simplify(diff({Jp}, Electrons@n0))"),
+                ("HoleCurrent:Electrons@n1",
+                 f"simplify(diff({Jp}, Electrons@n1))"),
+            ]
+        for name, eq in jp_models:
             ds.edge_model(device=device, region=region, name=name, equation=eq)
 
         # Time-node models (zero for DC, but equation() requires them)

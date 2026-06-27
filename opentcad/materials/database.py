@@ -25,6 +25,41 @@ class MobilityConstant(BaseModel):
     uncertainty_percent: float = 5.0
 
 
+class MobilityKlaassen(BaseModel):
+    """Klaassen unified low-field bulk mobility coefficients.
+
+    Reference: Klaassen, Solid-State Electron. 35, 953 (1992).
+    Default values are the published Si fit. If the YAML omits this
+    block, these defaults are used."""
+    mu_min_e: float = 52.2
+    mu_max_e: float = 1417.0
+    theta1_e: float = 2.285
+    m_e: float = 1.0
+    Nref_1_e: float = 9.68e16
+    alpha_1_e: float = 0.68
+
+    mu_min_h: float = 44.9
+    mu_max_h: float = 470.5
+    theta1_h: float = 2.247
+    m_h: float = 1.258
+    Nref_1_h: float = 2.2e17
+    alpha_1_h: float = 0.719
+
+    f_BH: float = 3.828
+    f_CW: float = 2.459
+    c_D: float = 0.21
+    c_A: float = 0.50
+    Nref_D: float = 4.0e20
+    Nref_A: float = 7.2e20
+
+    r1: float = 0.7643; r2: float = 2.2999; r3: float = 6.5502
+    r4: float = 2.3670; r5: float = -0.01552; r6: float = 0.6478
+
+    s1: float = 0.892333; s2: float = 0.41372; s3: float = 0.19778
+    s4: float = 0.28227;  s5: float = 0.005978; s6: float = 1.80618
+    s7: float = 0.72169
+
+
 class Recombination(BaseModel):
     tau_n_s: float = 1e-5       # [s] electron SRH lifetime
     tau_p_s: float = 1e-5       # [s] hole SRH lifetime
@@ -57,6 +92,7 @@ class MaterialParams(BaseModel):
     is_insulator: bool = False   # True for SiO2/Si3N4 (Poisson only, no carriers)
     band_structure: BandStructure = BandStructure()
     mobility_constant: MobilityConstant = MobilityConstant()
+    mobility_klaassen: MobilityKlaassen = MobilityKlaassen()
     recombination: Recombination = Recombination()
     velocity_saturation: VelocitySaturation = VelocitySaturation()
     raw: dict = {}   # full YAML dict for advanced access
@@ -114,6 +150,10 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
         hole_cm2_Vs=mob_raw.get("hole_cm2_Vs", 480.0),
     )
 
+    # Klaassen block is optional; if missing the pydantic defaults apply.
+    klaassen_raw = raw.get("mobility_klaassen", {})
+    klaassen = MobilityKlaassen(**klaassen_raw)
+
     rec_raw = raw.get("recombination", {})
     rec = Recombination(
         tau_n_s=rec_raw.get("tau_n_s", 1e-5),
@@ -137,6 +177,7 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
         is_insulator=bool(raw.get("is_insulator", False)),
         band_structure=band,
         mobility_constant=mob,
+        mobility_klaassen=klaassen,
         recombination=rec,
         velocity_saturation=vs,
         raw=raw,

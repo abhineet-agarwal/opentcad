@@ -21,16 +21,45 @@ mobility_constant:
   hole_cm2_Vs: 480.0       # [cm^2/Vs]
   uncertainty_percent: 5
 
-# Klaassen bulk mobility model — Ref: Klaassen (1992) Solid-State Electron. 35,953
+# Klaassen unified low-field bulk mobility — Ref: Klaassen (1992) Solid-State Electron. 35,953
+# Parameter naming follows the DEVSIM Klaassen.py reference implementation.
 mobility_klaassen:
-  mu_max_e: 1441.0   # [cm^2/Vs]
-  mu_max_h: 470.5    # [cm^2/Vs]
-  Nref_e_cm3: 1.072e17
-  Nref_h_cm3: 1.606e17
-  alpha_e: 0.6722
-  alpha_h: 0.7164
-  theta_e: 2.285
-  theta_h: 2.247
+  mu_min_e: 52.2     # [cm^2/Vs] minimum electron mobility (lattice limit)
+  mu_max_e: 1417.0   # [cm^2/Vs] maximum electron mobility
+  theta1_e: 2.285    # temperature exponent
+  m_e: 1.0           # effective mass ratio (electrons)
+  Nref_1_e: 9.68e16  # [cm^-3] electron ionized-impurity reference
+  alpha_1_e: 0.68    # electron impurity-scattering exponent
+
+  mu_min_h: 44.9
+  mu_max_h: 470.5
+  theta1_h: 2.247
+  m_h: 1.258
+  Nref_1_h: 2.2e17
+  alpha_1_h: 0.719
+
+  # Cluster-screening + carrier-carrier scattering coefficients
+  f_BH: 3.828
+  f_CW: 2.459
+  c_D: 0.21
+  c_A: 0.50
+  Nref_D: 4.0e20
+  Nref_A: 7.2e20
+
+  r1: 0.7643
+  r2: 2.2999
+  r3: 6.5502
+  r4: 2.3670
+  r5: -0.01552
+  r6: 0.6478
+
+  s1: 0.892333
+  s2: 0.41372
+  s3: 0.19778
+  s4: 0.28227
+  s5: 0.005978
+  s6: 1.80618
+  s7: 0.72169
 
 recombination:
   tau_n_s: 1.0e-5    # [s] SRH electron lifetime. HackerFab may be 100-1000x shorter.
