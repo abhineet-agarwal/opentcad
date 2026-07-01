@@ -280,17 +280,29 @@ print(si.mobility_constant.electron_cm2_Vs)   # 1350.0
 ### Physics models
 
 `DeviceSolver` takes an optional `PhysicsConfig` that bundles the
-mobility, recombination, etc. models to use. The default
-`ConstantMobility` reproduces the original behavior; `Klaassen` adds
-doping-and-carrier-dependent bulk mobility (Klaassen 1992).
+mobility, recombination, etc. models to use. Mobility is a single
+model; recombination is a list of contributors (their rates are
+summed).
 
 ```python
 from opentcad.device.physics import PhysicsConfig
-from opentcad.device.models import Klaassen
+from opentcad.device.models import Klaassen, SRH, Auger, Radiative
 
 solver = DeviceSolver(mf, mat_params,
-                      physics=PhysicsConfig(mobility=Klaassen()))
+                      physics=PhysicsConfig(
+                          mobility=Klaassen(),
+                          recombination=[SRH(), Auger(), Radiative()]))
 ```
+
+Available today:
+
+| Kind | Model | Notes |
+|---|---|---|
+| Mobility | `ConstantMobility` | default; YAML `mobility_constant` values |
+| Mobility | `Klaassen` | unified low-field bulk mobility (1992) with clustering + carrier-carrier scattering |
+| Recombination | `SRH` | default; mid-gap trap |
+| Recombination | `Auger` | Dziewior-Schmid; dominates over SRH for n,p > ~10¹⁸ cm⁻³ |
+| Recombination | `Radiative` | negligible in Si; central for GaAs/GaN |
 
 Klaassen's µ_n on uniformly-doped Si at 300 K:
 

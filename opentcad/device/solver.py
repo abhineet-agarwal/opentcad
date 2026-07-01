@@ -333,6 +333,16 @@ class DeviceSolver:
             self.physics.mobility.attach(
                 self._ds, self._device_name, region, params, self.T)
 
+    def _attach_recombination_models(self, region: str,
+                                     params: MaterialParams) -> str:
+        """Attach every configured recombination model on `region` and
+        return the symbolic sum of their term_names (so the continuity
+        equation can use it as its node_model). Empty list ⇒ '0'."""
+        for model in self.physics.recombination:
+            model.attach(self._ds, self._device_name, region, params, self.T)
+        names = [m.term_name for m in self.physics.recombination]
+        return " + ".join(names) if names else "0"
+
     def _params_for_region(self, mat: Material) -> MaterialParams:
         display = MATERIAL_NAMES.get(mat, mat.name)
         for key in (display, mat.name):
@@ -350,10 +360,6 @@ class DeviceSolver:
             "ElectronCharge": Q_C,
             "n_i": p.band_structure.ni_cm3_300K,
             "V_t": V_t,
-            "taun": p.recombination.tau_n_s,
-            "taup": p.recombination.tau_p_s,
-            "n1": p.band_structure.ni_cm3_300K,
-            "p1": p.band_structure.ni_cm3_300K,
         }
         for name, value in pairs.items():
             ds.set_parameter(device=self._device_name, region=region,
@@ -557,13 +563,20 @@ class DeviceSolver:
         ):
             ds.node_model(device=device, region=region, name=name, equation=eq)
 
-        # SRH recombination
-        USRH = ("-ElectronCharge*(Electrons*Holes - n_i^2)/"
-                "(taup*(Electrons + n1) + taun*(Holes + p1))")
+        # Recombination — sum every model registered in
+        # self.physics.recombination. Each model's term_name node_model
+        # holds its contribution (with carrier derivatives). The composite
+        # `URec` node_model is what the continuity equation actually sees.
+        params = self._params_for_region(self._region_materials[region])
+        rec_sum = self._attach_recombination_models(region, params)
         for name, eq in (
-            ("USRH", USRH),
-            ("USRH:Electrons", f"simplify(diff({USRH}, Electrons))"),
-            ("USRH:Holes", f"simplify(diff({USRH}, Holes))"),
+            ("URec", rec_sum),
+            ("URec:Electrons",
+             " + ".join(f"{m.term_name}:Electrons"
+                        for m in self.physics.recombination) or "0"),
+            ("URec:Holes",
+             " + ".join(f"{m.term_name}:Holes"
+                        for m in self.physics.recombination) or "0"),
         ):
             ds.node_model(device=device, region=region, name=name, equation=eq)
 
@@ -571,12 +584,12 @@ class DeviceSolver:
                     name="ElectronContinuityEquation",
                     variable_name="Electrons", edge_model="ElectronCurrent",
                     variable_update="positive",
-                    time_node_model="NCharge", node_model="USRH")
+                    time_node_model="NCharge", node_model="URec")
         ds.equation(device=device, region=region,
                     name="HoleContinuityEquation",
                     variable_name="Holes", edge_model="HoleCurrent",
                     variable_update="positive",
-                    time_node_model="PCharge", node_model="USRH")
+                    time_node_model="PCharge", node_model="URec")
 
     # ------------------------------------------------------------------
     # Contact BCs

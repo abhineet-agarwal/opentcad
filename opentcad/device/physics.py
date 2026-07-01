@@ -24,6 +24,7 @@ Usage:
 from __future__ import annotations
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
+from typing import List
 
 
 class MobilityModel(ABC):
@@ -56,15 +57,38 @@ class MobilityModel(ABC):
         """DEVSIM expression for hole mobility on the edge."""
 
 
+class RecombinationModel(ABC):
+    """Base class for net recombination contributors.
+
+    Each model registers (1) a node model named after `term_name` with
+    units of recombination rate * (-q) [A/cm^3] so it can be summed into
+    the continuity node_model, and (2) its derivatives w.r.t. Electrons
+    and Holes. The solver sums every model's term_name into the total
+    recombination expression passed to the continuity equation.
+    """
+
+    @property
+    @abstractmethod
+    def term_name(self) -> str:
+        """Unique node-model name this contributor will register."""
+
+    @abstractmethod
+    def attach(self, ds, device: str, region: str, params, T_K: float) -> None:
+        ...
+
+
 @dataclass
 class PhysicsConfig:
     """Container of physics models used by DeviceSolver. New model classes
-    (recombination, BGN, avalanche, ...) will be added as additional
-    fields here; today only mobility is pluggable."""
+    (BGN, avalanche, ...) will be added as additional fields here."""
     mobility: MobilityModel = field(default=None)   # type: ignore[assignment]
+    recombination: List[RecombinationModel] = field(default_factory=list)
 
     def __post_init__(self):
         if self.mobility is None:
             # Late import to avoid circular dep with models package.
             from .models.mobility import ConstantMobility
             self.mobility = ConstantMobility()
+        if not self.recombination:
+            from .models.recombination import SRH
+            self.recombination = [SRH()]
