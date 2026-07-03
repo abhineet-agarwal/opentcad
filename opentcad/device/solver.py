@@ -315,6 +315,12 @@ class DeviceSolver:
             if self._region_is_insulator.get(region, False):
                 self._build_insulator_potential(region)
             else:
+                # BGN must be attached before _build_potential_only so
+                # IntrinsicElectrons and PotentialIntrinsicNodeCharge can
+                # refer to n_i_eff. NoBGN is a no-op — the plain `n_i`
+                # parameter (set in _set_region_parameters) is used.
+                self.physics.bgn.attach(
+                    self._ds, self._device_name, region, params, self.T)
                 self._build_potential_only(region)
         for contact in self._contact_regions:
             self._build_contact_potential_equation(contact)
@@ -338,8 +344,10 @@ class DeviceSolver:
         """Attach every configured recombination model on `region` and
         return the symbolic sum of their term_names (so the continuity
         equation can use it as its node_model). Empty list ⇒ '0'."""
+        n_i_expr = self.physics.bgn.n_i_expr()
         for model in self.physics.recombination:
-            model.attach(self._ds, self._device_name, region, params, self.T)
+            model.attach(self._ds, self._device_name, region, params, self.T,
+                         n_i_expr=n_i_expr)
         names = [m.term_name for m in self.physics.recombination]
         return " + ".join(names) if names else "0"
 
@@ -392,13 +400,16 @@ class DeviceSolver:
 
         # Intrinsic carrier node models (used as initial guess + Poisson source).
         # Use DEVSIM's symbolic diff() to avoid hand-derivative bugs.
+        # `ni` is either "n_i" (parameter, no BGN) or "n_i_eff" (node
+        # model registered by the BGN model, doping-dependent).
+        ni = self.physics.bgn.n_i_expr()
         for name, eq in (
-            ("IntrinsicElectrons", "n_i*exp(Potential/V_t)"),
+            ("IntrinsicElectrons", f"{ni}*exp(Potential/V_t)"),
             ("IntrinsicElectrons:Potential",
-             "diff(n_i*exp(Potential/V_t), Potential)"),
-            ("IntrinsicHoles", "n_i^2/IntrinsicElectrons"),
+             f"diff({ni}*exp(Potential/V_t), Potential)"),
+            ("IntrinsicHoles", f"({ni})^2/IntrinsicElectrons"),
             ("IntrinsicHoles:Potential",
-             "diff(n_i^2/IntrinsicElectrons, Potential)"),
+             f"diff(({ni})^2/IntrinsicElectrons, Potential)"),
             ("IntrinsicCharge",
              "IntrinsicHoles - IntrinsicElectrons + NetDoping"),
             ("IntrinsicCharge:Potential",
@@ -618,19 +629,21 @@ class DeviceSolver:
 
         cemod = f"celec_{contact}"
         chmod = f"chole_{contact}"
-        # Equilibrium carrier densities at the contact (ohmic assumption)
+        # Equilibrium carrier densities at the contact (ohmic assumption).
+        # `ni` is n_i (parameter) or n_i_eff (BGN node model on the region).
+        ni = self.physics.bgn.n_i_expr()
         ds.contact_node_model(
             device=device, contact=contact, name=cemod,
-            equation="1e-10 + 0.5*(NetDoping + (NetDoping^2 + 4*n_i^2)^(0.5))")
+            equation=f"1e-10 + 0.5*(NetDoping + (NetDoping^2 + 4*({ni})^2)^(0.5))")
         ds.contact_node_model(
             device=device, contact=contact, name=chmod,
-            equation="1e-10 + 0.5*(-NetDoping + (NetDoping^2 + 4*n_i^2)^(0.5))")
+            equation=f"1e-10 + 0.5*(-NetDoping + (NetDoping^2 + 4*({ni})^2)^(0.5))")
 
         ds.contact_node_model(
             device=device, contact=contact, name=pot_name,
             equation=(f"ifelse(NetDoping > 0,"
-                      f" Potential-{biasname}-V_t*log({cemod}/n_i),"
-                      f" Potential-{biasname}+V_t*log({chmod}/n_i))"))
+                      f" Potential-{biasname}-V_t*log({cemod}/({ni})),"
+                      f" Potential-{biasname}+V_t*log({chmod}/({ni})))"))
         ds.contact_node_model(device=device, contact=contact,
                               name=f"{pot_name}:Potential", equation="1")
 
@@ -643,6 +656,7 @@ class DeviceSolver:
         device = self._device_name
         cemod = f"celec_{contact}"
         chmod = f"chole_{contact}"
+        ni = self.physics.bgn.n_i_expr()
 
         e_name = f"{contact}nodeelectrons"
         h_name = f"{contact}nodeholes"
@@ -650,14 +664,14 @@ class DeviceSolver:
             device=device, contact=contact, name=e_name,
             equation=(f"ifelse(NetDoping > 0,"
                       f" Electrons - {cemod},"
-                      f" Electrons - n_i^2/{chmod})"))
+                      f" Electrons - ({ni})^2/{chmod})"))
         ds.contact_node_model(device=device, contact=contact,
                               name=f"{e_name}:Electrons", equation="1.0")
         ds.contact_node_model(
             device=device, contact=contact, name=h_name,
             equation=(f"ifelse(NetDoping < 0,"
                       f" Holes - {chmod},"
-                      f" Holes - n_i^2/{cemod})"))
+                      f" Holes - ({ni})^2/{cemod})"))
         ds.contact_node_model(device=device, contact=contact,
                               name=f"{h_name}:Holes", equation="1.0")
 

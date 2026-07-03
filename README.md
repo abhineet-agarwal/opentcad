@@ -300,9 +300,20 @@ Available today:
 |---|---|---|
 | Mobility | `ConstantMobility` | default; YAML `mobility_constant` values |
 | Mobility | `Klaassen` | unified low-field bulk mobility (1992) with clustering + carrier-carrier scattering |
+| Mobility | `Canali` | high-field velocity saturation; wraps any base model (composes with `Klaassen`) |
 | Recombination | `SRH` | default; mid-gap trap |
 | Recombination | `Auger` | Dziewior-Schmid; dominates over SRH for n,p > ~10¹⁸ cm⁻³ |
 | Recombination | `Radiative` | negligible in Si; central for GaAs/GaN |
+| BGN | `NoBGN` | default; disables bandgap narrowing |
+| BGN | `Slotboom` | doping-dependent Eg narrowing; raises n_i_eff in n+/p+ regions |
+
+The full CMOS mobility stack is one line:
+
+```python
+physics = PhysicsConfig(mobility=Canali(base=Klaassen()),
+                        recombination=[SRH(), Auger()],
+                        bgn=Slotboom())
+```
 
 Klaassen's µ_n on uniformly-doped Si at 300 K:
 

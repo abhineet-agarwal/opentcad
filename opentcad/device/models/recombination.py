@@ -33,11 +33,12 @@ class SRH(RecombinationModel):
     U_SRH = (n*p - n_i^2) / (tau_p*(n + n1) + tau_n*(p + p1))
 
     Parameters tau_n_s, tau_p_s come from MaterialParams.recombination.
-    n1 = p1 = n_i for a mid-gap trap (Et = 0 in the YAML default)."""
+    n1 = p1 = n_i for a mid-gap trap (Et = 0 in the YAML default).
+    `n_i_expr` is substituted for the bare n_i wherever BGN is active."""
 
     term_name = "USRH"
 
-    def attach(self, ds, device, region, params, T_K):
+    def attach(self, ds, device, region, params, T_K, n_i_expr="n_i"):
         ds.set_parameter(device=device, region=region, name="taun",
                          value=float(params.recombination.tau_n_s))
         ds.set_parameter(device=device, region=region, name="taup",
@@ -46,8 +47,8 @@ class SRH(RecombinationModel):
                          value=float(params.band_structure.ni_cm3_300K))
         ds.set_parameter(device=device, region=region, name="p1",
                          value=float(params.band_structure.ni_cm3_300K))
-        eq = ("-ElectronCharge*(Electrons*Holes - n_i^2)/"
-              "(taup*(Electrons + n1) + taun*(Holes + p1))")
+        eq = (f"-ElectronCharge*(Electrons*Holes - ({n_i_expr})^2)/"
+              f"(taup*(Electrons + n1) + taun*(Holes + p1))")
         _node_with_carrier_derivs(ds, device, region, self.term_name, eq)
 
 
@@ -65,13 +66,13 @@ class Auger(RecombinationModel):
 
     term_name = "UAuger"
 
-    def attach(self, ds, device, region, params, T_K):
+    def attach(self, ds, device, region, params, T_K, n_i_expr="n_i"):
         ds.set_parameter(device=device, region=region, name="Cn_Auger",
                          value=float(params.recombination.Cn_cm6_per_s))
         ds.set_parameter(device=device, region=region, name="Cp_Auger",
                          value=float(params.recombination.Cp_cm6_per_s))
-        eq = ("-ElectronCharge*(Cn_Auger*Electrons + Cp_Auger*Holes)*"
-              "(Electrons*Holes - n_i^2)")
+        eq = (f"-ElectronCharge*(Cn_Auger*Electrons + Cp_Auger*Holes)*"
+              f"(Electrons*Holes - ({n_i_expr})^2)")
         _node_with_carrier_derivs(ds, device, region, self.term_name, eq)
 
 
@@ -86,8 +87,9 @@ class Radiative(RecombinationModel):
 
     term_name = "URad"
 
-    def attach(self, ds, device, region, params, T_K):
+    def attach(self, ds, device, region, params, T_K, n_i_expr="n_i"):
         ds.set_parameter(device=device, region=region, name="B_rad",
                          value=float(params.recombination.B_rad_cm3_per_s))
-        eq = "-ElectronCharge*B_rad*(Electrons*Holes - n_i^2)"
+        eq = (f"-ElectronCharge*B_rad*"
+              f"(Electrons*Holes - ({n_i_expr})^2)")
         _node_with_carrier_derivs(ds, device, region, self.term_name, eq)

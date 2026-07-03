@@ -65,6 +65,11 @@ class RecombinationModel(ABC):
     the continuity node_model, and (2) its derivatives w.r.t. Electrons
     and Holes. The solver sums every model's term_name into the total
     recombination expression passed to the continuity equation.
+
+    `n_i_expr` is the DEVSIM expression for the effective intrinsic
+    density — "n_i" (a parameter) when no BGN model is active, or the
+    node model registered by the BGN model when BGN is on. Recombination
+    formulas contain n_i^2 which must use the effective value.
     """
 
     @property
@@ -73,16 +78,37 @@ class RecombinationModel(ABC):
         """Unique node-model name this contributor will register."""
 
     @abstractmethod
+    def attach(self, ds, device: str, region: str, params, T_K: float,
+               n_i_expr: str = "n_i") -> None:
+        ...
+
+
+class BandgapNarrowingModel(ABC):
+    """Base class for effective-intrinsic-density models.
+
+    A BGN model registers a node model `n_i_eff` that captures the
+    doping-induced bandgap narrowing, and `n_i_expr()` returns the
+    name the solver substitutes for `n_i` in Poisson, contact BCs,
+    and recombination terms. The default (`NoBGN`) is a no-op and
+    returns the plain parameter name "n_i".
+    """
+
+    @abstractmethod
     def attach(self, ds, device: str, region: str, params, T_K: float) -> None:
         ...
+
+    @abstractmethod
+    def n_i_expr(self) -> str:
+        """DEVSIM node/parameter name to use in place of the bare n_i."""
 
 
 @dataclass
 class PhysicsConfig:
     """Container of physics models used by DeviceSolver. New model classes
-    (BGN, avalanche, ...) will be added as additional fields here."""
+    (avalanche, ...) will be added as additional fields here."""
     mobility: MobilityModel = field(default=None)   # type: ignore[assignment]
     recombination: List[RecombinationModel] = field(default_factory=list)
+    bgn: BandgapNarrowingModel = field(default=None)   # type: ignore[assignment]
 
     def __post_init__(self):
         if self.mobility is None:
@@ -92,3 +118,6 @@ class PhysicsConfig:
         if not self.recombination:
             from .models.recombination import SRH
             self.recombination = [SRH()]
+        if self.bgn is None:
+            from .models.bgn import NoBGN
+            self.bgn = NoBGN()

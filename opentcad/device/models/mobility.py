@@ -1,15 +1,20 @@
 """
-opentcad/device/models/mobility.py — Bulk low-field mobility models.
+opentcad/device/models/mobility.py — Bulk + high-field mobility models.
 
-Each model implements `attach(ds, device, region, params, T_K)` and is
-responsible for registering two edge models on the region:
-    ElectronMobilityEdge, HoleMobilityEdge
+Each model implements `attach(ds, device, region, params, T_K)` and
+exposes `mu_n_expr()` / `mu_p_expr()` returning the DEVSIM expression
+the solver should inline into the Scharfetter-Gummel current density.
 
-Carrier-dependent models (e.g. Klaassen) must also register the
-derivatives :Electrons@n0/@n1 and :Holes@n0/@n1 on the edge models so
-the Newton solver can pick them up via diff() in the current density.
+Carrier-dependent models (Klaassen) must register :Electrons@n0/@n1 /
+:Holes@n0/@n1 derivatives on any edge model they name so DEVSIM's
+diff() picks them up via the chain rule.
+
+Composition:
+  Canali(base=Klaassen())  # doping + carrier + high-field
+  Canali(base=ConstantMobility())  # simple + high-field
 """
 from __future__ import annotations
+from typing import Optional
 from ..physics import MobilityModel
 
 
@@ -150,3 +155,81 @@ class Klaassen(MobilityModel):
                                       edge_model=kind, node_model=node_name,
                                       derivative=var,
                                       average_type="geometric")
+
+
+class Canali(MobilityModel):
+    """Canali high-field velocity-saturation mobility (1975).
+
+    Wraps an underlying low-field bulk model:
+
+        mu_eff = mu_bulk / (1 + (mu_bulk*|E| / vsat)^beta)^(1/beta)
+
+    where |E| is the field magnitude along the edge. In the low-field
+    limit mu_eff -> mu_bulk; at high field the drift velocity saturates
+    at vsat regardless of mu_bulk. Reference: Canali, Majni, Minder,
+    Ottaviani, IEEE TED 22, 1045 (1975).
+
+    Composes with any MobilityModel:
+        Canali(base=Klaassen())       — full CMOS mobility
+        Canali(base=ConstantMobility()) — simple high-field
+    """
+
+    def __init__(self, base: Optional[MobilityModel] = None):
+        self.base = base if base is not None else ConstantMobility()
+
+    @property
+    def requires_carriers(self) -> bool:
+        return self.base.requires_carriers
+
+    def attach(self, ds, device, region, params, T_K):
+        self.base.attach(ds, device, region, params, T_K)
+        vs = params.velocity_saturation
+        for name, val in (("vsat_e", vs.vsat_e_cm_s),
+                          ("vsat_h", vs.vsat_h_cm_s),
+                          ("beta_e", vs.beta_e),
+                          ("beta_h", vs.beta_h)):
+            ds.set_parameter(device=device, region=region, name=name,
+                             value=float(val))
+
+        # |EField| as sqrt(EField^2 + eps^2) — a smoothed magnitude so
+        # the derivative doesn't have a kink at E=0 (which would break
+        # Newton during the initial ramp when the field is small). eps=1
+        # V/cm is negligible compared to any field of physical interest
+        # (typical relevant fields are 1e3 - 1e6 V/cm).
+        mu_bulk_e = self.base.mu_n_expr()
+        mu_bulk_h = self.base.mu_p_expr()
+        e_mag = "((EField*EField) + 1)^(0.5)"
+
+        mu_e = (f"({mu_bulk_e}) / "
+                f"(1 + ((({mu_bulk_e})*{e_mag}) / vsat_e)^beta_e)^(1/beta_e)")
+        mu_h = (f"({mu_bulk_h}) / "
+                f"(1 + ((({mu_bulk_h})*{e_mag}) / vsat_h)^beta_h)^(1/beta_h)")
+
+        ds.edge_model(device=device, region=region,
+                      name="ElectronMobilityCanali", equation=mu_e)
+        ds.edge_model(device=device, region=region,
+                      name="HoleMobilityCanali", equation=mu_h)
+
+        # Field-derivative always needed (Potential appears via EField).
+        for var in ("Potential@n0", "Potential@n1"):
+            ds.edge_model(device=device, region=region,
+                          name=f"ElectronMobilityCanali:{var}",
+                          equation=f"simplify(diff({mu_e}, {var}))")
+            ds.edge_model(device=device, region=region,
+                          name=f"HoleMobilityCanali:{var}",
+                          equation=f"simplify(diff({mu_h}, {var}))")
+
+        # If the base model depends on carriers (Klaassen), the wrapped
+        # expression does too — expose those derivatives to Newton.
+        if self.requires_carriers:
+            for var in ("Electrons@n0", "Electrons@n1",
+                        "Holes@n0",     "Holes@n1"):
+                ds.edge_model(device=device, region=region,
+                              name=f"ElectronMobilityCanali:{var}",
+                              equation=f"simplify(diff({mu_e}, {var}))")
+                ds.edge_model(device=device, region=region,
+                              name=f"HoleMobilityCanali:{var}",
+                              equation=f"simplify(diff({mu_h}, {var}))")
+
+    def mu_n_expr(self): return "ElectronMobilityCanali"
+    def mu_p_expr(self): return "HoleMobilityCanali"

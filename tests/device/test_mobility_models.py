@@ -12,7 +12,7 @@ We check:
 import numpy as np
 import pytest
 from opentcad.device.physics import PhysicsConfig
-from opentcad.device.models import ConstantMobility, Klaassen
+from opentcad.device.models import ConstantMobility, Klaassen, Canali
 from opentcad.device.solver import DeviceSolver
 from opentcad.geometry.formats import Material
 from opentcad.geometry.structure import Structure
@@ -124,8 +124,82 @@ def _sweep_diode(physics):
     return V, I
 
 
+# ---------------------------------------------------------------------------
+# Canali high-field velocity saturation
+# ---------------------------------------------------------------------------
+
+
+def _resistor_iv(physics, Nd=1e17, v_end=5.0, v_step=0.5):
+    """Build a lightly-doped n-Si resistor and sweep voltage across it.
+    Returns (V, I). At high V, I -> constant if velocity saturates."""
+    import devsim as ds
+    s = (Structure(width_um=1.0, name="resistor")
+         .add_substrate("body", 1.0, Material.SI, doping_Nd=Nd)
+         .add_contact("left",  0.0, 1.0, "body", surface="bottom")
+         .add_contact("right", 0.0, 1.0, "body", surface="top"))
+    mf = s.to_meshfield(mesh_size_um=0.1)
+    solver = DeviceSolver(mf, {"Silicon": load_material("Si")}, physics=physics)
+    V, I = solver.iv_sweep("left", "right", 0.0, v_end, v_step)
+    ds.delete_device(device=solver._device_name)
+    return np.asarray(V), np.asarray(I)
+
+
+def test_canali_composes_over_base_model():
+    """Canali.requires_carriers inherits from its base."""
+    assert Canali(base=ConstantMobility()).requires_carriers is False
+    assert Canali(base=Klaassen()).requires_carriers is True
+    # Default base is ConstantMobility
+    assert Canali().requires_carriers is False
+
+
 @pytest.mark.requires_devsim
-def test_pn_junction_klaassen_vs_constant_currents_match_qualitatively():
+def test_canali_low_field_reduces_to_bulk():
+    """At small bias (weak field) mu_eff -> mu_bulk. So a resistor's
+    slope dI/dV at low V should match the bulk-mobility solver."""
+    V_c, I_c = _resistor_iv(PhysicsConfig(mobility=ConstantMobility()),
+                            v_end=0.05, v_step=0.01)
+    V_ca, I_ca = _resistor_iv(PhysicsConfig(mobility=Canali(ConstantMobility())),
+                              v_end=0.05, v_step=0.01)
+
+    # Linear-region resistance from a two-point fit.
+    R_const = (V_c[-1]  - V_c[0])  / (I_c[-1]  - I_c[0])
+    R_can   = (V_ca[-1] - V_ca[0]) / (I_ca[-1] - I_ca[0])
+    ratio = R_can / R_const
+    print(f"\n  low-field R:  constant={R_const:.3e}, Canali={R_can:.3e}, "
+          f"ratio={ratio:.4f}")
+    assert 0.98 < ratio < 1.02, (
+        f"Canali at very low field should give same R as bulk, got {ratio:.3f}")
+
+
+@pytest.mark.requires_devsim
+def test_canali_saturates_current_at_high_field():
+    """At high field mu*E >> vsat, drift velocity saturates. So the
+    current in a resistor should compress sub-linearly with V. Compare
+    at V=2V, well past vsat/mu = ~0.75 V for the 1um resistor."""
+    V_c,  I_c  = _resistor_iv(PhysicsConfig(mobility=ConstantMobility()),
+                              v_end=2.0, v_step=0.2)
+    V_ca, I_ca = _resistor_iv(PhysicsConfig(mobility=Canali(ConstantMobility())),
+                              v_end=2.0, v_step=0.2)
+
+    print("\n  V     I(const)      I(Canali)     ratio")
+    for v, ic, ica in zip(V_c, I_c, I_ca):
+        r = (ica / ic) if abs(ic) > 1e-30 else float("nan")
+        print(f"  {v:.2f}  {ic:+.3e}   {ica:+.3e}   {r:.3f}")
+
+    # At V=2V across 1um: E ~ 2e4 V/cm. mu*E for e- = 1350*2e4 = 2.7e7
+    # > vsat_e = 1.02e7, so Canali must clearly compress vs. linear.
+    ok = (np.abs(I_c) > 1e-15)
+    compression = np.abs(I_ca[ok] / I_c[ok])
+    assert compression[-1] < 0.6, (
+        f"At V=2V Canali should compress I by >~1.7x, got ratio "
+        f"{compression[-1]:.3f}")
+    # And low-field V=0.2V should still be close to bulk.
+    assert compression[0] > 0.85, (
+        f"At V=0.2V Canali should still track bulk, got ratio "
+        f"{compression[0]:.3f}")
+
+
+def _diode_structure():
     """Same pn junction, two physics configs. Both should give similar
     forward IV (Shockley); Klaassen gives somewhat lower I because
     mu_n / mu_p drop at Na=Nd=1e17 vs. the lightly-doped constants."""
