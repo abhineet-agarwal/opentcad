@@ -51,6 +51,7 @@ class ContactSpec:
     surface: str = "top"   # "top" or "bottom"
     contact_type: str = "ohmic"
     work_function_eV: Optional[float] = None
+    flat_band_shift_V: float = 0.0   # metal-on-insulator Vfb shift
 
 
 class Structure:
@@ -103,10 +104,20 @@ class Structure:
     def add_contact(self, name: str, x_start: float, x_end: float,
                     layer_name: str, surface: str = "top",
                     contact_type: str = "ohmic",
-                    work_function_eV: Optional[float] = None) -> "Structure":
-        """Define a named electrical contact on a layer surface."""
+                    work_function_eV: Optional[float] = None,
+                    flat_band_shift_V: float = 0.0) -> "Structure":
+        """Define a named electrical contact on a layer surface.
+
+        `flat_band_shift_V` applies only to metal-on-insulator contacts
+        (typically the gate on an oxide). It packs fixed oxide charge Qf,
+        midgap Dit-driven Vfb offset, and metal-semi work-function
+        differences into a single compact-model number so a MOS-cap or
+        MOSFET can hit a target Vth without invoking the full interface-
+        Poisson surface-charge machinery."""
         self._contacts.append(ContactSpec(name, x_start, x_end, layer_name,
-                                           surface, contact_type, work_function_eV))
+                                           surface, contact_type,
+                                           work_function_eV,
+                                           flat_band_shift_V))
         return self
 
     @property
@@ -189,7 +200,9 @@ class Structure:
             if len(node_ids) == 0:
                 warnings.warn(f"Contact '{cs.name}': no nodes matched at y={y_c:.4f} um")
                 continue
-            contacts.append(ContactTag(cs.name, node_ids, cs.contact_type, cs.work_function_eV))
+            contacts.append(ContactTag(cs.name, node_ids, cs.contact_type,
+                                       cs.work_function_eV,
+                                       cs.flat_band_shift_V))
         return contacts
 
     def __repr__(self):

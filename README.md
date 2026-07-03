@@ -307,6 +307,9 @@ Available today:
 | Recombination | `Radiative` | negligible in Si; central for GaAs/GaN |
 | BGN | `NoBGN` | default; disables bandgap narrowing |
 | BGN | `Slotboom` | doping-dependent Eg narrowing; raises n_i_eff in n+/p+ regions |
+| Contact BC | `contact_type="ohmic"` | default; charge-neutral semiconductor contact |
+| Contact BC | `contact_type="schottky"` | metal-semi barrier; requires `work_function_eV`; rectifies |
+| Contact BC | `flat_band_shift_V` | metal-on-insulator Vfb offset; packs Qf, midgap Dit, and phi_MS in one number |
 
 The full CMOS mobility stack — bulk doping-dep + high-field saturation +
 surface degradation — composes in a single expression:

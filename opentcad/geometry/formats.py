@@ -29,6 +29,12 @@ class ContactTag:
     boundary_nodes: np.ndarray
     contact_type: str = "ohmic"
     work_function_eV: Optional[float] = None
+    #: Metal-on-insulator flat-band shift [V] — used to encode fixed oxide
+    #: charge Qf, midgap Dit-driven Vfb offset, and metal-semi work-function
+    #: differences on a gate contact in one compact-model number:
+    #:     Vfb_eff = -Qf/Cox - q*Dit*(Emidgap-Ef_ref)/Cox + phi_MS.
+    #: When set, the metal-on-insulator BC is Potential = bias - flat_band_shift_V.
+    flat_band_shift_V: float = 0.0
 
 @dataclass
 class ProcessStep:

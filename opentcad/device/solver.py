@@ -605,6 +605,14 @@ class DeviceSolver:
     # ------------------------------------------------------------------
     # Contact BCs
     # ------------------------------------------------------------------
+    def _contact_tag(self, contact_name: str):
+        """Look up the ContactTag object by name so we can read
+        contact_type and work_function_eV."""
+        for c in self.mf.contacts:
+            if c.name == contact_name:
+                return c
+        return None
+
     def _build_contact_potential_equation(self, contact: str) -> None:
         ds = self._ds
         device = self._device_name
@@ -615,16 +623,30 @@ class DeviceSolver:
 
         pot_name = f"{contact}nodemodel"
         if self._region_is_insulator.get(region, False):
-            # Metal-on-insulator: Potential pinned to bias (no semiconductor
-            # built-in offset, no carrier BCs).
+            # Metal-on-insulator: Potential pinned to bias, minus a
+            # flat-band shift that encodes fixed oxide charge Qf, midgap
+            # Dit-driven Vfb offset, and phi_MS in one compact-model
+            # number. Follow-up: implement proper interface-Poisson
+            # surface-charge for a physically-located Qf.
+            tag = self._contact_tag(contact)
+            vfb = 0.0 if tag is None else float(tag.flat_band_shift_V)
+            vfb_name = f"{contact}_vfb"
+            ds.set_parameter(device=device, region=region,
+                             name=vfb_name, value=vfb)
             ds.contact_node_model(device=device, contact=contact,
                                   name=pot_name,
-                                  equation=f"Potential-{biasname}")
+                                  equation=f"Potential-{biasname}+{vfb_name}")
             ds.contact_node_model(device=device, contact=contact,
                                   name=f"{pot_name}:Potential", equation="1")
             ds.contact_equation(device=device, contact=contact,
                                 name="PotentialEquation",
                                 node_model=pot_name)
+            return
+
+        tag = self._contact_tag(contact)
+        if tag is not None and tag.contact_type == "schottky":
+            self._build_schottky_potential(contact, region, biasname,
+                                           pot_name, tag)
             return
 
         cemod = f"celec_{contact}"
@@ -651,27 +673,99 @@ class DeviceSolver:
                             name="PotentialEquation",
                             node_model=pot_name)
 
+    def _build_schottky_potential(self, contact: str, region: str,
+                                  biasname: str, pot_name: str, tag) -> None:
+        """Schottky metal-semiconductor barrier.
+
+        Barrier for electrons: phi_Bn = phi_M - chi
+        Pinned electron density: n_sc = Nc * exp(-phi_Bn / V_t)
+        Pinned hole density: p_sc = n_i^2 / n_sc  (mass-action, consistent
+            because phi_Bn + phi_Bp = Eg and Nc*Nv*exp(-Eg/V_t) = n_i^2)
+
+        Potential BC: Potential = V_applied - V_t*log(n_sc / n_i) — same
+        form as ohmic n-side but with n_sc replacing the equilibrium
+        electron density from doping.
+        """
+        ds = self._ds
+        device = self._device_name
+
+        if tag.work_function_eV is None:
+            raise ValueError(
+                f"Schottky contact '{contact}' needs work_function_eV set.")
+
+        mat = self._region_materials[region]
+        params = self._params_for_region(mat)
+        chi = params.band_structure.electron_affinity_eV
+        Nc = params.band_structure.Nc_cm3_300K
+        phi_Bn = tag.work_function_eV - chi
+        if phi_Bn <= 0:
+            warnings.warn(
+                f"Schottky contact '{contact}': phi_Bn = {phi_Bn:.3f} eV <= 0. "
+                f"phi_M ({tag.work_function_eV} eV) - chi ({chi} eV) gives "
+                f"no barrier; behaves as ohmic.")
+
+        # Register as contact-scoped parameters so we can inspect them.
+        ds.set_parameter(device=device, region=region,
+                         name=f"{contact}_phiBn", value=float(phi_Bn))
+        ds.set_parameter(device=device, region=region,
+                         name=f"{contact}_Nc", value=float(Nc))
+
+        ni = self.physics.bgn.n_i_expr()
+        n_sc_expr = f"{contact}_Nc * exp(-{contact}_phiBn/V_t)"
+
+        ds.contact_node_model(
+            device=device, contact=contact,
+            name=f"n_schottky_{contact}", equation=n_sc_expr)
+        ds.contact_node_model(
+            device=device, contact=contact,
+            name=f"p_schottky_{contact}",
+            equation=f"({ni})^2 / n_schottky_{contact}")
+
+        ds.contact_node_model(
+            device=device, contact=contact, name=pot_name,
+            equation=(f"Potential-{biasname}"
+                      f" - V_t*log(n_schottky_{contact}/({ni}))"))
+        ds.contact_node_model(device=device, contact=contact,
+                              name=f"{pot_name}:Potential", equation="1")
+
+        ds.contact_equation(device=device, contact=contact,
+                            name="PotentialEquation",
+                            node_model=pot_name)
+
     def _build_contact_dd_equations(self, contact: str) -> None:
         ds = self._ds
         device = self._device_name
-        cemod = f"celec_{contact}"
-        chmod = f"chole_{contact}"
         ni = self.physics.bgn.n_i_expr()
 
+        tag = self._contact_tag(contact)
         e_name = f"{contact}nodeelectrons"
         h_name = f"{contact}nodeholes"
-        ds.contact_node_model(
-            device=device, contact=contact, name=e_name,
-            equation=(f"ifelse(NetDoping > 0,"
-                      f" Electrons - {cemod},"
-                      f" Electrons - ({ni})^2/{chmod})"))
+
+        if tag is not None and tag.contact_type == "schottky":
+            # Carriers pinned to the barrier-set concentrations, independent
+            # of doping (metal is the reservoir).
+            ds.contact_node_model(
+                device=device, contact=contact, name=e_name,
+                equation=f"Electrons - n_schottky_{contact}")
+            ds.contact_node_model(
+                device=device, contact=contact, name=h_name,
+                equation=f"Holes - p_schottky_{contact}")
+        else:
+            cemod = f"celec_{contact}"
+            chmod = f"chole_{contact}"
+            ds.contact_node_model(
+                device=device, contact=contact, name=e_name,
+                equation=(f"ifelse(NetDoping > 0,"
+                          f" Electrons - {cemod},"
+                          f" Electrons - ({ni})^2/{chmod})"))
+            ds.contact_node_model(
+                device=device, contact=contact, name=h_name,
+                equation=(f"ifelse(NetDoping < 0,"
+                          f" Holes - {chmod},"
+                          f" Holes - ({ni})^2/{cemod})"))
+
         ds.contact_node_model(device=device, contact=contact,
                               name=f"{e_name}:Electrons", equation="1.0")
-        ds.contact_node_model(
-            device=device, contact=contact, name=h_name,
-            equation=(f"ifelse(NetDoping < 0,"
-                      f" Holes - {chmod},"
-                      f" Holes - ({ni})^2/{cemod})"))
         ds.contact_node_model(device=device, contact=contact,
                               name=f"{h_name}:Holes", equation="1.0")
 
