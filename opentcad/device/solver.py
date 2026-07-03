@@ -137,6 +137,79 @@ class DeviceSolver:
         ds.solve(type="dc", absolute_error=1e10, relative_error=1e-7,
                  maximum_iterations=50)
 
+    def cv_sweep(self, terminal: str, reference: str,
+                 v_start: float, v_end: float, v_step: float
+                 ) -> tuple[list[float], list[float]]:
+        """Quasi-static CV sweep on `terminal` vs `reference` (held at 0V).
+
+        For each Vg in [v_start, v_end], solve DC and query the total
+        charge stored at `terminal` via DEVSIM's get_contact_charge.
+        Capacitance C(V) is then dQ/dV computed by central differences:
+            C(V_i) = (Q(V_{i+1}) - Q(V_{i-1})) / (V_{i+1} - V_{i-1}).
+
+        Returns (voltages, C_values). Units of C follow DEVSIM's 2-D
+        integration: F/cm of out-of-plane depth.
+
+        Notes:
+        - Requires `terminal` to be a metal-on-insulator (gate) contact,
+          on which we register PotentialEdgeFlux as the edge_charge_model.
+        - The result is quasi-static (the DC-diff limit) — equivalent to
+          measured LF CV. For HF CV where minority carriers can't follow,
+          a small-signal AC solve is a follow-up.
+        """
+        if not self._initialized:
+            self.initialize()
+        self.solve_equilibrium()
+        self._set_contact_voltage(reference, 0.0)
+
+        voltages = np.arange(v_start, v_end + v_step / 2, v_step)
+
+        # Ramp from equilibrium (V=0) to voltages[0] in small steps so
+        # Newton doesn't have to swallow a large first jump (crucial in
+        # MOS-cap accumulation/inversion where a sudden 1-2V step blows
+        # convergence). 50 mV steps are conservative but robust.
+        ramp_step = min(0.05, abs(v_step))
+        if abs(voltages[0]) > 1e-9:
+            pre_ramp = np.sign(voltages[0]) * np.arange(
+                ramp_step, abs(voltages[0]) + ramp_step / 2, ramp_step)
+            for v in pre_ramp:
+                self._set_contact_voltage(terminal, float(v))
+                self._solve_dc()
+
+        charges: list[float] = []
+        for v in voltages:
+            self._set_contact_voltage(terminal, float(v))
+            self._solve_dc()
+            charges.append(self._integrated_semiconductor_charge())
+
+        # Q_gate = -Q_semi (charge conservation on the isolated device).
+        Q = -np.asarray(charges)
+        C = np.gradient(Q, voltages)     # central diff, edge-safe
+        return voltages.tolist(), C.tolist()
+
+    def _integrated_semiconductor_charge(self) -> float:
+        """Return sum over every semi region of q * integral((p - n +
+        N_d - N_a) dV). By charge conservation on an isolated device
+        this equals -Q_stored_on_the_biasing_contacts."""
+        ds = self._ds
+        Q_total = 0.0
+        for region, is_ins in self._region_is_insulator.items():
+            if is_ins:
+                continue
+            vol = np.asarray(ds.get_node_model_values(
+                device=self._device_name, region=region, name="NodeVolume"))
+            n  = np.asarray(ds.get_node_model_values(
+                device=self._device_name, region=region, name="Electrons"))
+            p  = np.asarray(ds.get_node_model_values(
+                device=self._device_name, region=region, name="Holes"))
+            Nd = np.asarray(ds.get_node_model_values(
+                device=self._device_name, region=region, name="Donors"))
+            Na = np.asarray(ds.get_node_model_values(
+                device=self._device_name, region=region, name="Acceptors"))
+            rho = p - n + Nd - Na
+            Q_total += Q_C * float((rho * vol).sum())
+        return Q_total
+
     def iv_sweep(self, anode_contact: str, cathode_contact: str,
                  v_start: float, v_end: float, v_step: float
                  ) -> tuple[list[float], list[float]]:
