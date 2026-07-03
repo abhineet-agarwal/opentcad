@@ -315,13 +315,17 @@ class DeviceSolver:
             if self._region_is_insulator.get(region, False):
                 self._build_insulator_potential(region)
             else:
-                # BGN must be attached before _build_potential_only so
-                # IntrinsicElectrons and PotentialIntrinsicNodeCharge can
-                # refer to n_i_eff. NoBGN is a no-op — the plain `n_i`
-                # parameter (set in _set_region_parameters) is used.
+                # BGN and statistics both need to be attached before
+                # _build_potential_only: BGN so IntrinsicElectrons/Holes
+                # / PotentialIntrinsicNodeCharge can refer to n_i_eff;
+                # statistics so those same expressions can reference
+                # N_c/N_v (Blakemore/FD) as needed. Their defaults
+                # (NoBGN, Boltzmann) are no-ops.
                 self.physics.bgn.attach(
                     self._ds, self._device_name, region, params, self.T)
-                self._build_potential_only(region)
+                self.physics.statistics.attach(
+                    self._ds, self._device_name, region, params, self.T)
+                self._build_potential_only(region, params)
         for contact in self._contact_regions:
             self._build_contact_potential_equation(contact)
         for if_name, r0, r1 in self._interfaces:
@@ -373,7 +377,8 @@ class DeviceSolver:
             ds.set_parameter(device=self._device_name, region=region,
                              name=name, value=float(value))
 
-    def _build_potential_only(self, region: str) -> None:
+    def _build_potential_only(self, region: str,
+                              params: MaterialParams) -> None:
         """Create Potential solution + Poisson equation (intrinsic charge).
 
         After solve_equilibrium() switches to DD, PotentialEquation is rebuilt
@@ -402,14 +407,21 @@ class DeviceSolver:
         # Use DEVSIM's symbolic diff() to avoid hand-derivative bugs.
         # `ni` is either "n_i" (parameter, no BGN) or "n_i_eff" (node
         # model registered by the BGN model, doping-dependent).
+        # The statistics model wraps the Boltzmann-form n_boltz / p_boltz
+        # with FD corrections when active — a no-op for Boltzmann.
         ni = self.physics.bgn.n_i_expr()
+        stats = self.physics.statistics
+        n_boltz = f"{ni}*exp(Potential/V_t)"
+        p_boltz = f"({ni})^2/IntrinsicElectrons"
+        n_expr = stats.wrap_electron_density(n_boltz, params)
+        p_expr = stats.wrap_hole_density(p_boltz, params)
         for name, eq in (
-            ("IntrinsicElectrons", f"{ni}*exp(Potential/V_t)"),
+            ("IntrinsicElectrons", n_expr),
             ("IntrinsicElectrons:Potential",
-             f"diff({ni}*exp(Potential/V_t), Potential)"),
-            ("IntrinsicHoles", f"({ni})^2/IntrinsicElectrons"),
+             f"simplify(diff({n_expr}, Potential))"),
+            ("IntrinsicHoles", p_expr),
             ("IntrinsicHoles:Potential",
-             f"diff(({ni})^2/IntrinsicElectrons, Potential)"),
+             f"simplify(diff({p_expr}, Potential))"),
             ("IntrinsicCharge",
              "IntrinsicHoles - IntrinsicElectrons + NetDoping"),
             ("IntrinsicCharge:Potential",
@@ -653,7 +665,13 @@ class DeviceSolver:
         chmod = f"chole_{contact}"
         # Equilibrium carrier densities at the contact (ohmic assumption).
         # `ni` is n_i (parameter) or n_i_eff (BGN node model on the region).
+        # The built-in potential offset V_t*log(n/n_i) is statistics-aware
+        # (Boltzmann is a pass-through; FermiDirac adds the Blakemore
+        # correction so the equilibrium Vbi is consistent with the
+        # wrapped IntrinsicElectrons/Holes in the bulk).
         ni = self.physics.bgn.n_i_expr()
+        stats = self.physics.statistics
+        params = self._params_for_region(self._region_materials[region])
         ds.contact_node_model(
             device=device, contact=contact, name=cemod,
             equation=f"1e-10 + 0.5*(NetDoping + (NetDoping^2 + 4*({ni})^2)^(0.5))")
@@ -661,11 +679,13 @@ class DeviceSolver:
             device=device, contact=contact, name=chmod,
             equation=f"1e-10 + 0.5*(-NetDoping + (NetDoping^2 + 4*({ni})^2)^(0.5))")
 
+        n_offset = stats.electron_potential_offset(cemod, ni, params)
+        p_offset = stats.hole_potential_offset(chmod, ni, params)
         ds.contact_node_model(
             device=device, contact=contact, name=pot_name,
             equation=(f"ifelse(NetDoping > 0,"
-                      f" Potential-{biasname}-V_t*log({cemod}/({ni})),"
-                      f" Potential-{biasname}+V_t*log({chmod}/({ni})))"))
+                      f" Potential-{biasname}-({n_offset}),"
+                      f" Potential-{biasname}+({p_offset}))"))
         ds.contact_node_model(device=device, contact=contact,
                               name=f"{pot_name}:Potential", equation="1")
 

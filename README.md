@@ -310,6 +310,8 @@ Available today:
 | Contact BC | `contact_type="ohmic"` | default; charge-neutral semiconductor contact |
 | Contact BC | `contact_type="schottky"` | metal-semi barrier; requires `work_function_eV`; rectifies |
 | Contact BC | `flat_band_shift_V` | metal-on-insulator Vfb offset; packs Qf, midgap Dit, and phi_MS in one number |
+| Statistics | `Boltzmann` | default; classical Maxwell-Boltzmann |
+| Statistics | `FermiDirac` | Blakemore approximation; captures degeneracy at heavy doping (n → N_c) |
 
 The full CMOS mobility stack — bulk doping-dep + high-field saturation +
 surface degradation — composes in a single expression:

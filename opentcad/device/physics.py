@@ -102,6 +102,44 @@ class BandgapNarrowingModel(ABC):
         """DEVSIM node/parameter name to use in place of the bare n_i."""
 
 
+class StatisticsModel(ABC):
+    """Base class for carrier-statistics models.
+
+    Wraps a Boltzmann-form expression for `n(potential)` (and `p`) with
+    the statistics-specific correction. The solver substitutes the
+    wrapped forms into IntrinsicElectrons/Holes and the ohmic contact
+    built-in potential offset. Boltzmann is a no-op identity; FermiDirac
+    applies the Blakemore approximation.
+    """
+
+    def attach(self, ds, device: str, region: str, params, T_K: float) -> None:
+        """Register any per-region parameters (Nc, Nv, ...) needed for
+        the wrapping expressions. Boltzmann needs nothing; FermiDirac
+        registers Nc and Nv."""
+
+    @abstractmethod
+    def wrap_electron_density(self, boltz_expr: str, params) -> str:
+        """Given a Boltzmann-form expression for n, return the corrected
+        expression for the active statistics."""
+
+    @abstractmethod
+    def wrap_hole_density(self, boltz_expr: str, params) -> str:
+        """Same for p."""
+
+    @abstractmethod
+    def electron_potential_offset(self, n_expr: str, n_i_expr: str,
+                                  params) -> str:
+        """Return the built-in potential offset  V_t * log(n / n_i)
+        under the active statistics. Used in ohmic contact BCs to set
+        Potential so equilibrium n = n_expr is consistent with the
+        statistics model."""
+
+    @abstractmethod
+    def hole_potential_offset(self, p_expr: str, n_i_expr: str,
+                              params) -> str:
+        """Same for the p-side ohmic contact."""
+
+
 @dataclass
 class PhysicsConfig:
     """Container of physics models used by DeviceSolver. New model classes
@@ -109,6 +147,7 @@ class PhysicsConfig:
     mobility: MobilityModel = field(default=None)   # type: ignore[assignment]
     recombination: List[RecombinationModel] = field(default_factory=list)
     bgn: BandgapNarrowingModel = field(default=None)   # type: ignore[assignment]
+    statistics: StatisticsModel = field(default=None)   # type: ignore[assignment]
 
     def __post_init__(self):
         if self.mobility is None:
@@ -121,3 +160,6 @@ class PhysicsConfig:
         if self.bgn is None:
             from .models.bgn import NoBGN
             self.bgn = NoBGN()
+        if self.statistics is None:
+            from .models.statistics import Boltzmann
+            self.statistics = Boltzmann()
