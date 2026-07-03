@@ -233,3 +233,151 @@ class Canali(MobilityModel):
 
     def mu_n_expr(self): return "ElectronMobilityCanali"
     def mu_p_expr(self): return "HoleMobilityCanali"
+
+
+class Lombardi(MobilityModel):
+    """Lombardi surface mobility model.
+
+    Combines a bulk mobility with acoustic-phonon and surface-roughness
+    scattering via Matthiessen's rule:
+
+        1/mu_surf = 1/mu_bulk + 1/mu_ac + 1/mu_sr
+
+    where mu_ac and mu_sr depend on the normal field at the Si/SiO2
+    interface:
+
+        mu_ac(E_norm) = B/E_norm + C*NI^tau / (E_norm^(1/3) * (T/300)^kappa)
+        mu_sr(E_norm) = delta / E_norm^gamma
+        gamma        = A + alpha*(n+p) / NI^eta
+
+    NI = |Donors| + |Acceptors| is the total ionised impurity density.
+    Reference: Lombardi, Manzini, Saporito, Vanzi, IEEE TCAD 7, 1164 (1988).
+    Coefficients follow the DEVSIM Klaassen.py `Philips_Surface_Mobility`
+    reference (extracted from Darwish 1997 / Sentaurus defaults).
+
+    Composes with any bulk model. Typical MOS use:
+
+        Lombardi(base=Canali(base=Klaassen()))
+
+    Approximation: uses |EField| as the E_normal proxy. In our layered
+    Structure DSL, the Si/SiO2 interface is horizontal and the gate
+    field is primarily vertical, so |E| ≈ |E_y| under the channel. A
+    proper E_normal would require 2D element models — noted as follow-up.
+    """
+
+    def __init__(self, base: Optional[MobilityModel] = None):
+        self.base = base if base is not None else ConstantMobility()
+
+    @property
+    def requires_carriers(self) -> bool:
+        return True   # Lombardi mu_sr's gamma depends on (n+p)
+
+    _params = {
+        "Lb_B_e": 3.61e7, "Lb_C_e": 1.70e4,
+        "Lb_tau_e": 0.0233, "Lb_kappa_e": 1.7,
+        "Lb_A_e": 2.58, "Lb_alpha_e": 6.85e-21,
+        "Lb_eta_e": 0.0767, "Lb_delta_e": 3.58e18,
+        "Lb_B_h": 1.51e7, "Lb_C_h": 4.18e3,
+        "Lb_tau_h": 0.0119, "Lb_kappa_h": 0.9,
+        "Lb_A_h": 2.18, "Lb_alpha_h": 7.82e-21,
+        "Lb_eta_h": 0.123, "Lb_delta_h": 4.10e15,
+    }
+
+    def attach(self, ds, device, region, params, T_K):
+        self.base.attach(ds, device, region, params, T_K)
+        for name, val in self._params.items():
+            ds.set_parameter(device=device, region=region, name=name,
+                             value=float(val))
+        ds.set_parameter(device=device, region=region, name="T",
+                         value=float(T_K))
+
+        # NI = |Donors| + |Acceptors| as a node model, projected to edge
+        # via geometric mean (matches Klaassen.py Philips_Surface_Mobility).
+        ds.node_model(device=device, region=region, name="Lb_NI_node",
+                      equation="max(Donors + Acceptors, 1)")
+        ds.edge_average_model(device=device, region=region,
+                              edge_model="Lb_NI",
+                              node_model="Lb_NI_node",
+                              average_type="geometric")
+
+        # Smoothed |E| on the edge — same regularization as Canali so
+        # Newton's derivative through E=0 stays finite.
+        e_mag = "((EField*EField) + 1)^(0.5)"
+        # Prevent E_mag from being pathologically small in the mu_ac and
+        # mu_sr denominators. 1 V/cm floor is far below any real MOSFET
+        # inversion-layer field (typically 1e4 - 1e6 V/cm).
+        ds.edge_model(device=device, region=region, name="Lb_Emag",
+                      equation=f"max({e_mag}, 1)")
+
+        # Acoustic-phonon-limited surface mobility (edge)
+        for k in ("e", "h"):
+            ds.edge_model(
+                device=device, region=region, name=f"Lb_mu_ac_{k}",
+                equation=(
+                    f"Lb_B_{k}/Lb_Emag "
+                    f"+ (Lb_C_{k} * Lb_NI^Lb_tau_{k}) "
+                    f"/ (Lb_Emag^(1.0/3.0) * (T/300)^Lb_kappa_{k})"))
+
+        # Surface-roughness mobility (edge). gamma_x depends on (n+p),
+        # so it needs carrier derivatives — use edge_average of a node model.
+        for k in ("e", "h"):
+            ds.node_model(device=device, region=region,
+                          name=f"Lb_gamma_{k}_node",
+                          equation=(
+                              f"Lb_A_{k} + Lb_alpha_{k} * "
+                              f"(Electrons + Holes) / Lb_NI_node^Lb_eta_{k}"))
+            for var in ("Electrons", "Holes"):
+                ds.node_model(
+                    device=device, region=region,
+                    name=f"Lb_gamma_{k}_node:{var}",
+                    equation=(
+                        f"simplify(diff("
+                        f"Lb_A_{k} + Lb_alpha_{k} * "
+                        f"(Electrons + Holes) / Lb_NI_node^Lb_eta_{k}, {var}))"))
+            ds.edge_average_model(
+                device=device, region=region,
+                edge_model=f"Lb_gamma_{k}",
+                node_model=f"Lb_gamma_{k}_node",
+                average_type="arithmetic")
+            for var in ("Electrons", "Holes"):
+                ds.edge_average_model(
+                    device=device, region=region,
+                    edge_model=f"Lb_gamma_{k}",
+                    node_model=f"Lb_gamma_{k}_node",
+                    derivative=var,
+                    average_type="arithmetic")
+            ds.edge_model(
+                device=device, region=region, name=f"Lb_mu_sr_{k}",
+                equation=f"Lb_delta_{k} / Lb_Emag^Lb_gamma_{k}")
+
+        # Matthiessen composition: mu_surf = mu_b*mu_ac*mu_sr / (sum products)
+        mu_bulk_e = self.base.mu_n_expr()
+        mu_bulk_h = self.base.mu_p_expr()
+
+        mu_e = (f"({mu_bulk_e}) * Lb_mu_ac_e * Lb_mu_sr_e / "
+                f"(({mu_bulk_e})*Lb_mu_ac_e + ({mu_bulk_e})*Lb_mu_sr_e + "
+                f"Lb_mu_ac_e*Lb_mu_sr_e)")
+        mu_h = (f"({mu_bulk_h}) * Lb_mu_ac_h * Lb_mu_sr_h / "
+                f"(({mu_bulk_h})*Lb_mu_ac_h + ({mu_bulk_h})*Lb_mu_sr_h + "
+                f"Lb_mu_ac_h*Lb_mu_sr_h)")
+
+        ds.edge_model(device=device, region=region,
+                      name="ElectronMobilityLombardi", equation=mu_e)
+        ds.edge_model(device=device, region=region,
+                      name="HoleMobilityLombardi", equation=mu_h)
+
+        # All derivatives that Newton needs. The dependencies come from
+        # (a) the base bulk mobility (via chain rule), (b) Lb_Emag which
+        # depends on Potential, and (c) Lb_gamma_x which depends on carriers.
+        for var in ("Potential@n0", "Potential@n1",
+                    "Electrons@n0", "Electrons@n1",
+                    "Holes@n0",     "Holes@n1"):
+            ds.edge_model(device=device, region=region,
+                          name=f"ElectronMobilityLombardi:{var}",
+                          equation=f"simplify(diff({mu_e}, {var}))")
+            ds.edge_model(device=device, region=region,
+                          name=f"HoleMobilityLombardi:{var}",
+                          equation=f"simplify(diff({mu_h}, {var}))")
+
+    def mu_n_expr(self): return "ElectronMobilityLombardi"
+    def mu_p_expr(self): return "HoleMobilityLombardi"
