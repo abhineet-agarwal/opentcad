@@ -63,8 +63,17 @@ def _polyline_to_y_of_x(nodes, xmin: float, xmax: float,
     order = np.argsort(xs, kind="stable")
     xs, ys = xs[order], ys[order]
 
-    # Merge duplicates that share the same x (within atol): if y values
-    # agree, keep one; if they disagree, we've got a multi-valued surface.
+    # Merge duplicates that share the same x (within atol). If y values
+    # agree, keep the mean; if they disagree, the surface is multi-
+    # valued at that x — physically that's a vertical wall + undercut
+    # from a masked etch (the level-set has two zero-crossings on the
+    # same column). We keep the LOWER y, which represents the true top
+    # of the underlying material once you disregard the thin overhang
+    # sliver that hangs off the mask edge (the mask itself isn't in
+    # our material stack, so the overhang has nothing physical holding
+    # it up in the meshed geometry). Preserves the undercut extent and
+    # the trench floor, while giving gmsh a clean single-valued curve
+    # to mesh against.
     merged_xs: list[float] = []
     merged_ys: list[float] = []
     i = 0
@@ -73,13 +82,8 @@ def _polyline_to_y_of_x(nodes, xmin: float, xmax: float,
         while j + 1 < len(xs) and (xs[j + 1] - xs[i]) < atol:
             j += 1
         y_cluster = ys[i:j + 1]
-        if float(y_cluster.max() - y_cluster.min()) > 1e-3:  # 1 nm tolerance
-            raise ValueError(
-                f"Multi-valued surface at x={xs[i]:.4f}: y range "
-                f"{y_cluster.min():.4f}..{y_cluster.max():.4f}. "
-                "MVP mesh bridge only handles single-valued top surfaces.")
         merged_xs.append(float(xs[i]))
-        merged_ys.append(float(y_cluster.mean()))
+        merged_ys.append(float(y_cluster.min()))
         i = j + 1
 
     # Clamp x to the exact bounds and ensure we have an endpoint at each
@@ -123,16 +127,24 @@ def topography_to_meshfield(state: TopographyState,
 
     xmin, xmax, ymin, _ = state.bounds_um
 
-    tops: list[tuple[Material, np.ndarray, np.ndarray]] = []
+    raw_curves: list[tuple[Material, np.ndarray, np.ndarray]] = []
     for L in state.layers:
         nodes, _lines = extract_surface_polyline(L.level_set)
         xs, ys = _polyline_to_y_of_x(nodes, xmin, xmax)
-        n = max(n_samples, len(xs))
-        xs, ys = _resample_polyline_uniform(xs, ys, n)
-        tops.append((L.material, xs, ys))
+        raw_curves.append((L.material, xs, ys))
 
-    if not tops:
+    if not raw_curves:
         raise ValueError("TopographyState has no layers.")
+
+    # Resample every curve onto the same x grid so downstream code can
+    # compare y-values element-wise (stack-monotonicity, plotting, etc.)
+    # and so the gmsh side-wall connections at xmin/xmax align exactly.
+    max_raw_n = max(len(xs) for _, xs, _ in raw_curves)
+    n = max(n_samples, max_raw_n)
+    tops: list[tuple[Material, np.ndarray, np.ndarray]] = []
+    for material, xs, ys in raw_curves:
+        xs_r, ys_r = _resample_polyline_uniform(xs, ys, n)
+        tops.append((material, xs_r, ys_r))
 
     # Verify strict stacking: each polyline must lie above the previous.
     for i in range(1, len(tops)):

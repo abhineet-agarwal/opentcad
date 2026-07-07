@@ -124,3 +124,145 @@ def test_meshfield_bounds_align_with_substrate_top_and_deposit_thickness():
     assert ymin == pytest.approx(0.0, abs=1e-4)
     assert ymax == pytest.approx(0.53, abs=2e-3), \
         f"Post-etch top at y={ymax:.4f}, expected 0.530 um"
+
+
+# ---------------------------------------------------------------------------
+# Windowed isotropic etch — the "curved trench" case.
+#
+# A single etch step with a window in [x0, x1] on a bare Si substrate.
+# Expectation: the level-set drops to (initial - depth) inside the
+# window, stays at the initial height far outside the window, and
+# rounds smoothly (undercut) at the edges.
+# ---------------------------------------------------------------------------
+
+TRENCH_DEPTH_UM = 0.15
+TRENCH_X0, TRENCH_X1 = 0.35, 0.65
+TRENCH_INITIAL_Y_UM = 0.5
+
+
+def _build_trench():
+    struct = (Structure(width_um=1.0, name="curved_trench")
+              .add_substrate("body", TRENCH_INITIAL_Y_UM, Material.SI))
+    recipe = (Recipe("mask_and_etch")
+              .etch(depth_um=TRENCH_DEPTH_UM,
+                    window_x_um=(TRENCH_X0, TRENCH_X1)))
+    return struct, recipe
+
+
+def _sample_top(level_set, xmin=0.0, xmax=1.0):
+    """Return (xs, ys) — the extracted polyline sorted by x, with
+    the lower y kept at multi-valued x (matches mesh_bridge policy)."""
+    nodes, _ = extract_surface_polyline(level_set)
+    pts = np.asarray(nodes)
+    x, y = pts[:, 0], pts[:, 1]
+    keep = (x >= xmin - 1e-6) & (x <= xmax + 1e-6)
+    x, y = x[keep], y[keep]
+    order = np.argsort(x, kind="stable")
+    return x[order], y[order]
+
+
+def test_windowed_etch_floor_and_pristine_regions():
+    """Inside the window, y sits at initial - depth (etch bottoms out).
+    Well outside the window, y stays at the initial mask level."""
+    struct, recipe = _build_trench()
+    state = simulate(struct, recipe, grid_delta_um=0.005)
+    xs, ys = _sample_top(state.layers[0].level_set)
+
+    y_expected_floor = TRENCH_INITIAL_Y_UM - TRENCH_DEPTH_UM
+    center_mask = (xs > TRENCH_X0 + 0.05) & (xs < TRENCH_X1 - 0.05)
+    assert center_mask.any(), "no polyline nodes inside the window center"
+    assert np.all(np.abs(ys[center_mask] - y_expected_floor) < 5e-3), (
+        f"trench floor should sit at y={y_expected_floor}, got "
+        f"y in [{ys[center_mask].min():.4f}, {ys[center_mask].max():.4f}]")
+
+    # Far outside the undercut zone the mask must hold.
+    pristine = xs < 0.10
+    assert pristine.any()
+    assert np.all(np.abs(ys[pristine] - TRENCH_INITIAL_Y_UM) < 1e-3), (
+        f"unmasked regions should stay at y={TRENCH_INITIAL_Y_UM}, got "
+        f"y in [{ys[pristine].min():.4f}, {ys[pristine].max():.4f}]")
+
+
+def test_windowed_etch_produces_curved_undercut():
+    """Between the pristine mask level and the etched floor there is a
+    non-trivial transition zone — the classic isotropic-etch undercut.
+    Verify that the profile *varies* (curvature) rather than being a
+    step function, and that the undercut extends beyond the mask edge
+    (i.e. eats sideways into the material)."""
+    struct, recipe = _build_trench()
+    state = simulate(struct, recipe, grid_delta_um=0.005)
+    xs, ys = _sample_top(state.layers[0].level_set)
+
+    y_floor = TRENCH_INITIAL_Y_UM - TRENCH_DEPTH_UM
+
+    # Any x-node with y strictly between floor and initial is a
+    # transition-zone point — count them on each side.
+    transition = (ys > y_floor + 1e-3) & (ys < TRENCH_INITIAL_Y_UM - 1e-3)
+    assert transition.sum() >= 4, (
+        f"expected >=4 profile points in the curved-undercut zone, got "
+        f"{transition.sum()}. Profile is essentially a step function.")
+
+    # Undercut extent: nodes with y below the mask level that sit past
+    # the nominal window edge on each side.
+    left_undercut  = xs[(xs < TRENCH_X0) & (ys < TRENCH_INITIAL_Y_UM - 1e-3)]
+    right_undercut = xs[(xs > TRENCH_X1) & (ys < TRENCH_INITIAL_Y_UM - 1e-3)]
+    assert left_undercut.size >= 3, "no undercut past the left mask edge"
+    assert right_undercut.size >= 3, "no undercut past the right mask edge"
+
+    # Undercut depth (lateral) — the etch is depth d, isotropic, so we
+    # expect ~d of undercut at the deep end (quarter-circle). Require
+    # at least half of that to survive discretization + boundary tol.
+    lat_left  = TRENCH_X0 - left_undercut.min()
+    lat_right = right_undercut.max() - TRENCH_X1
+    assert lat_left  > 0.5 * TRENCH_DEPTH_UM, (
+        f"left undercut only {lat_left*1000:.1f} nm — expected "
+        f">{TRENCH_DEPTH_UM*1000*0.5:.0f} nm")
+    assert lat_right > 0.5 * TRENCH_DEPTH_UM, (
+        f"right undercut only {lat_right*1000:.1f} nm — expected "
+        f">{TRENCH_DEPTH_UM*1000*0.5:.0f} nm")
+
+
+def test_windowed_etch_profile_is_symmetric():
+    """A window centered in the domain should give a mirror-symmetric
+    trench profile — this catches numerical asymmetries in the Lax-
+    Friedrichs advection or bugs in the VF's x-bounds check."""
+    struct, recipe = _build_trench()
+    state = simulate(struct, recipe, grid_delta_um=0.005)
+    xs, ys = _sample_top(state.layers[0].level_set)
+
+    x_center = 0.5 * (TRENCH_X0 + TRENCH_X1)
+
+    # Sample the profile at ±dx around the center and compare y.
+    dxs = np.linspace(0.05, 0.35, 12)
+    ys_left  = np.interp(x_center - dxs, xs, ys)
+    ys_right = np.interp(x_center + dxs, xs, ys)
+    max_delta = float(np.max(np.abs(ys_left - ys_right)))
+    assert max_delta < 8e-3, (
+        f"trench profile is asymmetric: max |y(x)-y(-x)| = "
+        f"{max_delta*1000:.1f} nm across the window center")
+
+
+def test_windowed_etch_meshfield_area_matches_removed_material():
+    """The MeshField's Si area should equal (initial substrate area)
+    minus the area of material removed by the etch. We can compute the
+    removed area directly from the extracted top-surface polyline."""
+    struct, recipe = _build_trench()
+    state = simulate(struct, recipe, grid_delta_um=0.005)
+
+    xs, ys = _sample_top(state.layers[0].level_set)
+    # Area under the etched top surface = trapezoidal integral of y(x).
+    # Removed area = (initial_top * width) - integral y(x) dx.
+    initial_area = TRENCH_INITIAL_Y_UM * (xs[-1] - xs[0])
+    remaining_area = float(np.trapezoid(ys, xs))
+    expected_si_area = remaining_area
+    assert 0.3 < expected_si_area < initial_area, (
+        f"sanity: expected_si_area={expected_si_area:.4f}, "
+        f"initial_area={initial_area:.4f}")
+
+    mf = topography_to_meshfield(state, mesh_size_um=0.02)
+    areas = mf.grid.compute_cell_sizes(length=False, area=True,
+                                       volume=False).cell_data["Area"]
+    got_si = float(areas[mf.material_ids == int(Material.SI)].sum())
+    # Allow ~2% mesh discretization slop.
+    assert got_si == pytest.approx(expected_si_area, rel=2e-2), (
+        f"MeshField Si area {got_si:.4f} vs expected {expected_si_area:.4f} um^2")

@@ -1,9 +1,14 @@
 """
 Example 04 — Topography "hello world".
 
-Runs a two-step process recipe against a Si substrate:
-    1. deposit 50 nm of SiO2 (conformal)
-    2. etch 20 nm off the top (isotropic)
+Runs a two-step process recipe against a bare Si substrate:
+    1. blanket etch 30 nm (isotropic uniform)
+    2. window etch 150 nm through a 300-nm mask opening (curved trench
+       with quarter-circle undercuts at the mask edges)
+
+The window step is what showcases the level-set solver: the trench
+floor is flat inside the window, the sidewalls curl under the mask
+edges (undercut), and the profile is smoothly single-valued in y(x).
 
 and produces two artifacts:
     * examples/04_topography_recipe.png — the material stack at each
@@ -65,9 +70,9 @@ def _run_snapshots(struct, recipe, grid_delta_um: float):
 def main():
     struct = (Structure(width_um=1.0, name="topo_hello")
               .add_substrate("body", 0.5, Material.SI))
-    recipe = (Recipe("deposit_then_etch")
-              .deposit(Material.SIO2, 0.05)
-              .etch(0.02))
+    recipe = (Recipe("blanket_then_curved_trench")
+              .etch(0.03)
+              .etch(0.15, window_x_um=(0.35, 0.65)))
     print(recipe.summary())
     print()
 

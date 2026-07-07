@@ -168,14 +168,94 @@ def _apply_deposit(state: TopographyState, step: Deposit) -> None:
     state.layers.append(Layer(material=step.material, level_set=new_ls))
 
 
+class _MaskedIsotropicVelocity(viennals.VelocityField):
+    """Velocity field for an isotropic etch through a photolith-style
+    window in a rigid mask that sits on top of the current surface.
+
+    Physical model:
+      * The mask covers the surface everywhere except x ∈ [x0, x1].
+      * Where the mask holds (initial surface point at y = mask_y),
+        velocity is zero — the mask blocks the etchant.
+      * Where the material is exposed — either inside the window, or
+        anywhere the surface has already dropped below the mask level
+        (the sidewall of the trench once it starts undercutting) —
+        velocity is -rate along the outward normal, so the surface
+        recedes into the material at that rate.
+
+    The undercut curl under the mask edges falls out of the level-set
+    advancing every point along its normal simultaneously: the sidewall
+    normal is horizontal, so the sidewall advances laterally at the
+    same rate as the trench bottom advances downward. The two meet in
+    a classic quarter-circle at the mask edge.
+    """
+    def __init__(self, rate: float, x0: float, x1: float, mask_y: float,
+                 tol: float = 1e-4):
+        super().__init__()
+        self.rate = float(rate)
+        self.x0 = float(x0)
+        self.x1 = float(x1)
+        self.mask_y = float(mask_y)
+        self.tol = float(tol)
+
+    def getScalarVelocity(self, coord, material, normal, pointID):
+        x, y = coord[0], coord[1]
+        if self.x0 <= x <= self.x1:
+            return -self.rate
+        if y < self.mask_y - self.tol:
+            return -self.rate
+        return 0.0
+
+    def getVectorVelocity(self, coord, material, normal, pointID):
+        return [0.0, 0.0, 0.0]
+
+    def getDissipationAlpha(self, direction, material, coord):
+        return abs(self.rate)
+
+
+def _current_top_y(level_set: "viennals.d2.Domain",
+                   xmin: float, xmax: float) -> float:
+    """Return the max y of the current top surface — used as the mask
+    level for a windowed etch. Assumes a single-valued top surface."""
+    mesh = viennals.Mesh()
+    to_mesh = viennals.d2.ToSurfaceMesh()
+    to_mesh.setLevelSet(level_set)
+    to_mesh.setMesh(mesh)
+    to_mesh.apply()
+    nodes = mesh.getNodes()
+    if not nodes:
+        raise RuntimeError("Cannot sample top-y: level-set surface is empty.")
+    return max(n[1] for n in nodes if xmin - 1e-6 <= n[0] <= xmax + 1e-6)
+
+
 def _apply_etch(state: TopographyState, step: Etch) -> None:
-    """Erode the top layer by depth. If depth exceeds the top material's
-    thickness the top LS drops below the layer beneath it — the mesh
-    bridge deals with intersection when it happens.
+    """Erode the top layer by depth.
+
+    Two backends depending on whether a window is set:
+      * `window_x_um=None` — uniform Minkowski erosion via GeometricAdvect
+        with a SphereDistribution of radius -depth. Fast, closed-form.
+      * `window_x_um=(x0, x1)` — masked isotropic etch via Advect + the
+        Python `_MaskedIsotropicVelocity` field. Numerical Lax-Friedrichs
+        step; gives the textbook undercut profile.
     """
     if not state.layers:
         raise RuntimeError("Cannot etch an empty stack.")
-    _dilate(state.top.level_set, -step.depth_um)
+
+    if step.window_x_um is None:
+        _dilate(state.top.level_set, -step.depth_um)
+        return
+
+    x0, x1 = step.window_x_um
+    xmin, xmax, _, _ = state.bounds_um
+    if x0 < xmin - 1e-6 or x1 > xmax + 1e-6:
+        raise ValueError(
+            f"Etch window [{x0:.3f}, {x1:.3f}] um extends outside the "
+            f"simulation domain [{xmin:.3f}, {xmax:.3f}] um.")
+
+    mask_y = _current_top_y(state.top.level_set, xmin, xmax)
+    vf = _MaskedIsotropicVelocity(rate=1.0, x0=x0, x1=x1, mask_y=mask_y)
+    adv = viennals.d2.Advect(state.top.level_set, vf)
+    adv.setAdvectionTime(float(step.depth_um))
+    adv.apply()
 
 
 def simulate(structure, recipe: Recipe, grid_delta_um: float = 0.01
