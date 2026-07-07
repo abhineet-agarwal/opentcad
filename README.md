@@ -10,7 +10,7 @@ mature open libraries:
 | Layer               | Backend                                |
 | ------------------- | -------------------------------------- |
 | Meshing             | [Gmsh](https://gmsh.info)              |
-| Topography (planned)| [ViennaPS](https://viennatools.github.io/) |
+| Topography          | [ViennaLS](https://viennatools.github.io/) (level sets) |
 | Diffusion (planned) | [FiPy](https://www.ctcms.nist.gov/fipy/) |
 | Device solver       | [DEVSIM](https://devsim.org)           |
 | Visualization       | [PyVista](https://pyvista.org)         |
@@ -31,7 +31,8 @@ prototyping. See [PHASES.md](PHASES.md) for the full roadmap.
 | Phase | Scope                                    | Status         |
 | ----- | ---------------------------------------- | -------------- |
 | 0     | Geometry DSL + DEVSIM device simulation  | **Complete**   |
-| 1     | ViennaPS topography (etch / dep / oxide) | Planned        |
+| 1     | Topography (ViennaLS): deposit / etch    | In progress    |
+| 1.4   | Deal-Grove oxidation                     | Planned        |
 | 2     | Implant + diffusion (FiPy)               | Planned        |
 | 3     | Materials calibration vs. SKY130 / IHP   | Planned        |
 
@@ -45,6 +46,9 @@ What works today:
   (`ConstantMobility`, `Klaassen` unified bulk) without touching the solver
 - IV sweeps, MOS-capacitor regime analysis, NMOS Id–Vgs
 - YAML-based material parameter database (with `pydantic` validation)
+- **Topography DSL** (Phase 1.1a): `Recipe.deposit(...).etch(...)` runs
+  on ViennaLS and produces a per-material MeshField the device solver
+  consumes without any glue code
 
 Phase 0 exit criteria met:
 - ✓ 1-D p-n junction IV within 5% of Shockley
