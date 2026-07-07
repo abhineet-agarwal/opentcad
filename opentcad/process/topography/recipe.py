@@ -49,39 +49,56 @@ class Deposit:
 class Etch:
     """Remove *depth_um* of the top material.
 
-    - "isotropic": recedes along the local surface normal (wet etch,
-      downstream plasma). With `window_x_um=None` this is a uniform
-      Minkowski erosion; with a window it becomes a curved-under-mask
-      profile solved by the ViennaLS Lax-Friedrichs advection scheme.
-    - "directional": planned; recedes along a supplied direction only.
+    Models:
+      - "isotropic": recedes along the local surface normal (wet etch,
+        downstream plasma). With `window_x_um=None` this is a uniform
+        Minkowski erosion; with a window it becomes a curved-under-mask
+        profile solved by the ViennaLS Lax-Friedrichs advection scheme.
+      - "directional": RIE-style. Rate scales with how strongly the
+        local surface normal faces the incoming ion beam, so horizontal
+        tops recede at full rate and sidewalls barely move — giving
+        near-vertical trench walls. `direction` is the beam propagation
+        direction (etch travels along it); default is straight down.
+      - `sidewall_ratio`: fraction of the full etch rate that a purely-
+        lateral surface still receives (models chemical isotropy on top
+        of the directional ion flux). 0.0 = pure directional.
 
     Mask forms:
-      * `window_x_um=(x0, x1)`: photolithography-style mask with an
-        opening from x=x0 to x=x1. The surface only recedes inside the
-        window; the level-set naturally curls under the mask edges as
-        it advances, giving the classic undercut profile.
-      * `mask_material`: reserved for when the recipe carries a real
-        hardmask level-set (multi-layer initial stack). Not yet honored.
+      * `window_x_um=(x0, x1)`: photolithography-style opening.
+      * `mask_material`: reserved for a hardmask level-set (multi-layer
+        initial stack). Not yet honored.
     """
     depth_um: float
     model: str = "isotropic"
     window_x_um: Optional[Tuple[float, float]] = None
     mask_material: Optional[Material] = None
+    direction: Tuple[float, float] = (0.0, -1.0)
+    sidewall_ratio: float = 0.0
 
     def __post_init__(self):
         if self.depth_um <= 0:
             raise ValueError(
                 f"Etch depth must be positive (got {self.depth_um} um)")
-        if self.model not in ("isotropic",):
+        if self.model not in ("isotropic", "directional"):
             raise ValueError(
-                f"Etch model {self.model!r} not supported yet "
-                f"(supported: 'isotropic').")
+                f"Etch model {self.model!r} not supported "
+                f"(supported: 'isotropic', 'directional').")
         if self.window_x_um is not None:
             x0, x1 = self.window_x_um
             if not (x1 > x0):
                 raise ValueError(
                     f"Etch window must be (x0, x1) with x1 > x0; got "
                     f"{self.window_x_um!r}")
+        if self.model == "directional":
+            dx, dy = self.direction
+            if dx * dx + dy * dy < 1e-12:
+                raise ValueError(
+                    f"Directional etch direction must be a non-zero "
+                    f"vector; got {self.direction!r}")
+            if not (0.0 <= self.sidewall_ratio <= 1.0):
+                raise ValueError(
+                    f"sidewall_ratio must be in [0, 1]; got "
+                    f"{self.sidewall_ratio}")
 
 
 @dataclass(frozen=True)
@@ -120,8 +137,11 @@ class Recipe:
 
     def etch(self, depth_um: float, model: str = "isotropic",
              window_x_um: Optional[Tuple[float, float]] = None,
-             mask_material: Optional[Material] = None) -> "Recipe":
-        self.steps.append(Etch(depth_um, model, window_x_um, mask_material))
+             mask_material: Optional[Material] = None,
+             direction: Tuple[float, float] = (0.0, -1.0),
+             sidewall_ratio: float = 0.0) -> "Recipe":
+        self.steps.append(Etch(depth_um, model, window_x_um, mask_material,
+                                direction, sidewall_ratio))
         return self
 
     def oxidize(self, temperature_C: float, time_s: float,

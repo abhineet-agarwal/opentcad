@@ -242,6 +242,90 @@ def test_windowed_etch_profile_is_symmetric():
         f"{max_delta*1000:.1f} nm across the window center")
 
 
+def _build_directional_trench(sidewall_ratio: float = 0.0):
+    struct = (Structure(width_um=1.0, name="rie_trench")
+              .add_substrate("body", TRENCH_INITIAL_Y_UM, Material.SI))
+    recipe = (Recipe("rie_trench")
+              .etch(depth_um=TRENCH_DEPTH_UM, model="directional",
+                    window_x_um=(TRENCH_X0, TRENCH_X1),
+                    sidewall_ratio=sidewall_ratio))
+    return struct, recipe
+
+
+def test_directional_trench_floor_and_no_undercut():
+    """A pure directional etch (sidewall_ratio=0) reaches the same
+    floor depth as the isotropic version but has essentially zero
+    lateral undercut past the mask edges — the sidewalls stay vertical."""
+    struct, recipe = _build_directional_trench(sidewall_ratio=0.0)
+    state = simulate(struct, recipe, grid_delta_um=0.005)
+    xs, ys = _sample_top(state.layers[0].level_set)
+
+    y_floor = TRENCH_INITIAL_Y_UM - TRENCH_DEPTH_UM
+    center = (xs > TRENCH_X0 + 0.05) & (xs < TRENCH_X1 - 0.05)
+    assert np.all(np.abs(ys[center] - y_floor) < 5e-3), (
+        f"RIE floor should be at y={y_floor}, got range "
+        f"{ys[center].min():.4f}..{ys[center].max():.4f}")
+
+    # Lateral undercut past each mask edge — RIE limit ⇒ essentially 0.
+    left_undercut  = xs[(xs < TRENCH_X0) & (ys < TRENCH_INITIAL_Y_UM - 1e-3)]
+    right_undercut = xs[(xs > TRENCH_X1) & (ys < TRENCH_INITIAL_Y_UM - 1e-3)]
+    lat_left  = TRENCH_X0 - left_undercut.min()  if left_undercut.size else 0.0
+    lat_right = right_undercut.max() - TRENCH_X1 if right_undercut.size else 0.0
+    # Should be a small numerical smear from Lax-Friedrichs dissipation
+    # at the sharp mask corner — well under the ~150 nm quarter-circle
+    # the isotropic case gives at the same depth.
+    assert lat_left  < 0.03, (
+        f"Left undercut {lat_left*1000:.1f} nm — too large for a pure "
+        "directional etch.")
+    assert lat_right < 0.03, (
+        f"Right undercut {lat_right*1000:.1f} nm — too large for a "
+        "pure directional etch.")
+
+
+def test_directional_undercut_below_isotropic_at_same_depth():
+    """At the same window and depth, the isotropic quarter-circle
+    should extend much further past the mask edge than the directional
+    (RIE) profile — this is the qualitative difference between wet and
+    dry etches. Ratio > 5× is a generous safety margin."""
+    _, iso_recipe = _build_trench()
+    struct_iso, _ = _build_trench()
+    iso_state = simulate(struct_iso, iso_recipe, grid_delta_um=0.005)
+    xs_i, ys_i = _sample_top(iso_state.layers[0].level_set)
+
+    struct_dir, dir_recipe = _build_directional_trench(sidewall_ratio=0.0)
+    dir_state = simulate(struct_dir, dir_recipe, grid_delta_um=0.005)
+    xs_d, ys_d = _sample_top(dir_state.layers[0].level_set)
+
+    def right_undercut(xs, ys):
+        past = xs[(xs > TRENCH_X1) & (ys < TRENCH_INITIAL_Y_UM - 1e-3)]
+        return float(past.max() - TRENCH_X1) if past.size else 0.0
+
+    u_iso = right_undercut(xs_i, ys_i)
+    u_dir = right_undercut(xs_d, ys_d)
+    assert u_iso > 5.0 * u_dir + 0.01, (
+        f"Isotropic undercut {u_iso*1000:.1f} nm should be >>5× the "
+        f"directional undercut {u_dir*1000:.1f} nm")
+
+
+def test_directional_with_sidewall_ratio_gives_partial_undercut():
+    """Setting sidewall_ratio between 0 and 1 mixes some chemical
+    isotropy into the directional flux — the sidewalls now recede
+    at a fraction of the top rate, so the undercut lands between the
+    two limits."""
+    struct, recipe = _build_directional_trench(sidewall_ratio=0.4)
+    state = simulate(struct, recipe, grid_delta_um=0.005)
+    xs, ys = _sample_top(state.layers[0].level_set)
+
+    right_past = xs[(xs > TRENCH_X1) & (ys < TRENCH_INITIAL_Y_UM - 1e-3)]
+    u = float(right_past.max() - TRENCH_X1) if right_past.size else 0.0
+    # 40% sidewall etch at depth 150 nm ⇒ expect ~60 nm undercut,
+    # bracketed to catch both "no undercut" (bug: iso term dropped) and
+    # "full quarter-circle" (bug: directional term dropped).
+    assert 0.02 < u < 0.12, (
+        f"Undercut with sidewall_ratio=0.4 should sit between 20 and "
+        f"120 nm, got {u*1000:.1f} nm")
+
+
 def test_windowed_etch_meshfield_area_matches_removed_material():
     """The MeshField's Si area should equal (initial substrate area)
     minus the area of material removed by the etch. We can compute the

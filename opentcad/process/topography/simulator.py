@@ -33,8 +33,9 @@ State representation:
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass, field
-from typing import List, Sequence
+from typing import List, Sequence, Tuple
 
 import viennals
 
@@ -168,25 +169,28 @@ def _apply_deposit(state: TopographyState, step: Deposit) -> None:
     state.layers.append(Layer(material=step.material, level_set=new_ls))
 
 
+def _exposed(coord, mask_y, x0, x1, tol):
+    """Common mask gate: True if the surface point at *coord* is
+    reachable by etchant given a rigid mask that covers the surface
+    everywhere except x ∈ [x0, x1] and initially sits at y = mask_y.
+
+    Either the point is inside the window, or the point has already
+    dropped below the initial mask height (sidewall of the trench once
+    it starts advancing under the mask edge).
+    """
+    x, y = coord[0], coord[1]
+    if x0 <= x <= x1:
+        return True
+    return y < mask_y - tol
+
+
 class _MaskedIsotropicVelocity(viennals.VelocityField):
-    """Velocity field for an isotropic etch through a photolith-style
-    window in a rigid mask that sits on top of the current surface.
+    """Isotropic etch through a photolith-style mask window.
 
-    Physical model:
-      * The mask covers the surface everywhere except x ∈ [x0, x1].
-      * Where the mask holds (initial surface point at y = mask_y),
-        velocity is zero — the mask blocks the etchant.
-      * Where the material is exposed — either inside the window, or
-        anywhere the surface has already dropped below the mask level
-        (the sidewall of the trench once it starts undercutting) —
-        velocity is -rate along the outward normal, so the surface
-        recedes into the material at that rate.
-
-    The undercut curl under the mask edges falls out of the level-set
-    advancing every point along its normal simultaneously: the sidewall
-    normal is horizontal, so the sidewall advances laterally at the
-    same rate as the trench bottom advances downward. The two meet in
-    a classic quarter-circle at the mask edge.
+    Rate is uniform (-rate along the normal) wherever the surface is
+    exposed; the level-set produces the textbook quarter-circle
+    undercut at the mask edges because every exposed point advances
+    simultaneously along its own normal.
     """
     def __init__(self, rate: float, x0: float, x1: float, mask_y: float,
                  tol: float = 1e-4):
@@ -198,12 +202,56 @@ class _MaskedIsotropicVelocity(viennals.VelocityField):
         self.tol = float(tol)
 
     def getScalarVelocity(self, coord, material, normal, pointID):
-        x, y = coord[0], coord[1]
-        if self.x0 <= x <= self.x1:
-            return -self.rate
-        if y < self.mask_y - self.tol:
+        if _exposed(coord, self.mask_y, self.x0, self.x1, self.tol):
             return -self.rate
         return 0.0
+
+    def getVectorVelocity(self, coord, material, normal, pointID):
+        return [0.0, 0.0, 0.0]
+
+    def getDissipationAlpha(self, direction, material, coord):
+        return abs(self.rate)
+
+
+class _MaskedDirectionalVelocity(viennals.VelocityField):
+    """RIE-style directional etch through a photolith-style mask window.
+
+    The etchant is a collimated ion beam travelling along `direction`.
+    A surface facet's etch rate scales with how strongly it faces INTO
+    the beam:
+
+        v = -rate * (sidewall_ratio + (1 - sidewall_ratio) *
+                     max(0, -direction · normal))
+
+    So the horizontal trench floor (normal = (0, 1)) sees the full ion
+    flux and etches at -rate, whereas a vertical sidewall (normal = ±x)
+    sees no flux and only etches at -rate * sidewall_ratio. With
+    sidewall_ratio = 0 the sidewalls freeze and the trench walls stay
+    vertical — the RIE limit. The mask gate is the same as for the
+    isotropic case.
+    """
+    def __init__(self, rate: float, x0: float, x1: float, mask_y: float,
+                 direction: Tuple[float, float], sidewall_ratio: float,
+                 tol: float = 1e-4):
+        super().__init__()
+        self.rate = float(rate)
+        self.x0 = float(x0)
+        self.x1 = float(x1)
+        self.mask_y = float(mask_y)
+        # Normalize the 2D beam direction to unit length so
+        # dot(direction, normal) is a real cosine.
+        dx, dy = float(direction[0]), float(direction[1])
+        norm = math.sqrt(dx * dx + dy * dy)
+        self.dx, self.dy = dx / norm, dy / norm
+        self.iso = float(sidewall_ratio)
+        self.tol = float(tol)
+
+    def getScalarVelocity(self, coord, material, normal, pointID):
+        if not _exposed(coord, self.mask_y, self.x0, self.x1, self.tol):
+            return 0.0
+        nx, ny = normal[0], normal[1]
+        flux = max(0.0, -(self.dx * nx + self.dy * ny))
+        return -self.rate * (self.iso + (1.0 - self.iso) * flux)
 
     def getVectorVelocity(self, coord, material, normal, pointID):
         return [0.0, 0.0, 0.0]
@@ -230,29 +278,49 @@ def _current_top_y(level_set: "viennals.d2.Domain",
 def _apply_etch(state: TopographyState, step: Etch) -> None:
     """Erode the top layer by depth.
 
-    Two backends depending on whether a window is set:
-      * `window_x_um=None` — uniform Minkowski erosion via GeometricAdvect
+    Backends:
+      * unmasked isotropic — uniform Minkowski erosion via GeometricAdvect
         with a SphereDistribution of radius -depth. Fast, closed-form.
-      * `window_x_um=(x0, x1)` — masked isotropic etch via Advect + the
-        Python `_MaskedIsotropicVelocity` field. Numerical Lax-Friedrichs
-        step; gives the textbook undercut profile.
+      * masked isotropic  — Advect + `_MaskedIsotropicVelocity`.
+        Lax-Friedrichs step; textbook quarter-circle undercut.
+      * unmasked directional / masked directional — Advect + the
+        `_MaskedDirectionalVelocity` field. Ions travel along
+        `step.direction`; surface recedes at full rate where it faces
+        into the beam, at `sidewall_ratio · rate` where it doesn't. The
+        RIE trench falls out of the same advection loop as the isotropic
+        one.
     """
     if not state.layers:
         raise RuntimeError("Cannot etch an empty stack.")
 
-    if step.window_x_um is None:
+    if step.model == "isotropic" and step.window_x_um is None:
         _dilate(state.top.level_set, -step.depth_um)
         return
 
-    x0, x1 = step.window_x_um
     xmin, xmax, _, _ = state.bounds_um
-    if x0 < xmin - 1e-6 or x1 > xmax + 1e-6:
-        raise ValueError(
-            f"Etch window [{x0:.3f}, {x1:.3f}] um extends outside the "
-            f"simulation domain [{xmin:.3f}, {xmax:.3f}] um.")
+    if step.window_x_um is None:
+        # A directional etch without a window still needs an ion-beam
+        # gate so the horizontal top recedes at the right rate: model
+        # the "no mask" case as a window spanning the whole domain.
+        x0, x1 = xmin, xmax
+    else:
+        x0, x1 = step.window_x_um
+        if x0 < xmin - 1e-6 or x1 > xmax + 1e-6:
+            raise ValueError(
+                f"Etch window [{x0:.3f}, {x1:.3f}] um extends outside "
+                f"the simulation domain [{xmin:.3f}, {xmax:.3f}] um.")
 
     mask_y = _current_top_y(state.top.level_set, xmin, xmax)
-    vf = _MaskedIsotropicVelocity(rate=1.0, x0=x0, x1=x1, mask_y=mask_y)
+
+    if step.model == "isotropic":
+        vf = _MaskedIsotropicVelocity(rate=1.0, x0=x0, x1=x1, mask_y=mask_y)
+    elif step.model == "directional":
+        vf = _MaskedDirectionalVelocity(
+            rate=1.0, x0=x0, x1=x1, mask_y=mask_y,
+            direction=step.direction, sidewall_ratio=step.sidewall_ratio)
+    else:
+        raise ValueError(f"Unknown etch model {step.model!r}")
+
     adv = viennals.d2.Advect(state.top.level_set, vf)
     adv.setAdvectionTime(float(step.depth_um))
     adv.apply()
