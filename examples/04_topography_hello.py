@@ -1,21 +1,26 @@
 """
-Example 04 — Topography "hello world": isotropic vs directional trench.
+Example 04 — Topography "hello world": isotropic vs directional trench,
+plus a two-material through-etch.
 
-Runs two parallel recipes against a bare Si substrate. Both mask the
-same 300 nm window and etch 150 nm:
+Panel A — bare Si substrate, isotropic vs directional mask etch at the
+same depth. Shows the classic quarter-circle undercut on one side and
+near-vertical walls on the other.
 
-    * isotropic  — quarter-circle undercut curls under the mask edges,
-                   classic wet-etch profile.
-    * directional (RIE, sidewall_ratio=0) — the ion beam only sees the
-                   horizontal top, so the trench walls stay vertical.
+Panel B — Si substrate with a thin SiO2 hardmask on top. A directional
+etch punches through the oxide and drops into the Si, driven by
+ViennaLS's multi-level-set advection. The mesh bridge produces a valid
+per-material MeshField even where the oxide is fully consumed and the
+two level-sets coincide.
 
-Produces three artifacts:
+Produces:
     * examples/04_topography_recipe.png — recipe progression per step
-      for both recipes, in a 2×3 grid.
-    * examples/04_topography_profile.png — the two final profiles
-      overlaid on a single axis, so you can read undercut off directly.
-    * examples/04_topography_mesh.png — the isotropic result meshed
-      and ready to hand to the device solver.
+      for both bare-Si recipes, in a 2×3 grid.
+    * examples/04_topography_profile.png — the two final bare-Si
+      profiles overlaid on a single axis so you can read undercut off
+      directly.
+    * examples/04_topography_mesh.png — the isotropic result meshed.
+    * examples/04_topography_through.png — before/after of the two-
+      material through-etch, plus the meshed result.
 
 Run:
     python examples/04_topography_hello.py
@@ -200,6 +205,59 @@ def main():
     fig.tight_layout()
     fig.savefig("examples/04_topography_mesh.png", dpi=120)
     print("  → examples/04_topography_mesh.png")
+
+    # ---------------- Panel B: two-material through-etch ---------------
+    print("\n=== THROUGH-ETCH (Si + 30 nm SiO2 hardmask) ===")
+    tox = 0.03
+    tsi = INITIAL_Y_UM
+    struct_tm = (Structure(width_um=1.0, name="through")
+                 .add_substrate("body", tsi, Material.SI)
+                 .add_layer("oxide", tox, Material.SIO2))
+    recipe_tm = (Recipe("through_etch")
+                 .etch(TRENCH_DEPTH_UM, model="directional",
+                       window_x_um=TRENCH_WINDOW))
+    print(recipe_tm.summary())
+    tm_frames = _run_snapshots(struct_tm, recipe_tm, grid_delta_um=0.005)
+    for label, _, polylines in tm_frames:
+        heights = [f"{m.name}@{ys.mean():.4f}" for m, _, ys in polylines]
+        print(f"  {label:32s} → {heights}")
+
+    final_tm = simulate(struct_tm, recipe_tm, grid_delta_um=0.005)
+    mf_tm = topography_to_meshfield(final_tm, mesh_size_um=0.02)
+    print("MeshField (through-etch):")
+    print(mf_tm.summary())
+
+    fig, axes = plt.subplots(1, len(tm_frames) + 1,
+                             figsize=(4 * (len(tm_frames) + 1), 3.5),
+                             sharey=True)
+    for ax, (label, bounds, polylines) in zip(axes[:-1], tm_frames):
+        _plot_frame(ax, label, bounds, polylines, palette)
+
+    ax = axes[-1]
+    pts_tm = np.asarray(mf_tm.grid.points)[:, :2]
+    tris_tm = mf_tm.grid.cells_dict[5]
+    for material_id in np.unique(mf_tm.material_ids):
+        try:
+            mat = Material(int(material_id))
+        except ValueError:
+            continue
+        mask = mf_tm.material_ids == material_id
+        color = palette.get(mat, "#bbbbbb")
+        for a, b, c in tris_tm[mask]:
+            xs = [pts_tm[a, 0], pts_tm[b, 0], pts_tm[c, 0], pts_tm[a, 0]]
+            ys = [pts_tm[a, 1], pts_tm[b, 1], pts_tm[c, 1], pts_tm[a, 1]]
+            ax.fill(xs, ys, color=color, edgecolor="k", linewidth=0.12)
+    ax.set_xlabel("x [um]")
+    ax.set_title(f"MeshField — {mf_tm.n_cells} triangles", fontsize=9)
+    ax.set_xlim(0, struct_tm.width_um)
+    ax.set_ylim(0, mf_tm.bounds[3] * 1.05)
+    ax.set_aspect("equal")
+    ax.grid(True, alpha=0.2)
+    axes[-1].legend(handles=handles, labels=labels,
+                    loc="upper right", fontsize=8)
+    fig.tight_layout()
+    fig.savefig("examples/04_topography_through.png", dpi=120)
+    print("  → examples/04_topography_through.png")
 
 
 if __name__ == "__main__":

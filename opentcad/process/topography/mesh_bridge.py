@@ -146,16 +146,54 @@ def topography_to_meshfield(state: TopographyState,
         xs_r, ys_r = _resample_polyline_uniform(xs, ys, n)
         tops.append((material, xs_r, ys_r))
 
-    # Verify strict stacking: each polyline must lie above the previous.
-    for i in range(1, len(tops)):
-        _, _, ys_prev = tops[i - 1]
-        _, _, ys_cur = tops[i]
-        if not np.all(ys_cur >= ys_prev - 1e-6):
-            drop = float((ys_prev - ys_cur).max())
-            raise ValueError(
-                f"Layer {i} top drops {drop:.4f} um below layer {i-1} top — "
-                "etch broke through the underlying material. Handling this "
-                "properly needs a real polygon walker (planned).")
+    # Enforce stack invariant + break disappearing layers into segments.
+    #
+    # After a through-etch, an upper layer's top curve can coincide with
+    # (or briefly dip below) the layer beneath it — meaning the upper
+    # material has been fully consumed at those x samples. gmsh cannot
+    # mesh a zero-thickness surface, so we split each upper material into
+    # a list of contiguous (xs, ys) *segments* where its thickness is
+    # non-trivial, and stop trying to hand a single closed loop for the
+    # whole layer.
+    MIN_LAYER_THICKNESS_UM = 1e-3   # 1 nm — anything thinner is gone.
+    # segments_per_layer[i] is a list of (xs, ys) chunks for layer i.
+    segments_per_layer: list[list[tuple[np.ndarray, np.ndarray]]] = []
+    # After stack clamping, this holds the "top of everything below
+    # layer i" curve — used to detect where layer i is exposed.
+    stack_top = None
+    for idx, (material, xs, ys) in enumerate(tops):
+        # Clamp so we never dip below the stack top from earlier layers.
+        # (The domain floor is the substrate's bottom, not something
+        # you can go below.)
+        if stack_top is None:
+            base = np.full_like(ys, ymin)
+        else:
+            base = stack_top
+        # Snap-up: force ys ≥ base (physical stack invariant). If a small
+        # numerical dip crept in below base, clamp silently.
+        ys_clamped = np.maximum(ys, base)
+        # Find the connected x-runs where the layer has real thickness.
+        exists = (ys_clamped - base) > MIN_LAYER_THICKNESS_UM
+        chunks: list[tuple[np.ndarray, np.ndarray]] = []
+        if exists.any():
+            # Walk runs of True in `exists`.
+            transitions = np.diff(exists.astype(np.int8))
+            starts = list(np.where(transitions == 1)[0] + 1)
+            ends   = list(np.where(transitions == -1)[0] + 1)
+            if exists[0]:
+                starts.insert(0, 0)
+            if exists[-1]:
+                ends.append(len(exists))
+            for s, e in zip(starts, ends):
+                # For each chunk we need the bottom curve at the same
+                # xs so mesh_bridge can build a closed loop. Concat
+                # (xs[s:e], ys_clamped[s:e]) with the corresponding
+                # base slice.
+                chunks.append((xs[s:e].copy(), ys_clamped[s:e].copy()))
+        segments_per_layer.append(chunks)
+        # The "top of everything so far" for the next iteration: the max
+        # of the previous stack_top and this layer's clamped ys.
+        stack_top = ys_clamped if stack_top is None else np.maximum(stack_top, ys_clamped)
 
     lc_mm = mesh_size_um * 1e-3
     lc_fine_mm = lc_mm / 2
@@ -184,65 +222,67 @@ def topography_to_meshfield(state: TopographyState,
                 segments.append(gmsh.model.occ.addLine(a, b))
             return segments, pts
 
-        # Bottom of the whole domain: the floor of the substrate is where
-        # material layer[0] starts, but for meshing we need a closed loop
-        # per material. Use the domain floor ymin as the bottom of
-        # layer[0].
-        # For layer i > 0, the bottom curve is layer[i-1]'s top curve
-        # (shared boundary → same points).
+        # For each material chunk we build one closed loop:
+        #   bottom curve (from the stack below)  L→R
+        #   right side (straight vertical segment)
+        #   top curve (this chunk's ys)          R→L
+        #   left side (straight vertical segment)
+        #
+        # The "stack below" is the top-of-everything-else curve at each
+        # x — computed cumulatively as we iterate materials bottom-up.
+        # For a chunk with x-slice [s:e], we sample the stack-below at
+        # exactly those xs so top and bottom share endpoints and gmsh
+        # can close the loop.
 
-        # Persistent per-layer polyline endpoints so we can share sides.
-        # For each interface curve, keep its left/right endpoint tags so
-        # we can close the side edges consistently.
-        interface_curves: list[dict] = []
-        # Domain floor (special-cased):
-        floor_segments, floor_pts = make_curve(
-            np.array([xmin, xmax]),
-            np.array([ymin, ymin]),
-        )
-        interface_curves.append({
-            "segments": floor_segments,
-            "left_pt":  floor_pts[0],
-            "right_pt": floor_pts[-1],
-            "left_x":  xmin, "right_x": xmax,
-            "left_y":  ymin, "right_y": ymin,
-        })
-
-        for material, xs, ys in tops:
-            segs, pts = make_curve(xs, ys)
-            interface_curves.append({
-                "segments": segs,
-                "left_pt":  pts[0],
-                "right_pt": pts[-1],
-                "left_x":  float(xs[0]),  "right_x": float(xs[-1]),
-                "left_y":  float(ys[0]),  "right_y": float(ys[-1]),
-                "material": material,
-            })
+        # Master x grid (shared by all layers because we resampled).
+        xs_master, _ = tops[0][1], tops[0][2]
+        # stack_top_running[k] holds the top-of-material-stack at the
+        # k-th x sample after processing layers [0..i-1]. Starts at the
+        # domain floor.
+        stack_top_running = np.full_like(xs_master, ymin, dtype=float)
 
         surface_material: dict[int, Material] = {}
-        for i in range(1, len(interface_curves)):
-            bot = interface_curves[i - 1]
-            top = interface_curves[i]
 
-            # Left side: line from bot.left_pt to top.left_pt.
-            left_side = gmsh.model.occ.addLine(bot["left_pt"], top["left_pt"])
-            # Right side: line from top.right_pt to bot.right_pt (reverse
-            # so the loop traverses counter-clockwise when possible).
-            right_side = gmsh.model.occ.addLine(top["right_pt"],
-                                                bot["right_pt"])
+        for i, (material, xs, _) in enumerate(tops):
+            for chunk_xs, chunk_ys in segments_per_layer[i]:
+                # Locate this chunk's slice in the master x grid.
+                # Since every layer was resampled onto the same xs, we
+                # can find the start index by nearest match.
+                start = int(np.argmin(np.abs(xs_master - chunk_xs[0])))
+                end = start + len(chunk_xs)  # exclusive
+                bottom_ys = stack_top_running[start:end].copy()
+                top_ys    = chunk_ys.copy()
 
-            # Build the curve loop: bottom (L→R), right side (R→R),
-            # top reversed (R→L), left reversed (L→L). We negate segment
-            # tags for reversal.
-            loop_segs = (
-                list(bot["segments"])
-                + [right_side]
-                + [-s for s in reversed(top["segments"])]
-                + [-left_side]
-            )
-            wire = gmsh.model.occ.addWire(loop_segs, checkClosed=False)
-            surf = gmsh.model.occ.addPlaneSurface([wire])
-            surface_material[surf] = top["material"]
+                # Build gmsh points for this chunk's top and bottom
+                # curves. Endpoints of top and bottom must coincide so
+                # the side walls have zero length there (skipped) OR a
+                # real short segment (kept). We create them separately.
+                top_segs, top_pts = make_curve(chunk_xs, top_ys)
+                bot_segs, bot_pts = make_curve(chunk_xs, bottom_ys)
+
+                # Left side: from bot[0] to top[0]. May be zero-length
+                # if this chunk starts on the domain edge with y = ymin.
+                left_side = gmsh.model.occ.addLine(bot_pts[0], top_pts[0])
+                # Right side: from top[-1] to bot[-1].
+                right_side = gmsh.model.occ.addLine(top_pts[-1], bot_pts[-1])
+
+                loop_segs = (
+                    list(bot_segs)
+                    + [right_side]
+                    + [-s for s in reversed(top_segs)]
+                    + [-left_side]
+                )
+                wire = gmsh.model.occ.addWire(loop_segs, checkClosed=False)
+                surf = gmsh.model.occ.addPlaneSurface([wire])
+                surface_material[surf] = material
+
+            # Update the running stack top: max of previous and this
+            # layer's clamped ys at each x.
+            #   (clamped ys are just tops[i][2] with the stack invariant
+            #    applied — we recompute here to stay independent.)
+            _, _, ys_full = tops[i]
+            ys_clamped_full = np.maximum(ys_full, stack_top_running)
+            stack_top_running = np.maximum(stack_top_running, ys_clamped_full)
 
         gmsh.model.occ.synchronize()
 

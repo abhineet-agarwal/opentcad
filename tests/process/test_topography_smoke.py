@@ -326,6 +326,122 @@ def test_directional_with_sidewall_ratio_gives_partial_undercut():
         f"120 nm, got {u*1000:.1f} nm")
 
 
+# ---------------------------------------------------------------------------
+# Multi-material through-etch.
+#
+# Stack: 500 nm Si substrate + 30 nm SiO2 on top. A 100 nm etch through
+# a mask window consumes all 30 nm of SiO2 and 70 nm of Si inside the
+# window. ViennaLS's multi-LS advection is responsible for pinning the
+# SiO2 top LS at the Si top LS wherever the oxide is fully consumed
+# (the "top must sit above bottom" stack invariant).
+# ---------------------------------------------------------------------------
+
+MM_STACK_SI_UM  = 0.5
+MM_STACK_OX_UM  = 0.03
+MM_ETCH_DEPTH   = 0.10
+MM_WINDOW = (0.35, 0.65)
+
+
+def _build_multimaterial(model: str):
+    struct = (Structure(width_um=1.0, name=f"through_etch_{model}")
+              .add_substrate("body", MM_STACK_SI_UM, Material.SI)
+              .add_layer("oxide", MM_STACK_OX_UM, Material.SIO2))
+    recipe = (Recipe(f"through_{model}")
+              .etch(depth_um=MM_ETCH_DEPTH, model=model,
+                    window_x_um=MM_WINDOW))
+    return struct, recipe
+
+
+def _initial_tops():
+    """Convention matches simulator.initial_state_from_structure: layer
+    tops sit at cumulative thickness above y=0."""
+    return {
+        Material.SI:   MM_STACK_SI_UM,                        # 0.50 um
+        Material.SIO2: MM_STACK_SI_UM + MM_STACK_OX_UM,       # 0.53 um
+    }
+
+
+def test_multimaterial_initial_state_stacks_bottom_first():
+    """Sanity: a two-layer Structure produces a bottom-first LS stack
+    with Si LS at y=0.50 and SiO2 LS at y=0.53. Regression guard on
+    the multi-layer path in initial_state_from_structure."""
+    struct, _ = _build_multimaterial("directional")
+    from opentcad.process.topography import initial_state_from_structure
+    state = initial_state_from_structure(struct, grid_delta_um=0.005)
+
+    assert [L.material for L in state.layers] == [Material.SI, Material.SIO2]
+    tops = _initial_tops()
+    for L in state.layers:
+        xs, ys = _sample_top(L.level_set)
+        assert np.allclose(ys, tops[L.material], atol=1e-3), (
+            f"{L.material.name} LS should be flat at y={tops[L.material]}, "
+            f"got y range {ys.min():.4f}..{ys.max():.4f}")
+
+
+@pytest.mark.parametrize("model", ["isotropic", "directional"])
+def test_masked_etch_punches_through_top_layer_into_substrate(model):
+    """Inside the window the etch is deeper than the oxide is thick,
+    so the SiO2 top LS must clamp onto the Si top LS (fully-consumed
+    oxide) and the Si top LS must drop by (depth - oxide_thickness)."""
+    struct, recipe = _build_multimaterial(model)
+    state = simulate(struct, recipe, grid_delta_um=0.005)
+
+    tops = _initial_tops()
+    si_layer  = state.layers[0]
+    ox_layer  = state.layers[1]
+
+    xs_si, ys_si = _sample_top(si_layer.level_set)
+    xs_ox, ys_ox = _sample_top(ox_layer.level_set)
+
+    # Outside window: both LSs untouched.
+    outside = xs_si < 0.10
+    assert np.all(np.abs(ys_si[outside] - tops[Material.SI])   < 2e-3)
+    outside_ox = xs_ox < 0.10
+    assert np.all(np.abs(ys_ox[outside_ox] - tops[Material.SIO2]) < 2e-3)
+
+    # Inside window (center, away from mask-edge undercut).
+    y_target = tops[Material.SIO2] - MM_ETCH_DEPTH   # 0.53 - 0.10 = 0.43
+    center_si = (xs_si > MM_WINDOW[0] + 0.05) & (xs_si < MM_WINDOW[1] - 0.05)
+    assert np.all(np.abs(ys_si[center_si] - y_target) < 8e-3), (
+        f"Si top inside window should drop to y={y_target:.3f}, got "
+        f"y range {ys_si[center_si].min():.4f}..{ys_si[center_si].max():.4f}")
+
+    # SiO2 LS must not sit below Si LS anywhere — that's the stack
+    # invariant ViennaLS is meant to enforce.
+    ys_ox_on_si_grid = np.interp(xs_si, xs_ox, ys_ox)
+    assert np.all(ys_ox_on_si_grid >= ys_si - 3e-3), (
+        f"SiO2 LS dips below Si LS by up to "
+        f"{float((ys_si - ys_ox_on_si_grid).max())*1000:.1f} nm — the "
+        f"multi-material stack invariant is broken.")
+
+    # Inside the window centre, SiO2 is fully consumed → its LS coincides
+    # with the Si LS at those columns.
+    center_ox = (xs_ox > MM_WINDOW[0] + 0.05) & (xs_ox < MM_WINDOW[1] - 0.05)
+    ys_si_at_ox = np.interp(xs_ox[center_ox], xs_si, ys_si)
+    coincide = np.abs(ys_ox[center_ox] - ys_si_at_ox) < 8e-3
+    assert coincide.mean() > 0.9, (
+        f"Only {coincide.mean()*100:.0f}% of SiO2-window points sit on "
+        f"the Si LS — most of the oxide should be fully consumed there.")
+
+
+def test_multimaterial_meshfield_parses_after_through_etch():
+    """The mesh bridge must still produce a valid MeshField when the
+    two layer LSs touch across the window (SiO2 thickness = 0 there).
+    Regression guard on degenerate-layer handling."""
+    struct, recipe = _build_multimaterial("directional")
+    state = simulate(struct, recipe, grid_delta_um=0.005)
+    mf = topography_to_meshfield(state, mesh_size_um=0.02)
+
+    assert mf.n_cells > 0
+    # Both materials should appear somewhere in the mesh (Si everywhere,
+    # SiO2 in the unetched-mask region outside the window).
+    si_cells = int((mf.material_ids == int(Material.SI)).sum())
+    ox_cells = int((mf.material_ids == int(Material.SIO2)).sum())
+    assert si_cells > 0, "no Si cells in mesh"
+    assert ox_cells > 0, "no SiO2 cells after through-etch — the mask " \
+                         "region should still carry oxide."
+
+
 def test_windowed_etch_meshfield_area_matches_removed_material():
     """The MeshField's Si area should equal (initial substrate area)
     minus the area of material removed by the etch. We can compute the

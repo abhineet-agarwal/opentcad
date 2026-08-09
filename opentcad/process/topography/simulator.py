@@ -125,9 +125,11 @@ def initial_state_from_structure(structure, grid_delta_um: float = 0.01
                                  ) -> TopographyState:
     """Build the starting TopographyState from an opentcad Structure.
 
-    Currently supports single-substrate structures (add_substrate + no
-    add_layer calls). Multi-layer initial stacks are trivial to add — I
-    just haven't needed one yet for Milestone 1.1a.
+    Supports both single-substrate (add_substrate) and stacked initial
+    conditions (add_substrate + add_layer). Layers are iterated in
+    bottom-to-top order — matching Structure's storage — so state.layers
+    ends up bottom-first, which is also the order ViennaLS expects when
+    the stack is handed to Advect for multi-material simulation.
     """
     if len(structure._layers) < 1:
         raise ValueError(
@@ -321,7 +323,16 @@ def _apply_etch(state: TopographyState, step: Etch) -> None:
     else:
         raise ValueError(f"Unknown etch model {step.model!r}")
 
-    adv = viennals.d2.Advect(state.top.level_set, vf)
+    # Multi-material advection: hand ViennaLS every layer's LS bottom-
+    # first. It advects all of them under the shared VelocityField and
+    # enforces the stack invariant (upper LS ≥ lower LS everywhere) —
+    # so a deep etch that would push the top layer through the layer
+    # below is resolved by pinning the top LS to the lower LS at those
+    # columns and continuing to advect the exposed lower material.
+    adv = viennals.d2.Advect()
+    adv.setVelocityField(vf)
+    for layer in state.layers:
+        adv.insertNextLevelSet(layer.level_set)
     adv.setAdvectionTime(float(step.depth_um))
     adv.apply()
 
