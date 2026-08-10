@@ -1,6 +1,6 @@
 # OpenTCAD Phases
 
-## Phase 0 — Skeleton and Device Simulation (6-8 weeks)
+## Phase 0 — Skeleton and Device Simulation 
 Goal: p-n junction and MOSFET IV curves with hand-specified doping. No process sim.
 
 Milestone 0.1 — Shared data format (MeshField, Material enum, ContactTag)
@@ -11,7 +11,7 @@ Milestone 0.5 — Physics model library (constant mobility, SRH, ohmic contacts)
 
 Exit: 1D p-n junction IV within 5% of Shockley; 2D MOSFET threshold behavior correct.
 
-## Phase 1 — Process Topography (10-14 weeks)
+## Phase 1 — Process Topography 
 Goal: ViennaPS etch/deposition/oxidation producing geometry for device sim.
 
 Milestone 1.1 — ViennaPS wrapper (TopographySimulator class, recipe definition)
@@ -21,7 +21,7 @@ Milestone 1.4 — Oxidation (Deal-Grove + moving boundary coupled to ViennaPS)
 
 Exit: LOCOS isolation structure simulated correctly; gate oxide thickness within 5%.
 
-## Phase 2 — Doping Simulation (10-14 weeks)
+## Phase 2 — Doping Simulation 
 Goal: Realistic implant+anneal profiles feeding device simulation.
 
 Milestone 2.1 — Implant parameter database (Pearson IV tables B/P/As/BF2 in Si)
@@ -31,7 +31,7 @@ Milestone 2.4 — Process→device mesh translator (THE CORE PIECE)
 
 Exit: Full NMOS process flow simulated; Vth within 20% of SKY130 published value.
 
-## Phase 3 — Materials and Calibration (8-12 weeks)
+## Phase 3 — Materials and Calibration 
 Goal: Quantitative agreement with real fab data.
 
 Milestone 3.1 — Materials database (Klaassen, Lombardi, Canali, SRH, Auger)
