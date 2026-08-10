@@ -24,36 +24,79 @@ provenance.
 
 ## Status
 
-OpenTCAD is in **Phase 0**: device simulation on hand-specified
-structures. The current release is suitable for research, teaching, and
-prototyping. See [PHASES.md](PHASES.md) for the full roadmap.
+Phase 0 is complete and Phase 1 topography (deposit + etch, including
+masked directional through-etch) works end-to-end. The current release
+is suitable for research, teaching, and prototyping. See
+[PHASES.md](PHASES.md) for the full roadmap.
 
-| Phase | Scope                                    | Status         |
-| ----- | ---------------------------------------- | -------------- |
-| 0     | Geometry DSL + DEVSIM device simulation  | **Complete**   |
-| 1     | Topography (ViennaLS): deposit / etch    | In progress    |
-| 1.4   | Deal-Grove oxidation                     | Planned        |
-| 2     | Implant + diffusion (FiPy)               | Planned        |
-| 3     | Materials calibration vs. SKY130 / IHP   | Planned        |
+| Phase | Scope                                        | Status         |
+| ----- | -------------------------------------------- | -------------- |
+| 0     | Geometry DSL + DEVSIM device simulation      | **Complete**   |
+| 1.1–1.3 | Topography (ViennaLS): deposit + etch      | **Complete**   |
+| 1.4   | Deal-Grove oxidation                         | Planned        |
+| 2     | Implant + diffusion (FiPy)                   | Planned        |
+| 3     | Materials calibration vs. SKY130 / IHP       | Planned        |
 
-What works today:
-- 2D geometry builder (`Structure` DSL) → Gmsh triangular mesh
-- Multi-region structures with material *and* doping overrides
-  (e.g. Si/SiO₂ stacks, n+ source/drain in a p-body)
-- Drift-diffusion + Poisson via DEVSIM with Scharfetter–Gummel flux
-- SRH recombination, ohmic and metal-on-insulator contacts
-- **Pluggable physics layer** (`PhysicsConfig`): swap mobility models
-  (`ConstantMobility`, `Klaassen` unified bulk) without touching the solver
-- IV sweeps, MOS-capacitor regime analysis, NMOS Id–Vgs
-- YAML-based material parameter database (with `pydantic` validation)
-- **Topography DSL** (Phase 1.1a): `Recipe.deposit(...).etch(...)` runs
-  on ViennaLS and produces a per-material MeshField the device solver
-  consumes without any glue code
+**Test count**: 78/78 passing (device solver + physics + geometry +
+materials + topography). Slow ViennaLS-backed topography tests run in
+under 5 s on a laptop.
 
-Phase 0 exit criteria met:
-- ✓ 1-D p-n junction IV within 5% of Shockley
+### Device simulation (Phase 0)
+
+- 2-D `Structure` DSL → adaptive Gmsh triangular mesh with
+  per-material and per-region overrides (e.g. Si/SiO₂ stacks, n+ S/D
+  wells in a p-body).
+- Poisson + drift–diffusion via DEVSIM with Scharfetter–Gummel flux,
+  automatic Jacobians, and continuous Si/SiO₂ interface conditions.
+- Ohmic, Schottky, and metal-on-insulator contacts. `flat_band_shift_V`
+  packs Q_f, mid-gap D_it, and φ_MS into one compact-model number.
+- Full CMOS mobility stack composable in one expression —
+  `Lombardi(base=Canali(base=Klaassen()))` — plus recombination
+  (SRH + Auger + Radiative), bandgap narrowing (Slotboom), and
+  Fermi–Dirac statistics (Blakemore).
+- Analysis: `iv_sweep`, `cv_sweep` (quasi-static / low-frequency),
+  MOS-cap regime probes, NMOS Id–Vgs.
+- YAML-based material parameter database with `pydantic` validation.
+
+Phase 0 exit criteria (all met):
+
+- ✓ 1-D p-n junction IV within 5 % of Shockley
 - ✓ 2-D MOS capacitor — three regimes, φ_s ≈ 2·φ_F at strong inversion
-- ✓ 2-D NMOS Id–Vgs — clean turn-on, on/off > 10¹⁰ at Vds = 50 mV
+- ✓ 2-D NMOS Id–Vgs — clean turn-on, on/off > 10¹⁰ at V_ds = 50 mV
+- ✓ MOS-cap LF CV — accumulation → C_ox, depletion minimum, LF
+  inversion recovery to C_ox
+
+### Topography simulation (Phase 1)
+
+- Chainable `Recipe` DSL:
+  `Recipe().deposit(material, thickness).etch(depth, ...)`.
+- Deposit models: conformal (Minkowski dilation via ViennaLS
+  `GeometricAdvect` + `SphereDistribution`).
+- Etch models:
+  - unmasked isotropic — closed-form Minkowski erosion
+  - **masked isotropic** — Lax–Friedrichs advection, textbook
+    quarter-circle undercut under the mask edges
+  - **masked directional (RIE)** — configurable ion-beam `direction`
+    and `sidewall_ratio`; near-vertical trench walls at
+    `sidewall_ratio=0`, intermediate profiles for chemical–physical
+    mixes.
+- Multi-material stacks: a deep masked etch punches through a top
+  layer and continues into the material beneath it, via ViennaLS
+  multi-level-set advection. Enables hardmask patterning flows.
+- **Zero-glue device coupling**: `topography_to_meshfield` produces a
+  standard `MeshField` that `DeviceSolver` consumes unchanged — no
+  process-side re-meshing, no manual doping insertion.
+
+See [`examples/04_topography_hello.py`](examples/04_topography_hello.py)
+for a side-by-side isotropic-vs-directional trench comparison plus a
+two-material through-etch demo.
+
+**Backend note (macOS)**: OpenTCAD talks to ViennaLS directly rather
+than through ViennaPS, because the current ViennaPS macOS wheel
+statically links VTK and its duplicate `vtkCocoa*` classes collide with
+ViennaLS's copy, segfaulting on any real op. The ViennaPS process-model
+catalog (SF6O2Etching, MultiParticleProcess, …) plugs in when a fixed
+wheel ships — the Recipe / mesh-bridge boundaries won't move.
 
 ---
 
@@ -68,30 +111,37 @@ Every layer communicates through a single data object — the **`MeshField`**
 - a `ProcessStep` history for provenance
 
 ```
-                ┌──────────────────────────────────────────────┐
-                │     opentcad.geometry.Structure (DSL)        │
-                │  add_substrate / add_layer / add_region /    │
-                │  add_contact                                 │
-                └────────────────────┬─────────────────────────┘
-                                     │ .to_meshfield()
-                                     ▼
-   ┌──────────────────────────────────────────────────────────┐
-   │  MeshField  ─  pyvista UnstructuredGrid                  │
-   │   cells:  material_id                                    │
-   │   nodes:  Nd, Na                                         │
-   │   tags :  ContactTag, ProcessStep                        │
-   └─────┬──────────────────────────┬─────────────────────────┘
-         │                          │
-  (Phase 1–2)                       │ (Phase 0)
-  ViennaPS / FiPy                   ▼
-  process simulation     ┌────────────────────────────────────┐
-         │               │  opentcad.device.DeviceSolver      │
-         └──────────────▶│  DEVSIM  ·  Poisson + DD + SRH     │
-                         │  iv_sweep / solve_equilibrium      │
-                         └────────────────────────────────────┘
-                                     │
-                                     ▼
-                              VTK / matplotlib
+   ┌──────────────────────────────────────────────┐    ┌──────────────────────────────┐
+   │   opentcad.geometry.Structure (DSL)          │    │   opentcad.process.Recipe    │
+   │  add_substrate / add_layer / add_region /    │    │  .deposit(material, t)       │
+   │  add_contact                                 │    │  .etch(depth, model=...,     │
+   │                                              │    │        window_x_um=...)      │
+   └────────────────────┬─────────────────────────┘    └────────────┬─────────────────┘
+                        │ .to_meshfield()                           │ simulate(struct, recipe)
+                        │                                           ▼
+                        │                             ┌───────────────────────────────┐
+                        │                             │  ViennaLS multi-LS advection  │
+                        │                             │  (per-layer level-sets)       │
+                        │                             └────────────┬──────────────────┘
+                        │                                          │ topography_to_meshfield
+                        ▼                                          ▼
+   ┌──────────────────────────────────────────────────────────────────────────────────┐
+   │  MeshField  ─  pyvista UnstructuredGrid                                          │
+   │   cells:  material_id                                                            │
+   │   nodes:  Nd, Na                                                                 │
+   │   tags :  ContactTag, ProcessStep                                                │
+   └────────────────────────────────────────────┬─────────────────────────────────────┘
+                                                │
+                                                ▼
+                              ┌────────────────────────────────────────┐
+                              │  opentcad.device.DeviceSolver          │
+                              │  DEVSIM · Poisson + DD                 │
+                              │  Klaassen · Canali · Lombardi · SRH …  │
+                              │  iv_sweep · cv_sweep · equilibrium     │
+                              └────────────────────┬───────────────────┘
+                                                   │
+                                                   ▼
+                                            VTK / matplotlib
 ```
 
 **Units are enforced everywhere**: spatial in micrometers (µm),
@@ -233,6 +283,68 @@ analytic Vth ≈ 0.85 V for Nₐ = 10¹⁷).
 
 ---
 
+## Tutorial 4 — A curved trench from a masked etch
+
+The topography DSL runs process steps on a ViennaLS level-set and hands
+you a `MeshField` you can feed straight back into `DeviceSolver`. The
+following recipe starts with a bare Si substrate, blanket-etches 30 nm,
+then opens a 300 nm window in the mask and isotropically etches 150 nm.
+The result is the textbook quarter-circle profile:
+
+```python
+from opentcad.geometry.formats import Material
+from opentcad.geometry.structure import Structure
+from opentcad.process.topography import (
+    Recipe, simulate, topography_to_meshfield,
+)
+
+struct = (Structure(width_um=1.0, name="trench")
+    .add_substrate("body", 0.5, Material.SI))
+
+recipe = (Recipe("curved_trench")
+    .etch(0.03)                                   # blanket 30 nm
+    .etch(0.15, window_x_um=(0.35, 0.65)))        # 150 nm through mask
+
+state = simulate(struct, recipe, grid_delta_um=0.005)
+mf    = topography_to_meshfield(state, mesh_size_um=0.03)
+```
+
+Swap `.etch(depth, window_x_um=..., model="directional")` for the RIE
+variant with near-vertical sidewalls, or `.etch(depth, ...,
+model="directional", sidewall_ratio=0.4)` for an intermediate profile.
+[`examples/04_topography_hello.py`](examples/04_topography_hello.py)
+runs both models under the same window and produces:
+
+- `examples/04_topography_recipe.png` — recipe progression per step
+  for both isotropic and directional, in a 2×3 grid.
+- `examples/04_topography_profile.png` — the two final profiles
+  overlaid so you can read the undercut off directly.
+- `examples/04_topography_mesh.png` — the final MeshField shaded by
+  material, ready for the device solver.
+
+For multi-material patterning (say, a directional etch through a
+30 nm SiO₂ hardmask into the Si substrate), just start with a
+stacked `Structure`:
+
+```python
+struct = (Structure(width_um=1.0, name="through_etch")
+    .add_substrate("body", 0.5, Material.SI)
+    .add_layer   ("oxide", 0.03, Material.SIO2))
+
+recipe = Recipe("through").etch(
+    0.15, model="directional", window_x_um=(0.35, 0.65))
+
+state = simulate(struct, recipe, grid_delta_um=0.005)
+mf    = topography_to_meshfield(state, mesh_size_um=0.02)
+```
+
+The etch consumes the oxide inside the window and continues into the Si
+by the remaining depth; the mesh bridge splits each material into
+whichever contiguous x-ranges still carry non-zero thickness. See
+`examples/04_topography_through.png` for the result.
+
+---
+
 ## Concepts
 
 ### The `Structure` DSL
@@ -250,6 +362,27 @@ optional rectangular region overrides:
 
 The mesh is automatically refined at material interfaces; you can tune
 the global element size via `mesh_size_um`.
+
+### The `Recipe` DSL and topography engine
+
+`Recipe` describes an ordered process flow — pure data, no backend
+coupling. `simulate(structure, recipe)` plays it against an initial
+`TopographyState` (built from the substrate + any pre-existing layers
+in `Structure`) using ViennaLS level-sets:
+
+| Method                                            | Purpose                                                             |
+| ------------------------------------------------- | ------------------------------------------------------------------- |
+| `deposit(material, thickness_um)`                 | Conformal Minkowski-dilation of the surface                         |
+| `etch(depth_um)`                                  | Blanket isotropic erosion                                           |
+| `etch(depth_um, window_x_um=(x0, x1))`            | Masked isotropic etch — quarter-circle undercut                     |
+| `etch(depth_um, model="directional", ...)`        | Masked / unmasked RIE — near-vertical walls at `sidewall_ratio=0`   |
+| `oxidize(temperature_C, time_s, ambient="dry")`   | Deal-Grove stub (Milestone 1.4, planned)                            |
+
+`topography_to_meshfield(state, mesh_size_um=...)` extracts each
+layer's top-surface polyline via `ToSurfaceMesh`, clamps to the
+physical stack invariant, splits every layer into the x-ranges where
+it still has non-zero thickness, and hands the resulting polygons to
+gmsh for a triangulation tagged per material.
 
 ### The `MeshField` data contract
 
@@ -348,15 +481,17 @@ the relevant base in `opentcad/device/physics.py`.
 ```
 opentcad/
 ├── geometry/      Structure DSL, Gmsh meshing, MeshField data format
-├── process/       (Phase 1–2) ViennaPS topography, implant, diffusion
+├── process/
+│   └── topography/ Recipe DSL, ViennaLS simulator, level-set → mesh bridge
 ├── device/        DEVSIM wrapper, physics models, contact BCs
 ├── materials/     YAML parameter database + loader
-├── bridge/        Process → device mesh handoff (field interpolation)
+├── bridge/        Process → device field interpolation (Phase 2)
 ├── io/            VTK / GDS file I/O
 └── viz/           Plotting helpers
 
-examples/          Runnable tutorial scripts
-tests/             Pytest suite (markers: slow, requires_devsim, integration)
+examples/          Runnable tutorial scripts + generated PNG plots
+tests/             Pytest suite — 78 tests
+                   (markers: slow, requires_devsim, requires_viennaps)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
 
@@ -365,8 +500,9 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite
-pytest tests/geometry/ -v                # no DEVSIM/ViennaPS needed
+pytest tests/ -v                         # full suite (78 tests, ~20 s)
+pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
+pytest tests/process/ -v                 # topography (requires viennals)
 pytest -m "not slow" -v                  # skip slow tests
 pytest -m requires_devsim -v             # only DEVSIM-backed tests
 ```
@@ -378,17 +514,45 @@ Test markers are declared in
 
 ## Roadmap
 
-See [PHASES.md](PHASES.md) for full milestone descriptions. Highlights:
+See [PHASES.md](PHASES.md) for full milestone descriptions.
 
-- **Phase 1** — ViennaPS-backed topography (etch, deposition, oxidation
-  with Deal-Grove moving boundary), exit criterion: LOCOS isolation
-  structure correct, gate oxide within 5%.
-- **Phase 2** — Implant (Pearson IV) + FiPy diffusion with the
-  process → device mesh translator. Exit criterion: full NMOS process
-  flow with Vth within 20% of SKY130.
-- **Phase 3** — Quantitative calibration vs. SKY130 / IHP SG13G2 PDKs:
-  Klaassen / Lombardi / Canali mobility, surface mobility, BGN.
-- **Phase 4** — NEGF backend via NanoTCAD ViDES, GDS import, Sphinx docs.
+**Done**
+
+- **Phase 0** — Geometry DSL + DEVSIM device simulation with p-n
+  junction, MOS-cap, and NMOS Id–Vgs / CV as validated exit criteria.
+- **Phase 1.1–1.3** — Topography DSL (`Recipe.deposit / etch`),
+  ViennaLS backend, isotropic + directional (RIE) etch models, masked
+  windowed etches, multi-material through-etch, and a level-set →
+  `MeshField` bridge that drops straight into the device solver.
+
+**Next**
+
+- **Phase 1.4** — Deal-Grove thermal oxidation with a moving boundary
+  coupled to the level-set stack; enables the LOCOS bird's-beak demo
+  as the Phase 1 exit criterion.
+- **Phase 2** — Implant (Pearson IV, B/P/As/BF₂) + FiPy diffusion
+  driven by a `Recipe.implant / anneal` extension, with a process →
+  device field translator that fills `Nd` / `Na` on the meshed device
+  from the process-side profile. Exit: full NMOS process flow with
+  Vth within 20 % of SKY130.
+- **Phase 3** — Quantitative calibration vs. SKY130 / IHP SG13G2
+  PDKs: scipy-driven fit of the existing physics knobs against target
+  metrics (Vth, Ion, SS).
+- **Phase 4** — NEGF backend via NanoTCAD ViDES, GDS import, Sphinx
+  docs, community notebooks.
+
+**Backlog / follow-ups noted in code**
+
+- Angled directional etches (non-vertical ion beam direction).
+- Proper polygon walker in the mesh bridge for re-entrant profiles
+  (currently drops the overhang sliver at multi-valued x).
+- Element-based E_normal for Lombardi surface mobility (currently
+  ~3 % degradation instead of the textbook 20–40 %).
+- Interface-Poisson Q_f as a physically-located surface charge, for CV
+  curves with interface E-field discontinuities.
+- Joyce–Dixon inverse for Fermi–Dirac statistics beyond the Blakemore
+  ceiling (n > 3.7 · N_c).
+- Small-signal AC via DEVSIM's circuit machinery for true HF-CV.
 
 ---
 
@@ -407,10 +571,10 @@ citations), example notebooks, and DEVSIM physics models. Please:
 
 Apache License 2.0 — see [LICENSE](LICENSE). OpenTCAD wraps several
 permissively-licensed open-source projects (Gmsh GPLv2 with linking
-exception, DEVSIM Apache 2.0, FiPy public domain, ViennaPS MIT,
+exception, DEVSIM Apache 2.0, FiPy public domain, ViennaLS MIT,
 PyVista MIT); each retains its own license.
 
 ## Citation
 
 If you use OpenTCAD in academic work, please cite the upstream tools
-(DEVSIM, Gmsh, ViennaPS, FiPy) in addition to this repository.
+(DEVSIM, Gmsh, ViennaLS, FiPy) in addition to this repository.
