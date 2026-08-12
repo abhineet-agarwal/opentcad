@@ -594,20 +594,14 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
 - **Phase 4** — NEGF backend via NanoTCAD ViDES, GDS import, Sphinx
   docs, community notebooks.
 
-**Backlog / follow-ups noted in code**
-
-- Angled directional etches (non-vertical ion beam direction).
-- Proper polygon walker in the mesh bridge for re-entrant profiles
-  (currently drops the overhang sliver at multi-valued x).
-- Full 2D coupled O₂ diffusion for the bird's-beak profile (currently
-  an exponential heuristic feathering length).
-- Element-based E_normal for Lombardi surface mobility (currently
-  ~3 % degradation instead of the textbook 20–40 %).
-- Interface-Poisson Q_f as a physically-located surface charge, for CV
-  curves with interface E-field discontinuities.
-- Joyce–Dixon inverse for Fermi–Dirac statistics beyond the Blakemore
-  ceiling (n > 3.7 · N_c).
-- Small-signal AC via DEVSIM's circuit machinery for true HF-CV.
+**Known issues, caveats, and follow-ups** — the full audit through the
+end of Phase 1 lives in [`KNOWN_ISSUES.md`](KNOWN_ISSUES.md). Each
+entry states what the current behavior is, what regime it fails in,
+and what the proper fix would look like. Highlights: Lax-Friedrichs
+spikes at masked-etch mask corners, LOCOS bird's beak as a heuristic
+feathering, no material-selective etch rates, Lombardi's proxy
+E_normal, Q_f as a Vfb compact-model shift, Fermi-Dirac Blakemore
+ceiling, quasi-static-only CV.
 
 ---
 
