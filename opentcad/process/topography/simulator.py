@@ -37,10 +37,16 @@ import math
 from dataclasses import dataclass, field
 from typing import List, Sequence, Tuple
 
+import numpy as np
 import viennals
 
 from opentcad.geometry.formats import Material
 
+from .oxidation import (
+    ALPHA_SI_CONSUMED_PER_OXIDE,
+    oxide_thickness,
+    temperature_celsius_to_kelvin,
+)
 from .recipe import Deposit, Etch, Oxidize, Recipe
 
 
@@ -337,6 +343,156 @@ def _apply_etch(state: TopographyState, step: Etch) -> None:
     adv.apply()
 
 
+class _PerXScalarVelocity(viennals.VelocityField):
+    """Scalar velocity field with per-x profile.
+
+    For each surface point queried by the Advect kernel, look up the
+    velocity by 1D linear interpolation over a supplied (xs, dys) table.
+    Used to advect a horizontal-ish top surface by a per-column vertical
+    displacement — the natural discretization of Deal-Grove oxidation,
+    where the local oxide growth depends on the local existing thickness
+    and on a mask function.
+
+    We set the advection time to 1.0 and let `dys` carry the total
+    signed displacement in μm. Scalar velocity is applied along the
+    local normal, so a horizontal surface with normal = +y translates
+    scalar v → vertical dy directly; a small curvature (e.g. near a
+    bird's-beak feathering) introduces second-order deviation only.
+    """
+
+    def __init__(self, xs: np.ndarray, dys: np.ndarray):
+        super().__init__()
+        self.xs = np.asarray(xs, dtype=float)
+        self.dys = np.asarray(dys, dtype=float)
+        max_abs = float(np.max(np.abs(self.dys))) if self.dys.size else 0.0
+        # Guard against Lax-Friedrichs dissipation-alpha under-estimate
+        # for near-zero fields; 1e-9 μm is smaller than any physical
+        # oxide growth.
+        self._max_v = max(max_abs, 1e-9)
+
+    def getScalarVelocity(self, coord, material, normal, pointID):
+        return float(np.interp(coord[0], self.xs, self.dys))
+
+    def getVectorVelocity(self, coord, material, normal, pointID):
+        return [0.0, 0.0, 0.0]
+
+    def getDissipationAlpha(self, direction, material, coord):
+        return self._max_v
+
+
+def _advect_by_per_x_dy(level_set: "viennals.d2.Domain",
+                        xs: np.ndarray, dys: np.ndarray) -> None:
+    """Displace a nearly-horizontal top-surface LS by dy(x). In-place."""
+    if not np.any(np.abs(dys) > 1e-9):
+        return  # nothing to do
+    vf = _PerXScalarVelocity(xs, dys)
+    adv = viennals.d2.Advect(level_set, vf)
+    adv.setAdvectionTime(1.0)
+    adv.apply()
+
+
+def _sample_ls_y_at_xs(level_set: "viennals.d2.Domain",
+                       xs_master: np.ndarray) -> np.ndarray:
+    """Return y(x) for a single-valued top level-set at the master xs.
+
+    Handles the ToSurfaceMesh multi-node-per-x case by keeping the
+    lower y at duplicates (same policy as mesh_bridge)."""
+    nodes, _ = extract_surface_polyline(level_set)
+    if not nodes:
+        raise RuntimeError("Cannot sample y(x): level-set surface is empty.")
+    pts = np.asarray(nodes, dtype=float)
+    xs = pts[:, 0]
+    ys = pts[:, 1]
+    order = np.argsort(xs, kind="stable")
+    xs, ys = xs[order], ys[order]
+    return np.interp(xs_master, xs, ys)
+
+
+def _mask_factor(xs: np.ndarray, window: Tuple[float, float],
+                 bird_beak_length_um: float) -> np.ndarray:
+    """Growth-rate multiplier vs x: 1 inside the window, 0 far outside,
+    exponentially feathered over `bird_beak_length_um` past each edge.
+
+    The heuristic feathering stands in for lateral O2 diffusion under a
+    LOCOS nitride edge — a proper 2D coupled diffusion PDE would give
+    the exact bird's-beak shape, but at MVP scale the exponential tail
+    reproduces the characteristic feature qualitatively."""
+    x0, x1 = window
+    factor = np.zeros_like(xs, dtype=float)
+    inside = (xs >= x0) & (xs <= x1)
+    factor[inside] = 1.0
+    if bird_beak_length_um > 0.0:
+        left = xs < x0
+        right = xs > x1
+        factor[left] = np.exp(-(x0 - xs[left]) / bird_beak_length_um)
+        factor[right] = np.exp(-(xs[right] - x1) / bird_beak_length_um)
+    return factor
+
+
+def _apply_oxidize(state: TopographyState, step: Oxidize) -> None:
+    """Grow SiO2 on top of exposed Si per Deal-Grove.
+
+    Finds the top-most Si layer, spawns a SiO2 layer immediately above
+    if one isn't already present, and advects both level-sets:
+      * Si top drops by 0.44 · dx_ox
+      * SiO2 top rises by 0.56 · dx_ox
+    where dx_ox is the per-column Deal-Grove growth given the current
+    local oxide thickness. Outside the optional window, dx_ox is
+    masked to 0 (with an exponential bird's-beak tail if requested).
+    """
+    if not state.layers:
+        raise RuntimeError("Cannot oxidize an empty stack.")
+
+    # Locate the top-most Si layer and the layer directly above it (if
+    # any). If that layer is already SiO2 we grow it; otherwise we
+    # spawn a fresh SiO2 layer from a copy of Si-top, effectively
+    # starting with zero oxide thickness at every column.
+    si_idx = None
+    for i in range(len(state.layers) - 1, -1, -1):
+        if state.layers[i].material == Material.SI:
+            si_idx = i
+            break
+    if si_idx is None:
+        raise ValueError(
+            "Oxidize step needs a Si layer in the stack; none found.")
+
+    if si_idx + 1 < len(state.layers) and \
+       state.layers[si_idx + 1].material == Material.SIO2:
+        ox_layer = state.layers[si_idx + 1]
+    else:
+        new_ls = viennals.d2.Domain(state.layers[si_idx].level_set)
+        ox_layer = Layer(material=Material.SIO2, level_set=new_ls)
+        state.layers.insert(si_idx + 1, ox_layer)
+    si_layer = state.layers[si_idx]
+
+    xmin, xmax, _, _ = state.bounds_um
+    grid = state.grid_delta_um
+    # One xs sample per grid cell keeps interpolation consistent with
+    # the level-set resolution.
+    n_samples = max(64, int((xmax - xmin) / grid) + 1)
+    xs_master = np.linspace(xmin, xmax, n_samples)
+
+    ys_si = _sample_ls_y_at_xs(si_layer.level_set, xs_master)
+    ys_ox = _sample_ls_y_at_xs(ox_layer.level_set, xs_master)
+    x0 = np.maximum(0.0, ys_ox - ys_si)
+
+    T_K = temperature_celsius_to_kelvin(step.temperature_C)
+    x1 = np.array([oxide_thickness(float(x0i), step.time_s, T_K, step.ambient)
+                   for x0i in x0])
+
+    if step.window_x_um is None:
+        mask = np.ones_like(x1)
+    else:
+        mask = _mask_factor(xs_master, step.window_x_um,
+                            step.bird_beak_length_um)
+    dx_grown = mask * (x1 - x0)
+
+    _advect_by_per_x_dy(si_layer.level_set, xs_master,
+                        -ALPHA_SI_CONSUMED_PER_OXIDE * dx_grown)
+    _advect_by_per_x_dy(ox_layer.level_set, xs_master,
+                        +(1.0 - ALPHA_SI_CONSUMED_PER_OXIDE) * dx_grown)
+
+
 def simulate(structure, recipe: Recipe, grid_delta_um: float = 0.01
              ) -> TopographyState:
     """Run *recipe* on *structure*, returning the final TopographyState.
@@ -353,8 +509,7 @@ def simulate(structure, recipe: Recipe, grid_delta_um: float = 0.01
         elif isinstance(step, Etch):
             _apply_etch(state, step)
         elif isinstance(step, Oxidize):
-            raise NotImplementedError(
-                "Oxidize step not implemented yet — Milestone 1.4.")
+            _apply_oxidize(state, step)
         else:
             raise TypeError(f"Unknown recipe step type: {type(step).__name__}")
     return state

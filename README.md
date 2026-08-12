@@ -24,22 +24,22 @@ provenance.
 
 ## Status
 
-Phase 0 is complete and Phase 1 topography (deposit + etch, including
-masked directional through-etch) works end-to-end. The current release
-is suitable for research, teaching, and prototyping. See
+Phases 0 and 1 are complete: process topography (deposit, etch,
+oxidation) and device simulation both work end-to-end and are joined
+by a single `MeshField` data contract. The current release is
+suitable for research, teaching, and prototyping. See
 [PHASES.md](PHASES.md) for the full roadmap.
 
 | Phase | Scope                                        | Status         |
 | ----- | -------------------------------------------- | -------------- |
 | 0     | Geometry DSL + DEVSIM device simulation      | **Complete**   |
-| 1.1–1.3 | Topography (ViennaLS): deposit + etch      | **Complete**   |
-| 1.4   | Deal-Grove oxidation                         | Planned        |
+| 1     | Topography (ViennaLS): deposit + etch + Deal-Grove oxidation | **Complete** |
 | 2     | Implant + diffusion (FiPy)                   | Planned        |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned        |
 
-**Test count**: 78/78 passing (device solver + physics + geometry +
+**Test count**: 94/94 passing (device solver + physics + geometry +
 materials + topography). Slow ViennaLS-backed topography tests run in
-under 5 s on a laptop.
+under 10 s on a laptop.
 
 ### Device simulation (Phase 0)
 
@@ -69,7 +69,7 @@ Phase 0 exit criteria (all met):
 ### Topography simulation (Phase 1)
 
 - Chainable `Recipe` DSL:
-  `Recipe().deposit(material, thickness).etch(depth, ...)`.
+  `Recipe().deposit(material, thickness).etch(depth, ...).oxidize(...)`.
 - Deposit models: conformal (Minkowski dilation via ViennaLS
   `GeometricAdvect` + `SphereDistribution`).
 - Etch models:
@@ -83,13 +83,27 @@ Phase 0 exit criteria (all met):
 - Multi-material stacks: a deep masked etch punches through a top
   layer and continues into the material beneath it, via ViennaLS
   multi-level-set advection. Enables hardmask patterning flows.
+- **Deal–Grove thermal oxidation**: closed-form linear-parabolic law
+  with Arrhenius fits for dry O₂ and wet H₂O on ⟨100⟩ Si. Per-column
+  moving boundary — Si consumed downward by 0.44 · Δx, SiO₂ top up
+  by 0.56 · Δx. Optional mask window with an exponential bird's-beak
+  feathering length, enough for a qualitative LOCOS profile.
 - **Zero-glue device coupling**: `topography_to_meshfield` produces a
   standard `MeshField` that `DeviceSolver` consumes unchanged — no
   process-side re-meshing, no manual doping insertion.
 
+Phase 1 exit criteria (all met):
+
+- ✓ LOCOS isolation profile — pad oxide, masked field oxide, bird's
+  beak visible in the meshed structure
+  ([`examples/05_locos.py`](examples/05_locos.py))
+- ✓ Gate-oxide thickness within 5 % of Deal–Grove across dry+wet
+  ambients at 1000–1100 °C (verified in `test_oxidation.py`)
+
 See [`examples/04_topography_hello.py`](examples/04_topography_hello.py)
 for a side-by-side isotropic-vs-directional trench comparison plus a
-two-material through-etch demo.
+two-material through-etch demo, and
+[`examples/05_locos.py`](examples/05_locos.py) for the LOCOS flow.
 
 **Backend note (macOS)**: OpenTCAD talks to ViennaLS directly rather
 than through ViennaPS, because the current ViennaPS macOS wheel
@@ -345,6 +359,46 @@ whichever contiguous x-ranges still carry non-zero thickness. See
 
 ---
 
+## Tutorial 5 — LOCOS field isolation (Phase 1 exit demo)
+
+Deal–Grove oxidation on bare Si follows the linear-parabolic law
+x² + A·x = B(t + τ) with Arrhenius fits for A and B; OpenTCAD advects
+the Si-top and SiO₂-top level-sets by 0.44·Δx and 0.56·Δx respectively
+so each column's oxide growth conserves the physical volume ratio.
+A single `.oxidize(T_C, t_s, ambient)` call is the whole recipe:
+
+```python
+recipe = Recipe("locos").oxidize(
+    temperature_C=1000, time_s=3600, ambient="wet",
+    window_x_um=(0.7, 1.3),         # nitride-mask opening
+    bird_beak_length_um=0.03,       # lateral O2 diffusion tail
+)
+```
+
+Running the full flow — thin pad oxide, then a wet field oxidation
+inside a photolith window — reproduces the classic LOCOS profile:
+thick SiO₂ mesa in the active area, tapered "bird's beak" at each
+mask edge, unetched Si below. The full script lives at
+[`examples/05_locos.py`](examples/05_locos.py):
+
+```bash
+python examples/05_locos.py
+```
+
+It produces two PNGs: a step-by-step stack view
+(`examples/05_locos_profile.png`) and the final triangulated
+`MeshField` shaded per material (`examples/05_locos_mesh.png`, ~85 k
+triangles, ready for `DeviceSolver`).
+
+The Phase 1 exit criterion — SiO₂ thickness within 5 % of the analytic
+Deal–Grove prediction — is verified in
+[`tests/process/test_oxidation.py`](tests/process/test_oxidation.py)
+across dry+wet ambients at 1000–1100 °C.
+
+![LOCOS profile](examples/05_locos_profile.png)
+
+---
+
 ## Concepts
 
 ### The `Structure` DSL
@@ -376,7 +430,7 @@ in `Structure`) using ViennaLS level-sets:
 | `etch(depth_um)`                                  | Blanket isotropic erosion                                           |
 | `etch(depth_um, window_x_um=(x0, x1))`            | Masked isotropic etch — quarter-circle undercut                     |
 | `etch(depth_um, model="directional", ...)`        | Masked / unmasked RIE — near-vertical walls at `sidewall_ratio=0`   |
-| `oxidize(temperature_C, time_s, ambient="dry")`   | Deal-Grove stub (Milestone 1.4, planned)                            |
+| `oxidize(T_C, t_s, ambient, window_x_um=..., bird_beak_length_um=...)` | Deal–Grove growth with per-column moving boundary + optional LOCOS-style mask |
 
 `topography_to_meshfield(state, mesh_size_um=...)` extracts each
 layer's top-surface polyline via `ToSurfaceMesh`, clamps to the
@@ -520,16 +574,15 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
 
 - **Phase 0** — Geometry DSL + DEVSIM device simulation with p-n
   junction, MOS-cap, and NMOS Id–Vgs / CV as validated exit criteria.
-- **Phase 1.1–1.3** — Topography DSL (`Recipe.deposit / etch`),
-  ViennaLS backend, isotropic + directional (RIE) etch models, masked
-  windowed etches, multi-material through-etch, and a level-set →
-  `MeshField` bridge that drops straight into the device solver.
+- **Phase 1** — Topography DSL (`Recipe.deposit / etch / oxidize`)
+  on ViennaLS: conformal deposit, isotropic + directional (RIE) etch,
+  masked windowed etches, multi-material through-etch, Deal–Grove
+  thermal oxidation with a per-column moving boundary, and a
+  level-set → `MeshField` bridge that drops straight into the device
+  solver. LOCOS + gate-oxide-within-5 % exit criteria met.
 
 **Next**
 
-- **Phase 1.4** — Deal-Grove thermal oxidation with a moving boundary
-  coupled to the level-set stack; enables the LOCOS bird's-beak demo
-  as the Phase 1 exit criterion.
 - **Phase 2** — Implant (Pearson IV, B/P/As/BF₂) + FiPy diffusion
   driven by a `Recipe.implant / anneal` extension, with a process →
   device field translator that fills `Nd` / `Na` on the meshed device
@@ -546,6 +599,8 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
 - Angled directional etches (non-vertical ion beam direction).
 - Proper polygon walker in the mesh bridge for re-entrant profiles
   (currently drops the overhang sliver at multi-valued x).
+- Full 2D coupled O₂ diffusion for the bird's-beak profile (currently
+  an exponential heuristic feathering length).
 - Element-based E_normal for Lombardi surface mobility (currently
   ~3 % degradation instead of the textbook 20–40 %).
 - Interface-Poisson Q_f as a physically-located surface charge, for CV

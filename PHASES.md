@@ -11,15 +11,27 @@ Milestone 0.5 — Physics model library (constant mobility, SRH, ohmic contacts)
 
 Exit: 1D p-n junction IV within 5% of Shockley; 2D MOSFET threshold behavior correct.
 
-## Phase 1 — Process Topography 
-Goal: ViennaPS etch/deposition/oxidation producing geometry for device sim.
+## Phase 1 — Process Topography — COMPLETE
+Goal: level-set etch/deposition/oxidation producing geometry for device sim.
 
-Milestone 1.1 — ViennaPS wrapper (TopographySimulator class, recipe definition)
-Milestone 1.2 — Etch models (isotropic wet, anisotropic RIE via ViennaRay, masked)
-Milestone 1.3 — Deposition models (conformal, PVD)
-Milestone 1.4 — Oxidation (Deal-Grove + moving boundary coupled to ViennaPS)
+Milestone 1.1 — ViennaLS wrapper (TopographySimulator class, Recipe DSL)  ✓
+Milestone 1.2 — Etch models (isotropic wet, anisotropic RIE, masked, multi-material)  ✓
+Milestone 1.3 — Deposition models (conformal Minkowski dilation)  ✓
+Milestone 1.4 — Oxidation (Deal-Grove closed-form + per-column moving boundary)  ✓
 
-Exit: LOCOS isolation structure simulated correctly; gate oxide thickness within 5%.
+Exit: ✓ LOCOS isolation structure simulated (examples/05_locos.py);
+      ✓ oxide thickness within 5% of analytic Deal-Grove across dry+wet
+        ambients at 1000-1100°C (tests/process/test_oxidation.py).
+
+Backend note: shipping on ViennaLS directly instead of ViennaPS —
+the macOS ViennaPS 4.6 wheel statically links VTK and its duplicate
+vtkCocoa* classes segfault when both packages load. ViennaPS process
+models (SF6O2Etching, MultiParticleProcess, ...) plug in later when a
+fixed wheel arrives; the Recipe / mesh-bridge boundaries won't move.
+
+Deferred to Phase 3+: angled directional etch, polygon walker for
+re-entrant profiles, proper 2D coupled O2 diffusion under the mask
+(current bird's-beak is a heuristic exponential feathering).
 
 ## Phase 2 — Doping Simulation 
 Goal: Realistic implant+anneal profiles feeding device simulation.

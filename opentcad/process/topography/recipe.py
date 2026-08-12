@@ -103,16 +103,47 @@ class Etch:
 
 @dataclass(frozen=True)
 class Oxidize:
-    """Deal-Grove thermal oxidation stub. Placeholder for Milestone 1.4."""
+    """Deal-Grove thermal oxidation of the exposed Si-SiO2 stack.
+
+    Grows SiO2 on top of every exposed Si column following the linear-
+    parabolic law x_ox^2 + A x_ox = B (t + tau). The Si-SiO2 boundary
+    moves down by 0.44*dx_grown; the SiO2 top moves up by 0.56*dx_grown.
+
+    Args:
+      temperature_C: oxidation temperature in °C.
+      time_s:        oxidation duration in seconds.
+      ambient:       'dry' (O2) or 'wet' (H2O). Sets Deal-Grove
+                     coefficients per Plummer/Deal fits for <100> Si.
+      window_x_um:   optional (x0, x1). Only columns inside the window
+                     oxidize at full rate. Modelling a nitride hardmask
+                     over the rest of the wafer for LOCOS.
+      bird_beak_length_um: characteristic feathering length outside the
+                     window (heuristic stand-in for lateral O2 diffusion
+                     under the nitride edge). 0.0 = perfectly sharp
+                     mask; typical LOCOS value ≈ pad-oxide thickness
+                     (30-100 nm).
+    """
     temperature_C: float
     time_s: float
     ambient: str = "dry"
+    window_x_um: Optional[Tuple[float, float]] = None
+    bird_beak_length_um: float = 0.0
 
     def __post_init__(self):
         if self.time_s <= 0:
             raise ValueError("Oxidation time must be positive")
         if self.ambient not in ("dry", "wet"):
             raise ValueError(f"Ambient must be 'dry' or 'wet', got {self.ambient!r}")
+        if self.window_x_um is not None:
+            x0, x1 = self.window_x_um
+            if not (x1 > x0):
+                raise ValueError(
+                    f"Oxidation window must be (x0, x1) with x1 > x0; "
+                    f"got {self.window_x_um!r}")
+        if self.bird_beak_length_um < 0:
+            raise ValueError(
+                f"bird_beak_length_um must be ≥ 0; got "
+                f"{self.bird_beak_length_um}")
 
 
 Step = Union[Deposit, Etch, Oxidize]
@@ -145,8 +176,11 @@ class Recipe:
         return self
 
     def oxidize(self, temperature_C: float, time_s: float,
-                ambient: str = "dry") -> "Recipe":
-        self.steps.append(Oxidize(temperature_C, time_s, ambient))
+                ambient: str = "dry",
+                window_x_um: Optional[Tuple[float, float]] = None,
+                bird_beak_length_um: float = 0.0) -> "Recipe":
+        self.steps.append(Oxidize(temperature_C, time_s, ambient,
+                                   window_x_um, bird_beak_length_um))
         return self
 
     def __len__(self) -> int:
@@ -173,9 +207,16 @@ class Recipe:
                     f"  {i}. etch {step.depth_um*1000:.1f} nm "
                     f"({step.model}){''.join(bits)}")
             elif isinstance(step, Oxidize):
+                bits = []
+                if step.window_x_um is not None:
+                    x0, x1 = step.window_x_um
+                    bits.append(f" window=[{x0:.3f}..{x1:.3f}] um")
+                if step.bird_beak_length_um > 0:
+                    bits.append(
+                        f" bird_beak={step.bird_beak_length_um*1000:.0f} nm")
                 lines.append(
                     f"  {i}. oxidize @ {step.temperature_C:.0f}°C for "
-                    f"{step.time_s:.0f} s ({step.ambient})")
+                    f"{step.time_s:.0f} s ({step.ambient}){''.join(bits)}")
             else:
                 lines.append(f"  {i}. {step}")
         return "\n".join(lines)
