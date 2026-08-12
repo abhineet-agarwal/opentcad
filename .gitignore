@@ -28,3 +28,5 @@ htmlcov/
 CLAUDE.md
 **/CLAUDE.md
 .claude/
+
+KNOWN_ISSUES.md
