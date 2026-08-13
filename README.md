@@ -184,6 +184,20 @@ pytest tests/geometry -v          # no DEVSIM required
 pytest tests/ -v -m "not slow"    # full test suite
 ```
 
+### Optional: Streamlit GUI
+
+An interactive browser UI walks through the whole pipeline
+(Structure → Recipe → MeshField → IV/CV) with per-section live previews:
+
+```bash
+pip install -e ".[gui]"
+streamlit run opentcad/gui/app.py
+```
+
+Opens `http://localhost:8501`. Session state carries the built objects
+between sections; a sidebar "Reset entire pipeline" button clears
+everything.
+
 ---
 
 ## Tutorial 1 — A silicon p-n junction in 25 lines

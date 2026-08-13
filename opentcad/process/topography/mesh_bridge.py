@@ -201,7 +201,9 @@ def topography_to_meshfield(state: TopographyState,
     if gmsh.isInitialized():
         gmsh.clear()
     else:
-        gmsh.initialize()
+        # See mesh.py for why: interruptible=False lets gmsh be called
+        # from non-main threads (Streamlit script runner, workers, …).
+        gmsh.initialize(interruptible=False)
 
     try:
         gmsh.option.setNumber("General.Verbosity", 0)

@@ -52,6 +52,9 @@ dev = [
     "ruff>=0.1",
     "mypy>=1.5",
 ]
+gui = [
+    "streamlit>=1.30",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -37,7 +37,10 @@ def build_2d_mesh(structure, mesh_size_um: float = 0.05) -> pv.UnstructuredGrid:
     if gmsh.isInitialized():
         gmsh.clear()
     else:
-        gmsh.initialize()
+        # interruptible=False skips the SIGINT handler that gmsh
+        # otherwise installs on init — the handler call fails from any
+        # non-main thread (e.g. the Streamlit script-runner thread).
+        gmsh.initialize(interruptible=False)
 
     try:
         gmsh.option.setNumber("General.Verbosity", 0)
