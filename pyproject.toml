@@ -25,12 +25,6 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Physics",
 ]
-
-[project.urls]
-Homepage   = "https://github.com/abhineet-agarwal/opentcad"
-Repository = "https://github.com/abhineet-agarwal/opentcad"
-Issues     = "https://github.com/abhineet-agarwal/opentcad/issues"
-
 dependencies = [
     "numpy>=1.24",
     "scipy>=1.11",
@@ -44,6 +38,11 @@ dependencies = [
     "rich>=13.0",
     "click>=8.1",
 ]
+
+[project.urls]
+Homepage   = "https://github.com/abhineet-agarwal/opentcad"
+Repository = "https://github.com/abhineet-agarwal/opentcad"
+Issues     = "https://github.com/abhineet-agarwal/opentcad/issues"
 
 [project.optional-dependencies]
 dev = [
