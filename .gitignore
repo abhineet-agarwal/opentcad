@@ -30,3 +30,7 @@ CLAUDE.md
 .claude/
 
 KNOWN_ISSUES.md
+TALK_SCRIPT.md
+OpenTCAD_talk*.pptx
+~$*.pptx
+scratchpad/
