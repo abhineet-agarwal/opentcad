@@ -17,8 +17,7 @@ mature open libraries:
 
 The goal is to provide an end-to-end Python API where a single script can
 define a structure, simulate fabrication, extract a device mesh, and
-produce IV / CV / Vth characteristics — all with first-class data
-provenance.
+produce IV / CV / Vth characteristics.
 
 ---
 
