@@ -192,6 +192,30 @@ def _exposed(coord, mask_y, x0, x1, tol):
     return y < mask_y - tol
 
 
+def _rate_scale(material_idx: int,
+                materials_in_order,
+                rate_map,
+                default_rate: float) -> float:
+    """Look up the per-material rate scale for a surface point.
+
+    `material_idx` is the integer ViennaLS passes to the VelocityField
+    callback — it's the index of the stacked LS the surface point sits
+    on, matching the order we handed to `Advect.insertNextLevelSet`.
+    We map it back to an `opentcad.Material` enum via
+    `materials_in_order[material_idx]`, then look up `rate_map` for the
+    scale (or fall back to `default_rate` for an unlisted material).
+
+    When `rate_map is None` the behaviour is "etch everything at full
+    rate" — preserves Phase 1 scripts that pre-date Unit D selectivity.
+    """
+    if rate_map is None:
+        return 1.0
+    if 0 <= material_idx < len(materials_in_order):
+        mat = materials_in_order[material_idx]
+        return rate_map.get(mat, default_rate)
+    return default_rate
+
+
 class _MaskedIsotropicVelocity(viennals.VelocityField):
     """Isotropic etch through a photolith-style mask window.
 
@@ -199,8 +223,15 @@ class _MaskedIsotropicVelocity(viennals.VelocityField):
     exposed; the level-set produces the textbook quarter-circle
     undercut at the mask edges because every exposed point advances
     simultaneously along its own normal.
+
+    Per-material selectivity (`rate_map`): scales the uniform rate by
+    `rate_map[Material.<name>]` based on which stacked LS the point
+    sits on. Unlisted materials get `default_rate`. See `_rate_scale`.
     """
     def __init__(self, rate: float, x0: float, x1: float, mask_y: float,
+                 materials_in_order=None,
+                 rate_map=None,
+                 default_rate: float = 0.0,
                  tol: float = 1e-4):
         super().__init__()
         self.rate = float(rate)
@@ -208,11 +239,16 @@ class _MaskedIsotropicVelocity(viennals.VelocityField):
         self.x1 = float(x1)
         self.mask_y = float(mask_y)
         self.tol = float(tol)
+        self.materials_in_order = list(materials_in_order or [])
+        self.rate_map = dict(rate_map) if rate_map is not None else None
+        self.default_rate = float(default_rate)
 
     def getScalarVelocity(self, coord, material, normal, pointID):
-        if _exposed(coord, self.mask_y, self.x0, self.x1, self.tol):
-            return -self.rate
-        return 0.0
+        if not _exposed(coord, self.mask_y, self.x0, self.x1, self.tol):
+            return 0.0
+        scale = _rate_scale(material, self.materials_in_order,
+                             self.rate_map, self.default_rate)
+        return -self.rate * scale
 
     def getVectorVelocity(self, coord, material, normal, pointID):
         return [0.0, 0.0, 0.0]
@@ -228,18 +264,22 @@ class _MaskedDirectionalVelocity(viennals.VelocityField):
     A surface facet's etch rate scales with how strongly it faces INTO
     the beam:
 
-        v = -rate * (sidewall_ratio + (1 - sidewall_ratio) *
-                     max(0, -direction · normal))
+        v = -rate * material_scale *
+            (sidewall_ratio + (1 - sidewall_ratio) * max(0, -direction · normal))
 
     So the horizontal trench floor (normal = (0, 1)) sees the full ion
-    flux and etches at -rate, whereas a vertical sidewall (normal = ±x)
-    sees no flux and only etches at -rate * sidewall_ratio. With
-    sidewall_ratio = 0 the sidewalls freeze and the trench walls stay
-    vertical — the RIE limit. The mask gate is the same as for the
-    isotropic case.
+    flux and etches at -rate · material_scale, whereas a vertical
+    sidewall (normal = ±x) etches at -rate · material_scale · sidewall_ratio.
+    With sidewall_ratio = 0 the sidewalls freeze and the trench walls
+    stay vertical — the RIE limit. The mask gate is the same as for the
+    isotropic case, and the per-material rate scale is the same as
+    `_MaskedIsotropicVelocity`.
     """
     def __init__(self, rate: float, x0: float, x1: float, mask_y: float,
                  direction: Tuple[float, float], sidewall_ratio: float,
+                 materials_in_order=None,
+                 rate_map=None,
+                 default_rate: float = 0.0,
                  tol: float = 1e-4):
         super().__init__()
         self.rate = float(rate)
@@ -253,13 +293,20 @@ class _MaskedDirectionalVelocity(viennals.VelocityField):
         self.dx, self.dy = dx / norm, dy / norm
         self.iso = float(sidewall_ratio)
         self.tol = float(tol)
+        self.materials_in_order = list(materials_in_order or [])
+        self.rate_map = dict(rate_map) if rate_map is not None else None
+        self.default_rate = float(default_rate)
 
     def getScalarVelocity(self, coord, material, normal, pointID):
         if not _exposed(coord, self.mask_y, self.x0, self.x1, self.tol):
             return 0.0
+        scale = _rate_scale(material, self.materials_in_order,
+                             self.rate_map, self.default_rate)
+        if scale == 0.0:
+            return 0.0
         nx, ny = normal[0], normal[1]
         flux = max(0.0, -(self.dx * nx + self.dy * ny))
-        return -self.rate * (self.iso + (1.0 - self.iso) * flux)
+        return -self.rate * scale * (self.iso + (1.0 - self.iso) * flux)
 
     def getVectorVelocity(self, coord, material, normal, pointID):
         return [0.0, 0.0, 0.0]
@@ -301,7 +348,12 @@ def _apply_etch(state: TopographyState, step: Etch) -> None:
     if not state.layers:
         raise RuntimeError("Cannot etch an empty stack.")
 
-    if step.model == "isotropic" and step.window_x_um is None:
+    # Fast path: unmasked isotropic, no selectivity → closed-form
+    # Minkowski erosion on the top LS. Selectivity (rates=…) needs the
+    # Advect path so each LS sees its own per-material rate scale.
+    if (step.model == "isotropic"
+            and step.window_x_um is None
+            and step.rates is None):
         _dilate(state.top.level_set, -step.depth_um)
         return
 
@@ -320,12 +372,24 @@ def _apply_etch(state: TopographyState, step: Etch) -> None:
 
     mask_y = _current_top_y(state.top.level_set, xmin, xmax)
 
+    # Bottom-first list of Material enums — matches the order we hand
+    # the LSs to Advect.insertNextLevelSet, so a `material` index from
+    # the VF callback indexes directly into this list.
+    materials_in_order = [L.material for L in state.layers]
+    rate_map = step.rates
+    default_rate = step.default_rate
+
     if step.model == "isotropic":
-        vf = _MaskedIsotropicVelocity(rate=1.0, x0=x0, x1=x1, mask_y=mask_y)
+        vf = _MaskedIsotropicVelocity(
+            rate=1.0, x0=x0, x1=x1, mask_y=mask_y,
+            materials_in_order=materials_in_order,
+            rate_map=rate_map, default_rate=default_rate)
     elif step.model == "directional":
         vf = _MaskedDirectionalVelocity(
             rate=1.0, x0=x0, x1=x1, mask_y=mask_y,
-            direction=step.direction, sidewall_ratio=step.sidewall_ratio)
+            direction=step.direction, sidewall_ratio=step.sidewall_ratio,
+            materials_in_order=materials_in_order,
+            rate_map=rate_map, default_rate=default_rate)
     else:
         raise ValueError(f"Unknown etch model {step.model!r}")
 

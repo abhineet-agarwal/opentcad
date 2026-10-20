@@ -13,7 +13,7 @@ durations, degrees Celsius for temperatures unless noted otherwise.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Tuple, Union
 
 from opentcad.geometry.formats import Material
 
@@ -67,6 +67,16 @@ class Etch:
       * `window_x_um=(x0, x1)`: photolithography-style opening.
       * `mask_material`: reserved for a hardmask level-set (multi-layer
         initial stack). Not yet honored.
+
+    Material selectivity:
+      * `rates`: optional {Material: relative_rate} map. When set, each
+        material in the stack is etched at `rates[material] * depth_um`
+        and materials absent from the map are etched at
+        `default_rate * depth_um`. Default = 0.0 → "stop on anything
+        not listed" semantics. Classic use: strip nitride, stop on
+        oxide, with `rates={Material.SI3N4: 1.0, Material.SIO2: 0.02}`.
+      * When `rates is None` every material etches at the same rate
+        (backward-compat for Phase 1 scripts).
     """
     depth_um: float
     model: str = "isotropic"
@@ -74,6 +84,8 @@ class Etch:
     mask_material: Optional[Material] = None
     direction: Tuple[float, float] = (0.0, -1.0)
     sidewall_ratio: float = 0.0
+    rates: Optional[Dict[Material, float]] = None
+    default_rate: float = 0.0
 
     def __post_init__(self):
         if self.depth_um <= 0:
@@ -99,6 +111,19 @@ class Etch:
                 raise ValueError(
                     f"sidewall_ratio must be in [0, 1]; got "
                     f"{self.sidewall_ratio}")
+        if self.rates is not None:
+            for mat, rate in self.rates.items():
+                if not isinstance(mat, Material):
+                    raise ValueError(
+                        f"Etch rates key must be a Material enum; "
+                        f"got {mat!r} ({type(mat).__name__})")
+                if rate < 0.0:
+                    raise ValueError(
+                        f"Etch rate for {mat.name} must be ≥ 0; "
+                        f"got {rate}")
+        if self.default_rate < 0.0:
+            raise ValueError(
+                f"default_rate must be ≥ 0; got {self.default_rate}")
 
 
 @dataclass(frozen=True)
@@ -207,9 +232,12 @@ class Recipe:
              window_x_um: Optional[Tuple[float, float]] = None,
              mask_material: Optional[Material] = None,
              direction: Tuple[float, float] = (0.0, -1.0),
-             sidewall_ratio: float = 0.0) -> "Recipe":
+             sidewall_ratio: float = 0.0,
+             rates: Optional[Dict[Material, float]] = None,
+             default_rate: float = 0.0) -> "Recipe":
         self.steps.append(Etch(depth_um, model, window_x_um, mask_material,
-                                direction, sidewall_ratio))
+                                direction, sidewall_ratio,
+                                rates, default_rate))
         return self
 
     def oxidize(self, temperature_C: float, time_s: float,
@@ -250,6 +278,10 @@ class Recipe:
                     bits.append(f" window=[{x0:.3f}..{x1:.3f}] um")
                 if step.mask_material is not None:
                     bits.append(f" mask={step.mask_material.name}")
+                if step.rates is not None:
+                    rate_bits = ", ".join(
+                        f"{m.name}:{r:g}" for m, r in step.rates.items())
+                    bits.append(f" rates=[{rate_bits}]")
                 lines.append(
                     f"  {i}. etch {step.depth_um*1000:.1f} nm "
                     f"({step.model}){''.join(bits)}")
