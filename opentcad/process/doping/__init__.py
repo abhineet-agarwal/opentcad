@@ -13,6 +13,7 @@ Public surface:
     available_species              — species we ship data for
     PearsonMoments                 — the four-moment record returned by moments_for
 """
+from .dispatch import DopingRecipeResult, apply_doping_recipe
 from .implant import ImplantResult, apply_implant
 from .pearson_iv import (
     PearsonMoments,
@@ -23,7 +24,9 @@ from .pearson_iv import (
 
 __all__ = [
     "apply_implant",
+    "apply_doping_recipe",
     "ImplantResult",
+    "DopingRecipeResult",
     "moments_for",
     "PearsonMoments",
     "canonicalize_species",
