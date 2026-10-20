@@ -54,20 +54,78 @@ st.set_page_config(page_title="OpenTCAD", layout="wide",
 # ---------------------------------------------------------------------------
 # Session state initialization.
 # ---------------------------------------------------------------------------
+#: Demo geometry constants — matched to examples/02_nmos_idvg.py so the
+#: GUI walkthrough reproduces the Phase 0 exit result exactly.
+DEMO_L_GATE_UM = 1.0
+DEMO_W_SD_UM = 0.5
+DEMO_H_BODY_UM = 0.5
+DEMO_T_OX_UM = 0.005
+DEMO_SD_DEPTH_UM = 0.1
+DEMO_N_A = 1e17
+DEMO_N_D = 1e20
+DEMO_WIDTH_UM = 2.0 * DEMO_W_SD_UM + DEMO_L_GATE_UM   # = 2.0 um
+DEMO_VDS = 0.05
+
+
+def _seed_nmos_structure() -> "Structure":
+    """Build the same NMOS as examples/02_nmos_idvg.py — 2 µm wide,
+    p-body Na=1e17, 5 nm gate oxide, n+ S/D at 1e20 punched through the
+    oxide by 100 nm."""
+    w = DEMO_WIDTH_UM
+    top_of_si = DEMO_H_BODY_UM
+    top_of_ox = DEMO_H_BODY_UM + DEMO_T_OX_UM
+    return (Structure(width_um=w, name="nmos_demo")
+            .add_substrate("p_body", DEMO_H_BODY_UM, Material.SI,
+                           doping_Na=DEMO_N_A)
+            .add_layer("oxide", DEMO_T_OX_UM, Material.SIO2)
+            .add_region("source", 0.0, DEMO_W_SD_UM,
+                        top_of_si - DEMO_SD_DEPTH_UM, top_of_ox,
+                        Material.SI, doping_Nd=DEMO_N_D)
+            .add_region("drain", w - DEMO_W_SD_UM, w,
+                        top_of_si - DEMO_SD_DEPTH_UM, top_of_ox,
+                        Material.SI, doping_Nd=DEMO_N_D)
+            .add_contact("source", 0.0, DEMO_W_SD_UM, "oxide", surface="top")
+            .add_contact("drain",  w - DEMO_W_SD_UM, w, "oxide", surface="top")
+            .add_contact("gate",   DEMO_W_SD_UM, DEMO_W_SD_UM + DEMO_L_GATE_UM,
+                         "oxide", surface="top")
+            .add_contact("body",   0.0, w, "p_body", surface="bottom"))
+
+
 def _init_state():
+    """Seed session state with a demo-ready NMOS. Two clicks — Build
+    MeshField, then Run device solve — produce the Phase 0 exit Id-Vgs
+    curve at Vds = 50 mV, on/off > 10¹⁰. All device-analysis parameters
+    are pre-populated to match — sweep Vgs from 0 to 1.5 V, hold drain
+    at 50 mV, measure drain current.
+
+    Also seeds a demo Recipe (30 nm blanket + 100 nm masked RIE) so the
+    Recipe section has something to show without typing."""
     ss = st.session_state
     if "structure" not in ss:
-        ss.structure = Structure(width_um=1.0, name="device")
-        ss.structure.add_substrate("body", 0.5, Material.SI,
-                                    doping_Na=1e17)
+        ss.structure = _seed_nmos_structure()
     if "recipe_steps" not in ss:
-        ss.recipe_steps = []   # list of dicts serializing each step
+        # Left empty on purpose. ViennaLS advection callbacks are
+        # unstable on Streamlit's non-main script-runner thread on
+        # macOS — clicking "Run recipe" from the browser will segfault
+        # the server. Use the Python API (examples/04, 05) for
+        # topography demos; the GUI demonstrates the Structure DSL
+        # + DEVSIM path only.
+        ss.recipe_steps = []
     if "topography_state" not in ss:
         ss.topography_state = None
     if "meshfield" not in ss:
         ss.meshfield = None
     if "device_result" not in ss:
         ss.device_result = None    # {"kind": "iv"|"cv", "V":..., "I|C":...}
+    # Analysis defaults — match examples/02_nmos_idvg.py.
+    ss.setdefault("iv_v_start", 0.0)
+    ss.setdefault("iv_v_end",   1.5)
+    ss.setdefault("iv_v_step",  0.1)
+    ss.setdefault("iv_terminal_a",   "gate")     # sweep target
+    ss.setdefault("iv_terminal_b",   "source")   # reference at 0 V
+    ss.setdefault("iv_measure",      "drain")    # read current here
+    ss.setdefault("iv_hold_drain_v", DEMO_VDS)   # 50 mV
+    ss.setdefault("mesh_size_um",    0.03)
 
 
 _init_state()
@@ -464,10 +522,10 @@ with col1:
     mesh_source = st.radio(
         "Mesh source",
         ["From Structure (skip topography)", "From topography state"],
-        horizontal=False)
+        index=0, horizontal=False)
     mesh_size_um = st.number_input(
-        "Mesh size [µm]", min_value=0.005, max_value=0.5, value=0.03,
-        step=0.005, format="%.4f")
+        "Mesh size [µm]", min_value=0.005, max_value=0.5,
+        step=0.005, format="%.4f", key="mesh_size_um")
     if st.button("Build MeshField", type="secondary"):
         try:
             with st.spinner("Meshing…"):
@@ -506,16 +564,43 @@ with col1:
     if len(contact_names) < 2:
         st.warning("Need at least two named contacts on the structure.")
     else:
-        cA = st.selectbox("Terminal A", contact_names, index=0)
-        cB = st.selectbox("Terminal B (reference)",
-                          contact_names,
-                          index=len(contact_names) - 1)
+        def _default_idx(name: str, fallback: int) -> int:
+            return contact_names.index(name) if name in contact_names else fallback
+
+        cA = st.selectbox("Terminal A (swept)", contact_names,
+                          index=_default_idx(ss.get("iv_terminal_a", contact_names[0]), 0),
+                          help="Contact whose voltage is ramped from V start → V end.")
+        cB = st.selectbox("Terminal B (reference, held at 0 V)", contact_names,
+                          index=_default_idx(ss.get("iv_terminal_b", contact_names[-1]),
+                                              len(contact_names) - 1),
+                          help="Reference contact held at 0 V throughout the sweep.")
+        cMeas = st.selectbox("Measure current at", contact_names,
+                              index=_default_idx(ss.get("iv_measure", cA),
+                                                  _default_idx(cA, 0)),
+                              help="Which contact to read current from. "
+                                   "For NMOS Id-Vgs: sweep gate, measure drain.")
         c1c, c2c, c3c = st.columns(3)
-        v_start = c1c.number_input("V start [V]", value=0.0, step=0.05)
-        v_end   = c2c.number_input("V end [V]",   value=0.7, step=0.05)
-        v_step  = c3c.number_input("V step [V]",  value=0.05,
-                                    min_value=0.001, step=0.005,
-                                    format="%.3f")
+        v_start = c1c.number_input("V start [V]", step=0.05, key="iv_v_start")
+        v_end   = c2c.number_input("V end [V]",   step=0.05, key="iv_v_end")
+        v_step  = c3c.number_input("V step [V]",  min_value=0.001,
+                                    step=0.005, format="%.3f", key="iv_v_step")
+
+        # Hold-contact rows: any contact other than A, B, or measure can
+        # be pre-biased to a fixed DC voltage before the sweep starts.
+        # This is what makes MOSFET Id-Vgs at fixed Vds possible.
+        other_contacts = [c for c in contact_names if c not in {cA, cB}]
+        st.markdown("**Hold at fixed bias** (optional)")
+        holds: dict[str, float] = {}
+        if other_contacts:
+            for name in other_contacts:
+                default_v = 0.0
+                if name == "drain":
+                    default_v = float(ss.get("iv_hold_drain_v", 0.0))
+                v = st.number_input(f"{name} [V]", value=default_v,
+                                    step=0.01, format="%.3f",
+                                    key=f"hold_{name}")
+                if v != 0.0:
+                    holds[name] = float(v)
 
         if st.button("▶ Run device solve", type="primary",
                      disabled=(ss.meshfield is None)):
@@ -552,24 +637,48 @@ with col1:
                     except Exception:
                         pass
 
-                with st.spinner("Running device solve…"):
-                    solver = DeviceSolver(ss.meshfield, mat_params,
-                                           physics=cfg)
-                    if analysis_kind == "iv_sweep":
-                        V, I = solver.iv_sweep(
-                            cA, cB, v_start=float(v_start),
-                            v_end=float(v_end), v_step=float(v_step))
-                        ss.device_result = {"kind": "iv", "V": V, "I": I,
-                                             "A": cA, "B": cB}
-                    else:
-                        V, C = solver.cv_sweep(
-                            cA, cB, v_start=float(v_start),
-                            v_end=float(v_end), v_step=float(v_step))
-                        ss.device_result = {"kind": "cv", "V": V, "C": C,
-                                             "A": cA, "B": cB}
-                    import devsim as ds
-                    ds.delete_device(device=solver._device_name)
-                st.success("Done.")
+                import devsim as ds
+                # DEVSIM keeps a global device table. If the user clicks
+                # Run twice, or if a prior solve raised mid-flight,
+                # stale devices accumulate and can segfault on shutdown.
+                # Clear them before creating a fresh solver.
+                for stale in list(ds.get_device_list()):
+                    try:
+                        ds.delete_device(device=stale)
+                    except Exception:
+                        pass
+
+                solver = None
+                try:
+                    with st.spinner("Running device solve…"):
+                        solver = DeviceSolver(ss.meshfield, mat_params,
+                                               physics=cfg)
+                        if analysis_kind == "iv_sweep":
+                            V, I = solver.iv_sweep(
+                                cA, cB, v_start=float(v_start),
+                                v_end=float(v_end), v_step=float(v_step),
+                                hold_contacts=holds or None,
+                                measure_contact=cMeas)
+                            ss.device_result = {"kind": "iv", "V": V, "I": I,
+                                                 "A": cA, "B": cB,
+                                                 "measure": cMeas,
+                                                 "holds": dict(holds)}
+                        else:
+                            V, C = solver.cv_sweep(
+                                cA, cB, v_start=float(v_start),
+                                v_end=float(v_end), v_step=float(v_step))
+                            ss.device_result = {"kind": "cv", "V": V, "C": C,
+                                                 "A": cA, "B": cB}
+                    st.success("Done.")
+                finally:
+                    # Always drop the DEVSIM device, even on error. If
+                    # we leave it in the global table, the atexit
+                    # teardown can segfault on macOS.
+                    if solver is not None:
+                        try:
+                            ds.delete_device(device=solver._device_name)
+                        except Exception:
+                            pass
             except Exception as e:
                 st.error(f"Device solve failed: {e}")
 
@@ -592,8 +701,12 @@ with col2:
     if result is not None:
         st.subheader("Result")
         if result["kind"] == "iv":
-            fig = plot_iv(result["V"], result["I"],
-                           title=f"IV: {result['A']} → {result['B']}")
+            hold_bits = ", ".join(f"V_{n}={v*1000:.0f} mV"
+                                  for n, v in (result.get("holds") or {}).items())
+            hold_suffix = f"  |  {hold_bits}" if hold_bits else ""
+            title = (f"I_{result.get('measure', result['A'])} vs "
+                     f"V_{result['A']}  ({result['B']} = 0 V){hold_suffix}")
+            fig = plot_iv(result["V"], result["I"], title=title)
         else:
             fig = plot_cv(result["V"], result["C"],
                            title=f"CV: {result['A']} → {result['B']}")

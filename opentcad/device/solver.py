@@ -211,25 +211,51 @@ class DeviceSolver:
         return Q_total
 
     def iv_sweep(self, anode_contact: str, cathode_contact: str,
-                 v_start: float, v_end: float, v_step: float
+                 v_start: float, v_end: float, v_step: float,
+                 hold_contacts: dict[str, float] | None = None,
+                 measure_contact: str | None = None,
                  ) -> tuple[list[float], list[float]]:
         """Ramp `anode_contact` from v_start to v_end, holding cathode at 0V.
 
         Returns (voltages, currents). Current is total (electron+hole) at
-        the anode in Amps (2D DEVSIM integrates per-unit-depth, so the
-        numeric value is A/cm of out-of-plane length).
+        `measure_contact` in Amps (2D DEVSIM integrates per-unit-depth, so
+        the numeric value is A/cm of out-of-plane length).
+
+        Args:
+            anode_contact: contact whose voltage is ramped.
+            cathode_contact: reference contact, held at 0 V.
+            hold_contacts: {name: voltage} of other contacts to hold at a
+                nonzero DC bias — e.g. `{"drain": 0.05}` for a MOSFET
+                Id-Vgs sweep at Vds = 50 mV. Each is ramped from 0 up to
+                its target in ~50 mV steps before the main sweep begins.
+            measure_contact: contact to read current from. Defaults to
+                `anode_contact` (the classic diode / two-terminal case).
+                For an NMOS Id-Vgs sweep, set to the drain.
         """
         if not self._initialized:
             self.initialize()
         self.solve_equilibrium()
         self._set_contact_voltage(cathode_contact, 0.0)
 
+        # Ramp any pre-held contacts to their target bias smoothly so
+        # Newton doesn't get a step change on top of equilibrium.
+        holds = dict(hold_contacts or {})
+        for name, target in holds.items():
+            if target == 0.0:
+                self._set_contact_voltage(name, 0.0)
+                continue
+            n_steps = max(1, int(abs(target) / 0.05))
+            for step_v in np.linspace(0.0, float(target), n_steps + 1)[1:]:
+                self._set_contact_voltage(name, float(step_v))
+                self._solve_dc()
+
+        measure = measure_contact or anode_contact
         voltages = np.arange(v_start, v_end + v_step / 2, v_step)
         currents: list[float] = []
         for v in voltages:
             self._set_contact_voltage(anode_contact, float(v))
             self._solve_dc()
-            currents.append(self._get_contact_current(anode_contact))
+            currents.append(self._get_contact_current(measure))
         return voltages.tolist(), currents
 
     # ------------------------------------------------------------------
