@@ -146,7 +146,44 @@ class Oxidize:
                 f"{self.bird_beak_length_um}")
 
 
-Step = Union[Deposit, Etch, Oxidize]
+@dataclass(frozen=True)
+class Implant:
+    """Ion-implant step. Doping, not topography — plays no role in
+    level-set evolution, picked up by the doping dispatcher after the
+    topography state has been meshed.
+
+    Args:
+        species: 'boron' / 'B' / 'phosphorus' / 'P' / 'arsenic' / 'As'
+            (case-insensitive).
+        energy_keV: implant energy in keV. Must fall inside the
+            tabulated Pearson-IV range for the species.
+        dose_cm2: dose per unit area in cm⁻². Typical S/D is 1e14-1e16.
+        window_x_um: (x0, x1) mask opening in µm, or None for a
+            blanket implant. Mask edge is softened by the lateral
+            straggle in the kernel.
+        tilt_deg: documented but not yet implemented (vertical
+            implant assumed; nonzero issues a warning).
+    """
+    species: str
+    energy_keV: float
+    dose_cm2: float
+    window_x_um: Optional[Tuple[float, float]] = None
+    tilt_deg: float = 0.0
+
+    def __post_init__(self):
+        if self.energy_keV <= 0:
+            raise ValueError(f"Implant energy must be > 0 keV; got {self.energy_keV}")
+        if self.dose_cm2 <= 0:
+            raise ValueError(f"Implant dose must be > 0 cm⁻²; got {self.dose_cm2}")
+        if self.window_x_um is not None:
+            x0, x1 = self.window_x_um
+            if not (x1 > x0):
+                raise ValueError(
+                    f"Implant window must be (x0, x1) with x1 > x0; "
+                    f"got {self.window_x_um!r}")
+
+
+Step = Union[Deposit, Etch, Oxidize, Implant]
 
 
 @dataclass
@@ -183,6 +220,16 @@ class Recipe:
                                    window_x_um, bird_beak_length_um))
         return self
 
+    def implant(self, species: str, energy_keV: float, dose_cm2: float,
+                window_x_um: Optional[Tuple[float, float]] = None,
+                tilt_deg: float = 0.0) -> "Recipe":
+        self.steps.append(Implant(species=species,
+                                   energy_keV=energy_keV,
+                                   dose_cm2=dose_cm2,
+                                   window_x_um=window_x_um,
+                                   tilt_deg=tilt_deg))
+        return self
+
     def __len__(self) -> int:
         return len(self.steps)
 
@@ -217,6 +264,16 @@ class Recipe:
                 lines.append(
                     f"  {i}. oxidize @ {step.temperature_C:.0f}°C for "
                     f"{step.time_s:.0f} s ({step.ambient}){''.join(bits)}")
+            elif isinstance(step, Implant):
+                bits = []
+                if step.window_x_um is not None:
+                    x0, x1 = step.window_x_um
+                    bits.append(f" window=[{x0:.3f}..{x1:.3f}] um")
+                if step.tilt_deg:
+                    bits.append(f" tilt={step.tilt_deg:+.1f}°")
+                lines.append(
+                    f"  {i}. implant {step.species} @ {step.energy_keV:g} keV, "
+                    f"dose {step.dose_cm2:.1e} cm⁻²{''.join(bits)}")
             else:
                 lines.append(f"  {i}. {step}")
         return "\n".join(lines)

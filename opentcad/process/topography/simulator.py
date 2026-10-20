@@ -47,7 +47,7 @@ from .oxidation import (
     oxide_thickness,
     temperature_celsius_to_kelvin,
 )
-from .recipe import Deposit, Etch, Oxidize, Recipe
+from .recipe import Deposit, Etch, Implant, Oxidize, Recipe
 
 
 @dataclass
@@ -510,6 +510,11 @@ def simulate(structure, recipe: Recipe, grid_delta_um: float = 0.01
             _apply_etch(state, step)
         elif isinstance(step, Oxidize):
             _apply_oxidize(state, step)
+        elif isinstance(step, Implant):
+            # Doping — a MeshField concern, not a level-set concern.
+            # Carried through to the doping dispatcher after meshing;
+            # ignored by the topography simulator.
+            continue
         else:
             raise TypeError(f"Unknown recipe step type: {type(step).__name__}")
     return state
