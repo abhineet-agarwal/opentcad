@@ -29,7 +29,7 @@ from .doping import DopingRecipeResult, apply_doping_recipe
 from .topography import (
     Recipe, TopographyState, simulate, topography_to_meshfield,
 )
-from .topography.recipe import Implant
+from .topography.recipe import Anneal, Implant
 
 
 @dataclass
@@ -46,9 +46,9 @@ class RecipeRunResult:
 
 
 def _recipe_has_topography_steps(recipe: Recipe) -> bool:
-    """A recipe is topography-free if every step is a doping step —
-    today that means every step is an Implant."""
-    return any(not isinstance(step, Implant) for step in recipe)
+    """A recipe is topography-free if every step is a doping step
+    (Implant or Anneal)."""
+    return any(not isinstance(step, (Implant, Anneal)) for step in recipe)
 
 
 def run_recipe(structure,

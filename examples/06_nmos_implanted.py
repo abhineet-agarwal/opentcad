@@ -1,29 +1,25 @@
 """
-Example 06 — NMOS source/drain by ion implantation, in one Recipe.
+Example 06 — NMOS from a fab recipe, end to end (Phase 2 exit demo).
 
-The Phase 2.1 + 2.2 narrative: express a fab-style flow in a single
-chainable `Recipe` object and hand it, together with a Structure
-scaffold, to `run_recipe` — one call does the topography half
-(empty here), meshes the result, and plays the implant chain into
-the device-ready MeshField.
+The full "process recipe in, I-V curve out" story in one script:
 
-Why Example 06 doesn't yet drive DEVSIM:
-    The raw as-implanted Gaussian spans 4 decades in Nd with sharp
-    gradients, which Newton's equilibrium Poisson solve can't settle
-    on without an initial guess. In a real fab the implant is
-    immediately followed by an anneal at ~1000 °C that smears the
-    Gaussian into a flatter, Erf-like profile DEVSIM eats happily.
-    That anneal step is Unit C (Phase 2.3). Once it ships, the
-    `.anneal(...)` call appended to this Recipe produces an Id-Vgs
-    curve matching examples/02_nmos_idvg.py.
+    1. Build a device SCAFFOLD — substrate + gate oxide + S/D contact
+       windows (material-only overrides, no hand-doping anywhere).
+    2. Write a RECIPE of fab steps:
+         .implant(As, 30 keV, 1e15, S/D windows)   — shallow surface dope
+         .implant(As, 100 keV, 1e15, S/D windows)  — deeper S/D extension
+         .anneal(1000 °C, 30 min)                  — Fickian diffusion
+    3. run_recipe(struct, recipe) → doped MeshField ready for DEVSIM.
+    4. DeviceSolver on that MeshField → Id-Vgs sweep at Vds = 50 mV.
 
-For now, this example shows:
-    * The one-call pipeline API: `run_recipe(struct, recipe)` →
-      doped MeshField, plus a diagnostic record of every implant.
-    * A real two-species, two-energy S/D implant chain expressed as
-      four `Recipe.implant` calls.
-    * The depth-profile and 2D cross-section plots showing the
-      resulting dopant distribution.
+No hand-doped `add_region(doping_Nd=…)` anywhere. The n+ carriers in
+the output MeshField all came from the implant Pearson table + the
+anneal Fick diffusion.
+
+Compare to examples/02_nmos_idvg.py (same geometry, hand-doped) —
+the Id-Vgs curves should match qualitatively (same on/off, same Vth
+range), with any differences attributable to the physical implant +
+anneal profile vs. the hand-painted 1e20 flat-top region.
 
 Run:
     python examples/06_nmos_implanted.py
@@ -32,8 +28,10 @@ from __future__ import annotations
 
 import numpy as np
 
+from opentcad.device.solver import DeviceSolver
 from opentcad.geometry.formats import Material
 from opentcad.geometry.structure import Structure
+from opentcad.materials.database import load_material
 from opentcad.process import run_recipe
 from opentcad.process.doping import moments_for
 from opentcad.process.topography import Recipe
@@ -47,16 +45,19 @@ W_SD_UM = 0.5
 H_BODY_UM = 0.5
 SD_DEPTH_UM = 0.1
 WIDTH_UM = 2 * W_SD_UM + L_GATE_UM
+VDS = 0.05
 
 IMPLANT_SPECIES = "As"
 SOURCE_WINDOW = (0.0, W_SD_UM)
-DRAIN_WINDOW = (WIDTH_UM - W_SD_UM, WIDTH_UM)
+DRAIN_WINDOW  = (WIDTH_UM - W_SD_UM, WIDTH_UM)
+ANNEAL_T_C = 1000
+ANNEAL_T_S = 30 * 60   # 30 min
 
 
 def build_scaffold():
-    """Substrate + gate oxide + S/D contact windows (material-only
-    overrides). No doping is set on the Structure — every n+ carrier
-    in the output MeshField will come from a `Recipe.implant` call."""
+    """Substrate + gate oxide + S/D contact windows (material-only).
+    Every n+ carrier that ends up in the output MeshField comes from
+    the Recipe below — nothing is hand-doped here."""
     top_of_oxide = H_BODY_UM + T_OX_UM
     return (Structure(width_um=WIDTH_UM, name="nmos_from_recipe")
             .add_substrate("p_body", H_BODY_UM, Material.SI, doping_Na=N_A)
@@ -80,17 +81,14 @@ def build_scaffold():
 
 
 def build_recipe():
-    """The whole 'fab flow' in one DSL object. Two-energy As implant
-    chain into both source and drain through separate photolith masks.
-    Real fabs shoot both windows in a single pass; splitting them
-    here lets the Recipe be read as a document of what happened."""
-    return (Recipe("nmos_sd_implant")
-            # shallow As to pin the surface Nd high
+    """Full fab recipe — four implants (two energies, two windows)
+    + one anneal."""
+    return (Recipe("nmos_sd")
             .implant(IMPLANT_SPECIES,  30, 1e15, window_x_um=SOURCE_WINDOW)
             .implant(IMPLANT_SPECIES,  30, 1e15, window_x_um=DRAIN_WINDOW)
-            # deep As to extend the junction below the gate oxide
             .implant(IMPLANT_SPECIES, 100, 1e15, window_x_um=SOURCE_WINDOW)
-            .implant(IMPLANT_SPECIES, 100, 1e15, window_x_um=DRAIN_WINDOW))
+            .implant(IMPLANT_SPECIES, 100, 1e15, window_x_um=DRAIN_WINDOW)
+            .anneal(ANNEAL_T_C, ANNEAL_T_S))
 
 
 def main():
@@ -104,39 +102,49 @@ def main():
     print(recipe.summary())
     print()
 
-    print("Running recipe end-to-end (topography + mesh + doping)...")
+    print("Running recipe end-to-end (topography + mesh + doping + anneal)...")
     out = run_recipe(struct, recipe, mesh_size_um=0.015)
     mf = out.meshfield
 
     print(f"\n  MeshField: {mf.n_cells} triangles, {mf.n_points} nodes")
-    print(f"  topography_state = {out.topography_state!r} "
-          "(None → doping-only recipe, shortcut path taken)")
-    print()
-    print(f"  Implants fired ({out.doping_result.n_implants}):")
-    for i, r in enumerate(out.doping_result.implants, 1):
-        x0, x1 = r.window_x_um
-        print(f"    {i}. {r.species:11s} @ {r.energy_keV:3.0f} keV, "
-              f"{r.dose_cm2:.1e} cm⁻², window [{x0:.2f}..{x1:.2f}] µm "
-              f"→ Rp = {r.moments.Rp_um*1000:5.1f} nm, "
-              f"→ {r.added_to}")
+    print(f"  Implants fired: {out.doping_result.n_implants}")
+    print(f"  Anneals fired:  {out.doping_result.n_anneals}")
+    for a in out.doping_result.anneals:
+        print(f"    {a.temperature_C:.0f}°C · {a.time_s:.0f}s  →  "
+              f"σ(Nd)={a.sigma_Nd_um*1000:.1f}nm "
+              f"σ(Na)={a.sigma_Na_um*1000:.1f}nm")
 
-    print()
-    print(f"  Nd_max = {mf.Nd.max():.2e} cm⁻³   "
+    print(f"\n  Nd_max = {mf.Nd.max():.2e} cm⁻³   "
           f"Na_max = {mf.Na.max():.2e} cm⁻³")
-    net = mf.net_doping
-    print(f"  net doping range: [{net.min():+.2e}, {net.max():+.2e}]")
 
-    out_vtu = "examples/06_nmos_implanted.vtu"
-    mf.save(out_vtu)
-    print(f"\n  doped MeshField saved to {out_vtu}")
+    # ---- DEVSIM device solve ----------------------------------------------
+    print("\nHanding MeshField to DEVSIM...")
+    solver = DeviceSolver(mf, {"Silicon": load_material("Si"),
+                               "SiO2"   : load_material("SiO2")})
+    V, I = solver.iv_sweep("gate", "source",
+                            v_start=0.0, v_end=1.5, v_step=0.1,
+                            hold_contacts={"drain": VDS},
+                            measure_contact="drain")
+    V = np.asarray(V); I = np.asarray(I)
+    import devsim as ds
+    for d in list(ds.get_device_list()):
+        ds.delete_device(device=d)
 
+    print(f"\n  Vds = {VDS*1000:.0f} mV   L_gate = {L_GATE_UM:.1f} µm")
+    print(f"  {'Vgs':>8}  {'Id (A/cm)':>14}")
+    for v, i in zip(V, I):
+        print(f"  {v:8.3f}  {abs(i):14.3e}")
+
+    on_off = abs(I).max() / max(abs(I).min(), 1e-30)
+    print(f"\n  on/off ratio: {on_off:.2e}")
+
+    # ---- Plots ------------------------------------------------------------
     try:
         import matplotlib.pyplot as plt
     except ImportError:
-        print("\n(matplotlib not installed - skipping plots)")
+        print("\n(matplotlib not installed - skipping plot)")
         return
 
-    # Depth profile at source-well centre.
     pts = np.asarray(mf.grid.points)[:, :2]
     centre = np.abs(pts[:, 0] - W_SD_UM / 2) < 0.02
     y_centre = pts[centre, 1]
@@ -144,44 +152,38 @@ def main():
     y_srt = y_centre[order]
     depth_nm = (y_srt.max() - y_srt) * 1000
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4))
+    fig, axes = plt.subplots(1, 3, figsize=(14, 4))
 
-    ax1.semilogy(depth_nm, np.clip(mf.Nd[centre][order], 1e14, None),
-                  "o-", color="tab:red", markersize=3, label="As (implant)")
-    ax1.axhline(N_A, ls="--", color="tab:blue", lw=1,
-                 label=f"p-body Na = {N_A:.0e}")
+    axes[0].semilogy(depth_nm, np.clip(mf.Nd[centre][order], 1e14, None),
+                     "o-", color="tab:red", markersize=3,
+                     label=f"As (after {ANNEAL_T_C}°C/{ANNEAL_T_S//60}min)")
+    axes[0].axhline(N_A, ls="--", color="tab:blue", lw=1,
+                    label=f"p-body Na = {N_A:.0e}")
     for e in (30, 100):
         m = moments_for(IMPLANT_SPECIES, e)
-        ax1.axvline(m.Rp_um * 1000, ls=":", color="gray", lw=0.7)
-        ax1.text(m.Rp_um * 1000, 3e20, f" Rp\n{e} keV",
-                  fontsize=7, color="gray", va="top")
-    ax1.set_xlabel("depth below Si surface [nm]")
-    ax1.set_ylabel("Nd [cm⁻³]")
-    ax1.set_title("As implant chain — depth profile @ S well centre")
-    ax1.set_xlim(0, 200); ax1.set_ylim(1e14, 1e21)
-    ax1.grid(True, alpha=0.3, which="both")
-    ax1.legend(fontsize=8, loc="lower left")
+        axes[0].axvline(m.Rp_um * 1000, ls=":", color="gray", lw=0.7)
+    axes[0].set_xlabel("depth [nm]")
+    axes[0].set_ylabel("Nd [cm⁻³]")
+    axes[0].set_title("S/D depth profile (annealed)")
+    axes[0].set_xlim(0, 300); axes[0].set_ylim(1e14, 1e21)
+    axes[0].grid(True, alpha=0.3, which="both")
+    axes[0].legend(fontsize=8, loc="lower left")
 
-    sc = ax2.scatter(pts[:, 0], pts[:, 1],
-                      c=np.sign(net) * np.log10(np.clip(np.abs(net),
-                                                         1e14, None)),
-                      cmap="RdBu_r", s=4, vmin=-21, vmax=21)
-    ax2.set_xlabel("x [µm]"); ax2.set_ylabel("y [µm]")
-    ax2.set_title("net doping (red = n, blue = p)")
-    ax2.set_aspect("equal")
-    plt.colorbar(sc, ax=ax2, label="sign(net) · log₁₀|net| [cm⁻³]",
-                  shrink=0.8)
+    axes[1].plot(V, np.abs(I) * 1e3, "o-", color="tab:red")
+    axes[1].set_xlabel("Vgs [V]"); axes[1].set_ylabel("Id [mA/cm]")
+    axes[1].set_title(f"Id-Vgs (linear), Vds = {VDS*1000:.0f} mV")
+    axes[1].grid(True, alpha=0.3)
+
+    axes[2].semilogy(V, np.clip(np.abs(I), 1e-15, None), "o-",
+                     color="tab:red")
+    axes[2].set_xlabel("Vgs [V]"); axes[2].set_ylabel("|Id| [A/cm]")
+    axes[2].set_title(f"Id-Vgs (semilog), on/off = {on_off:.1e}")
+    axes[2].grid(True, alpha=0.3, which="both")
 
     fig.tight_layout()
-    out = "examples/06_nmos_implanted.png"
-    fig.savefig(out, dpi=120)
-    print(f"  depth-profile plot saved to {out}")
-
-    print()
-    print("Next piece (Phase 2.3 / Unit C): append")
-    print("  .anneal(temperature_C=1000, time_s=1800)")
-    print("to the Recipe to broaden the Gaussian into a flat-top S/D")
-    print("profile DEVSIM can equilibrate on.")
+    out_path = "examples/06_nmos_implanted.png"
+    fig.savefig(out_path, dpi=120)
+    print(f"\n  plot saved to {out_path}")
 
 
 if __name__ == "__main__":

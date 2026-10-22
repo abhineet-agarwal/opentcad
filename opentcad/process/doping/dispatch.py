@@ -25,8 +25,9 @@ from typing import List
 
 from opentcad.geometry.formats import MeshField
 
+from .anneal import AnnealResult, apply_anneal
 from .implant import ImplantResult, apply_implant
-from opentcad.process.topography.recipe import Implant, Recipe
+from opentcad.process.topography.recipe import Anneal, Implant, Recipe
 
 
 @dataclass
@@ -34,10 +35,15 @@ class DopingRecipeResult:
     """What apply_doping_recipe did, in order. Useful for the GUI's
     sidebar summary and for debugging a long multi-step recipe."""
     implants: List[ImplantResult] = field(default_factory=list)
+    anneals: List[AnnealResult] = field(default_factory=list)
 
     @property
     def n_implants(self) -> int:
         return len(self.implants)
+
+    @property
+    def n_anneals(self) -> int:
+        return len(self.anneals)
 
 
 def apply_doping_recipe(mf: MeshField, recipe: Recipe) -> DopingRecipeResult:
@@ -47,10 +53,9 @@ def apply_doping_recipe(mf: MeshField, recipe: Recipe) -> DopingRecipeResult:
     they were handled upstream by `simulate()` and are already baked
     into the MeshField's geometry.
 
-    Returns a `DopingRecipeResult` listing every implant that fired,
-    in order, with the Pearson moments and effective dose each one saw.
-    An empty recipe or a topography-only recipe returns an empty
-    result; the MeshField is untouched.
+    Returns a `DopingRecipeResult` listing every implant and anneal
+    that fired, in order. An empty recipe or a topography-only recipe
+    returns an empty result; the MeshField is untouched.
     """
     out = DopingRecipeResult()
     for step in recipe:
@@ -64,6 +69,15 @@ def apply_doping_recipe(mf: MeshField, recipe: Recipe) -> DopingRecipeResult:
                 tilt_deg=step.tilt_deg,
             )
             out.implants.append(res)
+        elif isinstance(step, Anneal):
+            res = apply_anneal(
+                mf,
+                temperature_C=step.temperature_C,
+                time_s=step.time_s,
+                species_Nd=step.species_Nd,
+                species_Na=step.species_Na,
+            )
+            out.anneals.append(res)
         # All other step types are topography-side; already consumed
         # by simulate() and have nothing to do with the doping field.
     return out

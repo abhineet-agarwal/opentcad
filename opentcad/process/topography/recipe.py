@@ -172,6 +172,37 @@ class Oxidize:
 
 
 @dataclass(frozen=True)
+class Anneal:
+    """Thermal anneal — Fickian diffusion of all dopant fields at the
+    given temperature for the given time.
+
+    Phase 2.3a implementation is intrinsic D only (no concentration-
+    dependent Fair term); see opentcad.process.doping.anneal for the
+    full set of caveats. The convolution kernel σ = √(2 D t) is applied
+    separately to Nd (using species_Nd's D) and to Na (species_Na's D).
+
+    Args:
+      temperature_C: anneal temperature in °C.
+      time_s:        duration in seconds.
+      species_Nd:    donor species whose D parameterises the Nd field
+                     diffusion. Default "As" — modern CMOS n+ S/D.
+      species_Na:    acceptor species for the Na field. Default "B".
+    """
+    temperature_C: float
+    time_s: float
+    species_Nd: str = "As"
+    species_Na: str = "B"
+
+    def __post_init__(self):
+        if self.time_s < 0:
+            raise ValueError(f"Anneal time must be ≥ 0 (got {self.time_s} s)")
+        if self.temperature_C <= -273.15:
+            raise ValueError(
+                f"Anneal temperature must be above absolute zero "
+                f"(got {self.temperature_C} °C)")
+
+
+@dataclass(frozen=True)
 class Implant:
     """Ion-implant step. Doping, not topography — plays no role in
     level-set evolution, picked up by the doping dispatcher after the
@@ -208,7 +239,7 @@ class Implant:
                     f"got {self.window_x_um!r}")
 
 
-Step = Union[Deposit, Etch, Oxidize, Implant]
+Step = Union[Deposit, Etch, Oxidize, Implant, Anneal]
 
 
 @dataclass
@@ -256,6 +287,15 @@ class Recipe:
                                    dose_cm2=dose_cm2,
                                    window_x_um=window_x_um,
                                    tilt_deg=tilt_deg))
+        return self
+
+    def anneal(self, temperature_C: float, time_s: float,
+               species_Nd: str = "As",
+               species_Na: str = "B") -> "Recipe":
+        self.steps.append(Anneal(temperature_C=temperature_C,
+                                  time_s=time_s,
+                                  species_Nd=species_Nd,
+                                  species_Na=species_Na))
         return self
 
     def __len__(self) -> int:
@@ -306,6 +346,11 @@ class Recipe:
                 lines.append(
                     f"  {i}. implant {step.species} @ {step.energy_keV:g} keV, "
                     f"dose {step.dose_cm2:.1e} cm⁻²{''.join(bits)}")
+            elif isinstance(step, Anneal):
+                lines.append(
+                    f"  {i}. anneal @ {step.temperature_C:.0f}°C for "
+                    f"{step.time_s:.0f} s "
+                    f"(Nd:{step.species_Nd}, Na:{step.species_Na})")
             else:
                 lines.append(f"  {i}. {step}")
         return "\n".join(lines)
