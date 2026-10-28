@@ -1,0 +1,27 @@
+
+Magic 8.3 revision 546 - Compiled on Wed Aug 27 19:09:35 IST 2025.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+Using NULL graphics device.
+Processing system .magicrc file
+Sourcing design .magicrc for technology sky130A ...
+2 Magic internal units = 1 Lambda
+Input style sky130(): scaleFactor=2, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    ubm 
+Scaled tech values by 2 / 1 to match internal grid scaling
+Loading sky130A Device Generator Menu ...
+Loading "route_extract.tcl" from command line.
+Cell bias_cells read from current working directory
+Processing timestamp mismatches.
+Cell sky130_fd_pr__pfet_01v8_THZQ3L read from current working directory
+Cell sky130_fd_pr__nfet_01v8_4YP8T4 read from current working directory
+Cell sky130_fd_pr__cap_mim_m3_1_S9G3Y7 read from current working directory
+Timestamp mismatches found in these cells: sky130_fd_pr__cap_mim_m3_1_S9G3Y7, sky130_fd_pr__nfet_01v8_4YP8T4, sky130_fd_pr__pfet_01v8_THZQ3L.
+Loading DRC CIF style.
+No errors found.
+Extracting microrobot_bias into microrobot_bias.ext:
+exttospice finished.
+exttospice finished.
+   Generating output for cell microrobot_bias
+OPENTCAD_FLOW_DONE

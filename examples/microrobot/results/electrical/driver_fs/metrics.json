@@ -1,0 +1,22 @@
+{
+  "corner": "fs",
+  "temperature_C": 26.85,
+  "timestep_s": 5e-05,
+  "edge_s": 1e-08,
+  "irradiance_W_m2": 1000,
+  "minimum_actuator_span_after_start_V": 1.07030448,
+  "minimum_electrode_V": -0.0334963202,
+  "maximum_electrode_above_upper_rail_V": 0.04613849000000014,
+  "settled_output_error_V": 0.0005671099999999818,
+  "reset_clamp_error_after_20ms_V": 0.11740287100000002,
+  "actuator_PV_mean_W": 2.393811532175821e-09,
+  "driver_logic_supply_mean_W": -9.749793236578567e-12,
+  "phase_input_stimulus_mean_W": 5.774544317274197e-11,
+  "ready_input_stimulus_mean_W": -2.534732735481509e-13,
+  "phase_A_eta_peak_to_peak_V": 1.2400660070165002,
+  "circuit_sha256": "5f8c5292d45b12adc1697b1c87fdbbb6b3b7f5259d1f75725da3ff92e6ce194c",
+  "electrode_sha256": "9df4c5ef9c56e9ce4c421a51be3d538eebba26b619301916c1b04f782fe7c2d3",
+  "scope": "Finite actuator PV + two transistor drivers + reduced electrode interfaces; ideal logic/phase/ready sources",
+  "passed": false,
+  "acceptance": "Own preliminary limits: excursions <100mV; settled error <20mV; clamp error <50mV after 20ms"
+}

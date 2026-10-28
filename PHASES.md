@@ -1,5 +1,26 @@
 # OpenTCAD Phases
 
+## Cross-cutting application milestone — microrobot/PV foundation
+
+The current implementation adds prescribed Beer-Lambert generation to the
+MeshField → DEVSIM path, explicit A/cm-to-A conversion, and charge-conservation
+regressions. A reusable ideal-diode terminal fit, maximum-power calculation and
+SPICE export are documented in `docs/photovoltaic_compact.md`. The application
+has digitized published PV curves, a PV-powered SKY130 clock with a real
+divider-cell load, verified two-phase RTL and independently checked transistor
+drivers. The bias macro has native/GDS DRC/LVS and RC post-layout comparisons;
+storage/extraction sensitivity exposed divider-edge failures at loose numerical
+settings; tighter tolerance qualifies the nominal 2 pF receiver at two timesteps.
+Complete reset, integration and the remaining controller layout are pending. See `docs/optical_generation.md` and `examples/microrobot/README.md`
+for executed experiments, assumptions and stages through analog layout.
+The core remains independent of the application. Surface recombination and
+TCAD measurement calibration remain future work. Foundry circuit/layout verification
+is separate from conceptual TCAD device physics.
+
+The Phase 2 list below is a roadmap, not an exhaustive capability inventory:
+Gaussian implant and intrinsic-diffusion anneal kernels already exist and have
+tests, but full Pearson-IV/Fair/TED/OED physics and calibration are incomplete.
+
 ## Phase 0 — Skeleton and Device Simulation 
 Goal: p-n junction and MOSFET IV curves with hand-specified doping. No process sim.
 

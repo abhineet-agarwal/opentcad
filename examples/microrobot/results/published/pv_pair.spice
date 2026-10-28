@@ -1,0 +1,6 @@
+* Terminal fit at 300 K; no charge/Rs/shunt model
+.subckt published_pv_pair p n params: illumination=1000 area_scale=1
+Iphoto n p DC {1.45262369066e-07*illumination/1000*area_scale}
+Dpv p n published_pv_pair_diode area={area_scale}
+.model published_pv_pair_diode D(IS=1.05859880341e-16 N=2.28941770792 TNOM=26.85 EG=0 XTI=0)
+.ends published_pv_pair

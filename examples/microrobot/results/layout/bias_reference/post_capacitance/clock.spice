@@ -1,0 +1,75 @@
+* Our low-power clock candidate; ideal voltage ramp
+.lib "/usr/local/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
+.temp 26.85
+* Functional open-PDK candidate, not a reproduction of Reynolds' PTAT clock.
+* Diode-stack bias is supply/temperature dependent. No compensated reference.
+* All W/L in um under the installed SKY130 model scale.
+.subckt microrobot_clock clk vdd vss bias_n bias_p
+* A passive diode-connected stack has a nonzero DC path at illumination.
+Vbias vdd ref_vdd 0
+Xlayout ref_vdd vss bias_n bias_p microrobot_bias
+X1 raw a vdd vss bias_p bias_n micro_starved_inv
+X2 a b vdd vss bias_p bias_n micro_starved_inv
+X3 b c vdd vss bias_p bias_n micro_starved_inv
+X4 c d vdd vss bias_p bias_n micro_starved_inv
+X5 d raw vdd vss bias_p bias_n micro_starved_inv
+Xc1 a vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xc2 b vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xc3 c vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xc4 d vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+* Deliberate timing-capacitor asymmetry for nominal startup.
+Xc5 raw vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2.5
+* Long-channel receiver first, then a smaller faster receiver. Their supply
+* current is included; a slow raw ring must not drive digital gates for free.
+Xbp1 buffered raw vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=8
+Xbn1 buffered raw vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xbp2 clk buffered vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=1
+Xbn2 clk buffered vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=1
+.ends microrobot_clock
+
+.subckt micro_starved_inv a y vdd vss bp bn
+Xps ps bp vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=8
+Xpi y a ps vdd sky130_fd_pr__pfet_01v8 w=1 l=0.5
+Xni y a ns vss sky130_fd_pr__nfet_01v8 w=0.5 l=0.5
+Xns ns bn vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+.ends micro_starved_inv
+* NGSPICE file created from microrobot_bias.ext - technology: sky130A
+
+.subckt microrobot_bias vdd vss bias_n bias_p
+X0 vss bias_n bias_p vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X1 vdd bias_p bias_p vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X2 vss bias_n bias_n vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X3 Xb2.D vdd vdd vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X4 bias_n vss sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+X5 bias_p vss sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+X6 bias_n Xb2.D Xb2.D vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+C0 bias_p Xb2.D 6.27185f
+C1 bias_n vdd 6.38283f
+C2 bias_n Xb2.D 0.35421f
+C3 bias_p bias_n 6.7663f
+C4 vdd Xb2.D 0.34245f
+C5 bias_p vdd 5.11886f
+C6 bias_p vss 19.1617f
+C7 bias_n vss 31.3493f
+C8 vdd vss 27.3145f
+C9 Xb2.D vss 18.804f
+.ends
+
+
+VDD supply 0 PWL(0 0 1u 0 0.000101 1.8)
+Vsense supply vdd 0
+Xclock clk vdd 0 bn bp microrobot_clock
+Vlogic supply digital_supply 0
+.include "receiver_cells.spice"
+Xff clk feedback 0 0 digital_supply digital_supply div2 sky130_fd_sc_hd__dfxtp_1
+Xfeedback div2 0 0 digital_supply digital_supply feedback sky130_fd_sc_hd__inv_1
+Coutput clk 0 2e-15
+.options method=gear maxord=2 reltol=1e-4 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+tran 5e-08 0.004 0 5e-08
+wrdata clock.dat v(vdd) v(clk) v(bn) v(bp) i(Vsense) i(Vlogic) v(div2) i(v.xclock.vbias)
+quit
+.endc
+.end

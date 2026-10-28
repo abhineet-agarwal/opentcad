@@ -1,0 +1,294 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * our low-power clock candidate; three scaled s2e-fit cells, optical ramp, chosen storage capacitor
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+illumination                                 0
+pv1                               -1.34305e-19
+pv2                               -2.68611e-19
+supply                            -4.02916e-19
+vdd                               -4.02916e-19
+xclock.ref_vdd                    -4.02916e-19
+xclock.xlayout.vss.t3              1.35709e-29
+xclock.xlayout.bias_n.t3           1.47207e-18
+xclock.xlayout.bias_p.t0          -2.17664e-19
+xclock.xlayout.vss.t2             -6.14687e-30
+xclock.xlayout.vdd.t1             -4.02916e-19
+xclock.xlayout.bias_p.t1          -2.17664e-19
+xclock.xlayout.bias_p.t2          -2.17664e-19
+xclock.xlayout.vdd.t0             -4.02916e-19
+xclock.xlayout.vss.t1             -1.86558e-28
+xclock.xlayout.bias_n.t0           1.47207e-18
+xclock.xlayout.bias_n.t1           1.47207e-18
+xclock.xlayout.vss.t0              6.18342e-29
+xclock.xlayout.xb2.d.t2            9.35031e-19
+xclock.xlayout.vdd.t2             -4.02916e-19
+xclock.xlayout.vdd.t3             -4.02916e-19
+xclock.xlayout.vss.t7              2.33029e-29
+xclock.xlayout.bias_n.t4           1.47207e-18
+xclock.xlayout.x4.a                          0
+xclock.xlayout.x4.b1                         0
+xclock.xlayout.vss.t4                        0
+xclock.xlayout.bias_p.t3          -2.17664e-19
+xclock.xlayout.x5.a                          0
+xclock.xlayout.x5.b1                         0
+xclock.xlayout.vss.t5                        0
+xclock.xlayout.bias_n.t2           1.47207e-18
+xclock.xlayout.xb2.d.t0            9.35031e-19
+xclock.xlayout.xb2.d.t1            9.35031e-19
+xclock.xlayout.vss.t6              9.95968e-29
+bn                                 1.47207e-18
+xclock.xlayout.bias_n.n3           1.47207e-18
+xclock.xlayout.bias_n.n1           1.47207e-18
+xclock.xlayout.bias_n.n2           1.47207e-18
+xclock.xlayout.bias_n.n0           1.47207e-18
+bp                                -2.17664e-19
+xclock.xlayout.bias_p.n0          -2.17664e-19
+xclock.xlayout.bias_p.n1          -2.17664e-19
+xclock.xlayout.bias_p.n2          -2.17664e-19
+xclock.xlayout.vss.n24             3.28212e-29
+xclock.xlayout.vss.n15             5.91143e-29
+xclock.xlayout.vss.n21             4.04199e-29
+xclock.xlayout.vss.n16             3.09363e-29
+xclock.xlayout.vss.n30             8.17003e-30
+xclock.xlayout.vss.n10            -5.27918e-30
+xclock.xlayout.vss.n27             3.94359e-30
+xclock.xlayout.vss.n11              -3.041e-30
+xclock.xlayout.vss.n36             5.64159e-29
+xclock.xlayout.vss.n7               9.4956e-29
+xclock.xlayout.vss.n33             5.31221e-29
+xclock.xlayout.vss.n8               4.9816e-29
+xclock.xlayout.vss.n39             2.39858e-29
+xclock.xlayout.vss.n4              2.26424e-29
+xclock.xlayout.vss.n2              1.16801e-29
+xclock.xlayout.vss.n5              1.54542e-29
+xclock.xlayout.vss.n38             2.95719e-29
+xclock.xlayout.vss.n37             6.02259e-29
+xclock.xlayout.vss.n32             5.54453e-29
+xclock.xlayout.vss.n31             1.29566e-29
+xclock.xlayout.vss.n26              6.8226e-30
+xclock.xlayout.vss.n25             3.41258e-29
+xclock.xlayout.vss.n6              2.32173e-29
+xclock.xlayout.vss.n20             5.89447e-29
+xclock.xlayout.vss.n23             3.09728e-29
+xclock.xlayout.vss.n17             5.65547e-29
+xclock.xlayout.vss.n22             3.54804e-29
+xclock.xlayout.vss.n29             3.93282e-30
+xclock.xlayout.vss.n12             -4.4923e-30
+xclock.xlayout.vss.n28             1.42566e-30
+xclock.xlayout.vss.n35             5.18944e-29
+xclock.xlayout.vss.n9              9.06018e-29
+xclock.xlayout.vss.n34             4.99405e-29
+xclock.xlayout.vss.n3              2.20028e-29
+xclock.xlayout.vss.n1              1.36428e-29
+xclock.xlayout.vss.n40             1.87039e-29
+xclock.xlayout.vss.n18                       0
+xclock.xlayout.vss.n13                       0
+xclock.xlayout.vss.n19                       0
+xclock.xlayout.vss.n14                       0
+xclock.xlayout.vss.n0                        0
+xclock.xlayout.vss.n41                       0
+xclock.xlayout.vss.n42                       0
+xclock.xlayout.vss.n43                       0
+xclock.xlayout.vdd.n9             -4.02916e-19
+xclock.xlayout.vdd.n5             -4.02916e-19
+xclock.xlayout.vdd.n6             -4.02916e-19
+xclock.xlayout.vdd.n3             -4.02916e-19
+xclock.xlayout.vdd.n7             -4.02916e-19
+xclock.xlayout.vdd.n8             -4.02916e-19
+xclock.xlayout.vdd.n4             -4.02916e-19
+xclock.xlayout.vdd.n2             -4.02916e-19
+xclock.xlayout.vdd.n10            -4.02916e-19
+xclock.xlayout.vdd.n0             -4.02916e-19
+xclock.xlayout.vdd.n11            -4.02916e-19
+xclock.xlayout.vdd.n1             -4.02916e-19
+xclock.xlayout.xb2.d               9.35031e-19
+xclock.xlayout.xb2.d.n0            9.35031e-19
+xclock.xlayout.xb2.d.n1            9.35031e-19
+xclock.x1.ps                      -7.41752e-19
+xclock.a                          -1.61329e-18
+xclock.raw                         5.16205e-19
+xclock.x1.ns                       1.50368e-18
+xclock.x2.ps                      -7.38877e-19
+xclock.b                           -5.2211e-19
+xclock.x2.ns                      -1.09798e-18
+xclock.x3.ps                      -7.38047e-19
+xclock.c                          -4.63949e-19
+xclock.x3.ns                      -1.18314e-18
+xclock.x4.ps                      -7.39123e-19
+xclock.d                           7.17093e-20
+xclock.x4.ns                      -3.62468e-19
+xclock.x5.ps                      -7.33897e-19
+xclock.x5.ns                      -2.22949e-19
+xclock.xc1.a                                 0
+xclock.xc1.b1                                0
+xclock.xc2.a                                 0
+xclock.xc2.b1                                0
+xclock.xc3.a                                 0
+xclock.xc3.b1                                0
+xclock.xc4.a                                 0
+xclock.xc4.b1                                0
+xclock.xc5.a                                 0
+xclock.xc5.b1                                0
+xclock.buffered                   -3.38385e-19
+clk                               -1.29268e-18
+digital_supply                    -4.02916e-19
+feedback                           3.13679e-19
+div2                              -8.05443e-19
+vlogic#branch                      -4.5838e-30
+v.xclock.vbias#branch              3.51902e-30
+vsense#branch                      4.71929e-30
+vlight#branch                                0
+
+ Reference value :  0.00000e+00
+ Reference value :  3.92625e-05
+ Reference value :  7.82056e-05
+ Reference value :  1.10513e-04
+ Reference value :  1.49287e-04
+ Reference value :  1.83490e-04
+ Reference value :  2.15401e-04
+ Reference value :  2.41152e-04
+ Reference value :  2.68908e-04
+ Reference value :  2.96292e-04
+ Reference value :  3.32567e-04
+ Reference value :  3.58572e-04
+ Reference value :  3.84314e-04
+ Reference value :  4.15395e-04
+ Reference value :  4.48217e-04
+ Reference value :  4.72880e-04
+ Reference value :  5.00151e-04
+ Reference value :  5.28233e-04
+ Reference value :  5.65399e-04
+ Reference value :  5.92737e-04
+ Reference value :  6.18241e-04
+ Reference value :  6.47365e-04
+ Reference value :  6.82845e-04
+ Reference value :  7.09245e-04
+ Reference value :  7.37345e-04
+ Reference value :  7.62562e-04
+ Reference value :  8.01004e-04
+ Reference value :  8.27759e-04
+ Reference value :  8.52676e-04
+ Reference value :  8.79262e-04
+ Reference value :  9.10579e-04
+ Reference value :  9.35425e-04
+ Reference value :  9.62039e-04
+ Reference value :  9.92089e-04
+ Reference value :  1.02629e-03
+ Reference value :  1.05057e-03
+ Reference value :  1.07425e-03
+ Reference value :  1.11117e-03
+ Reference value :  1.13908e-03
+ Reference value :  1.16412e-03
+ Reference value :  1.19120e-03
+ Reference value :  1.22401e-03
+ Reference value :  1.25587e-03
+ Reference value :  1.28345e-03
+ Reference value :  1.31014e-03
+ Reference value :  1.34312e-03
+ Reference value :  1.37804e-03
+ Reference value :  1.40342e-03
+ Reference value :  1.43208e-03
+ Reference value :  1.45638e-03
+ Reference value :  1.49642e-03
+ Reference value :  1.52411e-03
+ Reference value :  1.54964e-03
+ Reference value :  1.57732e-03
+ Reference value :  1.61057e-03
+ Reference value :  1.64110e-03
+ Reference value :  1.66940e-03
+ Reference value :  1.69524e-03
+ Reference value :  1.72970e-03
+ Reference value :  1.76291e-03
+ Reference value :  1.78899e-03
+ Reference value :  1.81749e-03
+ Reference value :  1.84289e-03
+ Reference value :  1.88040e-03
+ Reference value :  1.90863e-03
+ Reference value :  1.93535e-03
+ Reference value :  1.96286e-03
+ Reference value :  1.99711e-03
+ Reference value :  2.02737e-03
+ Reference value :  2.05658e-03
+ Reference value :  2.08329e-03
+ Reference value :  2.11622e-03
+ Reference value :  2.15065e-03
+ Reference value :  2.17616e-03
+ Reference value :  2.20363e-03
+ Reference value :  2.22924e-03
+ Reference value :  2.26828e-03
+ Reference value :  2.29582e-03
+ Reference value :  2.32172e-03
+ Reference value :  2.35013e-03
+ Reference value :  2.38368e-03
+ Reference value :  2.41317e-03
+ Reference value :  2.44034e-03
+ Reference value :  2.46474e-03
+ Reference value :  2.50278e-03
+ Reference value :  2.53094e-03
+ Reference value :  2.55496e-03
+ Reference value :  2.58027e-03
+ Reference value :  2.61559e-03
+ Reference value :  2.64275e-03
+ Reference value :  2.66964e-03
+ Reference value :  2.69493e-03
+ Reference value :  2.73432e-03
+ Reference value :  2.76215e-03
+ Reference value :  2.78660e-03
+ Reference value :  2.81494e-03
+ Reference value :  2.84754e-03
+ Reference value :  2.87636e-03
+ Reference value :  2.90307e-03
+ Reference value :  2.92550e-03
+ Reference value :  2.96415e-03
+ Reference value :  2.99213e-03
+ Reference value :  3.01754e-03
+ Reference value :  3.04488e-03
+ Reference value :  3.07946e-03
+ Reference value :  3.10542e-03
+ Reference value :  3.13356e-03
+ Reference value :  3.15792e-03
+ Reference value :  3.19721e-03
+ Reference value :  3.22289e-03
+ Reference value :  3.24910e-03
+ Reference value :  3.27599e-03
+ Reference value :  3.31124e-03
+ Reference value :  3.33602e-03
+ Reference value :  3.36276e-03
+ Reference value :  3.38870e-03
+ Reference value :  3.42251e-03
+ Reference value :  3.44994e-03
+ Reference value :  3.47476e-03
+ Reference value :  3.50781e-03
+ Reference value :  3.51145e-03
+ Reference value :  3.54332e-03
+ Reference value :  3.57113e-03
+ Reference value :  3.59917e-03
+ Reference value :  3.62518e-03
+ Reference value :  3.66243e-03
+ Reference value :  3.69238e-03
+ Reference value :  3.71603e-03
+ Reference value :  3.74354e-03
+ Reference value :  3.77527e-03
+ Reference value :  3.80769e-03
+ Reference value :  3.83458e-03
+ Reference value :  3.85886e-03
+ Reference value :  3.89439e-03
+ Reference value :  3.92600e-03
+ Reference value :  3.95206e-03
+ Reference value :  3.97993e-03
+No. of Data Rows : 182343
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+

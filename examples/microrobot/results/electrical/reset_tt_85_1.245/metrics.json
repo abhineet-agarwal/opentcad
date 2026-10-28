@@ -1,0 +1,13 @@
+{
+  "corner": "tt",
+  "temperature_C": 85,
+  "actuator_V": 1.245,
+  "turn_on_V": 1.77557516674504,
+  "turn_off_V": 1.711996527417383,
+  "hysteresis_V": 0.06357863932765695,
+  "power_at_1v77_W": 6.13876653165e-08,
+  "timestep_s": 2e-05,
+  "circuit_sha256": "970935d893921034f75ca26ae52e7cbd1550e5e87ef480de0302cc98412cfba2",
+  "method": "Slow supply ramp; DC sweep branch switching is not accepted as hysteresis evidence",
+  "status": "development candidate; not accepted for complete corner envelope"
+}

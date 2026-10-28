@@ -1,0 +1,39 @@
+* OpenTCAD microrobot interface experiment
+.lib /usr/local/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice ss
+.temp 26.85
+* DEVELOPMENT CANDIDATE: nominal operation only; corner startup fails.
+* Actuator-powered comparator. bn is the existing clock's NMOS bias output.
+* Reference tracks vact; this is not a compensated voltage reference.
+.subckt microrobot_brownout bn ready vact vss
+Xrt ref ref vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=8
+Xrb ref ref vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xfb ref bn fbs vss sky130_fd_pr__nfet_01v8 w=0.42 l=8
+Xfb_en fbs ready vss vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+Xtail tail bn vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=8
+Xref diode ref tail vss sky130_fd_pr__nfet_01v8 w=2 l=2
+Xsense sense bn tail vss sky130_fd_pr__nfet_01v8 w=2 l=2
+Xpm1 diode diode vact vact sky130_fd_pr__pfet_01v8 w=1 l=4
+Xpm2 sense diode vact vact sky130_fd_pr__pfet_01v8 w=1 l=4
+Xkeeper sense sense vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=8
+Xp ready sense vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xn ready sense vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xcsense sense vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+.ends microrobot_brownout
+
+Vact act 0 1.245
+Vlogic logic 0 PWL(0 0 1m 0 21m 1.94 23m 1.94 43m 0)
+* Exact unloaded NMOS stack from the existing clock generates bn.
+Xb1 bn bn 0 0 sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xb2 b2 b2 bn 0 sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xb3 logic logic b2 0 sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xd bn ready act 0 microrobot_brownout
+Cload ready 0 30f
+.options method=gear maxord=2 reltol=1e-4 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+tran 2e-05 44m 0 2e-05
+wrdata brownout.dat v(logic) v(bn) v(ready) v(xd.ref) v(xd.sense) i(Vact)
+quit
+.endc
+.end

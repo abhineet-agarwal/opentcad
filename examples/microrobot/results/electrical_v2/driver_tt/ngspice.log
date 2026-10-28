@@ -1,0 +1,98 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * opentcad microrobot interface experiment
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+light                                        0
+celllo                            -9.52733e-15
+mid                               -9.52733e-15
+cellhi                            -1.98499e-14
+act_raw                           -1.98499e-14
+act                               -1.98499e-14
+logic_raw                                    0
+logic                                        0
+cmda                                         0
+cmdb                                         0
+phasea_source                                0
+phaseb_source                                0
+pa                                           0
+pb                                           0
+en                                           0
+ready_source                                 0
+ready                                        0
+xda.phase_b                         1.6565e-63
+xda.phase_local_b                 -6.01542e-15
+xda.phase_local                   -6.01396e-15
+xda.p_gate                        -5.26175e-14
+xda.xhigh.series                   3.95193e-14
+xda.low_b                         -1.41548e-14
+xda.xlow.series                    5.81396e-16
+xda.n_gate                        -2.90921e-15
+xda.off                           -6.01313e-15
+ea                                -9.44097e-15
+xda.xsnub.a                       -9.52733e-15
+xda.xsnub.b1                      -9.52733e-15
+xdb.phase_b                        1.24621e-63
+xdb.phase_local_b                 -6.01544e-15
+xdb.phase_local                   -6.01526e-15
+xdb.p_gate                         -5.2617e-14
+xdb.xhigh.series                   3.95184e-14
+xdb.low_b                         -1.41549e-14
+xdb.xlow.series                    5.81445e-16
+xdb.n_gate                        -2.90937e-15
+xdb.off                           -6.01313e-15
+eb                                -4.56188e-15
+xdb.xsnub.a                       -9.52733e-15
+xdb.xsnub.b1                      -9.52733e-15
+sa                                -9.61959e-15
+ta                                         0.5
+sb                                -9.62087e-15
+tb                                         0.5
+sr                                -9.61968e-15
+tr                                         0.5
+bulk                              -9.61977e-15
+bready#branch                                0
+bphaseb#branch                               0
+bphasea#branch                               0
+vready#branch                                0
+venable#branch                               0
+vphaseb#branch                               0
+vphasea#branch                               0
+vcommandb#branch                             0
+vcommanda#branch                             0
+vlogicsense#branch                 5.81149e-74
+vlogic#branch                     -5.81149e-74
+vact#branch                        1.03908e-26
+vpvhi#branch                       1.03908e-26
+vpvlo#branch                        9.5756e-27
+vlight#branch                                0
+
+ Reference value :  0.00000e+00
+ Reference value :  1.43832e-01
+ Reference value :  3.00929e-01
+ Reference value :  4.61570e-01
+ Reference value :  6.07562e-01
+ Reference value :  7.76403e-01
+ Reference value :  9.27695e-01
+ Reference value :  1.09704e+00
+ Reference value :  1.23128e+00
+ Reference value :  1.35783e+00
+ Reference value :  1.47992e+00
+ Reference value :  1.63638e+00
+ Reference value :  1.79780e+00
+ Reference value :  1.91330e+00
+No. of Data Rows : 42714
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+

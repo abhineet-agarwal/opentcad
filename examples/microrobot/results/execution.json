@@ -1,0 +1,29 @@
+{
+  "verified_at_UTC": "2026-10-27T06:40:13.672729+00:00",
+  "full_pytest": "170 passed; one pre-existing Auger diagnostic warning",
+  "test_log": "tests_m2.txt",
+  "notebook_executed_code_cells": 9,
+  "notebook_error_outputs": 0,
+  "notebook_embedded_result_plots": 7,
+  "generic_photovoltaic_example": "executed successfully",
+  "generic_compact_PV_example_and_SPICE_roundtrip": "executed successfully",
+  "published_PV_comparison": "digitized S2E dark/light traces; fitted terminal model with pixel sensitivity",
+  "initial_RC_ring_spice_cases": 5,
+  "initial_RC_ring_decision": "rejected for proposed PV power budget",
+  "new_clock_matrix_cases": 15,
+  "new_clock_extra_sensitivity_cases": 3,
+  "new_clock_result": "all oscillation/first-DFF checks pass; PV power budget is checked separately",
+  "RTL": "Icarus phase/reset simulation and Yosys generic synthesis executed; not PDK mapped",
+  "system_acceptance_checks": "passed; numerical validation only",
+  "system_scope": "TT clock lookup; remaining logic estimated; drivers/electrochemistry/mechanics reduced models",
+  "quasistatic_clock_vs_direct_PV_SPICE": {
+    "supply_voltage_relative_error": 0.002562867778584721,
+    "frequency_relative_error": -0.02064275849754449,
+    "power_relative_error": 0.07031764091714288,
+    "scope": "Quasi-static clock+first-FF proxy vs direct PV-powered SPICE; supply ripple absent in proxy"
+  },
+  "final_controller_schematic": "pending transistor actuator drivers and complete reset/brownout circuitry",
+  "DRC_LVS_PEX_postlayout": "not executed; no controller layout",
+  "publication_submission_push": "not performed",
+  "scope": "Historical M2 execution record; latest separate M3 results are in execution_m3.json"
+}

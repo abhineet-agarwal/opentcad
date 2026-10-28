@@ -1,0 +1,278 @@
+scale 1000 1 500000
+rnode "Xb2.D.t2" 0 8.29542 12743 2207 0
+rnode "Xb3.S" 0 467.635 12772 2207 0
+rnode "Xb2.D.t0" 0 614.268 8943 2207 0
+rnode "Xb2.G" 0 653.378 8943 2312 0
+rnode "Xb2.D.n0" 0 2415.62 8743 9960 0
+rnode "b2" 0 531.942 0 9960 0
+rnode "Xb2.D.n1" 0 1259.08 8114 9960 0
+rnode "Xb2.D.t1" 0 8.29542 8143 2207 0
+rnode "Xb2.D" 0 341.485 8114 2207 0
+resist "Xb2.D.n1" "Xb2.D.n0" 0.369538
+resist "Xb2.D.n1" "b2" 4.76697
+resist "Xb2.G" "Xb2.D.t0" 9.77182
+resist "Xb2.D.n0" "Xb2.G" 20.78
+resist "Xb2.D" "Xb2.D.n1" 29.3241
+resist "Xb2.D.n0" "Xb3.S" 31.6911
+resist "Xb2.D" "Xb2.D.t1" 219.8
+resist "Xb3.S" "Xb2.D.t2" 219.8
+rnode "vdd.t1" 0 20.3778 15743 2266 0
+rnode "vdd" 0 869.949 0 9240 0
+rnode "vdd.t3" 0 9.93067 11143 2207 0
+rnode "Xb3.D" 0 364.722 11114 2207 0
+rnode "vdd.n0" 0 1672.59 11114 9240 0
+rnode "vdd.t2" 0 735.357 11943 2207 0
+rnode "Xb3.G" 0 728.605 11943 2312 0
+rnode "vdd.n1" 0 913.686 11743 9240 0
+rnode "vdd.n2" 0 80.5183 15886 2266 0
+rnode "vdd.n3" 0 79.2106 14943 2000 0
+rnode "vdd.n4" 0 79.2107 14943 2532 0
+rnode "vdd.n5" 0 79.2106 14943 2532 0
+rnode "vdd.n6" 0 716.7 15886 2266 0
+rnode "vdd.n7" 0 0 14943 2532 0
+rnode "vdd.t0" 0 1196.85 14943 2532 0
+rnode "vdd.n8" 0 0 14943 2532 0
+rnode "vdd.n9" 0 716.7 14000 2266 0
+rnode "vdd.n10" 0 80.5183 14000 2266 0
+rnode "Xpdiode.B" 0 641.397 14943 2000 0
+rnode "vdd.n11" 0 2065.36 15143 9240 0
+rnode "Xpdiode.S" 0 449.106 15772 2266 0
+resist "vdd.n1" "vdd.n0" 0.369538
+resist "vdd.t0" "vdd.n7" 1.88014
+resist "vdd.n8" "vdd.t0" 1.88014
+resist "vdd.n11" "vdd.n1" 1.9975
+resist "vdd.n8" "vdd.n3" 5.51117
+resist "vdd.n7" "vdd.n5" 5.51117
+resist "vdd.n0" "vdd" 6.52948
+resist "Xpdiode.B" "vdd.n3" 7.4
+resist "vdd.n5" "vdd.n4" 7.4
+resist "Xb3.G" "vdd.t2" 9.77182
+resist "vdd.n1" "Xb3.G" 19.655
+resist "vdd.n11" "Xpdiode.B" 20.0775
+resist "Xpdiode.S" "vdd.n11" 23.8264
+resist "vdd.n0" "Xb3.D" 28.1991
+resist "vdd.n10" "vdd.n9" 30.8333
+resist "vdd.n6" "vdd.n2" 30.8333
+resist "Xb3.D" "vdd.t3" 219.8
+resist "Xpdiode.S" "vdd.t1" 223.565
+resist "Xpdiode.B" "vdd.n10" 448.753
+resist "vdd.n10" "vdd.n4" 448.753
+resist "Xpdiode.B" "vdd.n2" 448.753
+resist "vdd.n4" "vdd.n2" 448.753
+resist "vdd.n9" "vdd.n8" 1068.61
+resist "vdd.n7" "vdd.n6" 1068.61
+resist "vdd.n6" "vdd.n3" 4207.06
+resist "vdd.n9" "vdd.n5" 4207.06
+rnode "vss.n0" 0 0 9143 9000 0
+rnode "vss.n1" 0 0 12886 2207 0
+rnode "vss.n2" 0 0 11943 2000 0
+rnode "vss.n3" 0 0 11943 2414 0
+rnode "vss.n4" 0 0 11943 2414 0
+rnode "vss.n5" 0 0 12886 2207 0
+rnode "vss.n6" 0 0 11943 2414 0
+rnode "vss.t7" 0 0 11943 2414 0
+rnode "vss.t6" 0 0 8943 2414 0
+rnode "vss.n7" 0 0 8943 2414 0
+rnode "vss.n8" 0 0 8943 2000 0
+rnode "vss.n9" 0 0 8943 2414 0
+rnode "vss.t4" 0 0 5943 2414 0
+rnode "vss.n10" 0 0 5943 2414 0
+rnode "vss.n11" 0 0 5943 2000 0
+rnode "vss.n12" 0 0 5943 2414 0
+rnode "vss.t5" 0 0 6743 2207 0
+rnode "Xmirror.S" 0 0 6772 2207 0
+rnode "vss.n13" 0 0 6772 9000 0
+rnode "vss.n14" 0 0 6143 9000 0
+rnode "vss.t1" 0 0 2943 2414 0
+rnode "vss.n15" 0 0 2943 2414 0
+rnode "vss.n16" 0 0 2943 2000 0
+rnode "vss.n17" 0 0 2943 2414 0
+rnode "vss.t2" 0 0 3743 2207 0
+rnode "Xb1.S" 0 0 3772 2207 0
+rnode "vss.n18" 0 0 3772 9000 0
+rnode "vss" 0 0 0 9000 0
+rnode "vss.n19" 0 0 3143 9000 0
+rnode "vss.n20" 0 0 2943 2000 0
+rnode "vss.n21" 0 0 2000 2207 0
+rnode "vss.n22" 0 0 2000 2207 0
+rnode "Xb1.B" 0 0 2943 2000 0
+rnode "vss.n23" 0 0 3886 2207 0
+rnode "vss.n24" 0 0 3886 2207 0
+rnode "vss.n25" 0 0 3886 2207 0
+rnode "vss.n26" 0 0 5000 2207 0
+rnode "vss.n27" 0 0 5000 2207 0
+rnode "vss.n28" 0 0 5000 2207 0
+rnode "Xmirror.B" 0 0 5943 2000 0
+rnode "vss.n29" 0 0 6886 2207 0
+rnode "vss.n30" 0 0 6886 2207 0
+rnode "vss.n31" 0 0 6886 2207 0
+rnode "vss.n32" 0 0 8000 2207 0
+rnode "vss.n33" 0 0 8000 2207 0
+rnode "vss.n34" 0 0 8000 2207 0
+rnode "Xb2.B" 0 0 8943 2000 0
+rnode "vss.n35" 0 0 9886 2207 0
+rnode "vss.n36" 0 0 9886 2207 0
+rnode "vss.n37" 0 0 9886 2207 0
+rnode "vss.n38" 0 0 11000 2207 0
+rnode "vss.n39" 0 0 11000 2207 0
+rnode "vss.n40" 0 0 11000 2207 0
+rnode "Xb3.B" 0 0 11943 2000 0
+rnode "vss.n41" 0 0 12143 9000 0
+rnode "Xcbiasp.C2" 0 0 12780 6740 0
+rnode "vss.n42" 0 0 12780 6740 0
+rnode "vss.t0" 0 0 11740 6740 0
+rnode "vss.t3" 0 0 5740 6740 0
+rnode "vss.n43" 0 0 6780 6740 0
+rnode "Xcbiasn.C2" 0 0 6780 6740 0
+resist "vss.t0" "vss.n42" 0.033027
+resist "vss.n43" "vss.t3" 0.033027
+resist "vss.n42" "Xcbiasp.C2" 0.189444
+resist "Xcbiasn.C2" "vss.n43" 0.189444
+resist "vss.n19" "vss.n18" 0.369538
+resist "vss.n14" "vss.n13" 0.369538
+resist "vss.n18" "vss.n14" 1.39296
+resist "vss.n13" "vss.n0" 1.39296
+resist "vss.n41" "vss.n0" 1.7625
+resist "vss.n19" "vss" 1.84651
+resist "vss.t7" "vss.n6" 2.13562
+resist "vss.n20" "vss.t1" 2.13562
+resist "vss.n43" "vss.t0" 2.47385
+resist "vss.n42" "vss.n41" 16.8301
+resist "vss.n41" "Xb3.B" 19.7025
+resist "Xb2.B" "vss.n0" 19.7025
+resist "Xmirror.B" "vss.n14" 19.7025
+resist "Xb1.B" "vss.n19" 19.7025
+resist "vss.n6" "vss.n4" 21.1899
+resist "vss.n20" "vss.n16" 21.1899
+resist "vss.t7" "vss.n2" 23.4
+resist "Xb3.B" "vss.n2" 23.4
+resist "vss.n4" "vss.n3" 23.4
+resist "vss.n15" "vss.t1" 23.4
+resist "vss.n17" "vss.n15" 23.4
+resist "Xb1.B" "vss.n16" 23.4
+resist "vss.n10" "vss.t4" 23.4
+resist "vss.n12" "vss.n10" 23.4
+resist "vss.n11" "vss.t4" 23.4
+resist "Xmirror.B" "vss.n11" 23.4
+resist "vss.n7" "vss.t6" 23.4
+resist "vss.n9" "vss.n7" 23.4
+resist "vss.n8" "vss.t6" 23.4
+resist "Xb2.B" "vss.n8" 23.4
+resist "vss.n13" "Xmirror.S" 27.8241
+resist "vss.n18" "Xb1.S" 27.8241
+resist "vss.n39" "vss.n38" 146.25
+resist "vss.n40" "vss.n39" 146.25
+resist "vss.n5" "vss.n1" 146.25
+resist "vss.n25" "vss.n24" 146.25
+resist "vss.n24" "vss.n23" 146.25
+resist "vss.n22" "vss.n21" 146.25
+resist "vss.n31" "vss.n30" 146.25
+resist "vss.n30" "vss.n29" 146.25
+resist "vss.n27" "vss.n26" 146.25
+resist "vss.n28" "vss.n27" 146.25
+resist "vss.n37" "vss.n36" 146.25
+resist "vss.n36" "vss.n35" 146.25
+resist "vss.n33" "vss.n32" 146.25
+resist "vss.n34" "vss.n33" 146.25
+resist "Xmirror.S" "vss.t5" 219.8
+resist "Xb1.S" "vss.t2" 219.8
+resist "Xb3.B" "vss.n40" 426.541
+resist "vss.n40" "vss.n3" 426.541
+resist "Xb3.B" "vss.n1" 426.541
+resist "vss.n3" "vss.n1" 426.541
+resist "Xb2.B" "vss.n34" 426.541
+resist "vss.n35" "Xb2.B" 426.541
+resist "vss.n34" "vss.n9" 426.541
+resist "vss.n35" "vss.n9" 426.541
+resist "Xmirror.B" "vss.n28" 426.541
+resist "vss.n29" "Xmirror.B" 426.541
+resist "vss.n28" "vss.n12" 426.541
+resist "vss.n29" "vss.n12" 426.541
+resist "Xb1.B" "vss.n22" 426.541
+resist "vss.n23" "Xb1.B" 426.541
+resist "vss.n22" "vss.n17" 426.541
+resist "vss.n23" "vss.n17" 426.541
+resist "vss.n25" "vss.t1" 515.237
+resist "vss.n26" "vss.t4" 515.237
+resist "vss.n31" "vss.t4" 515.237
+resist "vss.n32" "vss.t6" 515.237
+resist "vss.n37" "vss.t6" 515.237
+resist "vss.n38" "vss.t7" 515.237
+resist "vss.n21" "vss.n20" 598.995
+resist "vss.n6" "vss.n5" 598.995
+resist "vss.n26" "vss.n25" 608.668
+resist "vss.n32" "vss.n31" 608.668
+resist "vss.n38" "vss.n37" 608.668
+resist "vss.n5" "vss.n2" 6564.74
+resist "vss.n39" "vss.n2" 6564.74
+resist "vss.n39" "vss.n4" 6564.74
+resist "vss.n33" "vss.n8" 6564.74
+resist "vss.n36" "vss.n8" 6564.74
+resist "vss.n33" "vss.n7" 6564.74
+resist "vss.n36" "vss.n7" 6564.74
+resist "vss.n27" "vss.n11" 6564.74
+resist "vss.n30" "vss.n11" 6564.74
+resist "vss.n27" "vss.n10" 6564.74
+resist "vss.n30" "vss.n10" 6564.74
+resist "vss.n24" "vss.n16" 6564.74
+resist "vss.n21" "vss.n15" 6564.74
+resist "vss.n24" "vss.n15" 6564.74
+rnode "bias_p" 0 450.713 0 9720 0
+rnode "bias_p.t2" 0 11.0884 5143 2207 0
+rnode "Xmirror.D" 0 439.939 5114 2207 0
+rnode "bias_p.n0" 0 2123.94 5114 9720 0
+rnode "bias_p.t1" 0 22.7535 14143 2266 0
+rnode "Xpdiode.D" 0 518.041 14114 2266 0
+rnode "bias_p.n1" 0 1644.72 14114 9720 0
+rnode "bias_p.t0" 0 1155.98 14943 2266 0
+rnode "Xpdiode.G" 0 918.274 14943 2430 0
+rnode "bias_p.n2" 0 1710.1 14743 9720 0
+rnode "bias_p.t3" 0 4252.01 11740 6740 0
+rnode "Xcbiasp.C1" 0 4952.43 11740 6740 0
+resist "Xcbiasp.C1" "bias_p.t3" 0.0175781
+resist "bias_p.n2" "bias_p.n1" 0.369538
+resist "bias_p.n0" "bias_p" 3.00448
+resist "bias_p.n1" "bias_p.n0" 5.2875
+resist "Xpdiode.G" "bias_p.t0" 11.5492
+resist "Xcbiasp.C1" "bias_p.n2" 18.5856
+resist "bias_p.n2" "Xpdiode.G" 20.2206
+resist "bias_p.n1" "Xpdiode.D" 24.2069
+resist "bias_p.n0" "Xmirror.D" 28.9491
+resist "Xmirror.D" "bias_p.t2" 219.8
+resist "Xpdiode.D" "bias_p.t1" 223.565
+rnode "bias_n.t2" 0 7.35468 9743 2207 0
+rnode "bias_n" 0 27.6271 0 9480 0
+rnode "bias_n.t4" 0 2820.27 5740 6740 0
+rnode "Xcbiasn.C1" 0 3180.46 5740 6740 0
+rnode "bias_n.n0" 0 344.535 400 9480 0
+rnode "bias_n.t1" 0 7.35468 2143 2207 0
+rnode "Xb1.D" 0 280.919 2114 2207 0
+rnode "bias_n.n1" 0 714.521 2114 9480 0
+rnode "bias_n.t0" 0 544.608 2943 2207 0
+rnode "Xb1.G" 0 552.81 2943 2312 0
+rnode "bias_n.n2" 0 668.08 2743 9480 0
+rnode "bias_n.t3" 0 544.608 5943 2207 0
+rnode "Xmirror.G" 0 552.81 5943 2312 0
+rnode "bias_n.n3" 0 2534.71 5743 9480 0
+rnode "Xb2.S" 0 419.338 9772 2207 0
+resist "Xcbiasn.C1" "bias_n.t4" 0.0175781
+resist "bias_n.n0" "bias_n" 0.235
+resist "bias_n.n2" "bias_n.n1" 0.369538
+resist "bias_n.n1" "bias_n.n0" 1.00697
+resist "bias_n.n3" "bias_n.n2" 1.7625
+resist "Xmirror.G" "bias_n.t3" 9.77182
+resist "Xb1.G" "bias_n.t0" 9.77182
+resist "bias_n.n0" "Xcbiasn.C1" 16.2267
+resist "bias_n.n3" "Xmirror.G" 20.03
+resist "bias_n.n2" "Xb1.G" 20.03
+resist "bias_n.n1" "Xb1.D" 28.5741
+resist "Xb2.S" "bias_n.n3" 30.9411
+resist "Xb2.S" "bias_n.t2" 219.8
+resist "Xb1.D" "bias_n.t1" 219.8
+device msubckt sky130_fd_pr__nfet_01v8 8143 2157 8144 2158  "vss.t6" "Xb2.D.t0" 3200 0 "Xb2.D.t1" 100 5800,316 "bias_n.t2" 100 5800,316
+device csubckt sky130_fd_pr__cap_mim_m3_1 11040 6040 11041 6041  "None" "bias_p.t3" 10880 0 "vss.t0" -4080 6172800,31840
+device csubckt sky130_fd_pr__cap_mim_m3_1 5040 6040 5041 6041  "None" "bias_n.t4" 10880 0 "vss.t3" -4080 6172800,31840
+device msubckt sky130_fd_pr__nfet_01v8 11143 2157 11144 2158  "vss.t7" "vdd.t2" 3200 0 "vdd.t3" 100 5800,316 "Xb2.D.t2" 100 5800,316
+device msubckt sky130_fd_pr__nfet_01v8 2143 2157 2144 2158  "vss.t1" "bias_n.t0" 3200 0 "bias_n.t1" 100 5800,316 "vss.t2" 100 5800,316
+device msubckt sky130_fd_pr__pfet_01v8 14143 2166 14144 2167  "vdd.t0" "bias_p.t0" 3200 0 "bias_p.t1" 200 11600,516 "vdd.t1" 200 11600,516
+device msubckt sky130_fd_pr__nfet_01v8 5143 2157 5144 2158  "vss.t4" "bias_n.t3" 3200 0 "bias_p.t2" 100 5800,316 "vss.t5" 100 5800,316

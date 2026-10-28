@@ -1,0 +1,55 @@
+timestamp 1793099982
+version 8.3
+tech sky130A
+style ngspice()
+scale 1000 1 500000
+resistclasses 4400000 2200000 950000 3050000 120000 197000 114000 191000 120000 197000 114000 191000 48200 319800 2000000 48200 48200 12800 125 125 47 47 29 5
+parameters sky130_fd_pr__nfet_01v8 l=l w=w a1=as p1=ps a2=ad p2=pd
+parameters sky130_fd_pr__pfet_01v8 l=l w=w a1=as p1=ps a2=ad p2=pd
+parameters sky130_fd_pr__cap_mim_m3_1 w=w l=l
+port "bias_p" 4 0 9720 0 9720 m3
+port "bias_n" 3 0 9480 0 9480 m3
+port "vdd" 1 0 9240 0 9240 m3
+port "vss" 2 0 9000 0 9000 m3
+node "Xb2.D" 2476 18804 8085 2157 ndif 0 0 0 0 0 0 0 0 11600 632 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 441600 3752 0 0 116144 7104 163824 7340 1871520 47268 1478400 37120 0 0 0 0 0 0
+equiv "Xb2.D" "b2"
+equiv "Xb2.D" "Xb3.S"
+equiv "Xb2.D" "Xb2.G"
+node "bias_p" 2546 19161.7 0 9720 m3 0 0 0 0 0 0 0 0 5800 316 11600 516 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 630400 3988 0 0 119544 7304 168424 7540 1959760 49634 1492800 37600 2251604 17886 0 0 0 0
+equiv "bias_p" "Xcbiasp.C1"
+equiv "bias_p" "Xpdiode.G"
+equiv "bias_p" "Xpdiode.D"
+equiv "bias_p" "Xmirror.D"
+node "bias_n" 4145 31349.3 0 9480 m3 0 0 0 0 0 0 0 0 11600 632 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 883200 7504 0 0 224944 13640 313008 13960 2476960 62724 1492800 37600 2210004 16846 0 0 0 0
+equiv "bias_n" "Xcbiasn.C1"
+equiv "bias_n" "Xmirror.G"
+equiv "bias_n" "Xb2.S"
+equiv "bias_n" "Xb1.G"
+equiv "bias_n" "Xb1.D"
+node "vdd" 24559 27314.5 0 9240 m3 0 0 0 0 1270896 5260 0 0 170224 9988 11600 516 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 441600 3752 0 0 283968 16976 257440 11452 2279600 57630 1478400 37120 0 0 0 0 0 0
+equiv "vdd" "Xb3.D"
+equiv "vdd" "Xpdiode.S"
+equiv "vdd" "Xpdiode.B"
+equiv "vdd" "Xb3.G"
+substrate "vss" 0 0 0 9000 m3 0 0 0 0 0 0 0 0 11600 632 625600 36800 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 632944 37368 370704 16368 3552480 89932 7651200 68960 279552 6208 0 0 0 0
+equiv "vss" "Xcbiasn.C2"
+equiv "vss" "Xmirror.S"
+equiv "vss" "Xmirror.B"
+equiv "vss" "Xb3.B"
+equiv "vss" "Xb2.B"
+equiv "vss" "Xb1.S"
+equiv "vss" "Xb1.B"
+equiv "vss" "Xcbiasp.C2"
+cap "Xb2.D" "bias_n" 354.209
+cap "bias_p" "bias_n" 6766.3
+cap "bias_n" "vdd" 6382.83
+cap "Xb2.D" "bias_p" 6271.85
+cap "Xb2.D" "vdd" 342.446
+cap "bias_p" "vdd" 5118.86
+device csubckt sky130_fd_pr__cap_mim_m3_1 11040 6040 11041 6041 w=1400 l=1400 "None" "bias_p" 5280 0 "vss" 0 6172800,31840
+device csubckt sky130_fd_pr__cap_mim_m3_1 5040 6040 5041 6041 w=1400 l=1400 "None" "bias_n" 5280 0 "vss" 0 6172800,31840
+device msubckt sky130_fd_pr__pfet_01v8 14143 2166 14144 2167 l=1600 w=200 "vdd" "bias_p" 3200 0 "bias_p" 200 11600,516 "vdd" 200 11600,516
+device msubckt sky130_fd_pr__nfet_01v8 11143 2157 11144 2158 l=1600 w=100 "vss" "vdd" 3200 0 "vdd" 100 5800,316 "Xb2.D" 100 5800,316
+device msubckt sky130_fd_pr__nfet_01v8 8143 2157 8144 2158 l=1600 w=100 "vss" "Xb2.D" 3200 0 "Xb2.D" 100 5800,316 "bias_n" 100 5800,316
+device msubckt sky130_fd_pr__nfet_01v8 5143 2157 5144 2158 l=1600 w=100 "vss" "bias_n" 3200 0 "bias_p" 100 5800,316 "vss" 100 5800,316
+device msubckt sky130_fd_pr__nfet_01v8 2143 2157 2144 2158 l=1600 w=100 "vss" "bias_n" 3200 0 "bias_n" 100 5800,316 "vss" 100 5800,316

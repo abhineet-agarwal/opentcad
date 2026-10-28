@@ -1,0 +1,5 @@
+bias_p -39 9680 m3
+bias_n -39 9440 m3
+vdd -39 9200 m3
+vss -39 8960 m3
+Xb2.D 8085 2157 ndif

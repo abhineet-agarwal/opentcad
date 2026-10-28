@@ -1,0 +1,34 @@
+
+Magic 8.3 revision 546 - Compiled on Wed Aug 27 19:09:35 IST 2025.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+Using NULL graphics device.
+Processing system .magicrc file
+Sourcing design .magicrc for technology sky130A ...
+2 Magic internal units = 1 Lambda
+Input style sky130(): scaleFactor=2, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    ubm 
+Scaled tech values by 2 / 1 to match internal grid scaling
+Loading sky130A Device Generator Menu ...
+Loading "extract_rc.tcl" from command line.
+Cell microrobot_bias read from current working directory
+Extracting microrobot_bias into microrobot_bias.ext:
+exttosim finished.
+Port: name = vss exists, forcing drivepoint
+Location is (0, 9000); drivepoint (0, 9000)
+Port: name = vdd exists, forcing drivepoint
+Location is (0, 9240); drivepoint (0, 9240)
+Port: name = bias_n exists, forcing drivepoint
+Location is (0, 9480); drivepoint (0, 9480)
+Port: name = bias_p exists, forcing drivepoint
+Location is (0, 9720); drivepoint (0, 9720)
+Adding  Xb2.D; Tnew = 0.14ns, Told = 0.00ns
+Adding  vdd; Tnew = 0.15ns, Told = 0.00ns
+Adding  bias_p; Tnew = 0.14ns, Told = 0.00ns
+Adding  bias_n; Tnew = 0.18ns, Told = 0.00ns
+Total Nets: 13
+Nets extracted: 5 (0.384615)
+Nets output: 5 (0.384615)
+exttospice finished.
+OPENTCAD_FLOW_DONE

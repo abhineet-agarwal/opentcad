@@ -1,0 +1,29 @@
+* Our three-stage RC-loaded SKY130 ring; preliminary feasibility only
+.lib "/usr/local/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice" ss
+.temp 27
+Vpower vdd 0 PWL(0 0 1u 0 11u 1.6)
+.subckt inv a y vdd vss
+Xp y a vdd vdd sky130_fd_pr__pfet_01v8 w=1.26 l=1
+Xn y a vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+.ends inv
+X1 c x1 vdd 0 inv
+X2 a x2 vdd 0 inv
+X3 b x3 vdd 0 inv
+Xbuffer a out vdd 0 inv
+R1 x1 a 1Meg
+R2 x2 b 1Meg
+R3 x3 c 1Meg
+C1 a 0 10p
+C2 b 0 10p
+C3 c 0 10p
+Cload out 0 100f
+.ic v(a)=0 v(b)=0 v(c)=0.01
+.options reltol=1e-5 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+tran 100n 3m uic
+wrdata ring.dat v(vdd) v(out) v(a) v(b) i(Vpower)
+quit
+.endc
+.end

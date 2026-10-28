@@ -1,0 +1,18 @@
+{
+  "verified_at_UTC": "2026-10-28T03:00:13.872869+00:00",
+  "full_pytest": "174 passed, one pre-existing Auger diagnostic warning",
+  "test_log": "tests_m3.txt",
+  "new_notebook": "electrical_layout.ipynb",
+  "notebook_execution": "Archive-review mode with source/artifact hash validation; external SPICE/Magic/Netgen runs executed separately",
+  "notebook_executed_code_cells": 5,
+  "notebook_error_outputs": 0,
+  "notebook_embedded_plots": 4,
+  "driver_checks": "nine cases passed preliminary output criteria; ideal logic/phase/ready stimuli",
+  "brownout": "Rejected candidate: FS threshold above loaded PV logic rail; hot power/threshold drift",
+  "physical": "Bias macro only: native and GDS round-trip DRC0/LVS match; wrong-gate negative control rejected",
+  "extraction": "152 R / 45 parasitic C; current GDS and PEX from same fresh build",
+  "numerical_qualification": "Original 2 pF TT receiver passes at reltol=1e-6 and 25/50 ns; loose-tolerance failures retained; matched pre/post comparison executed",
+  "remaining": "Complete reset, corner qualification at tight tolerance, integrated supply/driver/divider circuit, remaining controller layout and assembly",
+  "git_delivery": "User authorized commit and push; delivery recorded separately in Git history",
+  "contest_submission_or_fabrication": "Not performed"
+}

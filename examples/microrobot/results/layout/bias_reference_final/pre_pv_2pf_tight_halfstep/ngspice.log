@@ -1,0 +1,186 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * our low-power clock candidate; three scaled s2e-fit cells, optical ramp, chosen storage capacitor
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+illumination                                 0
+pv1                               -4.92304e-16
+pv2                               -9.84607e-16
+supply                            -1.47691e-15
+vdd                               -1.47691e-15
+xclock.ref_vdd                    -1.47691e-15
+bn                                -6.55106e-17
+xclock.b2                         -3.57553e-16
+bp                                 -8.3492e-16
+xclock.xcbiasp.a                             0
+xclock.xcbiasp.b1                            0
+xclock.xcbiasn.a                             0
+xclock.xcbiasn.b1                            0
+xclock.x1.ps                      -1.47569e-15
+xclock.a                          -3.92949e-16
+xclock.raw                        -3.92838e-16
+xclock.x1.ns                      -1.45952e-16
+xclock.x2.ps                      -1.47568e-15
+xclock.b                          -3.93242e-16
+xclock.x2.ns                      -1.45608e-16
+xclock.x3.ps                      -1.47568e-15
+xclock.c                          -3.92833e-16
+xclock.x3.ns                      -1.45995e-16
+xclock.x4.ps                      -1.47568e-15
+xclock.d                          -3.93081e-16
+xclock.x4.ns                      -1.45812e-16
+xclock.x5.ps                      -1.47568e-15
+xclock.x5.ns                       -1.4605e-16
+xclock.xc1.a                                 0
+xclock.xc1.b1                                0
+xclock.xc2.a                                 0
+xclock.xc2.b1                                0
+xclock.xc3.a                                 0
+xclock.xc3.b1                                0
+xclock.xc4.a                                 0
+xclock.xc4.b1                                0
+xclock.xc5.a                                 0
+xclock.xc5.b1                                0
+xclock.buffered                   -4.77236e-16
+clk                               -1.59663e-16
+digital_supply                    -1.47691e-15
+feedback                          -4.34678e-16
+div2                              -7.73981e-16
+vlogic#branch                      8.50065e-27
+v.xclock.vbias#branch             -1.66796e-27
+vsense#branch                     -8.00733e-27
+vlight#branch                                0
+
+ Reference value :  0.00000e+00
+ Reference value :  4.85125e-05
+ Reference value :  9.38548e-05
+ Reference value :  1.36337e-04
+ Reference value :  1.73777e-04
+ Reference value :  2.07720e-04
+ Reference value :  2.43206e-04
+ Reference value :  2.77266e-04
+ Reference value :  3.13561e-04
+ Reference value :  3.48437e-04
+ Reference value :  3.89391e-04
+ Reference value :  4.24897e-04
+ Reference value :  4.62820e-04
+ Reference value :  4.99014e-04
+ Reference value :  5.31780e-04
+ Reference value :  5.67192e-04
+ Reference value :  6.00662e-04
+ Reference value :  6.36397e-04
+ Reference value :  6.69903e-04
+ Reference value :  7.02154e-04
+ Reference value :  7.32993e-04
+ Reference value :  7.72436e-04
+ Reference value :  8.07900e-04
+ Reference value :  8.41391e-04
+ Reference value :  8.76583e-04
+ Reference value :  9.09353e-04
+ Reference value :  9.44662e-04
+ Reference value :  9.78008e-04
+ Reference value :  1.01207e-03
+ Reference value :  1.04168e-03
+ Reference value :  1.07885e-03
+ Reference value :  1.11434e-03
+ Reference value :  1.14979e-03
+ Reference value :  1.18202e-03
+ Reference value :  1.21352e-03
+ Reference value :  1.24866e-03
+ Reference value :  1.28073e-03
+ Reference value :  1.31266e-03
+ Reference value :  1.34428e-03
+ Reference value :  1.38527e-03
+ Reference value :  1.42074e-03
+ Reference value :  1.45258e-03
+ Reference value :  1.48536e-03
+ Reference value :  1.51659e-03
+ Reference value :  1.55005e-03
+ Reference value :  1.58100e-03
+ Reference value :  1.61514e-03
+ Reference value :  1.65056e-03
+ Reference value :  1.68871e-03
+ Reference value :  1.71998e-03
+ Reference value :  1.75066e-03
+ Reference value :  1.78336e-03
+ Reference value :  1.81367e-03
+ Reference value :  1.84634e-03
+ Reference value :  1.88038e-03
+ Reference value :  1.91895e-03
+ Reference value :  1.95041e-03
+ Reference value :  1.97952e-03
+ Reference value :  2.01035e-03
+ Reference value :  2.04066e-03
+ Reference value :  2.07468e-03
+ Reference value :  2.11018e-03
+ Reference value :  2.14612e-03
+ Reference value :  2.17865e-03
+ Reference value :  2.20909e-03
+ Reference value :  2.24163e-03
+ Reference value :  2.27152e-03
+ Reference value :  2.30469e-03
+ Reference value :  2.34001e-03
+ Reference value :  2.37685e-03
+ Reference value :  2.40910e-03
+ Reference value :  2.43834e-03
+ Reference value :  2.47417e-03
+ Reference value :  2.50735e-03
+ Reference value :  2.54042e-03
+ Reference value :  2.57153e-03
+ Reference value :  2.61093e-03
+ Reference value :  2.64642e-03
+ Reference value :  2.68109e-03
+ Reference value :  2.71410e-03
+ Reference value :  2.74438e-03
+ Reference value :  2.77724e-03
+ Reference value :  2.80711e-03
+ Reference value :  2.84072e-03
+ Reference value :  2.87622e-03
+ Reference value :  2.91410e-03
+ Reference value :  2.94877e-03
+ Reference value :  2.98212e-03
+ Reference value :  3.01569e-03
+ Reference value :  3.04752e-03
+ Reference value :  3.08148e-03
+ Reference value :  3.11313e-03
+ Reference value :  3.14727e-03
+ Reference value :  3.18264e-03
+ Reference value :  3.21887e-03
+ Reference value :  3.25078e-03
+ Reference value :  3.28132e-03
+ Reference value :  3.31448e-03
+ Reference value :  3.34427e-03
+ Reference value :  3.37698e-03
+ Reference value :  3.41246e-03
+ Reference value :  3.44826e-03
+ Reference value :  3.48283e-03
+ Reference value :  3.50602e-03
+ Reference value :  3.53738e-03
+ Reference value :  3.56576e-03
+ Reference value :  3.60676e-03
+ Reference value :  3.64225e-03
+ Reference value :  3.67675e-03
+ Reference value :  3.71155e-03
+ Reference value :  3.74242e-03
+ Reference value :  3.77590e-03
+ Reference value :  3.80775e-03
+ Reference value :  3.84237e-03
+ Reference value :  3.87243e-03
+ Reference value :  3.91317e-03
+ Reference value :  3.94866e-03
+ Reference value :  3.98111e-03
+No. of Data Rows : 182748
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+

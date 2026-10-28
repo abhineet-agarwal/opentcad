@@ -1,0 +1,33 @@
+
+Magic 8.3 revision 546 - Compiled on Wed Aug 27 19:09:35 IST 2025.
+Starting magic under Tcl interpreter
+Using the terminal as the console.
+Using NULL graphics device.
+Processing system .magicrc file
+Sourcing design .magicrc for technology sky130A ...
+2 Magic internal units = 1 Lambda
+Input style sky130(): scaleFactor=2, multiplier=2
+The following types are not handled by extraction and will be treated as non-electrical types:
+    ubm 
+Scaled tech values by 2 / 1 to match internal grid scaling
+Loading sky130A Device Generator Menu ...
+Loading "generate_cells.tcl" from command line.
+Loading sky130A Device Generator Menu ...
+Creating new cell
+Diagnostic: Device bounding box e -4.289999904111028 -0.6899999845772982 4.289999904111028 0.6899999845772982 (um)
+Moving label "B" from psubdiff to psubdiffcont in cell sky130_fd_pr__nfet_01v8_4YP8T4.
+Diagnostic: Device bounding box e -4.289999904111028 -0.6899999845772982 4.289999904111028 0.6899999845772982 (um)
+Moving label "B" from psubdiff to psubdiffcont in cell sky130_fd_pr__nfet_01v8_4YP8T4.
+Diagnostic: Device bounding box e -4.289999904111028 -0.6899999845772982 4.289999904111028 0.6899999845772982 (um)
+Moving label "B" from psubdiff to psubdiffcont in cell sky130_fd_pr__nfet_01v8_4YP8T4.
+Diagnostic: Device bounding box e -4.289999904111028 -0.6899999845772982 4.289999904111028 0.6899999845772982 (um)
+Moving label "B" from psubdiff to psubdiffcont in cell sky130_fd_pr__nfet_01v8_4YP8T4.
+Diagnostic: Device bounding box e -4.289999904111028 -0.9849999779835343 4.289999904111028 0.9849999779835343 (um)
+Moving label "B" from nsubdiff to nsubdiffcont in cell sky130_fd_pr__pfet_01v8_THZQ3L.
+Moving label "C2" from metal3 to via3 in cell sky130_fd_pr__cap_mim_m3_1_S9G3Y7.
+Moving label "C1" from metal4 to mimcapcontact in cell sky130_fd_pr__cap_mim_m3_1_S9G3Y7.
+Moving label "C2" from metal3 to via3 in cell sky130_fd_pr__cap_mim_m3_1_S9G3Y7.
+Moving label "C1" from metal4 to mimcapcontact in cell sky130_fd_pr__cap_mim_m3_1_S9G3Y7.
+OPENTCAD_FLOW_DONE
+Cell bias_cells couldn't be read
+No such file or directory

@@ -1,0 +1,98 @@
+* OpenTCAD microrobot interface experiment
+.lib /usr/local/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice sf
+.temp 26.85
+* Our SKY130 actuator interface; not an extracted Reynolds schematic.
+* Pins: phase (logic domain), ready (actuator domain), electrode, logic supply,
+* actuator upper supply, actuator midpoint/Pt metal, common lower supply.
+* 1.8 V primitive dimensions in um. Body connections are explicit.
+.subckt microrobot_driver phase ready electrode vlogic vact vmid vss
+* Complementary logic input and static cross-coupled level converter.
+Xip phase_b phase vlogic vlogic sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xin phase_b phase vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xlsn phase_local_b phase vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xlsnb phase_local phase_b vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xlsp phase_local_b phase_local vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=4
+Xlspb phase_local phase_local_b vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=4
+* Actuator-domain logic: p_gate=!(ready & phase), n_gate=ready & !phase.
+Xhigh ready phase_local p_gate vact vss micro_nand2
+Xlow ready phase_local_b low_b vact vss micro_nand2
+Xlowinv low_b n_gate vact vss micro_inv
+Xoff ready off vact vss micro_inv
+Xdrivep electrode p_gate vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xdriven electrode n_gate vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+* A real transmission gate clamps the electrode to the Pt midpoint in reset.
+* Long-channel LVT clamp retains conduction at the ~0.6 V midpoint.
+* Standard-Vt clamps failed the 20 ms discharge limit in SS/FS.
+Xclampn electrode off vmid vss sky130_fd_pr__nfet_01v8_lvt w=0.42 l=8
+Xclampp electrode ready vmid vact sky130_fd_pr__pfet_01v8_lvt w=0.84 l=8
+* Explicit ~103 fF PDK MIM suppresses electrode gate-charge feedthrough.
+* This is our design component, not inferred electrode/PV capacitance.
+Xsnub electrode vmid sky130_fd_pr__cap_mim_m3_1 w=7 l=7
+.ends microrobot_driver
+
+.subckt micro_inv a y vdd vss
+Xp y a vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xn y a vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+.ends micro_inv
+
+.subckt micro_nand2 a b y vdd vss
+Xp1 y a vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xp2 y b vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xn1 y a series vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+Xn2 series b vss vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+.ends micro_nand2
+
+* Uncalibrated reduced electrode model; SI units.
+* eta = metal minus local solution voltage; unknown absolute Ag/AgCl offset.
+* theta is a dimensionless coverage encoded as a numerical voltage (1 V = 1).
+* Cdl, adsorption charge and Faradaic leakage are separate terminal currents.
+.subckt micro_electrode metal solution theta params: cdl=40p qmax=260p tau=20m rf=10g width=0.08 offset=0
+Cdouble metal solution {cdl}
+Rfaradaic metal solution {rf}
+* Numerical state normalization; not a physical capacitor/power contribution.
+Cstate theta 0 1n
+Bstate theta 0 I={1n/tau*(v(theta)-1/(1+exp(-(v(metal,solution)-offset)/width)))}
+Bads metal solution I={qmax/tau*(1/(1+exp(-(v(metal,solution)-offset)/width))-v(theta))}
+.ends micro_electrode
+
+* PV model held at its fitted 300 K; electronics temperature is varied separately.
+.model fitted_cell D(IS=1.05859880341e-16 N=1.14470885396 TNOM=26.85 EG=0 XTI=0)
+Vlight light 0 PWL(0 0 100u 0 1m 1000)
+Bphlo 0 celllo I={1.45262369066e-07*v(light)/1000}
+Dlo celllo 0 fitted_cell TEMP=26.85
+Vpvlo celllo mid 0
+Bphhi mid cellhi I={1.45262369066e-07*v(light)/1000}
+Dhi cellhi mid fitted_cell TEMP=26.85
+Vpvhi cellhi act_raw 0
+Vact act_raw act 0
+Cstorelo mid 0 1p
+Cstorehi act_raw mid 1p
+Vlogic logic_raw 0 PWL(0 0 1m 0 2m 1.77 1.2 1.77 1.201 0 1.4 0 1.401 1.77)
+Vlogicsense logic_raw logic 0
+VcommandA cmdA 0 PULSE(0 1 10m 1e-08 1e-08 0.166666 0.333333)
+VcommandB cmdB 0 PULSE(0 1 93.333m 1e-08 1e-08 0.166666 0.333333)
+BphaseA phaseA_source 0 V={v(cmdA)*v(logic)}
+BphaseB phaseB_source 0 V={v(cmdB)*v(logic)}
+VphaseA phaseA_source pa 0
+VphaseB phaseB_source pb 0
+* Explicit external ready stimulus: this bench does not validate the detector.
+Venable en 0 PWL(0 0 4m 0 4.001m 1 1.199 1 1.199001 0 1.403 0 1.403001 1)
+Bready ready_source 0 V={v(en)*v(act)}
+Vready ready_source ready 0
+Xda pa ready ea logic act mid 0 microrobot_driver
+Xdb pb ready eb logic act mid 0 microrobot_driver
+Xea ea sa ta micro_electrode
+Xeb eb sb tb micro_electrode
+Xreturn mid sr tr micro_electrode cdl=400p qmax=2600p rf=1g
+Rsa sa bulk 10meg
+Rsb sb bulk 10meg
+Rsr sr bulk 1meg
+.options method=gear maxord=2 reltol=1e-4 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+tran 5e-05 2 0 5e-05
+wrdata driver.dat v(act) v(mid) v(logic) v(ready) v(pa) v(pb) v(ea) v(eb) v(sa) v(sb) v(bulk) v(ta) v(tb) i(Vact) i(Vlogicsense) i(Vpvlo) i(Vpvhi) i(VphaseA) i(VphaseB) i(Vready)
+quit
+.endc
+.end

@@ -1,0 +1,45 @@
+| units: 500000 tech: sky130A format: MIT
+x bias_n bias_p vss vss s=5800,316 d=5800,316 l=1600 w=100 x=5143 y=2157 sky130_fd_pr__nfet_01v8
+x bias_p bias_p vdd vdd s=11600,516 d=11600,516 l=1600 w=200 x=14143 y=2166 sky130_fd_pr__pfet_01v8
+x bias_n bias_n vss vss s=5800,316 d=5800,316 l=1600 w=100 x=2143 y=2157 sky130_fd_pr__nfet_01v8
+x vdd vdd Xb2.D vss s=5800,316 d=5800,316 l=1600 w=100 x=11143 y=2157 sky130_fd_pr__nfet_01v8
+x bias_n vss s=6172800,31840 l=1400 w=1400 x=5040 y=6040 sky130_fd_pr__cap_mim_m3_1
+x bias_p vss s=6172800,31840 l=1400 w=1400 x=11040 y=6040 sky130_fd_pr__cap_mim_m3_1
+x Xb2.D Xb2.D bias_n vss s=5800,316 d=5800,316 l=1600 w=100 x=8143 y=2157 sky130_fd_pr__nfet_01v8
+C bias_p Xb2.D 6.3
+C bias_p vdd 5.1
+C bias_n vdd 6.4
+C bias_p bias_n 6.8
+C bias_p0 19.2
+R bias_p 2546
+= bias_p Xcbiasp.C1
+= bias_p Xpdiode.G
+= bias_p Xpdiode.D
+= bias_p Xmirror.D
+C bias_n0 31.3
+R bias_n 4145
+= bias_n Xcbiasn.C1
+= bias_n Xmirror.G
+= bias_n Xb2.S
+= bias_n Xb1.G
+= bias_n Xb1.D
+C vdd0 27.3
+R vdd 24559
+= vdd Xb3.D
+= vdd Xpdiode.S
+= vdd Xpdiode.B
+= vdd Xb3.G
+R vss 114127
+= vss Xcbiasn.C2
+= vss Xmirror.S
+= vss Xmirror.B
+= vss Xb3.B
+= vss Xb2.B
+= vss Xb1.S
+= vss Xb1.B
+= vss Xcbiasp.C2
+C Xb2.D0 18.8
+R Xb2.D 2476
+= Xb2.D b2
+= Xb2.D Xb3.S
+= Xb2.D Xb2.G

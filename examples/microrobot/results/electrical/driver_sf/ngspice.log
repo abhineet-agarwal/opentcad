@@ -1,0 +1,111 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * opentcad microrobot interface experiment
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+light                                        0
+celllo                            -1.84125e-14
+mid                               -1.84125e-14
+cellhi                             -1.3668e-14
+act_raw                            -1.3668e-14
+act                                -1.3668e-14
+logic_raw                                    0
+logic                                        0
+cmda                                         0
+cmdb                                         0
+phasea_source                                0
+phaseb_source                                0
+pa                                           0
+pb                                           0
+en                                           0
+ready_source                                 0
+ready                                        0
+xda.phase_b                       -4.67367e-19
+xda.phase_local_b                 -5.89605e-16
+xda.phase_local                   -8.81877e-14
+xda.p_gate                        -6.51706e-15
+xda.xhigh.series                  -1.32634e-15
+xda.low_b                         -6.73467e-15
+xda.xlow.series                   -1.94201e-15
+xda.n_gate                        -5.54148e-16
+xda.off                           -5.89276e-16
+ea                                 2.05652e-16
+xda.xsnub.a                       -1.84125e-14
+xda.xsnub.b1                      -1.84125e-14
+xdb.phase_b                       -4.60457e-19
+xdb.phase_local_b                 -5.90795e-16
+xdb.phase_local                   -8.81967e-14
+xdb.p_gate                        -6.51699e-15
+xdb.xhigh.series                  -1.32661e-15
+xdb.low_b                          -6.7347e-15
+xdb.xlow.series                   -1.94202e-15
+xdb.n_gate                        -5.56331e-16
+xdb.off                           -5.89276e-16
+eb                                 2.05652e-16
+xdb.xsnub.a                       -1.84125e-14
+xdb.xsnub.b1                      -1.84125e-14
+sa                                -5.30786e-15
+ta                                         0.5
+sb                                -5.30786e-15
+tb                                         0.5
+sr                                -5.30709e-15
+tr                                         0.5
+bulk                              -5.30722e-15
+bready#branch                                0
+bphaseb#branch                               0
+bphasea#branch                               0
+vready#branch                                0
+venable#branch                               0
+vphaseb#branch                               0
+vphasea#branch                               0
+vcommandb#branch                             0
+vcommanda#branch                             0
+vlogicsense#branch                 9.08376e-31
+vlogic#branch                     -9.08376e-31
+vact#branch                       -4.75748e-27
+vpvhi#branch                      -4.75748e-27
+vpvlo#branch                       1.84784e-26
+vlight#branch                                0
+
+ Reference value :  0.00000e+00
+ Reference value :  7.13277e-02
+ Reference value :  1.44683e-01
+ Reference value :  2.23678e-01
+ Reference value :  3.06339e-01
+ Reference value :  3.86761e-01
+ Reference value :  4.54974e-01
+ Reference value :  5.25311e-01
+ Reference value :  6.17021e-01
+ Reference value :  6.92744e-01
+ Reference value :  7.80159e-01
+ Reference value :  8.56444e-01
+ Reference value :  9.36154e-01
+ Reference value :  1.01303e+00
+ Reference value :  1.09484e+00
+ Reference value :  1.17667e+00
+ Reference value :  1.23293e+00
+ Reference value :  1.30780e+00
+ Reference value :  1.38338e+00
+ Reference value :  1.42667e+00
+ Reference value :  1.50173e+00
+ Reference value :  1.58097e+00
+ Reference value :  1.67044e+00
+ Reference value :  1.73609e+00
+ Reference value :  1.80791e+00
+ Reference value :  1.88320e+00
+ Reference value :  1.97707e+00
+No. of Data Rows : 42829
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+

@@ -1,0 +1,103 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * our low-power clock candidate; ideal voltage ramp
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+supply                                       0
+vdd                                          0
+xclock.ref_vdd                               0
+bn                                -2.60941e-28
+xclock.b2                          2.60941e-28
+bp                                 4.23824e-32
+xclock.xcbiasp.a                             0
+xclock.xcbiasp.b1                            0
+xclock.xcbiasn.a                             0
+xclock.xcbiasn.b1                            0
+xclock.x1.ps                      -1.11328e-26
+xclock.a                           1.24364e-23
+xclock.raw                          2.2549e-32
+xclock.x1.ns                       -1.3546e-23
+xclock.x2.ps                       3.08188e-21
+xclock.b                          -8.44578e-19
+xclock.x2.ns                       8.90579e-19
+xclock.x3.ps                      -3.04936e-17
+xclock.c                           9.12516e-13
+xclock.x3.ns                      -1.79983e-12
+xclock.x4.ps                       5.12319e-18
+xclock.d                           6.24513e-16
+xclock.x4.ns                      -4.86659e-16
+xclock.x5.ps                       2.92818e-34
+xclock.x5.ns                       2.93133e-32
+xclock.xc1.a                                 0
+xclock.xc1.b1                                0
+xclock.xc2.a                                 0
+xclock.xc2.b1                                0
+xclock.xc3.a                                 0
+xclock.xc3.b1                                0
+xclock.xc4.a                                 0
+xclock.xc4.b1                                0
+xclock.xc5.a                                 0
+xclock.xc5.b1                                0
+xclock.buffered                    3.46006e-28
+clk                                8.79527e-21
+digital_supply                               0
+feedback                           4.29254e-19
+div2                              -7.70167e-19
+vlogic#branch                     -6.61736e-31
+v.xclock.vbias#branch              1.37172e-40
+vsense#branch                     -1.03135e-24
+vdd#branch                         1.03135e-24
+
+ Reference value :  0.00000e+00
+ Reference value :  1.49885e-04
+ Reference value :  2.54490e-04
+ Reference value :  3.59081e-04
+ Reference value :  4.63666e-04
+ Reference value :  5.68251e-04
+ Reference value :  6.81428e-04
+ Reference value :  7.87711e-04
+ Reference value :  8.85897e-04
+ Reference value :  9.90385e-04
+ Reference value :  1.09386e-03
+ Reference value :  1.19811e-03
+ Reference value :  1.30663e-03
+ Reference value :  1.40493e-03
+ Reference value :  1.50963e-03
+ Reference value :  1.61859e-03
+ Reference value :  1.72837e-03
+ Reference value :  1.83286e-03
+ Reference value :  1.93506e-03
+ Reference value :  2.04318e-03
+ Reference value :  2.15001e-03
+ Reference value :  2.26057e-03
+ Reference value :  2.36516e-03
+ Reference value :  2.47232e-03
+ Reference value :  2.58656e-03
+ Reference value :  2.69394e-03
+ Reference value :  2.79935e-03
+ Reference value :  2.90397e-03
+ Reference value :  3.00855e-03
+ Reference value :  3.11314e-03
+ Reference value :  3.21772e-03
+ Reference value :  3.33057e-03
+ Reference value :  3.43479e-03
+ Reference value :  3.54752e-03
+ Reference value :  3.65500e-03
+ Reference value :  3.75971e-03
+ Reference value :  3.86534e-03
+ Reference value :  3.97766e-03
+No. of Data Rows : 89983
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+

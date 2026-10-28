@@ -1,0 +1,12 @@
+* NGSPICE file created from microrobot_bias.ext - technology: sky130A
+
+.subckt microrobot_bias vdd vss bias_n bias_p
+X0 vss bias_n bias_p vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X1 vdd bias_p bias_p vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X2 vss bias_n bias_n vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X3 Xb2.D vdd vdd vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X4 bias_n vss sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+X5 bias_p vss sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+X6 bias_n Xb2.D Xb2.D vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+.ends
+

@@ -1,0 +1,8 @@
+{
+  "nominal_ring_W": 1.443307297397861e-06,
+  "logic_array_maximum_PV_W": 2.8902195180494104e-08,
+  "ring_to_available_power_ratio": 49.9376358226222,
+  "decision": "reject this ring for the proposed PV allocation; redesign reference/clock",
+  "comparison": "ideal external 1.6 V SPICE supply vs conceptual TCAD array MPP",
+  "not_tested": "PV-powered transistor startup, mismatch, layout or PEX"
+}

@@ -34,3 +34,14 @@ TALK_SCRIPT.md
 OpenTCAD_talk*.pptx
 ~$*.pptx
 scratchpad/
+
+# Reproducible microrobot intermediates (retain metrics/netlists/plots).
+examples/microrobot/results/spice/**/ring.dat
+examples/microrobot/results/spice/**/.spiceinit
+examples/microrobot/.ipynb_checkpoints/
+examples/microrobot/results/notebook_run.log
+examples/microrobot/results/notebook_published_run.log
+examples/microrobot/local_references/
+examples/microrobot/local_runs/
+examples/microrobot/results/**/*.dat
+examples/microrobot/results/**/.spiceinit

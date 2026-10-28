@@ -23,6 +23,19 @@ produce IV / CV / Vth characteristics.
 
 ## Status
 
+**Microrobot/PV development:** prescribed monochromatic optical generation,
+explicit 2D current scaling, ideal-diode terminal fitting/SPICE export and a
+paper-inspired application are documented in
+[`docs/optical_generation.md`](docs/optical_generation.md) and
+[`docs/photovoltaic_compact.md`](docs/photovoltaic_compact.md), with results in
+[`examples/microrobot/README.md`](examples/microrobot/README.md). This work also
+corrects the hole recombination-source sign to enforce terminal-current
+conservation. The application reports its executed checks and keeps conceptual
+PV/actuator models distinct from foundry-model circuit and layout verification.
+The first bias macro now has DRC/LVS, GDS round-trip and extracted electrical
+checks; [scope and remaining work](examples/microrobot/PHYSICAL_VALIDATION.md)
+include the rejected brownout candidate and unfinished controller assembly.
+
 Phases 0 and 1 are complete: process topography (deposit, etch,
 oxidation) and device simulation both work end-to-end and are joined
 by a single `MeshField` data contract. The current release is
@@ -36,9 +49,10 @@ suitable for research, teaching, and prototyping. See
 | 2     | Implant + diffusion (FiPy)                   | Planned        |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned        |
 
-**Test count**: 94/94 passing (device solver + physics + geometry +
-materials + topography). Slow ViennaLS-backed topography tests run in
-under 10 s on a laptop.
+**Executed test count (2026-10-27)**: 170 passing, including optical,
+charge-conservation, compact-PV/SPICE and microrobot/RTL regressions. Full execution used
+ViennaLS 5.9.0; the environment and remaining limitations are recorded in
+[`examples/microrobot/README.md`](examples/microrobot/README.md).
 
 ### Device simulation (Phase 0)
 

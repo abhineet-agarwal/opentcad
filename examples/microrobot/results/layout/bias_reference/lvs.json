@@ -1,0 +1,81 @@
+[
+  {
+   "pins": [
+      [
+        "1",
+        "2",
+        "3",
+        "4"
+      ], [
+        "1",
+        "2",
+        "3",
+        "4"
+      ]
+   ]
+  },
+  {
+   "pins": [
+      [
+        "1",
+        "2",
+        "3",
+        "4"
+      ], [
+        "1",
+        "2",
+        "3",
+        "4"
+      ]
+   ]
+  },
+  {
+   "pins": [
+      [
+        "1",
+        "2"
+      ], [
+        "1",
+        "2"
+      ]
+   ]
+  },
+  {
+   "name": [
+      "microrobot_bias",
+      "microrobot_bias"
+   ],
+   "devices": [
+       [
+         ["sky130_fd_pr__nfet_01v8", 4],
+         ["sky130_fd_pr__pfet_01v8", 1],
+         ["sky130_fd_pr__cap_mim_m3_1", 2 ]
+       ], [
+         ["sky130_fd_pr__nfet_01v8", 4 ],
+         ["sky130_fd_pr__pfet_01v8", 1 ],
+         ["sky130_fd_pr__cap_mim_m3_1", 2 ]
+       ]
+   ],
+   "nets": [
+    5,
+    5
+   ],
+   "badnets": [
+   ],
+   "badelements": [
+   ],
+   "pins": [
+      [
+        "vdd",
+        "bias_p",
+        "bias_n",
+        "vss"
+      ], [
+        "vdd",
+        "bias_p",
+        "bias_n",
+        "vss"
+      ]
+   ]
+  }
+]

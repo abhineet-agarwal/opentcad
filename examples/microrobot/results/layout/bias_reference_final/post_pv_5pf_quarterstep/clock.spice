@@ -1,0 +1,270 @@
+* Our low-power clock candidate; three scaled S2E-fit cells, optical ramp, chosen storage capacitor
+.lib "/usr/local/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice" tt
+.temp 26.85
+* Functional open-PDK candidate, not a reproduction of Reynolds' PTAT clock.
+* Diode-stack bias is supply/temperature dependent. No compensated reference.
+* All W/L in um under the installed SKY130 model scale.
+.subckt microrobot_clock clk vdd vss bias_n bias_p
+* A passive diode-connected stack has a nonzero DC path at illumination.
+Vbias vdd ref_vdd 0
+Xlayout ref_vdd vss bias_n bias_p microrobot_bias
+X1 raw a vdd vss bias_p bias_n micro_starved_inv
+X2 a b vdd vss bias_p bias_n micro_starved_inv
+X3 b c vdd vss bias_p bias_n micro_starved_inv
+X4 c d vdd vss bias_p bias_n micro_starved_inv
+X5 d raw vdd vss bias_p bias_n micro_starved_inv
+Xc1 a vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xc2 b vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xc3 c vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xc4 d vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+* Deliberate timing-capacitor asymmetry for nominal startup.
+Xc5 raw vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2.5
+* Long-channel receiver first, then a smaller faster receiver. Their supply
+* current is included; a slow raw ring must not drive digital gates for free.
+Xbp1 buffered raw vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=8
+Xbn1 buffered raw vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xbp2 clk buffered vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=1
+Xbn2 clk buffered vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=1
+.ends microrobot_clock
+
+.subckt micro_starved_inv a y vdd vss bp bn
+Xps ps bp vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=8
+Xpi y a ps vdd sky130_fd_pr__pfet_01v8 w=1 l=0.5
+Xni y a ns vss sky130_fd_pr__nfet_01v8 w=0.5 l=0.5
+Xns ns bn vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+.ends micro_starved_inv
+* NGSPICE file created from microrobot_bias.ext - technology: sky130A
+
+.subckt microrobot_bias vdd vss bias_n bias_p
+X0 vss.t3 bias_n.t3 bias_p.t0 vss.t2 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X1 vdd.t1 bias_p.t1 bias_p.t2 vdd.t0 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X2 vss.t1 bias_n.t0 bias_n.t1 vss.t0 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X3 Xb2.D.t2 vdd.t2 vdd.t3 vss.t7 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X4 bias_n.t4 vss.t4 sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+X5 bias_p.t3 vss.t5 sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+X6 bias_n.t2 Xb2.D.t0 Xb2.D.t1 vss.t6 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+R0 bias_n bias_n.t1 219.8
+R1 bias_n bias_n.t2 219.8
+R2 bias_n bias_n.n3 30.9416
+R3 bias_n.n1 bias_n 28.5746
+R4 bias_n.n2 bias_n 20.0305
+R5 bias_n.n3 bias_n 20.0305
+R6 bias_n.n0 bias_n 16.2272
+R7 bias_n bias_n.t0 9.77232
+R8 bias_n bias_n.t3 9.77232
+R9 bias_n.n3 bias_n.n2 1.763
+R10 bias_n.n1 bias_n.n0 1.00747
+R11 bias_n.n2 bias_n.n1 0.370038
+R12 bias_n.n0 bias_n 0.259
+R13 bias_n bias_n.t4 0.0180781
+R14 bias_p bias_p.t2 223.565
+R15 bias_p bias_p.t0 219.8
+R16 bias_p.n0 bias_p 28.9496
+R17 bias_p.n1 bias_p 24.2074
+R18 bias_p.n2 bias_p 20.2211
+R19 bias_p bias_p.n2 18.5861
+R20 bias_p bias_p.t1 11.5497
+R21 bias_p.n1 bias_p.n0 5.288
+R22 bias_p.n0 bias_p 3.02848
+R23 bias_p.n2 bias_p.n1 0.370038
+R24 bias_p bias_p.t3 0.0180781
+R25 vss.n24 vss.n15 6564.74
+R26 vss.n21 vss.n15 6564.74
+R27 vss.n24 vss.n16 6564.74
+R28 vss.n30 vss.n10 6564.74
+R29 vss.n27 vss.n10 6564.74
+R30 vss.n30 vss.n11 6564.74
+R31 vss.n27 vss.n11 6564.74
+R32 vss.n36 vss.n7 6564.74
+R33 vss.n33 vss.n7 6564.74
+R34 vss.n36 vss.n8 6564.74
+R35 vss.n33 vss.n8 6564.74
+R36 vss.n39 vss.n4 6564.74
+R37 vss.n39 vss.n2 6564.74
+R38 vss.n5 vss.n2 6564.74
+R39 vss.n38 vss.n37 608.668
+R40 vss.n32 vss.n31 608.668
+R41 vss.n26 vss.n25 608.668
+R42 vss.n6 vss.n5 598.995
+R43 vss.n21 vss.n20 598.995
+R44 vss.n38 vss.t7 515.237
+R45 vss.n37 vss.t6 515.237
+R46 vss.n32 vss.t6 515.237
+R47 vss.n31 vss.t2 515.237
+R48 vss.n26 vss.t2 515.237
+R49 vss.n25 vss.t0 515.237
+R50 vss.n23 vss.n17 426.541
+R51 vss.n22 vss.n17 426.541
+R52 vss.n23 vss 426.541
+R53 vss vss.n22 426.541
+R54 vss.n29 vss.n12 426.541
+R55 vss.n28 vss.n12 426.541
+R56 vss.n29 vss 426.541
+R57 vss vss.n28 426.541
+R58 vss.n35 vss.n9 426.541
+R59 vss.n34 vss.n9 426.541
+R60 vss.n35 vss 426.541
+R61 vss vss.n34 426.541
+R62 vss.n3 vss.n1 426.541
+R63 vss vss.n1 426.541
+R64 vss.n40 vss.n3 426.541
+R65 vss vss.n40 426.541
+R66 vss vss.t1 219.8
+R67 vss vss.t3 219.8
+R68 vss.n34 vss.n33 146.25
+R69 vss.n33 vss.n32 146.25
+R70 vss.n36 vss.n35 146.25
+R71 vss.n37 vss.n36 146.25
+R72 vss.n28 vss.n27 146.25
+R73 vss.n27 vss.n26 146.25
+R74 vss.n30 vss.n29 146.25
+R75 vss.n31 vss.n30 146.25
+R76 vss.n22 vss.n21 146.25
+R77 vss.n24 vss.n23 146.25
+R78 vss.n25 vss.n24 146.25
+R79 vss.n5 vss.n1 146.25
+R80 vss.n40 vss.n39 146.25
+R81 vss.n39 vss.n38 146.25
+R82 vss.n18 vss 27.8246
+R83 vss.n13 vss 27.8246
+R84 vss vss.n8 23.4005
+R85 vss.n8 vss.t6 23.4005
+R86 vss.n9 vss.n7 23.4005
+R87 vss.n7 vss.t6 23.4005
+R88 vss vss.n11 23.4005
+R89 vss.n11 vss.t2 23.4005
+R90 vss.n12 vss.n10 23.4005
+R91 vss.n10 vss.t2 23.4005
+R92 vss vss.n16 23.4005
+R93 vss.n17 vss.n15 23.4005
+R94 vss.n15 vss.t0 23.4005
+R95 vss.n4 vss.n3 23.4005
+R96 vss vss.n2 23.4005
+R97 vss.t7 vss.n2 23.4005
+R98 vss.n20 vss.n16 21.1904
+R99 vss.n6 vss.n4 21.1904
+R100 vss vss.n19 19.703
+R101 vss vss.n14 19.703
+R102 vss vss.n0 19.703
+R103 vss.n41 vss 19.703
+R104 vss.n42 vss.n41 16.8306
+R105 vss.n43 vss.t5 2.47435
+R106 vss.n20 vss.t0 2.13612
+R107 vss.t7 vss.n6 2.13612
+R108 vss.n19 vss 1.87051
+R109 vss.n41 vss.n0 1.763
+R110 vss.n13 vss.n0 1.39346
+R111 vss.n18 vss.n14 1.39346
+R112 vss.n14 vss.n13 0.370038
+R113 vss.n19 vss.n18 0.370038
+R114 vss vss.n43 0.189944
+R115 vss.n42 vss 0.189944
+R116 vss.n43 vss.t4 0.033527
+R117 vss.t5 vss.n42 0.033527
+R118 vdd.n9 vdd.n5 4207.06
+R119 vdd.n6 vdd.n3 4207.06
+R120 vdd.n7 vdd.n6 1068.61
+R121 vdd.n9 vdd.n8 1068.61
+R122 vdd.n4 vdd.n2 448.753
+R123 vdd vdd.n2 448.753
+R124 vdd.n10 vdd.n4 448.753
+R125 vdd vdd.n10 448.753
+R126 vdd vdd.t1 223.565
+R127 vdd vdd.t3 219.8
+R128 vdd.n6 vdd.n2 30.8338
+R129 vdd.n10 vdd.n9 30.8338
+R130 vdd.n0 vdd 28.1996
+R131 vdd vdd.n11 23.8269
+R132 vdd.n11 vdd 20.078
+R133 vdd.n1 vdd 19.6555
+R134 vdd vdd.t2 9.77232
+R135 vdd.n5 vdd.n4 7.4005
+R136 vdd vdd.n3 7.4005
+R137 vdd.n0 vdd 6.55348
+R138 vdd.n7 vdd.n5 5.51167
+R139 vdd.n8 vdd.n3 5.51167
+R140 vdd.n11 vdd.n1 1.998
+R141 vdd.n8 vdd.t0 1.88064
+R142 vdd.t0 vdd.n7 1.88064
+R143 vdd.n1 vdd.n0 0.370038
+R144 Xb2.D Xb2.D.t2 219.8
+R145 Xb2.D Xb2.D.t1 219.8
+R146 Xb2.D.n0 Xb2.D 31.6916
+R147 Xb2.D Xb2.D.n1 29.3246
+R148 Xb2.D.n0 Xb2.D 20.7805
+R149 Xb2.D Xb2.D.t0 9.77232
+R150 Xb2.D.n1 Xb2.D 4.79097
+R151 Xb2.D.n1 Xb2.D.n0 0.370038
+C0 vdd bias_p 5.11886f
+C1 vdd bias_n 6.38283f
+C2 Xb2.D bias_p 6.27185f
+C3 Xb2.D bias_n 0.35421f
+C4 bias_n bias_p 6.7663f
+C5 Xb2.D vdd 0.34245f
+C6 bias_p vss 26.43762f
+C7 bias_n vss 36.36096f
+C8 vdd vss 30.36517f
+C9 Xb2.D vss 20.79584f
+C10 Xb2.D.t2 vss 0.0083f
+C11 Xb2.D.t0 vss 0.61427f
+C12 Xb2.D.n0 vss 2.41562f
+C13 Xb2.D.n1 vss 1.26168f
+C14 Xb2.D.t1 vss 0.0083f
+C15 vdd.t1 vss 0.02038f
+C16 vdd.t3 vss 0.00993f
+C17 vdd.n0 vss 1.6757f
+C18 vdd.t2 vss 0.73536f
+C19 vdd.n1 vss 0.91369f
+C20 vdd.n2 vss 0.08052f
+C21 vdd.n3 vss 0.07921f
+C22 vdd.n4 vss 0.07921f
+C23 vdd.n5 vss 0.07921f
+C24 vdd.n6 vss 0.7167f
+C25 vdd.t0 vss 1.19685f
+C26 vdd.n9 vss 0.7167f
+C27 vdd.n10 vss 0.08052f
+C28 vdd.n11 vss 2.06536f
+C29 bias_p.t0 vss 0.01109f
+C30 bias_p.n0 vss 2.12741f
+C31 bias_p.t2 vss 0.02275f
+C32 bias_p.n1 vss 1.64472f
+C33 bias_p.t1 vss 1.15598f
+C34 bias_p.n2 vss 1.7101f
+C35 bias_p.t3 vss 4.25201f
+C36 bias_n.t2 vss 0.00735f
+C37 bias_n.t4 vss 2.82027f
+C38 bias_n.n0 vss 0.34684f
+C39 bias_n.t1 vss 0.00735f
+C40 bias_n.n1 vss 0.71452f
+C41 bias_n.t0 vss 0.54461f
+C42 bias_n.n2 vss 0.66808f
+C43 bias_n.t3 vss 0.54461f
+C44 bias_n.n3 vss 2.53471f
+.ends
+
+
+Vlight illumination 0 PWL(0 0 1u 0 0.000101 1000)
+.model fitted_pv D(IS=2.9405522317e-17 N=1.14470885396 TNOM=26.85 EG=0 XTI=0)
+Bph1 0 pv1 I={4.0350658074e-08*v(illumination)/1000}
+Bph2 pv1 pv2 I={4.0350658074e-08*v(illumination)/1000}
+Bph3 pv2 supply I={4.0350658074e-08*v(illumination)/1000}
+Dp1 pv1 0 fitted_pv
+Dp2 pv2 pv1 fitted_pv
+Dp3 supply pv2 fitted_pv
+Cstore supply 0 5e-12
+Vsense supply vdd 0
+Xclock clk vdd 0 bn bp microrobot_clock
+Vlogic supply digital_supply 0
+.include "receiver_cells.spice"
+Xff clk feedback 0 0 digital_supply digital_supply div2 sky130_fd_sc_hd__dfxtp_1
+Xfeedback div2 0 0 digital_supply digital_supply feedback sky130_fd_sc_hd__inv_1
+Coutput clk 0 2e-15
+.options method=gear maxord=2 reltol=1e-4 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+tran 1.25e-08 0.004 0 1.25e-08
+wrdata clock.dat v(vdd) v(clk) v(bn) v(bp) i(Vsense) i(Vlogic) v(div2) i(v.xclock.vbias)
+quit
+.endc
+.end

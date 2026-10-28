@@ -1,0 +1,141 @@
+
+Circuit 1 cell sky130_fd_pr__nfet_01v8 and Circuit 2 cell sky130_fd_pr__nfet_01v8 are black boxes.
+Warning: Equate pins:  cell sky130_fd_pr__nfet_01v8 is a placeholder, treated as a black box.
+Warning: Equate pins:  cell sky130_fd_pr__nfet_01v8 is a placeholder, treated as a black box.
+
+Subcircuit pins:
+Circuit 1: sky130_fd_pr__nfet_01v8         |Circuit 2: sky130_fd_pr__nfet_01v8         
+-------------------------------------------|-------------------------------------------
+1                                          |1                                          
+2                                          |2                                          
+3                                          |3                                          
+4                                          |4                                          
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes sky130_fd_pr__nfet_01v8 and sky130_fd_pr__nfet_01v8 are equivalent.
+
+Circuit 1 cell sky130_fd_pr__pfet_01v8 and Circuit 2 cell sky130_fd_pr__pfet_01v8 are black boxes.
+Warning: Equate pins:  cell sky130_fd_pr__pfet_01v8 is a placeholder, treated as a black box.
+Warning: Equate pins:  cell sky130_fd_pr__pfet_01v8 is a placeholder, treated as a black box.
+
+Subcircuit pins:
+Circuit 1: sky130_fd_pr__pfet_01v8         |Circuit 2: sky130_fd_pr__pfet_01v8         
+-------------------------------------------|-------------------------------------------
+1                                          |1                                          
+2                                          |2                                          
+3                                          |3                                          
+4                                          |4                                          
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes sky130_fd_pr__pfet_01v8 and sky130_fd_pr__pfet_01v8 are equivalent.
+
+Circuit 1 cell sky130_fd_pr__cap_mim_m3_1 and Circuit 2 cell sky130_fd_pr__cap_mim_m3_1 are black boxes.
+Warning: Equate pins:  cell sky130_fd_pr__cap_mim_m3_1 is a placeholder, treated as a black box.
+Warning: Equate pins:  cell sky130_fd_pr__cap_mim_m3_1 is a placeholder, treated as a black box.
+
+Subcircuit pins:
+Circuit 1: sky130_fd_pr__cap_mim_m3_1      |Circuit 2: sky130_fd_pr__cap_mim_m3_1      
+-------------------------------------------|-------------------------------------------
+1                                          |1                                          
+2                                          |2                                          
+---------------------------------------------------------------------------------------
+Cell pin lists are equivalent.
+Device classes sky130_fd_pr__cap_mim_m3_1 and sky130_fd_pr__cap_mim_m3_1 are equivalent.
+
+Subcircuit summary:
+Circuit 1: microrobot_bias                 |Circuit 2: microrobot_bias                 
+-------------------------------------------|-------------------------------------------
+sky130_fd_pr__nfet_01v8 (4)                |sky130_fd_pr__nfet_01v8 (4)                
+sky130_fd_pr__pfet_01v8 (1)                |sky130_fd_pr__pfet_01v8 (1)                
+sky130_fd_pr__cap_mim_m3_1 (2)             |sky130_fd_pr__cap_mim_m3_1 (2)             
+Number of devices: 7                       |Number of devices: 7                       
+Number of nets: 5                          |Number of nets: 5                          
+---------------------------------------------------------------------------------------
+NET mismatches: Class fragments follow (with fanout counts):
+Circuit 1: microrobot_bias                 |Circuit 2: microrobot_bias                 
+
+---------------------------------------------------------------------------------------
+Net: Xb2.D                                 |Net: b2                                    
+  sky130_fd_pr__nfet_01v8/(1|3) = 2        |  sky130_fd_pr__nfet_01v8/(1|3) = 2        
+  sky130_fd_pr__nfet_01v8/2 = 1            |  sky130_fd_pr__nfet_01v8/2 = 1            
+---------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------
+Net: bias_p                                |Net: bias_p                                
+  sky130_fd_pr__nfet_01v8/(1|3) = 1        |  sky130_fd_pr__nfet_01v8/(1|3) = 1        
+  sky130_fd_pr__pfet_01v8/2 = 1            |  sky130_fd_pr__pfet_01v8/2 = 1            
+  sky130_fd_pr__pfet_01v8/(1|3) = 1        |  sky130_fd_pr__pfet_01v8/(1|3) = 1        
+  sky130_fd_pr__cap_mim_m3_1/1 = 1         |  sky130_fd_pr__cap_mim_m3_1/1 = 1         
+                                           |                                           
+Net: vdd                                   |Net: bias_n                                
+  sky130_fd_pr__pfet_01v8/(1|3) = 1        |  sky130_fd_pr__nfet_01v8/(1|3) = 2        
+  sky130_fd_pr__pfet_01v8/4 = 1            |  sky130_fd_pr__nfet_01v8/2 = 1            
+  sky130_fd_pr__nfet_01v8/2 = 1            |  sky130_fd_pr__cap_mim_m3_1/1 = 1         
+  sky130_fd_pr__nfet_01v8/(1|3) = 1        |                                           
+---------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------
+Net: bias_n                                |Net: vdd                                   
+  sky130_fd_pr__nfet_01v8/2 = 2            |  sky130_fd_pr__nfet_01v8/2 = 2            
+  sky130_fd_pr__nfet_01v8/(1|3) = 2        |  sky130_fd_pr__nfet_01v8/(1|3) = 1        
+  sky130_fd_pr__cap_mim_m3_1/1 = 1         |  sky130_fd_pr__pfet_01v8/(1|3) = 1        
+                                           |  sky130_fd_pr__pfet_01v8/4 = 1            
+---------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------
+Net: vss                                   |Net: vss                                   
+  sky130_fd_pr__nfet_01v8/(1|3) = 2        |  sky130_fd_pr__nfet_01v8/(1|3) = 2        
+  sky130_fd_pr__nfet_01v8/4 = 4            |  sky130_fd_pr__nfet_01v8/4 = 4            
+  sky130_fd_pr__cap_mim_m3_1/2 = 2         |  sky130_fd_pr__cap_mim_m3_1/2 = 2         
+---------------------------------------------------------------------------------------
+DEVICE mismatches: Class fragments follow (with node fanout counts):
+Circuit 1: microrobot_bias                 |Circuit 2: microrobot_bias                 
+
+---------------------------------------------------------------------------------------
+Instance: sky130_fd_pr__cap_mim_m3_1:5     |Instance: sky130_fd_pr__cap_mim_m3_1:cbias 
+  1 = 4                                    |  1 = 4                                    
+  2 = 8                                    |  2 = 8                                    
+                                           |                                           
+Instance: sky130_fd_pr__cap_mim_m3_1:4     |Instance: sky130_fd_pr__cap_mim_m3_1:cbias 
+  1 = 5                                    |  1 = 4                                    
+  2 = 8                                    |  2 = 8                                    
+---------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------
+Instance: sky130_fd_pr__pfet_01v8:1        |Instance: sky130_fd_pr__pfet_01v8:pdiode   
+  (1,3) = (4,4)                            |  (1,3) = (5,4)                            
+  2 = 4                                    |  2 = 4                                    
+  4 = 4                                    |  4 = 5                                    
+---------------------------------------------------------------------------------------
+
+---------------------------------------------------------------------------------------
+Instance: sky130_fd_pr__nfet_01v8:6        |Instance: sky130_fd_pr__nfet_01v8:mirror   
+  (1,3) = (5,3)                            |  (1,3) = (8,4)                            
+  2 = 3                                    |  2 = 4                                    
+  4 = 8                                    |  4 = 8                                    
+                                           |                                           
+Instance: sky130_fd_pr__nfet_01v8:3        |Instance: sky130_fd_pr__nfet_01v8:b3       
+  (1,3) = (4,3)                            |  (1,3) = (5,3)                            
+  2 = 4                                    |  2 = 5                                    
+  4 = 8                                    |  4 = 8                                    
+                                           |                                           
+Instance: sky130_fd_pr__nfet_01v8:2        |Instance: sky130_fd_pr__nfet_01v8:b2       
+  (1,3) = (8,5)                            |  (1,3) = (4,3)                            
+  2 = 5                                    |  2 = 3                                    
+  4 = 8                                    |  4 = 8                                    
+---------------------------------------------------------------------------------------
+Netlists do not match.
+Port matching may fail to disambiguate symmetries.
+
+Subcircuit pins:
+Circuit 1: microrobot_bias                 |Circuit 2: microrobot_bias                 
+-------------------------------------------|-------------------------------------------
+vdd                                        |bias_p **Mismatch**                        
+bias_p                                     |bias_n **Mismatch**                        
+bias_n                                     |vdd **Mismatch**                           
+vss                                        |vss                                        
+---------------------------------------------------------------------------------------
+Cell pin lists for microrobot_bias and microrobot_bias altered to match.
+Device classes microrobot_bias and microrobot_bias are equivalent.
+
+Final result: Top level cell failed pin matching.

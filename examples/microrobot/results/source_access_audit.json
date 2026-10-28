@@ -1,0 +1,31 @@
+{
+  "checked_at_UTC": "2026-10-26T18:39:17.771070+00:00",
+  "printed_dataset_DOI": "10.5281/zenodo.7008281",
+  "doi_resolver": {
+    "HTTP_status": 404,
+    "page_title": "Error: DOI Not Found"
+  },
+  "zenodo_API": {
+    "HTTP_status": 404,
+    "message": "The persistent identifier is not registered."
+  },
+  "datacite_DOI_API": {
+    "HTTP_status": 404,
+    "title": "The resource you are looking for doesn't exist."
+  },
+  "zenodo_exact_title_search_hits": 0,
+  "datacite_title_or_related_article_DOI_search_hits": 0,
+  "wayback_availability_lookup": {
+    "url": "zenodo.org/record/7008281",
+    "archived_snapshots": {}
+  },
+  "replacement_dataset": "none verified",
+  "cause": "unknown; cannot distinguish typo, unpublished reservation or other issue",
+  "supplement": {
+    "status": "user supplied and inspected",
+    "pages": 13,
+    "local_path": "examples/microrobot/local_references/scirobotics.abq2296_sm.pdf",
+    "sha256": "43138926560d636d64845f7f708ba6026e26446f79df2962cc8e1355ed6b9fd4"
+  },
+  "next_evidence": "S2 plot digitization is possible; request raw data/correct DOI from authors"
+}

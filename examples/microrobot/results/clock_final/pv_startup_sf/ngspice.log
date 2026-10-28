@@ -1,0 +1,105 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * our low-power clock candidate; three scaled s2e-fit cells, optical ramp, chosen storage capacitor
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+illumination                                 0
+pv1                               -4.20677e-15
+pv2                               -8.41354e-15
+supply                            -1.26203e-14
+vdd                               -1.26203e-14
+xclock.ref_vdd                    -1.26203e-14
+bn                                -5.39778e-16
+xclock.b2                         -2.67784e-15
+bp                                -4.70671e-15
+xclock.xcbiasp.a                             0
+xclock.xcbiasp.b1                            0
+xclock.xcbiasn.a                             0
+xclock.xcbiasn.b1                            0
+xclock.x1.ps                      -1.26195e-14
+xclock.a                          -3.25783e-15
+xclock.raw                        -3.25802e-15
+xclock.x1.ns                      -2.22179e-15
+xclock.x2.ps                      -1.26195e-14
+xclock.b                           -3.2575e-15
+xclock.x2.ns                      -2.22285e-15
+xclock.x3.ps                      -1.26195e-14
+xclock.c                          -3.25748e-15
+xclock.x3.ns                      -2.22281e-15
+xclock.x4.ps                      -1.26195e-14
+xclock.d                           -3.2575e-15
+xclock.x4.ns                       -2.2228e-15
+xclock.x5.ps                      -1.26195e-14
+xclock.x5.ns                      -2.22162e-15
+xclock.xc1.a                                 0
+xclock.xc1.b1                                0
+xclock.xc2.a                                 0
+xclock.xc2.b1                                0
+xclock.xc3.a                                 0
+xclock.xc3.b1                                0
+xclock.xc4.a                                 0
+xclock.xc4.b1                                0
+xclock.xc5.a                                 0
+xclock.xc5.b1                                0
+xclock.buffered                   -4.67004e-15
+clk                               -8.96049e-16
+digital_supply                    -1.26203e-14
+feedback                           -1.1245e-15
+div2                              -8.02517e-16
+vlogic#branch                      1.23916e-25
+v.xclock.vbias#branch             -2.50097e-26
+vsense#branch                     -1.19705e-25
+vlight#branch                                0
+
+ Reference value :  0.00000e+00
+ Reference value :  1.65922e-04
+ Reference value :  2.69593e-04
+ Reference value :  3.74964e-04
+ Reference value :  4.88156e-04
+ Reference value :  5.94691e-04
+ Reference value :  7.10003e-04
+ Reference value :  8.15487e-04
+ Reference value :  9.30175e-04
+ Reference value :  1.03935e-03
+ Reference value :  1.15105e-03
+ Reference value :  1.26420e-03
+ Reference value :  1.37132e-03
+ Reference value :  1.47958e-03
+ Reference value :  1.59154e-03
+ Reference value :  1.69323e-03
+ Reference value :  1.81277e-03
+ Reference value :  1.92098e-03
+ Reference value :  2.03177e-03
+ Reference value :  2.13430e-03
+ Reference value :  2.24526e-03
+ Reference value :  2.35585e-03
+ Reference value :  2.45857e-03
+ Reference value :  2.57457e-03
+ Reference value :  2.67277e-03
+ Reference value :  2.77960e-03
+ Reference value :  2.89500e-03
+ Reference value :  3.00120e-03
+ Reference value :  3.10974e-03
+ Reference value :  3.21526e-03
+ Reference value :  3.32555e-03
+ Reference value :  3.43717e-03
+ Reference value :  3.55053e-03
+ Reference value :  3.65573e-03
+ Reference value :  3.76098e-03
+ Reference value :  3.87439e-03
+ Reference value :  3.97594e-03
+No. of Data Rows : 87800
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+

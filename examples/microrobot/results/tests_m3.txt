@@ -1,0 +1,43 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.2, pytest-9.0.3, pluggy-1.6.0
+rootdir: /Users/abhineet/Documents/opentcad_final
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collected 174 items
+
+tests/bridge/test_field_interpolator.py .....                            [  2%]
+tests/device/test_bgn.py .....                                           [  5%]
+tests/device/test_compact_pv.py ....                                     [  8%]
+tests/device/test_cv_sweep.py .                                          [  8%]
+tests/device/test_lombardi.py ....                                       [ 10%]
+tests/device/test_mobility_models.py ........                            [ 15%]
+tests/device/test_mos_capacitor.py .                                     [ 16%]
+tests/device/test_nmos_idvg.py .                                         [ 16%]
+tests/device/test_optical.py ..........                                  [ 22%]
+tests/device/test_oxide_charge.py ...                                    [ 24%]
+tests/device/test_pn_junction_integration.py .                           [ 24%]
+tests/device/test_recombination_models.py .....                          [ 27%]
+tests/device/test_schottky.py ...                                        [ 29%]
+tests/device/test_solver_api.py ...                                      [ 31%]
+tests/device/test_statistics.py .....                                    [ 33%]
+tests/geometry/test_formats.py ........                                  [ 38%]
+tests/geometry/test_mesh.py ....                                         [ 40%]
+tests/integration/test_electrode_spice.py ..                             [ 41%]
+tests/integration/test_layout_edge_audit.py ..                           [ 43%]
+tests/integration/test_microrobot.py .....                               [ 45%]
+tests/integration/test_phase_generator.py .                              [ 46%]
+tests/materials/test_database.py ......                                  [ 50%]
+tests/process/test_anneal.py ...............                             [ 58%]
+tests/process/test_dispatch.py .........                                 [ 63%]
+tests/process/test_implant.py .....................                      [ 75%]
+tests/process/test_oxidation.py ................                         [ 85%]
+tests/process/test_selectivity.py ...........                            [ 91%]
+tests/process/test_topography_smoke.py ...............                   [100%]
+
+=============================== warnings summary ===============================
+tests/device/test_recombination_models.py::test_auger_dominates_at_high_carrier_density
+  /Users/abhineet/Documents/opentcad_final/tests/device/test_recombination_models.py:85: RuntimeWarning: invalid value encountered in scalar divide
+    f"|Auger/SRH| = {abs(u_aug/u_srh):.2e}")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== 174 passed, 1 warning in 89.89s (0:01:29) ===================

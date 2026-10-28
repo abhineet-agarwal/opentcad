@@ -1,0 +1,26 @@
+{
+  "source": "Reynolds et al. (2022), supplementary Fig. S2E, PDF page 8",
+  "doi": "10.1126/scirobotics.abq2296",
+  "source_pdf_sha256": "43138926560d636d64845f7f708ba6026e26446f79df2962cc8e1355ed6b9fd4",
+  "native_image_width_px": 1969,
+  "native_image_height_px": 1805,
+  "x_ticks_px": [846, 961, 1075, 1190, 1304],
+  "x_tick_voltage_V": [-1.0, -0.5, 0.0, 0.5, 1.0],
+  "y_ticks_px": [1273, 1526, 1653],
+  "y_tick_terminal_current_A": [4e-7, 0.0, -2e-7],
+  "plot_roi_px": [779, 1277, 1380, 1650],
+  "legend_exclusion": {"x_below_px": 1035, "y_below_px": 1415},
+  "axis_position_uncertainty_px": 2,
+  "curve_position_uncertainty_px": 3,
+  "uncertainty_interpretation": "Conservative digitization sensitivity assumptions; not experimental standard deviations or confidence intervals.",
+  "caption": {
+    "series_cells": 2,
+    "cell_area_um2": 540,
+    "irradiance_W_m2": 1000,
+    "approximate_pair_Voc_V": 1.24,
+    "approximate_pair_Isc_A": 1.5e-7,
+    "wavelength_nm": 660
+  },
+  "fit_temperature_K": 300,
+  "temperature_provenance": "Assumption; measurement temperature not specified in the figure/caption."
+}
