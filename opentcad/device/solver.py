@@ -82,7 +82,11 @@ class DeviceSolver:
         self._initialized = True
 
     def solve_equilibrium(self) -> None:
-        """Warm-start with Poisson-only then switch to coupled DD solve."""
+        """Warm-start with Poisson-only then switch to coupled DD solve.
+
+        With a prescribed optical generation field this returns an illuminated
+        steady state at the current contact biases, NOT thermal equilibrium.
+        """
         if not self._initialized:
             self.initialize()
         ds = self._ds
@@ -218,8 +222,8 @@ class DeviceSolver:
         """Ramp `anode_contact` from v_start to v_end, holding cathode at 0V.
 
         Returns (voltages, currents). Current is total (electron+hole) at
-        `measure_contact` in Amps (2D DEVSIM integrates per-unit-depth, so
-        the numeric value is A/cm of out-of-plane length).
+        `measure_contact` in A/cm of out-of-plane length. Use
+        ``opentcad.device.optical.current_from_2d`` for physical Amps.
 
         Args:
             anode_contact: contact whose voltage is ramped.
@@ -258,12 +262,30 @@ class DeviceSolver:
             currents.append(self._get_contact_current(measure))
         return voltages.tolist(), currents
 
+    def contact_current_A_per_cm(self, contact: str) -> float:
+        """Read conventional current entering a contact at the last DD solution.
+
+        Requires a successful ``solve_equilibrium`` or ``iv_sweep`` first.
+        Photovoltaic power delivery has negative current at its positive terminal.
+        """
+        if not self._initialized:
+            raise RuntimeError("Solve the device before reading contact current")
+        if contact not in self._contact_regions:
+            raise KeyError(f"Unknown contact: {contact}")
+        return self._get_contact_current(contact)
+
     # ------------------------------------------------------------------
     # Mesh conversion
     # ------------------------------------------------------------------
     def _convert_meshfield(self) -> None:
         ds = self._ds
         mf = self.mf
+        from .optical import GENERATION_FIELD
+        generation = np.asarray(mf.grid.point_data.get(
+            GENERATION_FIELD, np.zeros(mf.n_points)), dtype=float)
+        if (generation.shape != (mf.n_points,) or np.any(~np.isfinite(generation))
+                or np.any(generation < 0)):
+            raise ValueError(f"{GENERATION_FIELD} must be finite, non-negative and nodal")
 
         import pyvista as pv
         if not np.all(np.asarray(mf.grid.celltypes) == pv.CellType.TRIANGLE):
@@ -397,7 +419,10 @@ class DeviceSolver:
                 nd = mf.Nd[idx]
                 na = mf.Na[idx]
             for name, vals in (("Donors", nd), ("Acceptors", na),
-                               ("NetDoping", nd - na)):
+                               ("NetDoping", nd - na),
+                               ("OpticalGeneration", np.zeros(len(idx))
+                                if self._region_is_insulator.get(region, False)
+                                else generation[idx])):
                 ds.node_solution(device=self._device_name, region=region,
                                  name=name)
                 ds.set_node_values(device=self._device_name, region=region,
@@ -680,8 +705,8 @@ class DeviceSolver:
         for name, eq in (
             ("NCharge", "-ElectronCharge*Electrons"),
             ("NCharge:Electrons", "-ElectronCharge"),
-            ("PCharge", "-ElectronCharge*Holes"),
-            ("PCharge:Holes", "-ElectronCharge"),
+            ("PCharge", "ElectronCharge*Holes"),
+            ("PCharge:Holes", "ElectronCharge"),
         ):
             ds.node_model(device=device, region=region, name=name, equation=eq)
 
@@ -702,16 +727,29 @@ class DeviceSolver:
         ):
             ds.node_model(device=device, region=region, name=name, equation=eq)
 
+        # URec is -qR by the RecombinationModel contract. Electron and
+        # hole sources MUST have opposite signs so pair creation/destruction
+        # conserves charge. G is prescribed and has no carrier derivatives.
+        for name, eq in (
+            ("ElectronSource", "URec + ElectronCharge*OpticalGeneration"),
+            ("HoleSource", "-URec - ElectronCharge*OpticalGeneration"),
+            ("ElectronSource:Electrons", "URec:Electrons"),
+            ("ElectronSource:Holes", "URec:Holes"),
+            ("HoleSource:Electrons", "-URec:Electrons"),
+            ("HoleSource:Holes", "-URec:Holes"),
+        ):
+            ds.node_model(device=device, region=region, name=name, equation=eq)
+
         ds.equation(device=device, region=region,
                     name="ElectronContinuityEquation",
                     variable_name="Electrons", edge_model="ElectronCurrent",
                     variable_update="positive",
-                    time_node_model="NCharge", node_model="URec")
+                    time_node_model="NCharge", node_model="ElectronSource")
         ds.equation(device=device, region=region,
                     name="HoleContinuityEquation",
                     variable_name="Holes", edge_model="HoleCurrent",
                     variable_update="positive",
-                    time_node_model="PCharge", node_model="URec")
+                    time_node_model="PCharge", node_model="HoleSource")
 
     # ------------------------------------------------------------------
     # Contact BCs
