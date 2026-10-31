@@ -1,0 +1,10 @@
+{
+  "50ns": {
+    "public_deck_equal_excluding_comments": true,
+    "energy_max_absolute_difference_nJ": 0.0
+  },
+  "25ns": {
+    "public_deck_equal_excluding_comments": true,
+    "energy_max_absolute_difference_nJ": 0.0
+  }
+}

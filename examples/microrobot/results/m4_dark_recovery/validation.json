@@ -1,0 +1,14 @@
+{
+  "scope": "Post-freeze validation record; no circuit or numerical-result changes",
+  "repository_suite": {
+    "python": "3.14.2",
+    "passed": 206,
+    "skipped": 0,
+    "warnings": 1,
+    "duration_s": 49.41,
+    "warning": "Existing Auger/SRH invalid scalar divide at test_recombination_models.py:85",
+    "log": "/tmp/opentcad-dark-recovery-final-pytest.log",
+    "executed_by": "startup_evidence worker"
+  },
+  "history_note": "Prior195-test record and frozen670-hash bundle remain historical and unchanged. No notebook, export or electrical rerun for this metadata record."
+}

@@ -1,0 +1,12 @@
+{
+  "transient_processes": 1,
+  "transients": 1,
+  "copies": 2,
+  "no_analysis_options_queries": 1,
+  "version_queries": 1,
+  "fine": 0,
+  "rescue": 0,
+  "DC_sweeps": 0,
+  "DD": 0,
+  "layout": 0
+}

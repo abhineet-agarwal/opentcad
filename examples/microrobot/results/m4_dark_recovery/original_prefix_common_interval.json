@@ -1,0 +1,61 @@
+{
+  "scope": "Analysis-only originalfailedrun vs50ns separateprefix overcommon0..2.2ms; notfullruncompletion",
+  "endpoint_time_s": 0.0022,
+  "endpoint_differences_V": {
+    "v(logic)": 1.8580001981405303e-09,
+    "v(act)": 9.580003457188013e-11,
+    "v(mid)": -7.600031715071509e-12,
+    "v(reset_n)": -1.697999962857466e-09,
+    "v(driver_ready)": -6.524000228935734e-10,
+    "v(ea)": 1.459998788533312e-11,
+    "v(eb)": -6.20356000117085e-12,
+    "v(sa)": 4.529999708680066e-10,
+    "v(sb)": -4.3839998298267346e-10,
+    "v(sr)": 3.8500003185504283e-10,
+    "v(bulk)": 1.7019996523259806e-10
+  },
+  "endpoint_max_abs_difference_V": 1.8580001981405303e-09,
+  "signed_energy_nJ": {
+    "original_truncated": {
+      "logic": 0.04179013137264874,
+      "actuator": 0.07042649451846315,
+      "clock": 0.039982054597138564,
+      "firstff": 0.0009645306333699327,
+      "proxy": 0.0007491478638056118,
+      "resetlogic": 6.132358409229513e-05,
+      "monitor": 0.04005076529531359,
+      "phase": 8.020575135777522e-06,
+      "resetact": 5.469343480343843e-05,
+      "driverbuffer": 8.819363801102079e-05
+    },
+    "prefix_50ns": {
+      "logic": 0.0417901313726533,
+      "actuator": 0.07042649451846315,
+      "clock": 0.03998205459714702,
+      "firstff": 0.000964530633366226,
+      "proxy": 0.0007491478638050385,
+      "resetlogic": 6.132358409238063e-05,
+      "monitor": 0.04005076529531311,
+      "phase": 8.02057513576188e-06,
+      "resetact": 5.4693434803453204e-05,
+      "driverbuffer": 8.819363801097723e-05
+    }
+  },
+  "energy_difference_nJ": {
+    "logic": 4.558853294867049e-15,
+    "actuator": 0.0,
+    "clock": 8.458511668862911e-15,
+    "firstff": -3.7066703872934426e-15,
+    "proxy": -5.733261088103347e-16,
+    "resetlogic": 8.550289382763809e-17,
+    "monitor": -4.787836793695988e-16,
+    "phase": -1.564131040399791e-17,
+    "resetact": 1.4772254600114998e-17,
+    "driverbuffer": -4.355782227960514e-17
+  },
+  "qualified_rising_counts": [
+    12,
+    12
+  ],
+  "qualified_rising_max_time_difference_s": 0.0
+}

@@ -1,0 +1,36 @@
+{
+  "scope": "One held-input startup with small-signal passive adsorption RC branches.",
+  "source_deck_sha256": "5bf9048cc926129f132a535dabbce71ee1e0547648b568672b80e17511bd2aba",
+  "Qmax_C": [
+    2.6e-10,
+    2.6e-10,
+    2.6e-09
+  ],
+  "width_V": 0.08,
+  "tau_s": 0.02,
+  "offset_V": 0,
+  "reference_coverage": 0.5,
+  "Cads_F": [
+    8.124999999999999e-10,
+    8.124999999999999e-10,
+    8.125e-09
+  ],
+  "Rads_ohm": [
+    24615384.61538462,
+    24615384.61538462,
+    2461538.4615384615
+  ],
+  "formula": "Cads=Qmax/(4width); Rads=tau/Cads",
+  "topology": "metal\u2192Rads\u2192adsnode\u2192Cads\u2192solution; Cdl and RF remain metal\u2192solution",
+  "measurement_change": "No added/removed probes or save vectors; ta/tb/tr change from numerical coverage to physical Cads node, recovered offline",
+  "unchanged": "All other TCAD, logic/actuator circuits, clamp resistors, timing, storage, solver and output probes",
+  "interpretation_gate": "max(abs(eta))/width <0.01; no large-signal claim",
+  "source_dependency_sha256": {
+    "examples/microrobot/tcad_passive_adsorption.py": "7c86555be9e7fc54dfb946f482908f74571279de427c9264f7a477cdfd1ba576",
+    "tests/integration/test_tcad_passive_adsorption.py": "4dd8f8c2fade063f753cdb46f38d4d8e355eec653bfcd1f7bee85326867adb8d",
+    "examples/microrobot/tcad_passive_clamps.py": "09187a42e434f56233e42ae9e17e25d790f9827545ef31397be1f97d229eb3b4",
+    "examples/microrobot/tcad_actuator_startup.py": "cc3d0c4ba1e9a49a26ae6a9f390f3e8531ec29f1d82ad2cfd8b58d2265513cf1",
+    "examples/microrobot/tcad_controller.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4"
+  },
+  "executed_runner_sha256": "8fb537a7d9899438af155e191f18a54a3eeb2ab6ac0c011814c96cf95a71d18b"
+}

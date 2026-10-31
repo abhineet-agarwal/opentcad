@@ -1,0 +1,18 @@
+{
+  "tests": {
+    "passed": 3,
+    "seconds": 0.82,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "full_suite_run": false,
+  "exact_logic_source_preserved": true,
+  "exact_extracted_clock_body_preserved": true,
+  "reset_held_asserted": true,
+  "complete_finite_zero_to_250us": true,
+  "raw_data_exported": false,
+  "no_new_DC_DD_layout": true,
+  "only_one_transient": true,
+  "scope": "Held-reset logic isolation only, no released phase/actuator/bending/nativePOR acceptance",
+  "review_acceptance": "Reviewed and accepted as held-reset logic-only startup evidence; no released-controller or actuator validation."
+}

@@ -1,0 +1,133 @@
+{
+  "planned_end_dark3p1ms": null,
+  "planned_final4p5ms": null,
+  "light_fall_end1p6ms": {
+    "time_s": 0.0016,
+    "values": {
+      "v(sr)": 0.480628124,
+      "v(tr)": 0.500026908,
+      "v(bulk)": 0.48072575,
+      "v(pan)": 1.0,
+      "v(pbn)": 0.0,
+      "v(reset_ok_n)": 0.999908409,
+      "v(clock_n)": 1.0,
+      "v(driver_ready)": 0.960723344,
+      "v(xdriverbuffer.nand_b)": -2.84569227e-06,
+      "v(xdriverbuffer.series)": -2.22584118e-06,
+      "v(pa_source)": 1.60765351,
+      "v(pb_source)": 0.0,
+      "v(bp)": 0.780845561,
+      "v(xready.input_b)": -5.47451678e-07,
+      "v(light)": 0.0,
+      "v(logic)": 1.60765351,
+      "v(act)": 0.96063511,
+      "v(mid)": 0.480624755,
+      "v(ready)": 0.961130766,
+      "v(reset_n)": 1.60750627,
+      "v(pa)": 1.60765368,
+      "v(pb)": -1.74001153e-07,
+      "v(ea)": 0.961403562,
+      "v(eb)": -7.00058778e-05,
+      "v(sa)": 0.463383071,
+      "v(sb)": 0.499044693,
+      "v(ta)": 0.52335811,
+      "v(tb)": 0.476546636,
+      "v(clk)": -2.15251028e-07,
+      "v(q0)": -4.70700402e-09,
+      "v(bn)": 0.437971183
+    },
+    "known_supply_storage_nJ": {
+      "logic2pF": 0.00258454980821532,
+      "act_lower1pF": 0.00011550007755940501,
+      "act_upper1pF": 0.000115204970453613
+    },
+    "interfaces": {
+      "A": {
+        "eta_V": 0.498020491,
+        "theta": 0.52335811,
+        "double_layer_charge_pC": 19.920819639999998,
+        "adsorption_charge_change_from_initial_theta_pC": 6.073108599999996,
+        "initial_theta": 0.5
+      },
+      "B": {
+        "eta_V": -0.49911469887779997,
+        "theta": 0.476546636,
+        "double_layer_charge_pC": -19.964587955112,
+        "adsorption_charge_change_from_initial_theta_pC": -6.0978746399999935,
+        "initial_theta": 0.5
+      },
+      "return": {
+        "eta_V": -3.3689999999753084e-06,
+        "theta": 0.500026908,
+        "double_layer_charge_pC": -0.0013475999999901236,
+        "adsorption_charge_change_from_initial_theta_pC": 0.06996080000012395,
+        "initial_theta": 0.5
+      }
+    }
+  },
+  "last_saved_state": {
+    "time_s": 0.00300089994,
+    "values": {
+      "v(sr)": 0.272719218,
+      "v(tr)": 0.500023765,
+      "v(bulk)": 0.272643996,
+      "v(pan)": 1.0,
+      "v(pbn)": 0.0,
+      "v(reset_ok_n)": 0.999582082,
+      "v(clock_n)": 1.22323519e-08,
+      "v(driver_ready)": 0.565249557,
+      "v(xdriverbuffer.nand_b)": 1.90132851e-07,
+      "v(xdriverbuffer.series)": 1.76715443e-07,
+      "v(pa_source)": 1.10455235,
+      "v(pb_source)": 0.0,
+      "v(bp)": 0.465298893,
+      "v(xready.input_b)": 1.78011974e-07,
+      "v(light)": 0.0,
+      "v(logic)": 1.10455235,
+      "v(act)": 0.564238884,
+      "v(mid)": 0.272759328,
+      "v(ready)": 0.564909941,
+      "v(reset_n)": 1.10409074,
+      "v(pa)": 1.10455236,
+      "v(pb)": -3.95370243e-09,
+      "v(ea)": 0.543170195,
+      "v(eb)": 6.68832682e-05,
+      "v(sa)": 0.273149721,
+      "v(sb)": 0.27138605,
+      "v(ta)": 0.554756302,
+      "v(tb)": 0.445144968,
+      "v(clk)": 9.24265005e-09,
+      "v(q0)": 1.10455234,
+      "v(bn)": 0.296002372
+    },
+    "known_supply_storage_nJ": {
+      "logic2pF": 0.0012200358938905228,
+      "act_lower1pF": 3.7198825505505796e-05,
+      "act_upper1pF": 4.248016578297855e-05
+    },
+    "interfaces": {
+      "A": {
+        "eta_V": 0.27002047399999995,
+        "theta": 0.554756302,
+        "double_layer_charge_pC": 10.800818959999999,
+        "adsorption_charge_change_from_initial_theta_pC": 14.236638520000009,
+        "initial_theta": 0.5
+      },
+      "B": {
+        "eta_V": -0.2713191667318,
+        "theta": 0.445144968,
+        "double_layer_charge_pC": -10.852766669271999,
+        "adsorption_charge_change_from_initial_theta_pC": -14.262308320000004,
+        "initial_theta": 0.5
+      },
+      "return": {
+        "eta_V": 4.0110000000037616e-05,
+        "theta": 0.500023765,
+        "double_layer_charge_pC": 0.016044000000015046,
+        "adsorption_charge_change_from_initial_theta_pC": 0.061789000000023186,
+        "initial_theta": 0.5
+      }
+    }
+  },
+  "caveat": "Noextrapolation. Neutralmetalclamp doesnotinstantaneously neutralizeeta. Cstate1nF is numericalencoding,NOT physicalstorage."
+}

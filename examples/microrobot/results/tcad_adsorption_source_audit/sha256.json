@@ -1,0 +1,13 @@
+{
+  "README.md": "0e32d6243c4bf4d21fc97bc9829c2242601371a5ab5b945177fb6771cf2f9480",
+  "configuration.json": "68a84ce1473a213a855617844ba46602dee00f6ce1b02724f3e097701bf40b43",
+  "execution.json": "88ab52b7ae0f68b71b32cf31c50ad06b7295ba4b7e2fd6eb0ad199418d021ba5",
+  "execution_counts.json": "d5caf1477d5ca0e8d0077e7076386760bc424f30d8a3757328a63aea9f700e5b",
+  "metrics.json": "ae75b82358e3fd312345a6e19edbe8f929c03da743b805cf29b50c3e0f894869",
+  "ngspice.log": "f7167c647e4a687aa47439d31a174f8d3b00564c0fa978b556c60448951a80bc",
+  "raw_hashes.json": "cfc2399badbaff7c5cf444598173ae006b7e0cb8b03d779153e8d4f0e621639d",
+  "runner_as_executed.py": "72a7af4aca22bded493342a0cd760416f47f9ec85baae27f9eff5d11089d816c",
+  "source_audit.spice": "b5854b0164e884253dc629bbeaad625bfb25fd123c0d4cee13dc1af18137c760",
+  "status.json": "3c9df858317955f9b7a1ccdf35e03c23a1631804e2fc542bb6155b221f33f728",
+  "verification.json": "e151e7bb26f877a85206579e551bc86ee3fbcd1fc07fe180b0cf3d09ef30aa82"
+}

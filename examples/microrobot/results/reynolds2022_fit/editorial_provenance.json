@@ -1,0 +1,74 @@
+{
+  "revision": "Exact editorial phrase correction only; no numerical code, model data or fitting changes",
+  "old_phrase": "repeated-sweep scatter",
+  "new_phrase": "repeated-voltage scatter",
+  "replacement_method": "before_bytes.replace(old_phrase_utf8, new_phrase_utf8)",
+  "files": [
+    {
+      "path": "examples/microrobot/reynolds_fit.py",
+      "before_sha256": "3db7013d6d2c8bba1eb995fd865077e537b8b79394b1d9441925a804ec0afa7d",
+      "after_sha256": "fade52b0610b3e9b56fcff988bf83a623eac6672fe91c13cf0aa9ef6a2fbd4fd",
+      "replacement_count": 2,
+      "exact_byte_replacement_verified": true
+    },
+    {
+      "path": "examples/microrobot/results/reynolds2022_fit/README.md",
+      "before_sha256": "639757a413900f4951ba114667b3cb8190bd155bb8a8959c5e8841deb53b5a7b",
+      "after_sha256": "1029c343ef4670ea59cae725ebd478dc430360846062e7f7c7ca43d914c71be2",
+      "replacement_count": 1,
+      "exact_byte_replacement_verified": true
+    },
+    {
+      "path": "examples/microrobot/results/reynolds2022_fit/fit_report.json",
+      "before_sha256": "9511f02cb56ff38e9e513ed0af7832919802f98b8cfb2f239793a446f92ba6ca",
+      "after_sha256": "ad9e874d54400fdd5f619adcbc36723428249509fcae819e0eb91cbd5167fab6",
+      "replacement_count": 1,
+      "exact_byte_replacement_verified": true
+    }
+  ],
+  "canonical_report_parsed_recursive_string_replacement_only": true,
+  "numeric_data_unchanged": true,
+  "analysis_code_sha256_untouched": "bb0c5b14a36d45dfb027aba498dd8373cc33a69f203166e87fb037bbfec568c2",
+  "as_executed_report": {
+    "path": "examples/microrobot/results/reynolds2022_fit/fit_report_as_executed.json",
+    "sha256": "9511f02cb56ff38e9e513ed0af7832919802f98b8cfb2f239793a446f92ba6ca",
+    "identical_to_original_report": true,
+    "matches_execution_checks_original_report_sha256": true,
+    "historical_wording_preserved_as_executed": true
+  },
+  "source_before_matches_formatting_pass_sha256": true,
+  "provenance_note": "Original fit_report_as_executed.json retains the original executed bytes and wording. Canonical report wording is editorially corrected; its analysis_code_sha256 remains the original executed source hash. Original formatting_provenance.json unchanged. No fit rerun, metric changes, or numerical-code changes.",
+  "closure_validation": {
+    "date": "2026-10-30",
+    "targeted_tests": {
+      "command": ".venv/bin/python -m pytest tests/integration/test_reynolds_data.py tests/integration/test_reynolds_fit.py -q",
+      "passed": 34,
+      "elapsed_s": 0.93
+    },
+    "ruff_paths": [
+      "examples/microrobot/reynolds_data.py",
+      "examples/microrobot/reynolds_fit.py",
+      "tests/integration/test_reynolds_data.py",
+      "tests/integration/test_reynolds_fit.py"
+    ],
+    "ruff_check": "All checks passed!",
+    "ruff_format_check": "4 files already formatted",
+    "scoped_git_diff_check": "passed; untracked files also checked with git diff --no-index --check against /dev/null",
+    "exact_editorial_byte_replacement_verified_files": 3,
+    "numeric_json_values_unchanged": 2321,
+    "historical_formatting_and_execution_hash_chain_verified": true,
+    "relative_markdown_links": {
+      "files": [
+        "examples/microrobot/data/README.md",
+        "examples/microrobot/references.md",
+        "examples/microrobot/ATTRIBUTION.md",
+        "examples/microrobot/results/reynolds2022_fit/README.md"
+      ],
+      "checked": 14,
+      "missing": 0
+    },
+    "readme_note": "The README hashes above identify the exact editorial checkpoint before the appended closure-verification paragraph.",
+    "readme_sha256_after_closure_note": "740d737437a5d8eda360b0008cff9da315597e37bd2732ff440fa95a9f761b7b",
+    "scope": "Only focused tests and static/provenance/link checks rerun. Earlier 254-test full suite remains a pre-editorial checkpoint. No fit, simulation or full suite rerun; original reports, execution_checks.json and formatting_provenance.json preserved."
+  }
+}

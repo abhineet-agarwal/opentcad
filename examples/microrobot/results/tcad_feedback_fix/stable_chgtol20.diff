@@ -1,0 +1,11 @@
+--- 
++++ 
+@@ -76,7 +76,7 @@
+ Rsb_stable stable_sb stable_bulk 10meg
+ Rsr_stable stable_sr stable_bulk 1meg
+ Rfixed_ready_stable stable_driver_ready 0 10k
+-.options method=gear maxord=2 reltol=1e-6 abstol=1e-15
++.options method=gear maxord=2 reltol=1e-6 abstol=1e-15 chgtol=1e-20
+ .control
+ set wr_vecnames
+ set wr_singlescale

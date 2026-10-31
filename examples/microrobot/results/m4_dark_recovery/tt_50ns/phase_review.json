@@ -1,0 +1,36 @@
+{
+  "reset_input_crossings": [
+    {
+      "time_s": 0.00013218337278054565,
+      "rising": true,
+      "logic_V": 0.011095846698517374,
+      "actuator_V": 0.15368904821987173
+    },
+    {
+      "time_s": 0.0001737397741808698,
+      "rising": false,
+      "logic_V": 0.05826817745319058,
+      "actuator_V": 0.7443901401068816
+    },
+    {
+      "time_s": 0.0005294924204147691,
+      "rising": true,
+      "logic_V": 1.5537012560676298,
+      "actuator_V": 1.0507637825992169
+    }
+  ],
+  "functional_guard_s": 2e-06,
+  "definition": "After normalizedreset<.5 plus2ussettling; allguardexclusions retained in raw traces",
+  "dark_reset_low_observed": false,
+  "dark_clear_evaluable_samples": 0,
+  "phase_peak_during_clear": {
+    "v(pan)": null,
+    "v(pbn)": null
+  },
+  "last_normalized_reset": 0.999582082,
+  "last_phase_states": {
+    "pan": 1.0,
+    "pbn": 0.0
+  },
+  "restart_observation": "NOTREACHED:reference aborted before relight3.1ms"
+}

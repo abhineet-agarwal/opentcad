@@ -1,0 +1,12 @@
+{
+  "50ns": {
+    "deck_equal_excluding_comments": true,
+    "completed_data_available": true,
+    "energy_max_absolute_difference_nJ": 0.0
+  },
+  "25ns": {
+    "deck_equal_excluding_comments": true,
+    "completed_data_available": true,
+    "energy_max_absolute_difference_nJ": 0.0
+  }
+}

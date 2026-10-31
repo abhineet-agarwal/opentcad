@@ -7,20 +7,54 @@ layout or performance. See [evidence and missing material](references.md)
 before interpreting any plot. No submission, publication, push or fabrication
 is performed by the scripts.
 
+## Submission status and portability
+
+The primary deliverable is the [executed notebook](../../submission.ipynb);
+[submission.ipynb](submission.ipynb) is its unexecuted export source. It is an executable
+end-to-end **mixed-abstraction model with separately validated transistor
+blocks**. Actual drift-diffusion PV tables supply a characterized schematic
+clock/first-DFF lookup, behavioral divider/reset and finite-resistance drivers,
+nonlinear electrochemistry with a finite Pt return, and predicted bending.
+The notebook identifies archived inputs and freshly executed computations, embeds
+the actual compact clock layout and detailed plots/tables, and includes expandable
+complete numerical records with links to bundled machine-readable artifacts.
+
+**The fully transistor-coupled controller startup experiment failed and remains
+unresolved.** This package does not claim an accepted autonomous transistor
+controller, a calibrated physical robot, walking, or a complete controller
+layout. TCAD PV/process parameters are conceptual; actuator and mechanics
+parameters are assumptions. See [submission scope and limitations](SUBMISSION_STATUS.md).
+
+Compact-clock DRC/LVS/PEX, pre/post-layout comparison, nominal timestep
+consistency and one hot-electronics sensitivity are separate evidence. They
+qualify the stated clock experiment only. They do not resolve coupled startup.
+
+Team: **Abhineet Agarwal, IIT Bombay**; IEEE member: **No**; SSCS member: **No**.
+SPDX-License-Identifier: Apache-2.0. See [attribution/IP](ATTRIBUTION.md).
+
+Use [SETUP.md](SETUP.md) and `tools/build_microrobot_submission.py` for a
+self-contained `ISSCC27/submitted_notebooks/opentcad_microrobot/` folder.
+Only curated evidence is exported; local reference PDFs, raw SPICE transients
+and supplied measurement CSVs with unverified redistribution rights are excluded.
+Python 3.12 dependencies are pinned. Colab is untested. New calculations write
+to fresh `local_runs/`; exported reference evidence is checked for changes.
+The scripts do not submit, publish, push or initiate fabrication.
+
 ## Run
 
 From the repository root, in a Python environment matching
-`requirements-lock.txt` (tested Python 3.14.2):
+`requirements-notebook.txt` (Python 3.12 target; see SETUP.md for native prerequisites):
 
 ```sh
-python -m pip install -r examples/microrobot/requirements-lock.txt
-python -m pip install --no-deps -e .
+python -m pip install -r examples/microrobot/requirements-notebook.txt
 python -m examples.microrobot.run
 python -m examples.microrobot.run --spice  # optional installed ngspice + SKY130
 python -m examples.microrobot.digitize     # re-fit committed, attributed S2E numerical traces
 python -m examples.microrobot.published    # use archived clock characterization
 python -m examples.microrobot.published --spice  # rerun the current clock/corner/startup benches
-python -m pytest tests
+python -m pytest tests/device/test_optical.py tests/device/test_compact_pv.py \
+  tests/integration/test_microrobot.py tests/integration/test_electrode_spice.py \
+  tests/integration/test_layout_edge_audit.py tests/integration/test_phase_generator.py -ra
 ```
 
 `microrobot.ipynb` explains and reruns the numerical experiment. It can execute
@@ -30,14 +64,22 @@ For an interactive Jupyter session, select this virtual environment's kernel
 or register it with `python -m ipykernel install --user --name opentcad-microrobot`.
 Results include JSON provenance/metrics, CSV, mesh and timestep checks, PV
 and coupled transient plots, and optional ngspice decks, logs and PVT results.
-Raw SPICE waveforms are generated locally and ignored by git.
+Full SPICE `.dat` waveforms and new runs are ignored by git. Tracked plotting
+previews are losslessly compressed `.csv.gz`; they are distinct from full
+waveforms. CLI defaults and notebooks write to `local_runs/`, preserving the
+reference archive.
 
 ## Executed results
 
-The full suite passed **174 tests** (one pre-existing warning in an Auger
-test diagnostic). The finest conceptual PV mesh gives approximately
+Historical M3 full-suite execution passed **174 tests** with ngspice and Icarus
+installed (one pre-existing Auger diagnostic warning). Without those tools four
+tests skip in that checkout; M2 logs describe an earlier suite. Current test
+counts and skip reasons come from `pytest -ra`, not this historical count.
+The archived macOS finest conceptual PV mesh gives approximately
 0.1355 A/W responsivity and 0.461 V open-circuit voltage at 1000 W/m².
-The medium-to-fine Isc change is 0.366%; the largest terminal-current
+The archived medium-to-fine Isc change is about 0.37%; platform reruns can
+differ (an independent run reported about 0.40%). Current notebook values are
+computed from run JSON and checked against declared tolerances; the largest terminal-current
 imbalance among the DD sweeps is about 3.1e-12 relative. The system gives
 2.24 Hz behavioral outputs with measured phase lag 0.251 cycles. Halving
 its timestep changes bending range by 0.051%, driver energy by 0.95%
@@ -115,7 +157,7 @@ system results below retain their original assumptions.
 
 ## Feasibility and repository audit
 
-No AGENTS.md was found in the repository or ancestor directories. README,
+The initial audit predates the repository AGENTS.md workflow instructions now in force. README,
 PHASES, Strategy, geometry/MeshField, solver/physics, material data,
 process/doping, examples and numerical tests were inspected. Existing code
 already implements analytic Gaussian implant profiles and an intrinsic
@@ -143,7 +185,7 @@ the next reusable device-physics needs if measurement data support them.
 ## Electrical topology: published connections and our adaptation
 
 The separate IC and actuator PV pairs and exposed Pt solution return must
-be retained. The supplement, supplied by the user on 2026-10-27, confirms
+be retained. The supplement, obtained locally on 2026-10-27, confirms
 the common lower rail and actuator midpoint/switch arrangement in Fig. S1B.
 The published-data experiment adapts the logic pair to three cells:
 
@@ -291,7 +333,7 @@ before packaging. No PR has been created.
 The immediate priority is redesigning the rejected brownout circuit and
 integrating the separately checked drivers and clock, followed by
 clean-environment notebook reproduction and submission packaging
-for user review. Keep full-controller layout/extraction as a broader objective
+for project review. Keep full-controller layout/extraction as a broader objective
 if its validation cannot be completed before the deadline. The current
 notebook documents the executed device, PV-fit, clock and RTL work and the
 remaining schematic/layout stages explicitly.

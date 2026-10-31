@@ -1,0 +1,36 @@
+{
+  "reset_input_crossings": [
+    {
+      "time_s": 0.00013218337491705779,
+      "rising": true,
+      "logic_V": 0.011095844750321292,
+      "actuator_V": 0.1536890267253737
+    },
+    {
+      "time_s": 0.0001737405012980402,
+      "rising": false,
+      "logic_V": 0.058269325256289015,
+      "actuator_V": 0.7444041293529355
+    },
+    {
+      "time_s": 0.0005294920889079456,
+      "rising": true,
+      "logic_V": 1.553699387979821,
+      "actuator_V": 1.0507592583447267
+    }
+  ],
+  "functional_guard_s": 2e-06,
+  "definition": "After normalizedreset<.5 plus2ussettling; allguardexclusions retained in raw traces",
+  "dark_reset_low_observed": false,
+  "dark_clear_evaluable_samples": 0,
+  "phase_peak_during_clear": {
+    "v(pan)": null,
+    "v(pbn)": null
+  },
+  "last_normalized_reset": 0.999974022,
+  "last_phase_states": {
+    "pan": 1.0,
+    "pbn": 0.0
+  },
+  "restart_observation": "NOTREACHED:prefix stops2.2ms before plannedrelight bydesign"
+}

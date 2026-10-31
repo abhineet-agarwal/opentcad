@@ -1,0 +1,9 @@
+{
+  "ngspice_processes": 1,
+  "transients": 1,
+  "model_copies": 2,
+  "fine": 0,
+  "rescue": 0,
+  "DD": 0,
+  "layout": 0
+}

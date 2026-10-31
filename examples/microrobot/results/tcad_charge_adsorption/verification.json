@@ -1,0 +1,24 @@
+{
+  "tests": {
+    "passed": 2,
+    "seconds": 1.3,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "exact_bounded_transformation_verified": true,
+  "DD_sources_identical": true,
+  "output_vectors_identical": true,
+  "algebra_pass": true,
+  "counts": {
+    "transients": 1,
+    "fine": 0,
+    "rescue": 0,
+    "DC": 0,
+    "DD": 0,
+    "layout": 0
+  },
+  "current_discrepancy_explicit_A": 1.6714051216027992e-13,
+  "raw_exported": false,
+  "scope": "Reviewed algebra and failed nonlinear-series startup evidence; no exact numerical-conservation, large-signal physical or released-actuation claim",
+  "review_acceptance": "Reviewed and accepted as failed nonlinear adsorption-reformulation evidence; nonlinear startup and end-to-end actuation remain unvalidated."
+}

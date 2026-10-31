@@ -1,0 +1,15 @@
+{
+  "README.md": "6292d98bcbe8c745d634c15bbddbb95ca0599fd61150dcbc2d72c1f5d5a24c13",
+  "configuration.json": "faa67a8af4b75e32ee684edd7f31c920e9e97f908fb9c00d32900218c67d06c9",
+  "execution.json": "c50ac3e5516a78fdc9d531a9153b821af8609ef051bff776b4a051591d5a3125",
+  "execution_counts.json": "142bbdc5592ba6e1c5fb61982ebf266a6ef45071995ae8b9aab907e62b36efcb",
+  "metrics.json": "c6c0ba57e0a435bcd0647c8f1e6c299f110552a2fac97575155e3b3201f3ccd0",
+  "nominal_25ns.log": "079b1fa211c4b2170c78de02ae2201079f0de49bb23652285ac14fae73144b93",
+  "nominal_25ns.png": "1b6a881f7c01e7ebdf1b0bd53c571364d6505729c81062dbe39c783b748a80c0",
+  "nominal_25ns.spice": "ced29f40bd6ff63949781af968dedc251910ea4c23a7108b19c2d84593f3012b",
+  "prefix_observations.json": "68df8b4e404aed3fc003d985a508cf7f5180be18088f973cf20d566f30c04af2",
+  "runner_as_executed.py": "b5e02def691e6577356cd130417c536194d5f1ab8db4f30403834c3f27adc059",
+  "status.json": "63999c1ffcc0310b57c0e14ff2a92ca7b899691904ee5175095fd72d341549b7",
+  "tcad_controller_as_executed.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4",
+  "verification.json": "1723ab28c97d556689f6e5f2988508e2da8d385ceefb38bce0e209de97da8da9"
+}

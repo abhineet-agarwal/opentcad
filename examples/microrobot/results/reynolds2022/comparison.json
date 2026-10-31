@@ -1,0 +1,817 @@
+{
+  "analysis_code_sha256": "f9605c76cb23c5f917233facd6595bb9494a7ebc105d614af449aec6cc3ca19b",
+  "status": "Derived comparison only; historical model unchanged; no new fit or simulation",
+  "source_provenance": {
+    "description": "Six local CSVs supplied by user as Reynolds (2022) data",
+    "user_claimed_repository": "Zenodo; source identity and redistribution license not independently verified",
+    "article_doi": "10.1126/scirobotics.abq2296",
+    "raw_files_copied": false
+  },
+  "ingestion": "Explicit column groups; UTF-8-sig or Windows-1252 decoding; finite complete rows with trailing group padding only. No sorting, deduplication or offsets.",
+  "source_header_override": {
+    "file": "FigS2_CircuitTesting.csv",
+    "column_zero_based": 10,
+    "literal_header": "Current (\u00b5m)",
+    "interpreted_unit": "\u00b5A",
+    "evidence": "Supplementary Fig. S2C right y-axis explicitly labels Current (\u00b5A); visually checked by coordinator from local supplement page 8 render.",
+    "policy": "Literal header and native numeric values retained; SI current would be native * 1e-6."
+  },
+  "measurement_context": {
+    "Fig3_PurcellBot.csv": "Purcell motion, 660 nm laser (main paper Fig. 3)",
+    "Fig4_PurcellBot.csv": "Filename retained literally; paper Fig. 4 is Antbot, 600 nm LED",
+    "Fig5_Dogbot.csv": "Dogbot motion, 660 nm laser (main paper Fig. 5)",
+    "FigS2_CircuitTesting.csv": "Circuit characterization; 660 nm illumination. S2A lowest-frequency setting; S2D nominal 8 Hz setting. A sun denotes 1 kW/m\u00b2, not a standard solar spectrum.",
+    "context_evidence": "Main paper Fig. 3\u20135 and supplementary Fig. S2 captions, locally provided reference documents; no new measurement inferred."
+  },
+  "datasets": {
+    "Fig3_PurcellBot.csv": {
+      "sha256": "701190d1410ef7bf0096aec793ed5935fa297297861e0cfb900f8ca22554e002",
+      "size_bytes": 3649,
+      "encoding": "utf-8-sig",
+      "data_rows": 230,
+      "groups": {
+        "motion": {
+          "points": 230,
+          "columns_zero_based": [
+            0,
+            1
+          ],
+          "source_line_range": [
+            2,
+            231
+          ],
+          "trailing_padding_rows": 0,
+          "native_column_ranges": {
+            "Time (s)": [
+              0.0,
+              22.9
+            ],
+            "Distance (\u00b5m)": [
+              0.0,
+              113.97
+            ]
+          },
+          "axis_header": "Time (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 230
+        },
+        "inset": {
+          "points": 9,
+          "columns_zero_based": [
+            2,
+            3
+          ],
+          "source_line_range": [
+            2,
+            10
+          ],
+          "trailing_padding_rows": 221,
+          "native_column_ranges": {
+            "Time inset (s)": [
+              0.0,
+              0.8
+            ],
+            "Distance inset (\u00b5m)": [
+              0.0,
+              9.4366
+            ]
+          },
+          "axis_header": "Time inset (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 9
+        }
+      }
+    },
+    "Fig4_PurcellBot.csv": {
+      "sha256": "b24a3ce6161d367a872b3edcc6ab2b2b9f9d2e302bbe5ad97f6cf13f690270de",
+      "size_bytes": 20039,
+      "encoding": "cp1252",
+      "data_rows": 745,
+      "groups": {
+        "motion": {
+          "points": 745,
+          "columns_zero_based": [
+            0,
+            1,
+            2
+          ],
+          "source_line_range": [
+            2,
+            746
+          ],
+          "trailing_padding_rows": 0,
+          "native_column_ranges": {
+            "Time (s)": [
+              0.0,
+              37.2
+            ],
+            "Distance (\u00b5m)": [
+              0.0,
+              428.492
+            ],
+            "Speed (\u00b5m / s)": [
+              -56.6056,
+              93.8982
+            ]
+          },
+          "axis_header": "Time (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 745
+        },
+        "feet": {
+          "points": 60,
+          "columns_zero_based": [
+            3,
+            4,
+            5
+          ],
+          "source_line_range": [
+            2,
+            61
+          ],
+          "trailing_padding_rows": 685,
+          "native_column_ranges": {
+            "Time (s)": [
+              0.0,
+              2.95
+            ],
+            "Foot Position 1 (\u00b5m)": [
+              -5.70531,
+              5.08198
+            ],
+            "Foot Position 2 (\u00b5m)": [
+              -5.51167,
+              3.22048
+            ]
+          },
+          "axis_header": "Time (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 60
+        }
+      }
+    },
+    "Fig5_Dogbot.csv": {
+      "sha256": "bd65fa42919ee50473beb0517bda3bb650029167f9f1be344871ec547144e4fb",
+      "size_bytes": 2695,
+      "encoding": "utf-8-sig",
+      "data_rows": 201,
+      "groups": {
+        "motion": {
+          "points": 201,
+          "columns_zero_based": [
+            0,
+            1
+          ],
+          "source_line_range": [
+            2,
+            202
+          ],
+          "trailing_padding_rows": 0,
+          "native_column_ranges": {
+            "Time (s)": [
+              0.0,
+              10.0
+            ],
+            "Position (\u00b5m)": [
+              0.0,
+              39.6229
+            ]
+          },
+          "axis_header": "Time (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 201
+        }
+      }
+    },
+    "FigS2_CircuitTesting.csv": {
+      "sha256": "fe9899154837d6e3d02e33c5bdf6e59f4c4754f2ad017d4c2f45d62dd94eee02",
+      "size_bytes": 7487131,
+      "encoding": "cp1252",
+      "data_rows": 100004,
+      "groups": {
+        "current_2_5sun": {
+          "points": 100004,
+          "columns_zero_based": [
+            0,
+            1
+          ],
+          "source_line_range": [
+            2,
+            100005
+          ],
+          "trailing_padding_rows": 0,
+          "native_column_ranges": {
+            "Time 2.5 sun (s)": [
+              0.0,
+              5.00015
+            ],
+            "Current 2.5 sun (\u00b5A)": [
+              -0.336307,
+              0.373647
+            ]
+          },
+          "axis_header": "Time 2.5 sun (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 100004
+        },
+        "current_7sun": {
+          "points": 100004,
+          "columns_zero_based": [
+            2,
+            3
+          ],
+          "source_line_range": [
+            2,
+            100005
+          ],
+          "trailing_padding_rows": 0,
+          "native_column_ranges": {
+            "Time 7 sun (s)": [
+              0.0,
+              5.00015
+            ],
+            "Current 7 sun (\u00b5A)": [
+              -1.38263,
+              1.38263
+            ]
+          },
+          "axis_header": "Time 7 sun (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 100004
+        },
+        "phase_voltages": {
+          "points": 100004,
+          "columns_zero_based": [
+            4,
+            5,
+            6
+          ],
+          "source_line_range": [
+            2,
+            100005
+          ],
+          "trailing_padding_rows": 0,
+          "native_column_ranges": {
+            "Time V 2 phase (s)": [
+              0.0,
+              10.0003
+            ],
+            "Voltage phase 1 (V)": [
+              -0.59781,
+              0.57145
+            ],
+            "Voltage phase 2 (V)": [
+              -0.62297,
+              0.667446
+            ]
+          },
+          "axis_header": "Time V 2 phase (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 100004
+        },
+        "irradiance_voltage": {
+          "points": 22,
+          "columns_zero_based": [
+            7,
+            8
+          ],
+          "source_line_range": [
+            2,
+            23
+          ],
+          "trailing_padding_rows": 99982,
+          "native_column_ranges": {
+            "Power In V meas (kW / m2)": [
+              0.0282942,
+              7.01696
+            ],
+            "Voltage (V)": [
+              0.118368,
+              0.66582
+            ]
+          },
+          "axis_header": "Power In V meas (kW / m2)",
+          "axis_strictly_increasing": false,
+          "axis_decreasing_steps": 1,
+          "axis_equal_steps": 1,
+          "axis_unique_values": 14
+        },
+        "irradiance_current_header_ambiguous": {
+          "points": 27,
+          "columns_zero_based": [
+            9,
+            10
+          ],
+          "source_line_range": [
+            2,
+            28
+          ],
+          "trailing_padding_rows": 99977,
+          "native_column_ranges": {
+            "Power in I meas (kW / m2)": [
+              0.0282942,
+              7.01696
+            ],
+            "Current (\u00b5m)": [
+              0.0019,
+              1.285
+            ]
+          },
+          "axis_header": "Power in I meas (kW / m2)",
+          "axis_strictly_increasing": false,
+          "axis_decreasing_steps": 1,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 20
+        },
+        "irradiance_frequency": {
+          "points": 32,
+          "columns_zero_based": [
+            11,
+            12
+          ],
+          "source_line_range": [
+            2,
+            33
+          ],
+          "trailing_padding_rows": 99972,
+          "native_column_ranges": {
+            "Power in f meas (kW / m2)": [
+              0.0282942,
+              7.01696
+            ],
+            "Frequency (Hz)": [
+              0.227946,
+              12.0934
+            ]
+          },
+          "axis_header": "Power in f meas (kW / m2)",
+          "axis_strictly_increasing": false,
+          "axis_decreasing_steps": 1,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 20
+        },
+        "iv_dark": {
+          "points": 15003,
+          "columns_zero_based": [
+            13,
+            14
+          ],
+          "source_line_range": [
+            2,
+            15004
+          ],
+          "trailing_padding_rows": 85001,
+          "native_column_ranges": {
+            "Voltage 0 sun (V)": [
+              -1.29002,
+              1.32695
+            ],
+            "Current 0 sun (\u00b5A)": [
+              0.00067141,
+              0.580462
+            ]
+          },
+          "axis_header": "Voltage 0 sun (V)",
+          "axis_strictly_increasing": false,
+          "axis_decreasing_steps": 6797,
+          "axis_equal_steps": 1395,
+          "axis_unique_values": 1060
+        },
+        "iv_1sun": {
+          "points": 15003,
+          "columns_zero_based": [
+            15,
+            16
+          ],
+          "source_line_range": [
+            2,
+            15004
+          ],
+          "trailing_padding_rows": 85001,
+          "native_column_ranges": {
+            "Voltage 1 sun (V)": [
+              -1.29749,
+              1.32695
+            ],
+            "Current 1 sun (\u00b5A)": [
+              -0.150365,
+              0.408857
+            ]
+          },
+          "axis_header": "Voltage 1 sun (V)",
+          "axis_strictly_increasing": false,
+          "axis_decreasing_steps": 6801,
+          "axis_equal_steps": 1429,
+          "axis_unique_values": 1061
+        }
+      }
+    },
+    "FigS4_LEGO_purcell.csv": {
+      "sha256": "f2c30e5a1779f9e9eb90d3852782bd8d92cfeb84d48f54cbc28bd4b3ea491716",
+      "size_bytes": 183,
+      "encoding": "utf-8-sig",
+      "data_rows": 6,
+      "groups": {
+        "motion": {
+          "points": 6,
+          "columns_zero_based": [
+            0,
+            1
+          ],
+          "source_line_range": [
+            2,
+            7
+          ],
+          "trailing_padding_rows": 0,
+          "native_column_ranges": {
+            "Time (s)": [
+              0.0,
+              24.0
+            ],
+            "Distance (cm)": [
+              0.0,
+              50.3389
+            ]
+          },
+          "axis_header": "Time (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 6
+        },
+        "inset": {
+          "points": 5,
+          "columns_zero_based": [
+            2,
+            3
+          ],
+          "source_line_range": [
+            2,
+            6
+          ],
+          "trailing_padding_rows": 1,
+          "native_column_ranges": {
+            "Time inset (s)": [
+              0.0,
+              4.8
+            ],
+            "Distance inset (cm)": [
+              0.0,
+              10.9313
+            ]
+          },
+          "axis_header": "Time inset (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 5
+        }
+      }
+    },
+    "FigS6_DogbotCircuit.csv": {
+      "sha256": "d53e17cbac42ab6e70fd40f58de9cdd1ec23658640f32ed7c6502fbf9475a727",
+      "size_bytes": 5436998,
+      "encoding": "utf-8-sig",
+      "data_rows": 318448,
+      "groups": {
+        "current_trace": {
+          "points": 318448,
+          "columns_zero_based": [
+            0,
+            1
+          ],
+          "source_line_range": [
+            2,
+            318449
+          ],
+          "trailing_padding_rows": 0,
+          "native_column_ranges": {
+            "Current (nA)": [
+              -304.682,
+              286.981
+            ],
+            "Time (s)": [
+              0.0,
+              6.36894
+            ]
+          },
+          "axis_header": "Time (s)",
+          "axis_strictly_increasing": true,
+          "axis_decreasing_steps": 0,
+          "axis_equal_steps": 0,
+          "axis_unique_values": 318448
+        }
+      }
+    }
+  },
+  "pv_comparison": {
+    "historical_fit_path": "/Users/abhineet/Documents/opentcad_final/examples/microrobot/results/published/pv_fit.json",
+    "historical_fit_sha256": "f9dae2a338d94e74282078f26b45561fa8e81d42bb289ec969a6275632918016",
+    "historical_model_parameters": {
+      "saturation_A": 1.0585988034104368e-16,
+      "ideality": 1.1447088539600483,
+      "photocurrent_A": 1.4526236906638614e-07,
+      "reference_irradiance_W_m2": 1000.0,
+      "series_cells": 2,
+      "temperature_K": 300
+    },
+    "historical_model_Voc_1sun_V": 1.245255703588111,
+    "historical_model_MPP_1sun_V_A_W": [
+      1.0707048175601896,
+      1.3765322496075386e-07,
+      1.473859711181757e-07
+    ],
+    "measured_current_convention": "Conventional terminal entering current; native \u00b5A multiplied by 1e-6. Model current_A delivers current and is negated.",
+    "comparison": "Frozen historical raster fit; no optimization or default parameter changes. Sample metrics weight every acquisition equally; the additional RMS gives equal weight to each occupied 25mV bin's mean squared residual. Voltage intervals include the lower bound and exclude the upper bound.",
+    "measurement_context": {
+      "figure": "S2E",
+      "series_cells": 2,
+      "each_cell_area_um2": 540,
+      "1sun_W_m2": 1000,
+      "context_source": "Supplement Fig. S2 caption and historical fit metadata",
+      "temperature_K": 300,
+      "temperature_provenance": "Historical fit assumption; not a measured temperature."
+    },
+    "branches": {
+      "iv_dark": {
+        "irradiance_W_m2": 0.0,
+        "errors_by_sample": {
+          "all": {
+            "points": 15003,
+            "voltage_range_V": [
+              -1.29002,
+              1.32695
+            ],
+            "mean_model_minus_measured_A": -3.946616728092711e-09,
+            "rms_A": 1.3556361680050414e-08,
+            "mae_A": 4.091363990759181e-09,
+            "maximum_absolute_A": 2.497705514066652e-07
+          },
+          "entering_negative": {
+            "points": 0,
+            "voltage_range_V": null,
+            "mean_model_minus_measured_A": null,
+            "rms_A": null,
+            "mae_A": null,
+            "maximum_absolute_A": null
+          },
+          "entering_nonnegative": {
+            "points": 15003,
+            "voltage_range_V": [
+              -1.29002,
+              1.32695
+            ],
+            "mean_model_minus_measured_A": -3.946616728092711e-09,
+            "rms_A": 1.3556361680050414e-08,
+            "mae_A": 4.091363990759181e-09,
+            "maximum_absolute_A": 2.497705514066652e-07
+          },
+          "V_below_0": {
+            "points": 7377,
+            "voltage_range_V": [
+              -1.29002,
+              -0.00259407
+            ],
+            "mean_model_minus_measured_A": -2.0000035088777552e-09,
+            "rms_A": 2.028801566316926e-09,
+            "mae_A": 2.0000035088777552e-09,
+            "maximum_absolute_A": 3.0518501058503213e-09
+          },
+          "V_0_to_0.8": {
+            "points": 4628,
+            "voltage_range_V": [
+              0.0,
+              0.798212
+            ],
+            "mean_model_minus_measured_A": -1.9759809388292124e-09,
+            "rms_A": 2.0036375278369643e-09,
+            "mae_A": 1.9759809388292124e-09,
+            "maximum_absolute_A": 2.892782532714021e-09
+          },
+          "V_0.8_to_1.1": {
+            "points": 1757,
+            "voltage_range_V": [
+              0.800653,
+              1.09958
+            ],
+            "mean_model_minus_measured_A": -2.15213550372813e-09,
+            "rms_A": 2.275033449622681e-09,
+            "mae_A": 2.155069881118929e-09,
+            "maximum_absolute_A": 9.446286320328105e-09
+          },
+          "V_1.1_to_1.3": {
+            "points": 1149,
+            "voltage_range_V": [
+              1.10218,
+              1.29978
+            ],
+            "mean_model_minus_measured_A": -2.186014639031558e-08,
+            "rms_A": 4.132567718971326e-08,
+            "mae_A": 2.3182269733666443e-08,
+            "maximum_absolute_A": 2.497705514066652e-07
+          },
+          "V_above_1.3": {
+            "points": 92,
+            "voltage_range_V": [
+              1.30222,
+              1.32695
+            ],
+            "mean_model_minus_measured_A": -6.971320455607861e-08,
+            "rms_A": 8.94951235136248e-08,
+            "mae_A": 7.674981063433153e-08,
+            "maximum_absolute_A": 1.7540620072218732e-07
+          }
+        },
+        "equal_occupied_25mV_bin_rms_A": 1.4216215168847297e-08,
+        "occupied_25mV_bins": 106,
+        "direct_observations": {
+          "observed_sample_mpp": null,
+          "zero_current_crossings": {
+            "adjacent_sign_changes": 0,
+            "exact_zero_samples": 0,
+            "count": 0,
+            "voltage_range_V": null,
+            "median_voltage_V": null
+          },
+          "closest_zero_current_sample": {
+            "sample_index_zero_based": 11302,
+            "voltage_V": -0.0273141,
+            "entering_current_A": 6.7141e-10
+          },
+          "repeated_voltage_values": 1058,
+          "repeated_voltage_max_current_span_A": 2.4256099999999994e-07,
+          "near_zero_voltage_abs_below_10mV": {
+            "points": 127,
+            "median_entering_current_A": 1.86163e-09,
+            "entering_current_range_A": [
+              1.40385e-09,
+              2.41096e-09
+            ],
+            "interpretation": "Local observed current distribution; no exact Isc interpolation or offset correction."
+          },
+          "method": "Acquisition order retained; no global interpolation, sorting, averaging or offsets. MPP is the maximum observed generating sample, sensitive to noise and extreme-value selection; it is not a smoothed/continuous-curve estimate or a model validation tolerance. Crossings may reflect noise or sweep reversal and are not a unique measured Voc."
+        }
+      },
+      "iv_1sun": {
+        "irradiance_W_m2": 1000.0,
+        "errors_by_sample": {
+          "all": {
+            "points": 15003,
+            "voltage_range_V": [
+              -1.29749,
+              1.32695
+            ],
+            "mean_model_minus_measured_A": 2.6689965084189904e-09,
+            "rms_A": 1.16577709073402e-08,
+            "mae_A": 5.262777784627815e-09,
+            "maximum_absolute_A": 2.0876148319801074e-07
+          },
+          "entering_negative": {
+            "points": 14582,
+            "voltage_range_V": [
+              -1.29749,
+              1.25538
+            ],
+            "mean_model_minus_measured_A": 3.910040866619762e-09,
+            "rms_A": 4.903172569884392e-09,
+            "mae_A": 4.015862975529373e-09,
+            "maximum_absolute_A": 5.13319395772341e-08
+          },
+          "entering_nonnegative": {
+            "points": 421,
+            "voltage_range_V": [
+              1.23554,
+              1.32695
+            ],
+            "mean_model_minus_measured_A": -4.031653515733793e-08,
+            "rms_A": 6.332802493325222e-08,
+            "mae_A": 4.8451641790028e-08,
+            "maximum_absolute_A": 2.0876148319801074e-07
+          },
+          "V_below_0": {
+            "points": 7375,
+            "voltage_range_V": [
+              -1.29749,
+              -0.00259407
+            ],
+            "mean_model_minus_measured_A": 3.5219578834918038e-09,
+            "rms_A": 3.5727111557138735e-09,
+            "mae_A": 3.5219578834918038e-09,
+            "maximum_absolute_A": 5.102630827753972e-09
+          },
+          "V_0_to_0.8": {
+            "points": 4643,
+            "voltage_range_V": [
+              0.0,
+              0.798212
+            ],
+            "mean_model_minus_measured_A": 3.013659680062422e-09,
+            "rms_A": 3.0441300412024903e-09,
+            "mae_A": 3.013659680062422e-09,
+            "maximum_absolute_A": 4.186679760059852e-09
+          },
+          "V_0.8_to_1.1": {
+            "points": 1734,
+            "voltage_range_V": [
+              0.800653,
+              1.09958
+            ],
+            "mean_model_minus_measured_A": 4.653734378444631e-09,
+            "rms_A": 5.178353491664917e-09,
+            "mae_A": 4.653734378444631e-09,
+            "maximum_absolute_A": 1.2979752851542684e-08
+          },
+          "V_1.1_to_1.3": {
+            "points": 1161,
+            "voltage_range_V": [
+              1.10218,
+              1.29978
+            ],
+            "mean_model_minus_measured_A": -1.972130054425585e-09,
+            "rms_A": 3.22323669086445e-08,
+            "mae_A": 2.101961790165465e-08,
+            "maximum_absolute_A": 2.0876148319801074e-07
+          },
+          "V_above_1.3": {
+            "points": 90,
+            "voltage_range_V": [
+              1.30222,
+              1.32695
+            ],
+            "mean_model_minus_measured_A": -6.337598987229613e-08,
+            "rms_A": 8.492545040371362e-08,
+            "mae_A": 7.241380023827985e-08,
+            "maximum_absolute_A": 1.720629943784229e-07
+          }
+        },
+        "equal_occupied_25mV_bin_rms_A": 1.3005316062881297e-08,
+        "occupied_25mV_bins": 106,
+        "direct_observations": {
+          "observed_sample_mpp": {
+            "sample_index_zero_based": 13556,
+            "voltage_V": 1.12934,
+            "delivered_current_A": 1.43254e-07,
+            "power_W": 1.6178247236e-07
+          },
+          "zero_current_crossings": {
+            "adjacent_sign_changes": 4,
+            "exact_zero_samples": 0,
+            "count": 4,
+            "voltage_range_V": [
+              1.2349670273604272,
+              1.2479
+            ],
+            "median_voltage_V": 1.242842843244257
+          },
+          "closest_zero_current_sample": {
+            "sample_index_zero_based": 13352,
+            "voltage_V": 1.24058,
+            "entering_current_A": -4.2726e-10
+          },
+          "repeated_voltage_values": 1060,
+          "repeated_voltage_max_current_span_A": 2.4710899999999997e-07,
+          "near_zero_voltage_abs_below_10mV": {
+            "points": 130,
+            "median_entering_current_A": -1.48106e-07,
+            "entering_current_range_A": [
+              -1.4908299999999999e-07,
+              -1.47374e-07
+            ],
+            "interpretation": "Local observed current distribution; no exact Isc interpolation or offset correction."
+          },
+          "method": "Acquisition order retained; no global interpolation, sorting, averaging or offsets. MPP is the maximum observed generating sample, sensitive to noise and extreme-value selection; it is not a smoothed/continuous-curve estimate or a model validation tolerance. Crossings may reflect noise or sweep reversal and are not a unique measured Voc."
+        },
+        "method_dependent_ratios_to_historical_model": {
+          "observed_sample_MPP_power_ratio": 1.0976789115856964,
+          "near_zero_voltage_median_delivered_current_ratio": 1.0195758264985633,
+          "interpretation": "Ratios compare different extraction methods: an extreme observed sample versus a smooth model MPP, and a finite-voltage-window median versus model current at V=0. They are not measurement uncertainty, validation tolerance or recalibration factors."
+        }
+      }
+    }
+  },
+  "limitations": [
+    "The literal S2C header Current (\u00b5m) is preserved; figure-confirmed \u00b5A override is explicit.",
+    "S2C voltage/current describe output amplitudes, not PV Voc or PV IV.",
+    "S2E characterizes large actuator PVs; it does not calibrate small logic PVs or physical TCAD parameters.",
+    "Historical 300 K and 1 sun=1000 W/m\u00b2 are explicit comparison assumptions/context.",
+    "No uncertainties, unique monotone IV curve or acquisition sweep timing are provided for S2E.",
+    "Observed MPP and local zero crossings are sampling/noise dependent; no unique measured Voc inferred.",
+    "No license or redistribution rights inferred from possession of these local files."
+  ]
+}

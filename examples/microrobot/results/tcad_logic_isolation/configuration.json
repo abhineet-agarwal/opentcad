@@ -1,0 +1,30 @@
+{
+  "scope": "Single logic-only TCAD cold-start isolation, with reset held asserted.\n\nNo actuator network, actuator PV, phase counter, electrode or native supervisor\nis instantiated. This diagnostic cannot establish released controller behavior.\n",
+  "removed_components": [
+    "both actuator PV stacks and their storage",
+    "transistor actuator drivers and their midpoint ports",
+    "working and Pt-return electrodes, electrolyte and solution resistors",
+    "functional phase counter and phase output bridges",
+    "actuator supervisor controls, numeric hysteresis state and driver-ready bridge",
+    "native brownout, current-limited reset converter and qualified LVT receiver"
+  ],
+  "stop_s": 0.00025,
+  "max_step_s": 2.5e-08,
+  "reset": "Asserted throughout via existing 10k rail-powered bridge",
+  "logic_PV": "Four series cells,1080um2 each; same conditional dark/light DD superposition",
+  "logic_storage_F": 2e-12,
+  "optical_ramp": "1us dark then linear ramp to1000W/m2 at101us",
+  "source_expression_unchanged": true,
+  "source_verification_sha256": "44e0771fa79dfce0ed4833efc72d73bf30d81a11ffa6e9af7e55d7769f586141",
+  "clock_source_sha256": "9ce3fe5d28860b620a134d1867d76844f95981e3858bb694516ef26b28fd8cab",
+  "light_source_sha256": "c8fcd5af1aaa412f1a6f770bd7a6a5d819efc9812a1969aed297875f5fefd181",
+  "dark_source_sha256": "4d9c1d68a599883bb98daa496a533aa2f8941ed6bec16fa3d0f894a4080f01f0",
+  "source_dependency_sha256": {
+    "examples/microrobot/tcad_logic_isolation.py": "b9163b60f0ebbdcf30e5131fed9d35fca56825d7f001834e70e129c609faa035",
+    "tests/integration/test_tcad_logic_isolation.py": "760bcb09e382e1c202b1af81b76d23b636d4d25db660010c5b5cd1c8334554b8",
+    "examples/microrobot/tcad_controller.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4",
+    "examples/microrobot/controller.py": "28a0731b9270441e93c36093e5f5c4fb0ae65a71014e9527a87c89b095469f41",
+    "examples/microrobot/electrical.py": "7bffb8f1e4411a51246502a83510173d4ea1e8dde841dacb76c85844ce416da2",
+    "examples/microrobot/pv.py": "3d91bd170f44b1f325e767c9cfa4919fbe9730f7960990909b38c4378cd7a942"
+  }
+}

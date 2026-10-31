@@ -1,0 +1,35 @@
+{
+  "scope": "One charge-conserving nonlinear adsorption-series startup diagnostic.",
+  "source_deck_sha256": "b7e4e306190e3884791fcfc2e7b19a45f2f20f07ce10864f0857a79ee861dbd7",
+  "replacement": {
+    "old": "Rads metal adsnode {tau*4*width/qmax}",
+    "new": "Bads_series metal adsnode I={qmax/(4*width*tau)*(2*width*tanh((v(metal,solution)-offset)/(2*width))-v(adsnode,solution))}"
+  },
+  "width_V": 0.08,
+  "tau_s": 0.02,
+  "offset_V": 0,
+  "Qmax_C": [
+    2.6e-10,
+    2.6e-10,
+    2.6e-09
+  ],
+  "Ca_F": [
+    8.124999999999999e-10,
+    8.124999999999999e-10,
+    8.125e-09
+  ],
+  "reference_coverage": 0.5,
+  "charge_conservation": "Only Ia metal\u2192state and Ca state\u2192solution; no ground state source or duplicate direct adsorption current",
+  "state_energy_scope": "Normalization capacitor energy is diagnostic, not chemical energy",
+  "unchanged": "Every other circuit/probe/model/timing/storage/solver line, apart from one explanatory comment",
+  "duration_s": 0.00025,
+  "max_step_s": 2.5e-08,
+  "source_dependency_sha256": {
+    "examples/microrobot/tcad_charge_adsorption.py": "c898a52bf3f4912a4aa0ab6b8a046a141b35865e62ca0c7157e57ae9f600cdc7",
+    "tests/integration/test_tcad_charge_adsorption.py": "18ab9cce62d7054ae3ed5cb3a989f3230af141e101793a54417db6e30de1ec29",
+    "examples/microrobot/tcad_passive_adsorption.py": "7c86555be9e7fc54dfb946f482908f74571279de427c9264f7a477cdfd1ba576",
+    "examples/microrobot/tcad_passive_clamps.py": "09187a42e434f56233e42ae9e17e25d790f9827545ef31397be1f97d229eb3b4",
+    "examples/microrobot/tcad_actuator_startup.py": "cc3d0c4ba1e9a49a26ae6a9f390f3e8531ec29f1d82ad2cfd8b58d2265513cf1",
+    "examples/microrobot/tcad_controller.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4"
+  }
+}

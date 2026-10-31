@@ -1,0 +1,25 @@
+{
+  "tests": {
+    "passed": 2,
+    "seconds": 1.31,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "only_electrode_model_replacement": true,
+  "source_vectors_unchanged": true,
+  "DD_lines_unchanged": true,
+  "counts": {
+    "transients": 1,
+    "fine": 0,
+    "rescue": 0,
+    "DC": 0,
+    "DD": 0,
+    "layout": 0
+  },
+  "small_signal_gate_pass": true,
+  "raw_exported": false,
+  "editorial_change_after_execution": "Corrected inherited measurement-change label; executed runner snapshot preserved; no numerical result or deck change",
+  "limitation": "Local electrode terminal-versus-solution current discrepancy1.701pA is reported, not a sub-pA precision claim",
+  "scope": "Complete held-input small-signal adsorption startup only; no released or large-signal actuation/controller acceptance",
+  "review_acceptance": "Reviewed and accepted as small-signal held-input startup evidence; nonlinear adsorption and released actuation remain unvalidated."
+}

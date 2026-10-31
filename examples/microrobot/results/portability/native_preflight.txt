@@ -1,0 +1,6 @@
+Searching DEVSIM_MATH_LIBS="libopenblas.dylib:liblapack.dylib:libblas.dylib"
+Loading "libopenblas.dylib": MISSING DLL
+Loading "liblapack.dylib": ALL BLAS/LAPACK LOADED
+Skipping libblas.dylib
+loading UMFPACK 5.1 as direct solver
+/tmp/opentcad-standalone-review/opentcad/__init__.py /tmp/opentcad-standalone-review/examples/microrobot/__init__.py

@@ -1,0 +1,28 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * opentcad microrobot interface experiment
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+act                                        1.2
+raw                                          0
+ib                                         1.2
+out                                2.16963e-08
+vinput#branch                                0
+vact#branch                       -2.50748e-12
+
+ Reference value :  0.00000e+00
+No. of Data Rows : 6239
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+

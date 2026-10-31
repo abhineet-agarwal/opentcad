@@ -1,0 +1,23 @@
+{
+  "scope": "Engineering numerical conventions for distinct2.2ms powerdown-prefix pair; not a rescue/recovery claim",
+  "requested_stop_s": 0.0022,
+  "terminal_comparison_time_s": 0.0022,
+  "qualified_native_edge_counts": "identical,logic>=1.6V/reset-high withpreregistered1usguard",
+  "terminal_voltage_and_eta_difference_limit_V": 0.001,
+  "corresponding_crossing_time_difference_limit_s": 1e-06,
+  "full_signed_port_energy_relative_limit": 0.01,
+  "relative_energy_gate_minimum_magnitude_nJ": 0.001,
+  "tiny_port_rule": "reportabsolute differences only; no relative precision gate",
+  "fixed_protocol": "samefullPWL through4.5ms, physicalcircuit/storage/tolerances unchanged; Gear2",
+  "specific_states": [
+    "fallinglogic1.6Vcrossing",
+    "2.0ms",
+    "2.2ms"
+  ],
+  "interval_audit": [
+    "extrema/transitions/durations ofreset/monitor/driver,eventphases,Q",
+    "no-resetduration below1.6V",
+    "electrode-midpoint/eta",
+    "signedportenergy andknownstorageDeltaE"
+  ]
+}

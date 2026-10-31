@@ -1,0 +1,9 @@
+* Installed options query, no analysis
+Vquery n 0 0
+Rquery n 0 1k
+.options method=gear maxord=2 reltol=1e-6 abstol=1e-15
+.control
+option
+quit
+.endc
+.end

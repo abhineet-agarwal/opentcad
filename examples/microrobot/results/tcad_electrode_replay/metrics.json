@@ -1,0 +1,198 @@
+{
+  "complete": true,
+  "failure": null,
+  "actual_stop_s": 0.00025,
+  "shape": [
+    69575,
+    27
+  ],
+  "finite": true,
+  "comparisons_to_benchmark": {
+    "rc": {
+      "eta": {
+        "maximum_absolute_error": [
+          4.061702094119632e-09,
+          4.06170470314374e-09,
+          8.110675367945022e-10
+        ],
+        "allowed": [
+          1.3705511871654464e-06,
+          1.3705511871654464e-06,
+          1.0741102674317595e-06
+        ],
+        "pass": true
+      },
+      "coverage": {
+        "maximum_absolute_error": [
+          8.260392370118552e-12,
+          8.26072543702594e-12,
+          4.807931830441703e-12
+        ],
+        "allowed": [
+          1.8981869672464174e-08,
+          1.8981869672464174e-08,
+          1.1796302120382621e-08
+        ],
+        "pass": true
+      },
+      "current": {
+        "maximum_absolute_error": [
+          9.862411382336094e-12,
+          9.981031613933439e-12,
+          3.127095031244049e-11
+        ],
+        "allowed": [
+          1.454958530728847e-11,
+          1.4549585307302105e-11,
+          2.4099171215877453e-11
+        ],
+        "pass": false
+      }
+    },
+    "stable": {
+      "eta": {
+        "maximum_absolute_error": [
+          4.0620622504688206e-09,
+          4.06206086269004e-09,
+          8.110317876131093e-10
+        ],
+        "allowed": [
+          1.3705511871654464e-06,
+          1.3705511871654464e-06,
+          1.0741102674317595e-06
+        ],
+        "pass": true
+      },
+      "coverage": {
+        "maximum_absolute_error": [
+          7.0179417832605395e-12,
+          7.016942582538377e-12,
+          9.876488515914161e-12
+        ],
+        "allowed": [
+          1.8981869672464174e-08,
+          1.8981869672464174e-08,
+          1.1796302120382621e-08
+        ],
+        "pass": true
+      },
+      "current": {
+        "maximum_absolute_error": [
+          9.659806951960633e-12,
+          9.917530951497275e-12,
+          2.8839713688534107e-11
+        ],
+        "allowed": [
+          1.454958530728847e-11,
+          1.4549585307302105e-11,
+          2.4099171215877453e-11
+        ],
+        "pass": false
+      }
+    }
+  },
+  "comparison_between_models": {
+    "eta": {
+      "maximum_absolute_error": [
+        1.6380452549924485e-11,
+        1.6342815989389692e-11,
+        3.180500307564671e-11
+      ],
+      "allowed": [
+        1.1852784657785378e-07,
+        1.1852784658362694e-07,
+        1.0370556812001599e-07
+      ],
+      "pass": true
+    },
+    "coverage": {
+      "maximum_absolute_error": [
+        1.6434631433526192e-12,
+        1.644906433284632e-12,
+        5.0692228192872335e-12
+      ],
+      "allowed": [
+        1.4491017440155787e-09,
+        1.4491017443486456e-09,
+        1.0898199126186938e-09
+      ],
+      "pass": true
+    },
+    "current": {
+      "maximum_absolute_error": [
+        2.650787380561719e-13,
+        9.041669504612547e-14,
+        2.4312366239063773e-12
+      ],
+      "allowed": [
+        1.4774790614538425e-12,
+        1.4774790616016232e-12,
+        1.954958093001256e-12
+      ],
+      "pass": false
+    }
+  },
+  "networks": {
+    "rc": {
+      "coverage_min_max": [
+        0.4999999101800874,
+        0.5000004491017443
+      ],
+      "max_abs_eta_V": 1.852784658362694e-05,
+      "metal_history_max_error_V": 5.551115123125783e-16,
+      "terminal_KCL_max_A": 3.362875658215328e-11,
+      "solution_KCL_max_A": 5.995205554773309e-22,
+      "terminal_vs_solution_current_max_A": 3.127050292273833e-11,
+      "integrated_charge_KCL_residual_C": [
+        -4.121759438604804e-21,
+        -4.12165518287083e-21,
+        1.2173551621033538e-20
+      ],
+      "external_signed_source_work_J": 5.377232072335354e-18,
+      "double_layer_delta_J": 3.585546992783759e-21,
+      "signed_adsorption_terminal_work_J": 3.8818208565191145e-21,
+      "solution_resistive_loss_J": 5.3640424490692635e-18,
+      "Faradaic_loss_J": 9.605260850729473e-24,
+      "electrode_energy_residual_J": 5.712650155936841e-21
+    },
+    "stable": {
+      "coverage_min_max": [
+        0.49999991017501816,
+        0.5000004491001006
+      ],
+      "max_abs_eta_V": 1.852784679878816e-05,
+      "metal_history_max_error_V": 5.551115123125783e-16,
+      "terminal_KCL_max_A": 3.394661453581749e-11,
+      "solution_KCL_max_A": 5.662136111250004e-22,
+      "terminal_vs_solution_current_max_A": 2.8839262991588583e-11,
+      "integrated_charge_KCL_residual_C": [
+        -3.783668411453602e-21,
+        -3.78473017030873e-21,
+        2.65899144739145e-20
+      ],
+      "external_signed_source_work_J": 5.390785283858964e-18,
+      "double_layer_delta_J": 3.5855363150600636e-21,
+      "signed_adsorption_terminal_work_J": 3.881814961046895e-21,
+      "solution_resistive_loss_J": 5.364042434082088e-18,
+      "Faradaic_loss_J": 9.605246710270458e-24,
+      "electrode_energy_residual_J": 1.9265893254058796e-20
+    }
+  },
+  "scope": "Externally powered isolated voltage replay; not end-to-end power/startup or released-actuation validation. Input histories are piecewise-linear approximations between frozen adaptive samples.",
+  "raw_local_path": "/Users/abhineet/Documents/opentcad_final/examples/microrobot/local_runs/tcad_electrode_replay/native/replay.dat",
+  "raw_sha256": "913f49c5df25e2065bf790c8f45f2b35a9194523e78e0d0892d866ad36c16fe8",
+  "benchmark_precision": {
+    "terminal_KCL_peak_A": 1.6772663008452175e-12,
+    "solution_KCL_peak_A": 5.662136111250004e-22,
+    "terminal_solution_current_difference_peak_A": 1.7010642092271202e-12,
+    "integrated_charge_KCL_residual_C": [
+      4.664282651774648e-21,
+      4.66428197776696e-21,
+      -2.0895060609302463e-20
+    ],
+    "signed_electrode_port_work_J": 5.357969810895174e-18
+  },
+  "all_comparisons_pass": false,
+  "acceptance_scope": "Both model copies complete; eta/coverage comparisons pass, but peak terminal-current comparison limits fail. No blanket replay-current precision acceptance.",
+  "review_acceptance": "Reviewed and accepted as completed isolated replay evidence with failed current-agreement gates; end-to-end actuation remains unvalidated."
+}

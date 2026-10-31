@@ -1,0 +1,11 @@
+{
+  "single_change": {
+    "from": ".options method=gear maxord=2 reltol=1e-6 abstol=1e-15",
+    "to": ".options method=gear maxord=2 reltol=1e-6 abstol=1e-15 chgtol=1e-20"
+  },
+  "execution_order": "stable first; matching RC only if stable completes and every unchanged accuracy/domain/clamp gate passes",
+  "current_limits": "5pA+2% frozen benchmark branch peak; terminal sum allowance is sum of three branch allowances",
+  "charge_limit": "1e-20C+2% frozen benchmark Cdl/Cads charge excursion",
+  "energy_limit": "Existing2% with1e-15J absolute floor; current gates decide precision separately",
+  "rationale": "Recorded charge scales and1pA*25ns=2.5e-20C; CHGTOL is not a direct saved-current bound"
+}

@@ -537,7 +537,7 @@ def tolerance_audit(dest, *, reuse=False):
     return report
 
 
-def run(destination=HERE / "results/layout/bias_reference_final", *, postlayout=True):
+def run(destination=HERE / "local_runs/layout/bias_reference_final", *, postlayout=True):
     dest = Path(destination).resolve()
     if (dest / "microrobot_bias.mag").exists():
         raise FileExistsError("Use a fresh output directory; existing layout is preserved")
@@ -689,7 +689,7 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=HERE / "results/layout/bias_reference_final")
+    parser.add_argument("--output", type=Path, default=HERE / "local_runs/layout/bias_reference_final")
     parser.add_argument("--no-postlayout", action="store_true")
     args = parser.parse_args()
     print(json.dumps(run(args.output, postlayout=not args.no_postlayout), indent=2))

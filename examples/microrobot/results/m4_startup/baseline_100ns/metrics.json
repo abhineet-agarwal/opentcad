@@ -1,0 +1,38 @@
+{
+  "scope": "Coupled microrobot circuit bench with explicit digital/electrical abstraction.\n\nPDK transistors: clock, first resettable DFF, reset level conversion, candidate\nbrownout and two drivers. XSPICE models implement the remaining binary counter;\nits functional phases follow the RTL. A switched PDK-capacitor load proxies the\nremaining digital power. It is not a transistor netlist or power signoff of RTL.\n",
+  "netlist_sha256": "3a689674b0757360a1610bc7c2f7f457aebff0a2e8d29bfa47325dc571a168e8",
+  "configuration": {
+    "stop_s": 0.002,
+    "adaptive_diagnostics": true
+  },
+  "output_columns": [
+    "time_s",
+    "light_W_m2",
+    "logic_V",
+    "actuator_V",
+    "midpoint_V",
+    "ready_V",
+    "reset_n_V",
+    "phase_A_V",
+    "phase_B_V",
+    "electrode_A_V",
+    "electrode_B_V",
+    "solution_A_V",
+    "solution_B_V",
+    "theta_A",
+    "theta_B",
+    "logic_energy_nJ",
+    "actuator_energy_nJ",
+    "clock_energy_nJ",
+    "firstff_energy_nJ",
+    "proxy_energy_nJ",
+    "resetlogic_energy_nJ",
+    "monitor_energy_nJ",
+    "phase_energy_nJ",
+    "clock_V",
+    "first_DFF_Q_V",
+    "bias_n_V"
+  ],
+  "simulation_executed": true,
+  "status": "Exploratory integration; inspect electrical acceptance before promotion"
+}

@@ -1,0 +1,16 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.11, pytest-9.0.3, pluggy-1.7.0
+rootdir: /private/tmp/opentcad-standalone-py312
+configfile: pytest.ini
+testpaths: tests
+plugins: platformdirs-4.13.6
+collected 24 items
+
+tests/device/test_compact_pv.py ....                                     [ 16%]
+tests/device/test_optical.py ..........                                  [ 58%]
+tests/integration/test_electrode_spice.py ..                             [ 66%]
+tests/integration/test_layout_edge_audit.py ..                           [ 75%]
+tests/integration/test_microrobot.py .....                               [ 95%]
+tests/integration/test_phase_generator.py .                              [100%]
+
+============================= 24 passed in 12.40s ==============================

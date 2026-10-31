@@ -1,0 +1,9 @@
+{
+  "scope": "Exploratory AND-qualified driver-ready cold-start control; no startup acceptance",
+  "actual_stop_s": 0.0008,
+  "rows": 20624,
+  "wall_s": 94.76368241599994,
+  "netlist_sha256": "85304131f913ea90c22c1196d37587fd7ed51d219d2e41edb037b62e22ec70cf",
+  "physical_change": "Six-FET actuator NAND+inverter AND of native reset and monitor-ready; only driver ready pins move; real driver gates provide output load",
+  "energy_method": "offline adaptive branch powers; separate Vdriverbuffer actuator feed; no auxiliary energy states"
+}

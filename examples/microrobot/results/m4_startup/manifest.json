@@ -1,0 +1,243 @@
+{
+  "scope": "Compact M4 startup evidence; full adaptive raw waveforms excluded; no autonomous controller acceptance",
+  "archive_format": 1,
+  "cases": {
+    "baseline_100ns": {
+      "source_local_run": "controller_startup_adaptive_baseline",
+      "files_sha256": {
+        "metrics.json": "4a1bb847c1856415e4e18a2e99b9ba367c4a03f94cbab7cffa308d3ad71973f9",
+        "diagnostic_summary.json": "4d49597b4ef727e0f70312fb6cae938b0d55ecd821f9670af5257003eed7f830",
+        "startup_review.json": "02e4f0050882406984a5f018caa8c1b001ee18ff46c1e1d7e37094f6b36a27b6",
+        "bench.spice": "3a689674b0757360a1610bc7c2f7f457aebff0a2e8d29bfa47325dc571a168e8",
+        "ngspice.log": "6a8987e61b8abea52ce851b4d786fb5b8364485d98ba0d7b306bc385fae07a5b"
+      },
+      "actual_saved_stop_s": 0.002,
+      "saved_rows": 55503,
+      "full_adaptive_data_sha256": "2c246df767451acd18bd7d2b3181fd93c05f21469446b4a80db0fab2d01f8d66"
+    },
+    "baseline_50ns_abort": {
+      "source_local_run": "controller_startup_adaptive_halfstep",
+      "files_sha256": {
+        "failure_review.json": "19c6223da0ce55899496a0c4ca214e6676f7ec3c11e04a5f14455e2a880af4f5",
+        "bench.spice": "e210c01b503cbe3f6c4801c0a4aaea4898b0c9ad55ea826026c176b032e00ebe",
+        "ngspice.log": "10fd1b17663393ddd469422c385e5f90ba970aee096c36ccf5082617ea36f07f"
+      },
+      "actual_saved_stop_s": 0.000536320166,
+      "saved_rows": 13021,
+      "full_adaptive_data_sha256": "0aca2031a66e25c4df8805c4be5d9af67b708393753a4dc9de05d563adddc8f3"
+    },
+    "current_limited_50ns": {
+      "source_local_run": "current_limited_ready_exploration/current_limited_2ms_no_energy_50ns",
+      "files_sha256": {
+        "full_review.json": "9570d0fdd9362630911435103bd5d3a7cd09f9e1d724f4f3ee4746ccb574b580",
+        "execution.json": "decd7c4b959b8aa88c175d3d02eeac66fda8641291828637d076fd7644802255",
+        "bench.spice": "500bcab4e81defadce7c9ae97d63b037d69c113e100ec267e1bfb63c9a3a1eab",
+        "ngspice.log": "95b2179483b31d39f7af9b462ef9bfc6edebbca59c6be15d505568cf50e13b61"
+      },
+      "actual_saved_stop_s": 0.002,
+      "saved_rows": 67856,
+      "full_adaptive_data_sha256": "bac38cc226263ea0a0491f9839633427529b5f286979b2a2551e4d5a5b42de9c"
+    },
+    "current_limited_25ns": {
+      "source_local_run": "current_limited_ready_exploration/current_limited_2ms_no_energy_25ns",
+      "files_sha256": {
+        "full_review.json": "5addb923b400051119c891146ba031619fb62e51cba29c7996f6ff945bbe8c06",
+        "execution.json": "2d6b9f2438b44e5bbdb2e798c3d413190f2f61108f0f9c5f085d829d9bfd0997",
+        "bench.spice": "af12f2e546903248f72fc2dfbcfb2322b3d342a05691c70d919b068536788c00",
+        "ngspice.log": "dd6747a017cb4804917ad7c925f8a20186751ca321cd7d270fab830f96fd2994"
+      },
+      "actual_saved_stop_s": 0.002,
+      "saved_rows": 101808,
+      "full_adaptive_data_sha256": "0b70020026a6ad04b78be27b15285034d7a47e3c460bc282025b7de774d80b7c"
+    },
+    "buffered_latch": {
+      "source_local_run": "buffered_ready_exploration/buffered_08ms",
+      "files_sha256": {
+        "review.json": "4af25f8acfd7c52f0dc91d43c203e014ba70e5e40a1d9cde312ecc75120e725a",
+        "execution.json": "bebae8ec3784e615741281c5a91dcfc65c82eede6cdc57ae7e43e2e5f8889956",
+        "bench.spice": "74e7958406b62cc0890d07a73577951c640731b4e005b247d83caf26e38acf57",
+        "ngspice.log": "36ed948802df3615a5aeb9a044222205df0a67d6b7ab147dec6d99e0bd32f7b9"
+      },
+      "actual_saved_stop_s": 0.0008,
+      "saved_rows": 14314,
+      "full_adaptive_data_sha256": "ca8d86d626073b2e8d07ca5d70f9a82424216dfca544cb6b01092cc66b1841cb"
+    },
+    "weak_l16": {
+      "source_local_run": "por_exploration/weak_l16_08ms",
+      "files_sha256": {
+        "bench.spice": "bf68641c53a8d50ffd064b1e0bdb6087f3a91ded045a1d75933466e9de262337",
+        "ngspice.log": "f6a8ef7eea5167cc241f4a55b0ffe0d07b7bb93fec5a8f28531f8c2e0df5eed3"
+      },
+      "actual_saved_stop_s": 0.0008,
+      "saved_rows": 14212,
+      "full_adaptive_data_sha256": "202fb3fc7f851095f3105e456d34098e9fa308fd9055ee7a9b7d39ab7e02e8e1"
+    },
+    "schmitt_isolated": {
+      "source_local_run": "schmitt_receiver_exploration/fixed_1p7v",
+      "files_sha256": {
+        "metrics.json": "a0e4ab001fb7a546abfe3fd7cfa498cd51d90710ac520298c358cc83f4f93fa4",
+        "bench.spice": "3ba012c364b83d864039e648676fc420101ef917c301f804e45f1653825264d9",
+        "ngspice.log": "b55bea9a00ba8ddd1e5e6b9dba7de97e60ebdcb1f081504083a1ffd096e7d7bb"
+      }
+    },
+    "actuator_pair_isolated": {
+      "source_local_run": "actuator_reset_receiver/fixed_1p2v",
+      "files_sha256": {
+        "metrics.json": "8daa55e74b4a66711d8fc33927093489c70741bf6db072b3ad9cc5732ad8ddbd",
+        "bench.spice": "29c457ad22386b26b25ab843c1fa3badb2e5dab622772de635977440156b215b",
+        "ngspice.log": "58fbc496c5f1cc907bd555b0a245136852f5e8e64df7239c69cebce4d42bae49"
+      }
+    },
+    "driver_pair": {
+      "source_local_run": "driver_ready_ordering_control/finite_pv_08ms",
+      "files_sha256": {
+        "review.json": "1bec62d876628e6eac5219ea1bc9e779b8cdcc4466f86cd8c1a011c3a42ea1ac",
+        "functional_review.json": "0bf107dfa37a94805ac26dad2f466af080388e3f116243f54557e3328c25941d",
+        "execution.json": "8e2b7cdd96723476ddf8b34a0be00de2f9e37994c60ae263d921a35d477bd3a7",
+        "bench.spice": "4c945f09aff879494950d0b74c219e81d91e1f9b555755b25f9fc410e91c16a2",
+        "ngspice.log": "fb06f7016419061a45105bbcf14e980375d24196146e35390807557c8579e0b8"
+      },
+      "actual_saved_stop_s": 0.0008,
+      "saved_rows": 20727,
+      "full_adaptive_data_sha256": "c7865d5d4d47df972e12f2b6533825eb8d0c85b3c936762845948eac992c94de",
+      "plot_preview": "Bin extrema plus endpoints; plot-only decimation. Full-waveform metrics remain in review JSON."
+    },
+    "driver_and": {
+      "source_local_run": "driver_ready_qualified_control/finite_pv_08ms",
+      "files_sha256": {
+        "cold_start_review.json": "213b718d55c527c391b161bd674cf402ab071e5e1bfba1a3220fb7e0f90dee19",
+        "review.json": "54152f75df18fa69410f4716e7c70fcd06f5e01a76ef891081a32ac7025b88a5",
+        "execution.json": "fe01772daad39b7fd08f20a35a6fcd8d94f775e26d4fb5c450c289259202c029",
+        "bench.spice": "85304131f913ea90c22c1196d37587fd7ed51d219d2e41edb037b62e22ec70cf",
+        "ngspice.log": "aeb5a7eff1f07c1383943a237ff8d3f15df43a9bf8d00bd2604ff77261478ea8"
+      },
+      "actual_saved_stop_s": 0.0008,
+      "saved_rows": 20624,
+      "full_adaptive_data_sha256": "607350b79a8680d30fe460560f0cc9799ea7d40d4ccfb1149284b98801e6a183",
+      "plot_preview": "Bin extrema plus endpoints; plot-only decimation. Full-waveform metrics remain in review JSON."
+    },
+    "driver_forced_low": {
+      "source_local_run": "driver_ready_qualified_control/forced_driver_ready0_04ms",
+      "files_sha256": {
+        "review.json": "dd5c96985b83db58194e6e2d54b20c5d2dd05c2433361a25e4b52f7e7fb54337",
+        "execution.json": "d988bff09c079b93240a744b2f98df0ccaa42f00673760cb3c9e1eaf5d939074",
+        "bench.spice": "7351a5b8e0b29baf0d0459768b84a3d5a253637ff588be0d77f600ecbcd4b73b",
+        "ngspice.log": "003e2f7ef941f0a05e503423e5b593f6ed531ea91b4e09e728a3226f83a362da"
+      },
+      "actual_saved_stop_s": 0.0004,
+      "saved_rows": 8248,
+      "full_adaptive_data_sha256": "3cabed78c9deeb2c803e7c78fb473be13a4e3e4b7a51f1301691e907901896ce",
+      "plot_preview": "Bin extrema plus endpoints; plot-only decimation. Full-waveform metrics remain in review JSON."
+    },
+    "driver_lvt_08ms": {
+      "source_local_run": "driver_ready_qualified_lvt_control/finite_pv_08ms",
+      "files_sha256": {
+        "cold_start_review.json": "80e1cef97f5e2c2354017e0fddcc45b4d0d1ae649ca71217427ab5dc0e6df76c",
+        "leakage_review.json": "3abb50b9e6c4a7c9473f68fb6c0d5f492d5c19cedbe63c0ebf0707233ceb60b1",
+        "review.json": "332b93afe14a9506ed5417b11d8be7f3555d5450e149c1baf2918a708b8d137f",
+        "execution.json": "59094e24474072d99b206be6afdc0b6595f196a51205706d1ff834204d4189eb",
+        "bench.spice": "373004e5aa852674d2a1ebfe36a6279c22d009b58c07c74c36dff9becdfd4896",
+        "ngspice.log": "c695bc9f4ed288fbb9105b4962f81243db1062c30ce0263b4046a0e306b9da27"
+      },
+      "actual_saved_stop_s": 0.0008,
+      "saved_rows": 20491,
+      "full_adaptive_data_sha256": "28c2f79ecce5a59ca24c740133f283237bdf9d6abc0b445cb8ee029e31738280",
+      "plot_preview": "Bin extrema plus endpoints; plot-only decimation. Full-waveform metrics remain in review JSON."
+    },
+    "driver_lvt_50ns": {
+      "source_local_run": "driver_ready_qualified_lvt_control/finite_pv_2ms_50ns",
+      "files_sha256": {
+        "leakage_review.json": "1f914c7b44147a91c8d5496c0c885d3fe94760790210cb8fe1d26c8ac265a0eb",
+        "full_review.json": "113ab3f66e72789b50e1c74525e18aa6442708aa249321d4f96e0476f8ce7a07",
+        "limits_review.json": "9aa19245ae48fcbf6777a786a980b45546b2f2b853c99a1b132f226304364588",
+        "execution.json": "e5657cf54c6938b9d7a1b0c3efd2aff86dcb9582a3b62da121fa32f478218525",
+        "bench.spice": "4856b39fbc5e174b8911c25ffb56b8502f7263bcd8f469a2a9cce37d3b88cba1",
+        "ngspice.log": "965dec85154890703b0c3f2e431c4fbba59f781063f9d1b944b971f888d2eaa9"
+      },
+      "actual_saved_stop_s": 0.002,
+      "saved_rows": 67808,
+      "full_adaptive_data_sha256": "518a66494656ed95e67832c5f2e0babf312f94da41b11c7af30bd148ae830dfe"
+    },
+    "driver_lvt_25ns": {
+      "source_local_run": "driver_ready_qualified_lvt_control/finite_pv_2ms_25ns",
+      "files_sha256": {
+        "leakage_review.json": "708aa6d39875b9263e79be32eadf28f9bc7418eeae23c887b9eca3a1393c9775",
+        "full_review.json": "741af3d1ea6c27e8a1e018dc5d527eb576b868711d8141e5d770d7384972189e",
+        "limits_review.json": "f87f4fc1a4ab93f38ea21700a3dc188caad0a43cf754bcfa583edadf1e344029",
+        "execution.json": "9b924f867b2b2a0a1167bd1af36736bdfa51d3ed702efd19ff8654008e814117",
+        "bench.spice": "fbb73712a6a8d806a7ecae998953914bb8072f1de8ce6fc087a57fa3dccd9d02",
+        "ngspice.log": "7915c84f76f5589da691ad7cbb8403e6dbd7529c4cc0fb4a7473586da531501c"
+      },
+      "actual_saved_stop_s": 0.002,
+      "saved_rows": 101883,
+      "full_adaptive_data_sha256": "a905b35ac816f2e8102bbb6f1a1f3bd45bdf401d65f518abf3dd42e10482ed6a"
+    },
+    "driver_lvt_85C": {
+      "source_local_run": "driver_ready_qualified_lvt_control/finite_pv_hot85_08ms",
+      "files_sha256": {
+        "failure_review.json": "e75f2dec267f9e443155e0e1f024bf2cf775488091b0036c6c48c1b0ddf0d4b7",
+        "bench.spice": "34a64523a4ce794020a5be5bfd9421d638fd7af813c5aa3bf81ef5c0c56fdafb",
+        "ngspice.log": "52754af571b689bbbea9c6d4fc2583444ea48a71b1e54b73fe09977f5ee1ff92"
+      },
+      "actual_saved_stop_s": 0.000101757103,
+      "saved_rows": 2230,
+      "full_adaptive_data_sha256": "d43d36cdb09275ff6efb41779d7a581bb6f6bd1b7654d41ea5f91b720b861968"
+    },
+    "slow_clock_ideal": {
+      "source_local_run": "slow_clock_exploration/ideal_tt",
+      "files_sha256": {
+        "metrics.json": "d4e567da926e5229118c242433c26f3d9740af0a9cc57ff3126865ba8d15157c",
+        "clock.spice": "6f1c4e734285d08c0fa50c130e19970692c41be4af6f9af8a84d11ab55847939",
+        "receiver_cells.spice": "3ddb5dee842c380f2aa7850c320587889935d81db323087d39371d42aef84bf0",
+        "ngspice.log": "5238df860148e49f0116c992e0e6a40c2118afe1650427da0ff3c8d57c3891af"
+      }
+    },
+    "slow_clock_pv": {
+      "source_local_run": "slow_clock_exploration/pv_tt",
+      "files_sha256": {
+        "metrics.json": "4937233f7ec6195f1455b088e7469c5ba304bad1b18ef159c00074b645c412b8",
+        "clock.spice": "af6a7efba1df0d4bd0bac8a8e9fd84a2d811f31d5054827c91836cad271d883b",
+        "receiver_cells.spice": "3ddb5dee842c380f2aa7850c320587889935d81db323087d39371d42aef84bf0",
+        "ngspice.log": "fa044147690ab253fa66e34eb503e78f147b02a31ca4dd3a81ad55a7660cb932"
+      }
+    }
+  },
+  "source_circuit_sha256": {
+    "actuator_driver.spice": "dea3d0636501f19becdbe2d998decf202fef3aa19cf7879d22f9897dfbd52973",
+    "bias_reference.spice": "27cba31a6adca8fb38f7cd84695e9fbc333846794ef520a36926f8cbd131f4e1",
+    "brownout_candidate.spice": "970935d893921034f75ca26ae52e7cbd1550e5e87ef480de0302cc98412cfba2",
+    "brownout_v2.spice": "c18bfb0076482bad658205bdc2ba1286eeaaac41e212586056e4029bdb91fbd1",
+    "brownout_v3.spice": "dcd62f9046933d316dd07f69f3eccccc769da5f1cecc12c2595ce5a4b50220ba",
+    "electrochemical.spice": "9df4c5ef9c56e9ce4c421a51be3d538eebba26b619301916c1b04f782fe7c2d3",
+    "ready_driver_buffer.spice": "8a6f8e698186c78b39bf7cfdd17b008e517bc5e171c392e4f946bf25e8cb59bb",
+    "ready_driver_qualified.spice": "0d71369f573b67b1dd52bc7828235e48396387afce09c62b5d7b094c0aee55f5",
+    "ready_driver_qualified_lvt.spice": "7604cb233934b9733029d0d40b49d2501d0ff57b320b379a88868cf009d9b5c5",
+    "ready_levelshift.spice": "a06d7402634eeb7222b40443df5eefabef5e8f11efd6364bb5ed984082d44929",
+    "ready_levelshift_buffered.spice": "9fa52232431905d10ca5b320738842f4b79a52d4e9f03389629abf9b4d9ef6d7",
+    "ready_levelshift_current_limited.spice": "836a0183fc713e59b59bb610e752b5e8ddd489bbc09b79effabbb7e7b275001d",
+    "ready_levelshift_qualified.spice": "92a4d00a24f6316e3dea6cd5f1484b985dab0b6386c216439efd285aba052eaf",
+    "ready_levelshift_schmitt.spice": "f619da17b492d6d69cc5760712bfd58dd337e83db8a3b5053ff57bc230a71a73",
+    "ready_levelshift_weak.spice": "903a142def1534cc95ab58522243850146429140a90ac87c834938dbae2d8c8d",
+    "starved_clock.spice": "dc606bcaa35616e6412c2b8d8c63e17175f6b53d6baad820a222b66b74dc29de",
+    "starved_clock_slow.spice": "3f7e930eec05ccd530aa4a78d522986ffcfa602b3a8f782ff2ac2033cee1fd0a"
+  },
+  "source_generator_sha256": {
+    "controller.py": "b893b2cd7bc1106b3454b5eeadbd8054b9d90ba9019264b84713635a751b00e8",
+    "electrical.py": "7bffb8f1e4411a51246502a83510173d4ea1e8dde841dacb76c85844ce416da2"
+  },
+  "model_library_header_sha256": "17c208a699228f5acb87bf59c09c22a4c4d3937b6766b4957737d34e8e075f64",
+  "model_provenance_note": "Library entry-file hash only; not a recursive hash of installed PDK. Exact included deck/model paths retained. Native environment matches SETUP.md, but this archive is not portable execution evidence.",
+  "installed_model_sha256": {
+    "libs.ref/sky130_fd_pr/spice/sky130_fd_pr__nfet_01v8__tt.pm3.spice": "459eca963a134574cf7c842ad6d3814e7e0752bfb5de8e581c2f483534b5ad06",
+    "libs.ref/sky130_fd_pr/spice/sky130_fd_pr__pfet_01v8__tt.pm3.spice": "c943246ce012ea3db2777e3f4633ddccdfee7c8f1bf4dca79af9f7ff17b3d51f",
+    "libs.ref/sky130_fd_pr/spice/sky130_fd_pr__nfet_01v8_lvt__tt.pm3.spice": "7e946eed0e30b40fd1f1788510a2e8ab128ea0fa93865cf9f9204004276d20bc"
+  },
+  "source_snapshot_note": "Generator/circuit hashes describe the reviewed current working-tree snapshot; per-case exact deck hashes identify executed circuits, which may precede subsequent generator changes.",
+  "native_environment": {
+    "ngspice": "44.2, KLU",
+    "compatibility": "hs a; single thread via generated .spiceinit",
+    "platform": "macOS; no Linux/Colab execution claimed",
+    "PDK_root": "/usr/local/share/pdk/sky130A",
+    "provenance_limit": "Selected active TT device files and library entry hashes; not a recursive whole-PDK hash or foundry signoff."
+  }
+}

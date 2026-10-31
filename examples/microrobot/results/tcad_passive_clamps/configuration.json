@@ -1,0 +1,46 @@
+{
+  "scope": "One passive-equivalent held-input startup diagnostic; no released operation.",
+  "source_deck_sha256": "4a890c8ac2b23aabeef6fb4d3362754f7f3f35891943c95e123618ede5d5bc1b",
+  "equivalence_per_branch": {
+    "reset": {
+      "removed_high": "Bsupervisor_reset_hi",
+      "replaced_low": "Bsupervisor_reset_lo",
+      "new_resistor": "Rfixed_reset reset_n 0 10k",
+      "reason": "Fixed zero control: high current identically0, low current V(output)/10000"
+    },
+    "ready": {
+      "removed_high": "Bsupervisor_driver_hi",
+      "replaced_low": "Bsupervisor_driver_lo",
+      "new_resistor": "Rfixed_ready driver_ready 0 10k",
+      "reason": "Fixed zero control: high current identically0, low current V(output)/10000"
+    },
+    "phase_A": {
+      "removed_high": "Bpahi",
+      "replaced_low": "Bpalo",
+      "new_resistor": "Rfixed_phase_A pa 0 10k",
+      "reason": "Fixed zero control: high current identically0, low current V(output)/10000"
+    },
+    "phase_B": {
+      "removed_high": "Bpbhi",
+      "replaced_low": "Bpblo",
+      "new_resistor": "Rfixed_phase_B pb 0 10k",
+      "reason": "Fixed zero control: high current identically0, low current V(output)/10000"
+    }
+  },
+  "removed_probes": [
+    "Vsupervisor_reset",
+    "Vsupervisor_driver",
+    "Vphase"
+  ],
+  "unchanged": "All TCAD expressions, geometry, clock, DFF, proxy, driver/electrode/Pt-return, storage, ramp, solver and duration",
+  "duration_s": 0.00025,
+  "max_step_s": 2.5e-08,
+  "caveat": "Equivalent terminal equations do not imply identical numerical conditioning or establish an abort root cause",
+  "source_dependency_sha256": {
+    "examples/microrobot/tcad_passive_clamps.py": "09187a42e434f56233e42ae9e17e25d790f9827545ef31397be1f97d229eb3b4",
+    "tests/integration/test_tcad_passive_clamps.py": "e69527f8d9f1406445c36a88970028a3851e62259e025952b16bc99ea3c46704",
+    "examples/microrobot/tcad_actuator_startup.py": "cc3d0c4ba1e9a49a26ae6a9f390f3e8531ec29f1d82ad2cfd8b58d2265513cf1",
+    "examples/microrobot/tcad_logic_isolation.py": "b9163b60f0ebbdcf30e5131fed9d35fca56825d7f001834e70e129c609faa035",
+    "examples/microrobot/tcad_controller.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4"
+  }
+}

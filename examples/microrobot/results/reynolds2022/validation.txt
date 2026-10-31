@@ -1,0 +1,207 @@
+Reynolds 2022 local-data closure validation
+UTC timestamp: 2026-10-30T14:26:54.175171+00:00
+Working directory: /Users/abhineet/Documents/opentcad_final
+
+Accepted post-freeze checkpoint
+Command: MPLCONFIGDIR=/tmp/opentcad-reynolds-mpl-cache .venv/bin/python -m pytest -q -ra > /tmp/opentcad-reynolds-post-freeze-pytest.log 2>&1
+Exit code: 0
+Result: 239 passed, 0 skipped, 0 failed, 0 errors, 1 warning in 97.93 seconds.
+The 19 new loader tests include archive-marker and existing-file preservation.
+Warning: pre-existing test_recombination_models.py:85 scalar divide in diagnostic text.
+
+Earlier pre-guard checkpoint (NOT accepted)
+Command: MPLCONFIGDIR=/tmp/opentcad-reynolds-mpl-cache .venv/bin/python -m pytest -q -ra > /tmp/opentcad-reynolds-full-pytest.log 2>&1
+Interrupted to freeze the requested preservation guard. Exit code: 2.
+Partial result: 122 passed, 1 warning in 40.85 seconds; KeyboardInterrupt.
+The complete post-freeze run above supersedes this partial attempt.
+
+Formatting checks after the guard was frozen
+.venv/bin/ruff check examples/microrobot/reynolds_data.py tests/integration/test_reynolds_data.py
+Result: All checks passed (exit 0).
+.venv/bin/ruff format --check examples/microrobot/reynolds_data.py tests/integration/test_reynolds_data.py
+Result: 2 files already formatted (exit 0).
+
+Scope
+Accepted numeric report and both figures were not regenerated. The sole module
+change after accepted analysis adds rejection of nonempty output directories
+and existing file destinations, before data loading/writes. Removing exactly
+that guard reproduces the original accepted analysis SHA256. The JSON retains
+its original executed-code hash; current workflow hash is recorded separately.
+Sources were read only; no new fit, default-model update, archived application
+simulation refresh, submission-bundle refresh, push or publication occurred.
+The full suite includes its existing native/device, small SPICE fixtures and
+isolated temporary export test. The named frozen bundle was checked read only,
+not rebuilt; no archived application/transient results were refreshed.
+Repository user work was preserved; no claim of a clean git working tree.
+The files' user-claimed Zenodo identity/license remains independently unverified.
+
+SHA256 evidence and independent audit comparisons
+{
+  "comparison_json_sha256": "0c9d924b7694f84b93ae700494a017b9f52932a130cececf73113d0550140dc9",
+  "audit_inventory_sha256": "26e6d95ff646cf14e8e1636bb82f16512f045207b12118cc453a9b6f241b777c",
+  "sources": {
+    "Fig3_PurcellBot.csv": {
+      "sha256": "701190d1410ef7bf0096aec793ed5935fa297297861e0cfb900f8ca22554e002",
+      "report_match": true,
+      "audit_match": true,
+      "size_matches": true,
+      "data_rows_match": true
+    },
+    "Fig4_PurcellBot.csv": {
+      "sha256": "b24a3ce6161d367a872b3edcc6ab2b2b9f9d2e302bbe5ad97f6cf13f690270de",
+      "report_match": true,
+      "audit_match": true,
+      "size_matches": true,
+      "data_rows_match": true
+    },
+    "Fig5_Dogbot.csv": {
+      "sha256": "bd65fa42919ee50473beb0517bda3bb650029167f9f1be344871ec547144e4fb",
+      "report_match": true,
+      "audit_match": true,
+      "size_matches": true,
+      "data_rows_match": true
+    },
+    "FigS2_CircuitTesting.csv": {
+      "sha256": "fe9899154837d6e3d02e33c5bdf6e59f4c4754f2ad017d4c2f45d62dd94eee02",
+      "report_match": true,
+      "audit_match": true,
+      "size_matches": true,
+      "data_rows_match": true
+    },
+    "FigS4_LEGO_purcell.csv": {
+      "sha256": "f2c30e5a1779f9e9eb90d3852782bd8d92cfeb84d48f54cbc28bd4b3ea491716",
+      "report_match": true,
+      "audit_match": true,
+      "size_matches": true,
+      "data_rows_match": true
+    },
+    "FigS6_DogbotCircuit.csv": {
+      "sha256": "d53e17cbac42ab6e70fd40f58de9cdd1ec23658640f32ed7c6502fbf9475a727",
+      "report_match": true,
+      "audit_match": true,
+      "size_matches": true,
+      "data_rows_match": true
+    }
+  },
+  "code": {
+    "accepted_analysis_sha256": "f9605c76cb23c5f917233facd6595bb9494a7ebc105d614af449aec6cc3ca19b",
+    "current_workflow_sha256": "12f10d9d9b6b1fc633677286df6e76039b85c6c81bca1abf3f939edb02f12f6b",
+    "sha_difference_explained": "Output-preservation guard added after the executed analysis; accepted JSON and plots deliberately not regenerated.",
+    "removing_only_preservation_guard_reproduces_accepted_analysis_sha256": true
+  },
+  "historical_fit": {
+    "sha256": "f9dae2a338d94e74282078f26b45561fa8e81d42bb289ec969a6275632918016",
+    "report_match": true
+  },
+  "frozen_bundle": {
+    "path": "/tmp/opentcad-m4-final-export-20261029",
+    "manifest_sha256": "c60070f2ecad816231e86dfd616f4cd81b9ca840297ff3ea7e77a2f42719c3ac",
+    "listed_files": 670,
+    "missing_files": [],
+    "mismatched_files": [],
+    "historical_fit_matches_current": true,
+    "raw_input_names_in_manifest": []
+  },
+  "default_file_comparison_to_frozen_bundle": {
+    "examples/microrobot/published.py": {
+      "current_sha256": "0408d623715efa4f72fffe677c835bab4bea6937e56751d024c6fdccd9ceed0f",
+      "frozen_manifest_sha256": "0408d623715efa4f72fffe677c835bab4bea6937e56751d024c6fdccd9ceed0f",
+      "matches_frozen": true
+    },
+    "examples/microrobot/pv.py": {
+      "current_sha256": "f22437cb90341a0bafa066f94a0d361584eb24d062a7abd4583f7b927202408e",
+      "frozen_manifest_sha256": "f22437cb90341a0bafa066f94a0d361584eb24d062a7abd4583f7b927202408e",
+      "matches_frozen": true
+    },
+    "examples/microrobot/run.py": {
+      "current_sha256": "5b26747f0562be97a18d4fb9c373c017cca06ebcfbfd58251cf58b772ceeb49b",
+      "frozen_manifest_sha256": "5b26747f0562be97a18d4fb9c373c017cca06ebcfbfd58251cf58b772ceeb49b",
+      "matches_frozen": true
+    },
+    "examples/microrobot/controller.py": {
+      "current_sha256": "28a0731b9270441e93c36093e5f5c4fb0ae65a71014e9527a87c89b095469f41",
+      "frozen_manifest_sha256": "b893b2cd7bc1106b3454b5eeadbd8054b9d90ba9019264b84713635a751b00e8",
+      "matches_frozen": false,
+      "limitation": "Repository work differs from the frozen export; this loader task did not edit it. Preserve existing work; do not infer an all-default-files match."
+    },
+    "examples/microrobot/microrobot.ipynb": {
+      "current_sha256": "b0e83f2da7208099be02794697ee97517696eaa734c366c34585f31482d04a73",
+      "frozen_manifest_sha256": null,
+      "matches_frozen": false,
+      "limitation": "Export relocates this notebook to its root and rewrites markdown; same-path manifest entry is absent. No change conclusion from this check."
+    },
+    "opentcad/device/compact.py": {
+      "current_sha256": "e7e6b55bf39ebf5c8243e3b0fd6783a045a7f383c3add970db582e6e6f9fc0c7",
+      "frozen_manifest_sha256": "e7e6b55bf39ebf5c8243e3b0fd6783a045a7f383c3add970db582e6e6f9fc0c7",
+      "matches_frozen": true
+    }
+  },
+  "audit_group_matches": {
+    "checked_groups": 16,
+    "all_match": true
+  },
+  "accepted_artifact_sha256": {
+    "comparison.json": "0c9d924b7694f84b93ae700494a017b9f52932a130cececf73113d0550140dc9",
+    "pv_comparison.png": "1eb11ee8c611da2f8d921721aff8d71e1ee9dfbf38854fd2dbb60cb934316eee",
+    "dataset_overview.png": "a8fc9d99d9bd38d3cec60d10cb5264438b9183e044a45b5615b6e2387f313a46"
+  },
+  "post_pytest_hash_recheck": {
+    "all_six_sources_unchanged": true,
+    "accepted_json_and_both_figures_unchanged": true,
+    "current_guard_workflow_unchanged": true,
+    "historical_fit_unchanged": true,
+    "frozen_bundle_manifest_unchanged": true,
+    "all_670_bundle_files_still_match": true
+  }
+}
+Full post-freeze pytest output
+============================= test session starts ==============================
+platform darwin -- Python 3.14.2, pytest-9.0.3, pluggy-1.6.0
+rootdir: /Users/abhineet/Documents/opentcad_final
+configfile: pyproject.toml
+testpaths: tests
+plugins: cov-7.1.0
+collected 239 items
+
+tests/bridge/test_field_interpolator.py .....                            [  2%]
+tests/device/test_bgn.py .....                                           [  4%]
+tests/device/test_compact_pv.py ....                                     [  5%]
+tests/device/test_cv_sweep.py .                                          [  6%]
+tests/device/test_lombardi.py ....                                       [  7%]
+tests/device/test_mobility_models.py ........                            [ 11%]
+tests/device/test_mos_capacitor.py .                                     [ 11%]
+tests/device/test_nmos_idvg.py .                                         [ 12%]
+tests/device/test_optical.py ..........                                  [ 16%]
+tests/device/test_oxide_charge.py ...                                    [ 17%]
+tests/device/test_pn_junction_integration.py .                           [ 17%]
+tests/device/test_recombination_models.py .....                          [ 20%]
+tests/device/test_schottky.py ...                                        [ 21%]
+tests/device/test_solver_api.py ...                                      [ 22%]
+tests/device/test_statistics.py .....                                    [ 24%]
+tests/geometry/test_formats.py ........                                  [ 28%]
+tests/geometry/test_mesh.py ....                                         [ 29%]
+tests/integration/test_clock_completion.py ..............                [ 35%]
+tests/integration/test_controller_events.py ............................ [ 47%]
+...                                                                      [ 48%]
+tests/integration/test_electrode_spice.py ..                             [ 49%]
+tests/integration/test_layout_edge_audit.py ..                           [ 50%]
+tests/integration/test_microrobot.py .....                               [ 52%]
+tests/integration/test_phase_generator.py .                              [ 52%]
+tests/integration/test_reynolds_data.py ...................              [ 60%]
+tests/integration/test_submission_bundle.py .                            [ 61%]
+tests/materials/test_database.py ......                                  [ 63%]
+tests/process/test_anneal.py ...............                             [ 69%]
+tests/process/test_dispatch.py .........                                 [ 73%]
+tests/process/test_implant.py .....................                      [ 82%]
+tests/process/test_oxidation.py ................                         [ 89%]
+tests/process/test_selectivity.py ...........                            [ 93%]
+tests/process/test_topography_smoke.py ...............                   [100%]
+
+=============================== warnings summary ===============================
+tests/device/test_recombination_models.py::test_auger_dominates_at_high_carrier_density
+  /Users/abhineet/Documents/opentcad_final/tests/device/test_recombination_models.py:85: RuntimeWarning: invalid value encountered in scalar divide
+    f"|Auger/SRH| = {abs(u_aug/u_srh):.2e}")
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+================== 239 passed, 1 warning in 97.93s (0:01:37) ===================
+

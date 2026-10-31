@@ -1,0 +1,159 @@
+{
+  "schema_version": 1,
+  "audit_date": "2026-10-31",
+  "scope": "Targeted PV structure source audit; no new fit, model, solver, or simulation",
+  "sources": [
+    {
+      "id": "R22",
+      "local_path": "/private/tmp/pv-structure-audit/reynolds2022.pdf",
+      "source_url": "https://mceuengroup.lassp.cornell.edu/sites/mceuen/files/publications/scirobotics.abq2296.pdf",
+      "size_bytes": 1457149,
+      "sha256": "4e9a538f61d01ddd80d7c45cf117dc9e25f8b49e9e87b07438123e8ad4f6022f",
+      "pdf_pages": 12,
+      "text_extraction": "Poppler pdftotext -layout; complete extracted text scanned for PV/process/optical inputs",
+      "visually_inspected_complete_pdf_pages_1based": [
+        3
+      ],
+      "relevant_locators": [
+        "pp. 1-3; Fig. 1",
+        "p. 6 Circuit design",
+        "pp. 7-8 Circuit testing",
+        "p. 8 Robot manipulation and operation",
+        "p. 10 ref. 41"
+      ]
+    },
+    {
+      "id": "R22-SM",
+      "local_path": "/Users/abhineet/Documents/opentcad_final/examples/microrobot/local_references/scirobotics.abq2296_sm.pdf",
+      "source_url": "https://www.science.org/doi/suppl/10.1126/scirobotics.abq2296/suppl_file/scirobotics.abq2296_sm.pdf",
+      "size_bytes": 3575075,
+      "sha256": "43138926560d636d64845f7f708ba6026e26446f79df2962cc8e1355ed6b9fd4",
+      "pdf_pages": 13,
+      "text_extraction": "Poppler pdftotext -layout; complete extracted text scanned for PV/process/optical inputs",
+      "visually_inspected_complete_pdf_pages_1based": [
+        7,
+        8,
+        9
+      ],
+      "relevant_locators": [
+        "pp. 2-6 Fabrication Process, steps 1-23",
+        "p. 7 Fig. S1",
+        "p. 8 Fig. S2",
+        "p. 9 Fig. S3"
+      ]
+    },
+    {
+      "id": "M20",
+      "local_path": "/Users/abhineet/Downloads/s41586-020-2626-9.pdf",
+      "source_url": "https://doi.org/10.1038/s41586-020-2626-9",
+      "size_bytes": 9206772,
+      "sha256": "00b896c45a2a60dfa87ab3ea7bd3fba4c191a04b2c514e0e6b69bf9443c8e1db",
+      "pdf_pages": 15,
+      "text_extraction": "Poppler pdftotext -layout; complete extracted text scanned for PV/process/optical inputs",
+      "visually_inspected_complete_pdf_pages_1based": [
+        6,
+        14
+      ],
+      "relevant_locators": [
+        "p. 3 Fig. 3",
+        "p. 6 Methods: Microrobot fabrication protocol",
+        "p. 14 Extended Data Fig. 6"
+      ]
+    },
+    {
+      "id": "X22",
+      "local_path": "/Users/abhineet/Downloads/a-210x340-1.pdf",
+      "source_url": null,
+      "size_bytes": 971308,
+      "sha256": "b553e4c64f39f10131bffe3fa552137166af31c2771da11466a0a8a9e3fbd8f3",
+      "pdf_pages": 3,
+      "text_extraction": "Poppler pdftotext -layout; complete extracted text scanned for PV/process/optical inputs",
+      "visually_inspected_complete_pdf_pages_1based": [
+        2
+      ],
+      "relevant_locators": [
+        "PDF p. 1 / printed p. 194",
+        "PDF p. 2 / printed p. 195 Figs. 12.1.2-12.1.3"
+      ]
+    }
+  ],
+  "additional_primary_web_sources": [
+    {
+      "id": "C20",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7196798/",
+      "doi": "10.1073/pnas.1919677117",
+      "inspected_sections": [
+        "Results and Discussion: Fig. 2 and junction formation",
+        "Materials and Methods"
+      ],
+      "status": "Primary article HTML read; separate SI not retrieved"
+    },
+    {
+      "id": "XFAB-current",
+      "url": "https://www.xfab.com/xt018",
+      "inspected_sections": [
+        "Platform description and SOI/DTI/BOX statements"
+      ],
+      "transferability": "Current platform description does not identify 2022 robot process options or PV cross-section"
+    }
+  ],
+  "access_gaps": [
+    {
+      "source": "M20 protocol ref. 41",
+      "doi": "10.21203/rs.3.pex-1012/v1",
+      "urls_attempted": [
+        "https://doi.org/10.21203/rs.3.pex-1012/v1",
+        "https://protocolexchange.researchsquare.com/article/pex-1012/v1"
+      ],
+      "outcome": "Web tool fetch failures; protocol not inspected"
+    },
+    {
+      "source": "C20 SI Appendix",
+      "urls_attempted": [
+        "https://www.pnas.org/lookup/suppl/doi%3A10.1073/pnas.1919677117/-/DCSupplemental",
+        "https://pmc.ncbi.nlm.nih.gov/articles/instance/7196798/bin/pnas.1919677117.sapp.pdf"
+      ],
+      "outcome": "Web tool fetch failures; SI not inspected"
+    },
+    {
+      "source": "M20 separate SI",
+      "outcome": "No separate SI/protocol PDF located in targeted local inventory; main article includes Methods and Extended Data"
+    }
+  ],
+  "identity_checks": {
+    "downloads_and_local_2022_supplement_sha256_equal": true,
+    "R22_main_matches_prior_reference_hash": true,
+    "M20_matches_prior_reference_hash": true
+  },
+  "unresolved_R22_numeric_inputs": [
+    "PV junction topology/polarity and activated dopant profiles",
+    "device-Si and BOX thickness",
+    "localized semiconductor contacts and recombination",
+    "540 um2 area definition, optical aperture and shading",
+    "final PV optical stack and R/T/EQE",
+    "S2E individually tagged wavelength, temperature and acquisition metadata",
+    "logic-cell dimensions/IV and validity of 150/540 scaling"
+  ],
+  "execution": {
+    "tools": [
+      "pdftotext",
+      "pdftoppm",
+      "pdfinfo",
+      "Python stdlib hashlib/json/pathlib",
+      "primary-source web tools"
+    ],
+    "simulation_executed": false,
+    "raw_measurements_refit": false,
+    "source_files_modified": false,
+    "new_outputs": [
+      "examples/microrobot/data/PV_STRUCTURE_EVIDENCE.md",
+      "examples/microrobot/data/pv_structure_provenance.json"
+    ],
+    "temporary_directory": "/tmp/pv-structure-audit",
+    "limitations": [
+      "pypdf missing from existing .venv; Poppler used successfully",
+      "Some renders emitted fontconfig cache warnings; inspected images legible",
+      "Initial sandbox R22 download failed DNS; approved escalated curl retry completed"
+    ]
+  }
+}

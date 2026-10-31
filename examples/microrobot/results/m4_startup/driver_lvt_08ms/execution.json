@@ -1,0 +1,9 @@
+{
+  "scope": "Exploratory final-LVT-pulldown AND-qualified driver-ready control; no startup acceptance",
+  "actual_stop_s": 0.0008,
+  "rows": 20491,
+  "wall_s": 134.1665654160024,
+  "netlist_sha256": "373004e5aa852674d2a1ebfe36a6279c22d009b58c07c74c36dff9becdfd4896",
+  "physical_change": "Same six-FET AND qualifier; only final output pulldown model changes to existing LVT NFET at.42/1; real driver gate load retained",
+  "energy_method": "offline adaptive branch powers; separate Vdriverbuffer actuator feed; no auxiliary energy states"
+}

@@ -151,7 +151,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--pdf", type=Path, help="Re-extract from the supplied PDF instead of CSV")
     parser.add_argument("--csv", type=Path, default=HERE / "data/s2e_digitized.csv")
-    parser.add_argument("--output", type=Path, default=HERE / "results/published")
+    parser.add_argument("--output", type=Path, default=HERE / "local_runs/published")
     args = parser.parse_args()
     _, report = extract(args.pdf, args.output) if args.pdf else fit_digitized(args.csv, args.output)
     print(json.dumps({k: report[k] for k in ("fitted_terminal_model", "fit_metrics",

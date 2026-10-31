@@ -1,0 +1,13 @@
+{
+  "README.md": "f7791a20ce034c7419cf342f47c31f7d90dabdffdfc1315645526371f33825d4",
+  "configuration.json": "52ffb86b57567ad3c702a3b599224f5cdea4932aa472a46b60b296e41268366a",
+  "execution.json": "64c656ddbdc716b19c89056e5aa9d20b675cfddb1b4bb0416059cb751086aa05",
+  "execution_counts.json": "cda4bed6cba6239f61d2e1720d6dfe3b7baf6dabd7c50334331ad932d1bb0e25",
+  "local_waveform_hashes.json": "0c628669c97b4b71d6984c8490ff58ce181f0925bdfda03239d707e4f4ffeeb1",
+  "metrics.json": "47a81a1b241eb4b363c0834a00ab46b1ecb3bfee65896c9d10919211a00944d5",
+  "ngspice.log": "f1864aa7077b44848e8a633eded6c26df68e2ceb3ad927e406dec25767c1027c",
+  "replay_template.spice": "9a41d6191c53c6cc186cf68195be06a9cfbc840becb4190a021e959bf11b82c5",
+  "runner_as_executed.py": "35c113e677a1aa7140155dad8d25c12134195d0016725ff87ec284c569b47234",
+  "status.json": "8695614ee2922cd254b479d022d01b2f26506bbc024ff781d84d2afacc54d206",
+  "verification.json": "cb198a3929b73fdebab141abf4c62df241d996f1e1aa87fbe9f2b88044929610"
+}

@@ -1,0 +1,224 @@
+{
+  "port_definitions": {
+    "logic": "v(logic)*i(Vlogic):load-port delivery AFTER2pFClogic onlogic_raw; positive darkenergy cancome fromstorage,NOT photogeneratedPVenergy",
+    "actuator": "mid*i(Vpvlo)+(act-mid)*i(Vpvhi):sum signed PVterminal-port deliveries BEFORE the two1pFrail stores; not incidentopticalenergy",
+    "clock_firstff_proxy_resetlogic": "Individual logic-load branch deliveries; components within logicloadport",
+    "monitor_resetact_driverbuffer": "Individual actuator-domain load deliveries; components within actuatorPVterminalport, do NOT add again",
+    "phase": "Actual independent pa_source/pb_source terminal voltages times Vpa/Vpb currents, including10k\u03a9seriesloss"
+  },
+  "windows": {
+    "initial_protocol": {
+      "requested_interval_s": [
+        0,
+        0.0016
+      ],
+      "observed": true,
+      "complete": true,
+      "actual_interval_s": [
+        0,
+        0.0016
+      ],
+      "signed_port_energy_nJ": {
+        "logic": 0.040898984169329765,
+        "actuator": 0.07053245561534957,
+        "clock": 0.039108216372591424,
+        "firstff": 0.0009287735169098995,
+        "proxy": 0.0007600790172431685,
+        "resetlogic": 6.586077732182074e-05,
+        "monitor": 0.039278130365132696,
+        "phase": 1.1598707891957026e-05,
+        "resetact": 5.428538533605571e-05,
+        "driverbuffer": 9.071656260819892e-05
+      },
+      "known_supply_storage_change_nJ": {
+        "logic2pF": 0.002584848358093249,
+        "act_lower1pF": 0.00011549079928485124,
+        "act_upper1pF": 0.00011519630834957573
+      }
+    },
+    "dark_hold": {
+      "requested_interval_s": [
+        0.0016,
+        0.0031
+      ],
+      "observed": true,
+      "complete": false,
+      "actual_interval_s": [
+        0.0016,
+        0.0022
+      ],
+      "signed_port_energy_nJ": {
+        "logic": 0.0008904059006822676,
+        "actuator": -0.00010589189965136685,
+        "clock": 0.0008743261880935235,
+        "firstff": 3.4490789715344994e-05,
+        "proxy": -1.0855011414296668e-05,
+        "resetlogic": -4.5489392785705285e-06,
+        "monitor": 0.0007732139512915762,
+        "phase": -3.5899616591703306e-06,
+        "resetact": 4.098355781838674e-07,
+        "driverbuffer": -2.519165835517757e-06
+      },
+      "known_supply_storage_change_nJ": {
+        "logic2pF": -0.001048280608787559,
+        "act_lower1pF": -4.252077171605714e-05,
+        "act_upper1pF": -4.3180884293593066e-05
+      }
+    },
+    "recovery": {
+      "requested_interval_s": [
+        0.0031,
+        0.0045
+      ],
+      "observed": false,
+      "complete": false,
+      "actual_interval_s": null,
+      "signed_port_energy_nJ": null,
+      "known_supply_storage_change_nJ": null
+    },
+    "initial_zero": {
+      "requested_interval_s": [
+        0,
+        0.0001
+      ],
+      "observed": true,
+      "complete": true,
+      "actual_interval_s": [
+        0,
+        0.0001
+      ],
+      "signed_port_energy_nJ": {
+        "logic": -1.3260770076684811e-33,
+        "actuator": -1.1319139976208223e-36,
+        "clock": -1.1987884115610458e-33,
+        "firstff": 7.061004096520063e-36,
+        "proxy": -3.2601883274224e-36,
+        "resetlogic": -1.223568942002678e-34,
+        "monitor": 9.317324674990667e-33,
+        "phase": 0.0,
+        "resetact": 1.9763255890911315e-34,
+        "driverbuffer": -1.442612584909611e-34
+      },
+      "known_supply_storage_change_nJ": {
+        "logic2pF": 6.829313256117585e-34,
+        "act_lower1pF": 1.1310745116673249e-33,
+        "act_upper1pF": 9.611723441238374e-33
+      }
+    },
+    "initial_light_ramp": {
+      "requested_interval_s": [
+        0.0001,
+        0.001
+      ],
+      "observed": true,
+      "complete": true,
+      "actual_interval_s": [
+        0.0001,
+        0.001
+      ],
+      "signed_port_energy_nJ": {
+        "logic": 0.016357831384520946,
+        "actuator": 0.03565875829122204,
+        "clock": 0.015595249580023847,
+        "firstff": 0.00037554479852570775,
+        "proxy": 0.00028421623174330034,
+        "resetlogic": 6.718840836398772e-05,
+        "monitor": 0.015225153792008688,
+        "phase": 1.4013881257112432e-05,
+        "resetact": 5.3436408757759385e-05,
+        "driverbuffer": 9.549217568001815e-05
+      },
+      "known_supply_storage_change_nJ": {
+        "logic2pF": 0.003285085744128303,
+        "act_lower1pF": 0.00018314535790329677,
+        "act_upper1pF": 0.00018311588489656978
+      }
+    },
+    "initial_full_light": {
+      "requested_interval_s": [
+        0.001,
+        0.0015
+      ],
+      "observed": true,
+      "complete": true,
+      "actual_interval_s": [
+        0.001,
+        0.0015
+      ],
+      "signed_port_energy_nJ": {
+        "logic": 0.02167532417722111,
+        "actuator": 0.031479207768575365,
+        "clock": 0.020755624821989307,
+        "firstff": 0.0004855429145367567,
+        "proxy": 0.0004283805161031167,
+        "resetlogic": 2.2235962776561906e-06,
+        "monitor": 0.02138204643853025,
+        "phase": 1.324781468342421e-07,
+        "resetact": 7.504263594583071e-07,
+        "driverbuffer": 2.7062627747161122e-06
+      },
+      "known_supply_storage_change_nJ": {
+        "logic2pF": 3.712005465114545e-05,
+        "act_lower1pF": 2.096054995895223e-06,
+        "act_upper1pF": 2.113374219438923e-06
+      }
+    },
+    "light_fall": {
+      "requested_interval_s": [
+        0.0015,
+        0.0016
+      ],
+      "observed": true,
+      "complete": true,
+      "actual_interval_s": [
+        0.0015,
+        0.0016
+      ],
+      "signed_port_energy_nJ": {
+        "logic": 0.0028658286075877015,
+        "actuator": 0.003394489555552165,
+        "clock": 0.0027573419705782696,
+        "firstff": 6.76858038474352e-05,
+        "proxy": 4.7482269396751425e-05,
+        "resetlogic": -3.5512273198231577e-06,
+        "monitor": 0.0026709301345937634,
+        "phase": -2.5476515119896493e-06,
+        "resetact": 9.855021883801713e-08,
+        "driverbuffer": -7.481875846535333e-06
+      },
+      "known_supply_storage_change_nJ": {
+        "logic2pF": -0.0007373574406861995,
+        "act_lower1pF": -6.975061361434075e-05,
+        "act_upper1pF": -7.003295076643297e-05
+      }
+    },
+    "relight_ramp": {
+      "requested_interval_s": [
+        0.0031,
+        0.004
+      ],
+      "observed": false,
+      "complete": false,
+      "actual_interval_s": null,
+      "signed_port_energy_nJ": null,
+      "known_supply_storage_change_nJ": null
+    },
+    "final_full_light": {
+      "requested_interval_s": [
+        0.004,
+        0.0045
+      ],
+      "observed": false,
+      "complete": false,
+      "actual_interval_s": null,
+      "signed_port_energy_nJ": null,
+      "known_supply_storage_change_nJ": null
+    }
+  },
+  "caveats": [
+    "Signed charge return retained",
+    "Storage\u0394E covers onlyknown2pFlogic+two1pFactuator capacitors; notfullenergyclosure",
+    "Electrode/PDKcaps, chemicaladsorptionwork, biasstorage andotherports notall included in knownstorage\u0394E",
+    "Small signedcurrent-cancellation residuals andfastedge quadrature are not converged precision; no25nscomparison available"
+  ]
+}

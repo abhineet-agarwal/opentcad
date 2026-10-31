@@ -1,0 +1,22 @@
+* OpenTCAD microrobot interface experiment
+.lib /usr/local/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice tt
+.temp 26.85
+
+Vact act 0 1.2
+Vinput raw 0 PWL(0 0 20u 0 120u 1.7 160u 1.7 260u 0 300u 0)
+* Exploratory small actuator-powered input inverter + ordinary output inverter.
+Xip ib raw act act sky130_fd_pr__pfet_01v8 w=.42 l=1
+Xin ib raw 0 0 sky130_fd_pr__nfet_01v8 w=.42 l=1
+Xop out ib act act sky130_fd_pr__pfet_01v8 w=.84 l=1
+Xon out ib 0 0 sky130_fd_pr__nfet_01v8 w=.42 l=1
+* Two-driver gate-only approximation, no full driver or native DFF.
+Cload out 0 .19p
+.options method=gear maxord=2 reltol=1e-6 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+tran 50n 300u 0 50n
+wrdata receiver.dat v(raw) v(out) v(ib) i(Vact) i(Vinput)
+quit
+.endc
+.end

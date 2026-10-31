@@ -45,6 +45,7 @@ class Parameters:
     mechanical_tau_s: float = 0.05
     curvature_span_m_inv: float = 1e5
     hinge_length_um: float = 10
+    actuator_series_cells_per_half: int = 1
 
 
 def illumination(t):
@@ -71,6 +72,8 @@ def simulate(table: PVTable, *, dt_s=0.001, duration_s=6.0, p=Parameters(),
     """
     if dt_s <= 0 or duration_s <= 0 or light_scale < 0 or faradaic_scale <= 0:
         raise ValueError("Positive time/leakage parameters and non-negative light required")
+    if not isinstance(p.actuator_series_cells_per_half, int) or p.actuator_series_cells_per_half < 1:
+        raise ValueError("Actuator series-cell count must be a positive integer")
     t = np.arange(round(duration_s / dt_s) + 1) * dt_s
     names = ("logic_V", "positive_V", "negative_magnitude_V", "phase_cycles",
              "drive_A_V", "drive_B_V", "eta_A_V", "eta_B_V", "eta_return_V",
@@ -78,12 +81,14 @@ def simulate(table: PVTable, *, dt_s=0.001, duration_s=6.0, p=Parameters(),
              "curvature_B_m_inv", "current_A_A", "current_B_A", "enabled",
              "bias_W", "logic_W", "driver_W", "electrolyte_W", "faradaic_W",
              "interface_W", "adsorption_W", "actuator_PV_W", "logic_PV_W", "storage_J",
-             "phase_Hz")
+             "phase_Hz", "theta_return", "current_return_A", "electrolyte_KCL_A")
     out = {name: np.zeros(len(t)) for name in names}
     vlogic = vp = vn = phase = 0.0
     enabled = False
     eta = np.zeros(3)
     theta = np.full(3, 0.5)
+    for name in ("theta_A", "theta_B", "theta_return"):
+        out[name][0] = 0.5
     kappa = np.zeros(2)
     areas = np.array([p.actuator_area_um2] * 2 + [p.return_area_um2]) * 1e-12
     cap = areas * p.double_layer_F_m2
@@ -153,9 +158,9 @@ def simulate(table: PVTable, *, dt_s=0.001, duration_s=6.0, p=Parameters(),
         ip = float(current[:2][high].sum()) if enabled else 0.0
         im = float(-current[:2][~high].sum()) if enabled else 0.0
         vp = advance_supply(vp, p.actuator_storage_each_F, p.actuator_cell_area_um2,
-                            1, lambda v: ip, light)
+                            p.actuator_series_cells_per_half, lambda v: ip, light)
         vn = advance_supply(vn, p.actuator_storage_each_F, p.actuator_cell_area_um2,
-                            1, lambda v: im, light)
+                            p.actuator_series_cells_per_half, lambda v: im, light)
 
         theta = new_theta
         kappa = (p.curvature_span_m_inv * (theta[:2] - 0.5) * (1 - mechanical_decay)
@@ -174,11 +179,11 @@ def simulate(table: PVTable, *, dt_s=0.001, duration_s=6.0, p=Parameters(),
                   np.dot(current[:2], current[:2]) * p.solution_each_ohm
                   + current[2]**2 * p.solution_return_ohm,
                   np.sum(eta**2 / rf), np.dot(eta, current), np.dot(eta, adsorption_A),
-                  table.current(vp, light, p.actuator_cell_area_um2) * vp
-                  + table.current(vn, light, p.actuator_cell_area_um2) * vn,
+                  table.current(vp / p.actuator_series_cells_per_half, light, p.actuator_cell_area_um2) * vp
+                  + table.current(vn / p.actuator_series_cells_per_half, light, p.actuator_cell_area_um2) * vn,
                   table.current(vlogic / p.logic_series_cells, light,
                                 p.logic_cell_area_um2) * vlogic,
-                  storage, clock / p.divider)
+                  storage, clock / p.divider, theta[2], current[2], current.sum())
         for name, value in zip(names, values, strict=True):
             out[name][j] = value
     out["time_s"] = t

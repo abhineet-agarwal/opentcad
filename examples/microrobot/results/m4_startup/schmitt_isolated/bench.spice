@@ -1,0 +1,31 @@
+* OpenTCAD microrobot interface experiment
+.lib /usr/local/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice tt
+.temp 26.85
+.subckt receiver raw_reset reset_n vlogic vss
+Xsp_top p_mid raw_reset vlogic vlogic sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xsp_out reset_b raw_reset p_mid vlogic sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xsn_out reset_b raw_reset n_mid vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xsn_bottom n_mid raw_reset vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xsn_feedback vlogic reset_b n_mid vss sky130_fd_pr__nfet_01v8 w=0.42 l=2
+Xsp_feedback vss reset_b p_mid vlogic sky130_fd_pr__pfet_01v8 w=0.84 l=2
+* Final noninverting polarity relative to raw_reset, shared load driver.
+Xoutp reset_n reset_b vlogic vlogic sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xoutn reset_n reset_b vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+.ends receiver
+
+Vlogic logic 0 1.7
+Vinput raw 0 PWL(0 0 20u 0 120u 1.7 160u 1.7 260u 0 300u 0)
+Xr raw reset logic 0 receiver
+* .19pF approximate unchanged two-driver gate load + .05pF UNCHARACTERIZED
+* nativeDFFreset load placeholder. No actual DFF or driver power represented.
+Cdriver reset 0 .19p
+Creset reset 0 .05p
+.options method=gear maxord=2 reltol=1e-6 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+tran 50n 300u 0 50n
+wrdata receiver.dat v(raw) v(reset) v(xr.reset_b) v(xr.p_mid) v(xr.n_mid) i(Vlogic) i(Vinput)
+quit
+.endc
+.end

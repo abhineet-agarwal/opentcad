@@ -1,0 +1,79 @@
+{
+  "scope": "Actual early finitePV startup; no assumption of functioning CMOS at subthreshold rails",
+  "early0to0p4ms": {
+    "ea": {
+      "peak_midpoint_error_V": 0.0034220189999999984,
+      "time_s": 0.000171584721,
+      "logic_V": 0.0549622717,
+      "actuator_V": 0.704958145,
+      "native_reset_V": 0.197239068,
+      "monitor_ready_V": 0.127725282,
+      "driver_ready_V": 0.000231936126,
+      "nand_b_V": 0.49620071,
+      "metal_V": 0.357127501,
+      "mid_V": 0.353705482,
+      "eta_range_V": [
+        -3.5970000000218327e-06,
+        2.149700000009247e-05
+      ]
+    },
+    "eb": {
+      "peak_midpoint_error_V": 0.0034220189999999984,
+      "time_s": 0.000171584721,
+      "logic_V": 0.0549622717,
+      "actuator_V": 0.704958145,
+      "native_reset_V": 0.197239068,
+      "monitor_ready_V": 0.127725282,
+      "driver_ready_V": 0.000231936126,
+      "nand_b_V": 0.49620071,
+      "metal_V": 0.357127501,
+      "mid_V": 0.353705482,
+      "eta_range_V": [
+        -3.5969999999663216e-06,
+        2.149700000009247e-05
+      ]
+    }
+  },
+  "v(ready)": {
+    "ratio_range_logic_below1V_act_above0p1V": [
+      -3.57420214181703e-05,
+      0.44748749602384896
+    ],
+    "high50_time_range_s": null,
+    "absolute_max_0to0p4ms_V": 0.193423487
+  },
+  "v(driver_ready)": {
+    "ratio_range_logic_below1V_act_above0p1V": [
+      -1.630695584649024e-05,
+      0.8164006546826488
+    ],
+    "high50_time_range_s": [
+      0.000126025,
+      0.000156762754
+    ],
+    "absolute_max_0to0p4ms_V": 0.279270083
+  },
+  "v(xdriverbuffer.nand_b)": {
+    "ratio_range_logic_below1V_act_above0p1V": [
+      0.5933685832694866,
+      1.0000067375726145
+    ],
+    "high50_time_range_s": [
+      0.000126025,
+      0.000408277719
+    ],
+    "absolute_max_0to0p4ms_V": 1.1776938
+  },
+  "v(xdriverbuffer.series)": {
+    "ratio_range_logic_below1V_act_above0p1V": [
+      -0.06341342426459415,
+      0.17734191005567423
+    ],
+    "high50_time_range_s": null,
+    "absolute_max_0to0p4ms_V": 0.0433638445
+  },
+  "early_phase_max_V": {
+    "v(pa)": 0.0582751363,
+    "v(pb)": 1.11463222e-06
+  }
+}

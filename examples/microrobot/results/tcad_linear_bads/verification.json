@@ -1,0 +1,24 @@
+{
+  "tests": {
+    "passed": 2,
+    "seconds": 1.24,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "exact_single_line_reversal_verified": true,
+  "terminal_equivalence_verified": true,
+  "all_other_deck_lines_unchanged": true,
+  "complete_finite_0_to_250us": true,
+  "endpoint_labels": "Actual v(logic),v(act),v(mid),v(reset_n),v(driver_ready),v(pa),v(pb) used",
+  "counts": {
+    "transients": 1,
+    "fine": 0,
+    "rescue": 0,
+    "DC": 0,
+    "DD": 0,
+    "layout": 0
+  },
+  "raw_exported": false,
+  "scope": "Linear behavioral-source held-input control only; no unique cause, simulator-defect or released-actuation conclusion",
+  "review_acceptance": "Reviewed and accepted as linear behavioral-source held-input startup evidence; nonlinear and released actuation remain unvalidated."
+}

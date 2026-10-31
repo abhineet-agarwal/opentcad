@@ -1,0 +1,16 @@
+--- passive_adsorption
++++ nonlinear_series_adsorption
+@@ -1311,11 +1311,11 @@
+ * eta = metal minus local solution voltage; unknown absolute Ag/AgCl offset.
+ * theta is a dimensionless coverage encoded as a numerical voltage (1 V = 1).
+ * Cdl, adsorption charge and Faradaic leakage are separate terminal currents.
+-* Linearized at eta=offset=0, theta0=0.5; third pin is now physical Cads node.
++* Nonlinear series adsorption; u=V(adsnode,solution)=4width*(theta-0.5).
+ .subckt micro_electrode metal solution adsnode params: cdl=40p qmax=260p tau=20m rf=10g width=0.08 offset=0
+ Cdouble metal solution {cdl}
+ Rfaradaic metal solution {rf}
+-Rads metal adsnode {tau*4*width/qmax}
++Bads_series metal adsnode I={qmax/(4*width*tau)*(2*width*tanh((v(metal,solution)-offset)/(2*width))-v(adsnode,solution))}
+ Cads adsnode solution {qmax/(4*width)}
+ .ends micro_electrode
+ 

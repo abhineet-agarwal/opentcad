@@ -1,0 +1,14 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.14.2, pytest-9.0.3, pluggy-1.6.0
+rootdir: /Users/abhineet/Documents/opentcad_final
+configfile: pyproject.toml
+plugins: cov-7.1.0
+collected 58 items
+
+tests/integration/test_pv_calibration.py .........                       [ 15%]
+tests/integration/test_microrobot.py .....                               [ 24%]
+tests/integration/test_reynolds_data.py ...................              [ 56%]
+tests/integration/test_reynolds_fit.py ...............                   [ 82%]
+tests/device/test_optical.py ..........                                  [100%]
+
+============================== 58 passed in 5.47s ==============================

@@ -1,0 +1,17 @@
+{
+  "README.md": "cb68873f6d90521db3ebd8c67d1baad5fe331c277854a1ae906124acf9a0cedc",
+  "configuration.json": "0cf336daa1e622c44bf5bcd9b7e0570391fdea12041497d0176255fddea6ee18",
+  "execution.json": "6843e0397b3079825eb611cd4a7a3c1a5d296c21094021e7c5f58fd35e2ea9bf",
+  "execution_counts.json": "f82f997cc9cb56872b191db663f8fba95bf2571fb400d605becbd2bbf06d6290",
+  "feedback_template.spice": "9b48b749d8b41cd4f07bed234febfcc729e04ab0be9bed8d9e2be0ca90918d23",
+  "metrics.json": "90a4695b2cd241ac4b60e1d3a789b62bc33a286b535a6dc8fe65a245bed64455",
+  "ngspice.log": "9cb92c16585844bf904755bffd11a93e4a8de05f2348436f40cb1b44a8cda407",
+  "no_analysis_options.log": "6f69e0fe68a63f873b2d835fbee1c6ed9882fa041bab12caf2718b1b3ccff18b",
+  "no_analysis_options.spice": "15e78ccc7d1b0e90086ce0030272f72512dc0ca8b36b06b2b3f622c9ad6526ef",
+  "numerical_conventions.md": "8fc4c5e9c77d0149b7f68cf7526944e067d62bc9e479b969ed2f63da63fc5b59",
+  "options_before.txt": "b034a18a8e1bbdd451e50a33d9b4c60b6389fc204c14e9c19ed6a5f87f222c2b",
+  "options_effective.txt": "66d7eec566f675735c5d03f2e0f756719ee75826b8ccb778a5a047a48f0f31b2",
+  "runner_as_executed.py": "0966d6ecf4b3ef23ceed9a87a46e0946254c66c287b8266e92b63c366c302f4d",
+  "status.json": "85f61ccdadf8774e7b8821daf267ffc7f9c8c9d0d5676ac9d8352b322ebc3349",
+  "verification.json": "2f4c69329f133b8b4dce7a71f6017075ef7618ffd62ad4601e8669d613c3400b"
+}

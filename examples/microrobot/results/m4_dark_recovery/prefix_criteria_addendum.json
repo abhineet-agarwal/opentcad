@@ -1,0 +1,35 @@
+{
+  "scope": "Separately authorized power-down prefix reproducibility check, defined before prefix result review",
+  "parent_criteria_sha256": "c1b04511a85f1ddb693022da38dfb2e146755d1a04a1394ca5353d335a437665",
+  "original_attempt_status": "Original4.5ms reference aborted at3.00089994ms; original25ns recovery comparison skipped. These statuses remain unchanged.",
+  "prefix_requested_stop_s": 0.0022,
+  "reference_max_step_s": 5e-08,
+  "conditional_comparison_max_step_s": 2.5e-08,
+  "physical_change": "None: retain complete original illumination history, circuit, component values, models and numerical tolerances. Only requested stop is2.2ms; paired comparison changes maxstep50ns to25ns.",
+  "purpose": "Check reproducibility of stored rails and retained reset/driver-enable state after light removal, before the original3ms numerical abort. This cannot qualify relight/recovery or resolve that abort.",
+  "completion": "Each prefix must independently reach2.2ms within1e-6 relative and contain finite valid data;25ns is conditional on complete50ns prefix.",
+  "comparisons": [
+    "Apply original qualified-edge guards/counts and meaningful-rail clamp/overshoot checks to the prefix only; report exclusions and asynchronous changes.",
+    "Compare times of rail1.6V crossings and reset/driver-enable crossings, qualified edge counts, and actual terminal state at2.2ms.",
+    "For times>=1.6ms with1V<=logic<1.6V and actuator>=0.5V, report duration, native-reset/logic and driver-ready/actuator ratios and any assertion transitions; classify state retention separately from valid native-clock operation.",
+    "Report event-phase/reset inputs and their state at2.2ms; no phase restart or full gait is inferred.",
+    "Compare full-prefix signed source energies and explicitly selected capacitor storage changes. For ports with magnitude>=1pJ in both runs, report relative differences against a provisional1% numerical target; report absolute differences for smaller cancellation-sensitive quantities.",
+    "Compare the50ns prefix against the original failed run over the common0..2.2ms interval; numerical prefix agreement is not fullrun completion."
+  ],
+  "limits": "No relight, full1.5ms darkness, recovery, PVT, physicalfail-cause, completeenergyclosure or safety qualification. Do not relabel the prefix as a successful original experiment.",
+  "end_state_voltage_agreement_limit_V": 0.001,
+  "end_state_fields": [
+    "logic",
+    "actuator",
+    "midpoint",
+    "native_reset",
+    "driver_ready",
+    "electrode_metals",
+    "solution_nodes",
+    "local_eta"
+  ],
+  "transition_time_agreement_limit_s": 1e-06,
+  "qualified_native_count_requirement": "Identical qualified native clock/Q counts under original guards",
+  "mask_coverage_requirement": "Report each clamp mask duration and overlap with falling/dark intervals, including zero overlap. A passing reset-low mask confined to startup is not a dark clamp pass when reset stayed released.",
+  "review_status": "Astra approved comparison convention before prefix output review; endpoint1mV, crossing1us and significant-port energy1% are diagnostic numerical targets."
+}

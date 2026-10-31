@@ -1,0 +1,1355 @@
+--- reviewed/netlist
++++ stage_local/netlist
+@@ -1,51 +1,51 @@
+ * NGSPICE file created from microrobot_clock.ext - technology: sky130A
+ 
+ .subckt microrobot_clock clk vdd vss bias_n bias_p
+-X0 Xc3.C1.t2 vss.t16 sky130_fd_pr__cap_mim_m3_1 l=2 w=2
+-X1 vss.t10 bias_n.t4 bias_p.t2 vss.t9 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X2 Xc4.C1.t2 vss.t29 sky130_fd_pr__cap_mim_m3_1 l=2 w=2
+-X3 X2_Xps.D.t0 Xc1.C1.t2 Xc2.C1.t1 vdd.t3 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+-X4 vss.t12 bias_n.t5 X2_Xns.D.t1 vss.t11 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X5 vdd.t8 bias_p.t5 X1_Xps.D.t1 vdd.t7 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+-X6 X1_Xns.D.t0 X1_Xpi.G.t2 Xc1.C1.t1 vss.t20 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+-X7 vdd.t14 bias_p.t0 bias_p.t1 vdd.t13 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+-X8 X5_Xps.D.t0 Xc4.C1.t3 X1_Xpi.G.t1 vdd.t6 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+-X9 vdd.t20 X1_Xpi.G.t3 Xbp1.D.t1 vdd.t19 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+-X10 vdd.t12 bias_p.t3 X4_Xps.D.t1 vdd.t11 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+-X11 X4_Xns.D.t0 Xc3.C1.t3 Xc4.C1.t0 vss.t17 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+-X12 vss.t3 bias_n.t0 bias_n.t1 vss.t2 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X13 Xbias.Xb2.D.t2 vdd.t4 vdd.t5 vss.t27 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X14 vdd.t22 Xbp1.D.t2 clk.t1 vdd.t21 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=1
+-X15 vss.t1 bias_n.t3 X5_Xns.D.t1 vss.t0 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X16 X3_Xps.D.t0 Xc2.C1.t2 Xc3.C1.t0 vdd.t2 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+-X17 Xc1.C1.t3 vss.t30 sky130_fd_pr__cap_mim_m3_1 l=2 w=2
+-X18 vdd.t10 bias_p.t8 X2_Xps.D.t1 vdd.t9 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+-X19 bias_n.t8 vss.t6 sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+-X20 Xc2.C1.t3 vss.t25 sky130_fd_pr__cap_mim_m3_1 l=2 w=2
+-X21 vss.t8 bias_n.t9 X3_Xns.D.t1 vss.t7 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X22 X1_Xpi.G.t4 vss.t21 sky130_fd_pr__cap_mim_m3_1 l=2.5 w=2
+-X23 bias_p.t6 vss.t15 sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+-X24 X2_Xns.D.t0 Xc1.C1.t4 Xc2.C1.t0 vss.t31 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+-X25 vdd.t18 bias_p.t4 X5_Xps.D.t1 vdd.t17 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+-X26 X5_Xns.D.t0 Xc4.C1.t4 X1_Xpi.G.t0 vss.t28 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+-X27 vss.t19 X1_Xpi.G.t5 Xbp1.D.t0 vss.t18 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X28 bias_n.t2 Xbias.Xb2.D.t0 Xbias.Xb2.D.t1 vss.t22 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X29 X1_Xps.D.t0 X1_Xpi.G.t6 Xc1.C1.t0 vdd.t1 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+-X30 vss.t14 bias_n.t6 X1_Xns.D.t1 vss.t13 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X31 vss.t24 Xbp1.D.t3 clk.t0 vss.t23 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=1
+-X32 X4_Xps.D.t0 Xc3.C1.t4 Xc4.C1.t1 vdd.t0 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+-X33 vss.t5 bias_n.t7 X4_Xns.D.t1 vss.t4 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+-X34 vdd.t16 bias_p.t7 X3_Xps.D.t1 vdd.t15 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+-X35 X3_Xns.D.t0 Xc2.C1.t4 Xc3.C1.t1 vss.t26 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+-R0 Xc3.C1.n0 Xc3.C1.t4 272.32
+-R1 Xc3.C1.n0 Xc3.C1.t3 246.232
+-R2 Xc3.C1.t4 Xc3.C1 231.048
++X0 Xc3.C1.t2 vss.t8 sky130_fd_pr__cap_mim_m3_1 l=2 w=2
++X1 vss.t21 bias_n.t4 bias_p.t0 vss.t20 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X2 Xc4.C1.t2 vss.t2 sky130_fd_pr__cap_mim_m3_1 l=2 w=2
++X3 X2_Xps.D.t1 Xc1.C1.t2 Xc2.C1.t1 vdd.t18 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
++X4 vss.t23 bias_n.t5 X2_Xns.D.t0 vss.t22 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X5 vdd.t12 bias_p.t5 X1_Xps.D.t0 vdd.t11 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
++X6 X1_Xns.D.t0 X1_Xpi.G.t2 Xc1.C1.t0 vss.t12 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
++X7 vdd.t8 bias_p.t1 bias_p.t2 vdd.t7 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
++X8 X5_Xps.D.t1 Xc4.C1.t3 X1_Xpi.G.t1 vdd.t17 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
++X9 vdd.t21 X1_Xpi.G.t3 Xbp1.D.t0 vdd.t20 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
++X10 vdd.t6 bias_p.t3 X4_Xps.D.t1 vdd.t5 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
++X11 X4_Xns.D.t0 Xc3.C1.t3 Xc4.C1.t1 vss.t9 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
++X12 vss.t17 bias_n.t1 bias_n.t2 vss.t16 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X13 Xbias.Xb2.D.t2 vdd.t2 vdd.t3 vss.t31 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X14 vdd.t1 Xbp1.D.t2 clk.t0 vdd.t0 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=1
++X15 vss.t19 bias_n.t3 X5_Xns.D.t0 vss.t18 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X16 X3_Xps.D.t1 Xc2.C1.t2 Xc3.C1.t0 vdd.t19 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
++X17 Xc1.C1.t3 vss.t10 sky130_fd_pr__cap_mim_m3_1 l=2 w=2
++X18 vdd.t10 bias_p.t8 X2_Xps.D.t0 vdd.t9 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
++X19 bias_n.t8 vss.t28 sky130_fd_pr__cap_mim_m3_1 l=7 w=7
++X20 Xc2.C1.t3 vss.t4 sky130_fd_pr__cap_mim_m3_1 l=2 w=2
++X21 vss.t30 bias_n.t9 X3_Xns.D.t0 vss.t29 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X22 X1_Xpi.G.t4 vss.t13 sky130_fd_pr__cap_mim_m3_1 l=2.5 w=2
++X23 bias_p.t6 vss.t0 sky130_fd_pr__cap_mim_m3_1 l=7 w=7
++X24 X2_Xns.D.t1 Xc1.C1.t4 Xc2.C1.t0 vss.t11 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
++X25 vdd.t14 bias_p.t4 X5_Xps.D.t0 vdd.t13 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
++X26 X5_Xns.D.t1 Xc4.C1.t4 X1_Xpi.G.t0 vss.t1 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
++X27 vss.t15 X1_Xpi.G.t5 Xbp1.D.t1 vss.t14 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X28 bias_n.t0 Xbias.Xb2.D.t0 Xbias.Xb2.D.t1 vss.t7 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X29 X1_Xps.D.t1 X1_Xpi.G.t6 Xc1.C1.t1 vdd.t22 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
++X30 vss.t25 bias_n.t6 X1_Xns.D.t1 vss.t24 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X31 vss.t6 Xbp1.D.t3 clk.t1 vss.t5 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=1
++X32 X4_Xps.D.t0 Xc3.C1.t4 Xc4.C1.t0 vdd.t4 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
++X33 vss.t27 bias_n.t7 X4_Xns.D.t1 vss.t26 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
++X34 vdd.t16 bias_p.t7 X3_Xps.D.t0 vdd.t15 sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
++X35 X3_Xns.D.t1 Xc2.C1.t4 Xc3.C1.t1 vss.t3 sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
++R0 Xc3.C1.n0 Xc3.C1.t4 253.445
++R1 Xc3.C1.t4 Xc3.C1 231.048
++R2 Xc3.C1.n0 Xc3.C1.t3 227.357
+ R3 Xc3.C1 Xc3.C1.t0 223.565
+ R4 Xc3.C1 Xc3.C1.t1 219.8
+ R5 Xc3.C1.t3 Xc3.C1 202.611
+-R6 Xc3.C1.n2 Xc3.C1 40.6543
+-R7 Xc3.C1 Xc3.C1.n3 35.9121
+-R8 Xc3.C1.n1 Xc3.C1 22.3197
++R6 Xc3.C1.n2 Xc3.C1 21.7792
++R7 Xc3.C1 Xc3.C1.n3 17.0371
++R8 Xc3.C1.n1 Xc3.C1 13.5267
+ R9 Xc3.C1.n1 Xc3.C1.n0 6.55876
+ R10 Xc3.C1.n3 Xc3.C1.n2 2.3505
+ R11 Xc3.C1.n2 Xc3.C1.n1 0.374737
+@@ -61,7 +61,7 @@
+ R21 vss.n180 vss.n20 12462.1
+ R22 vss.n181 vss.n17 12462.1
+ R23 vss.n181 vss.n18 12462.1
+-R24 vss.t18 vss.n16 9788.38
++R24 vss.t14 vss.n16 9788.38
+ R25 vss.n160 vss.n46 6564.74
+ R26 vss.n50 vss.n46 6564.74
+ R27 vss.n160 vss.n47 6564.74
+@@ -94,11 +94,11 @@
+ R54 vss.n59 vss.n55 6564.74
+ R55 vss.n9 vss.n7 6564.74
+ R56 vss.n183 vss.n6 6564.74
+-R57 vss.t13 vss.n25 6503.45
+-R58 vss.t11 vss.n23 6503.45
+-R59 vss.t7 vss.n21 6503.45
+-R60 vss.t4 vss.n19 6503.45
+-R61 vss.t0 vss.n17 6503.45
++R57 vss.t24 vss.n25 6503.45
++R58 vss.t22 vss.n23 6503.45
++R59 vss.t29 vss.n21 6503.45
++R60 vss.t26 vss.n19 6503.45
++R61 vss.t18 vss.n17 6503.45
+ R62 vss.n177 vss.n176 5756.66
+ R63 vss.n181 vss.n180 4330.98
+ R64 vss.n180 vss.n179 4330.98
+@@ -111,7 +111,7 @@
+ R71 vss.n58 vss.n54 3297.63
+ R72 vss.n10 vss.n6 3297.63
+ R73 vss.n182 vss.n7 3297.63
+-R74 vss.t18 vss.n181 2909.87
++R74 vss.t14 vss.n181 2909.87
+ R75 vss.n15 vss.n14 2508.85
+ R76 vss.n15 vss.n1 2508.85
+ R77 vss.n11 vss.n1 2508.85
+@@ -130,12 +130,12 @@
+ R90 vss.n69 vss.n66 2219.15
+ R91 vss.n69 vss.n67 2219.15
+ R92 vss.n71 vss.n66 2219.15
+-R93 vss.n16 vss.t23 1675.86
+-R94 vss.t20 vss.n26 1331.03
+-R95 vss.t31 vss.n24 1331.03
+-R96 vss.t26 vss.n22 1331.03
+-R97 vss.t17 vss.n20 1331.03
+-R98 vss.t28 vss.n18 1331.03
++R93 vss.n16 vss.t5 1675.86
++R94 vss.t12 vss.n26 1331.03
++R95 vss.t11 vss.n24 1331.03
++R96 vss.t3 vss.n22 1331.03
++R97 vss.t9 vss.n20 1331.03
++R98 vss.t1 vss.n18 1331.03
+ R99 vss.n12 vss.n11 1027.75
+ R100 vss.n154 vss.n151 842.444
+ R101 vss.n133 vss.n130 842.444
+@@ -186,37 +186,37 @@
+ R146 vss.n171 vss.n170 290.156
+ R147 vss.n45 vss.n43 290.156
+ R148 vss.n162 vss.n161 290.156
+-R149 vss.n176 vss.t27 245.618
+-R150 vss.n171 vss.t27 245.618
+-R151 vss.n170 vss.t22 245.618
+-R152 vss.n43 vss.t22 245.618
+-R153 vss.t9 vss.n45 245.618
+-R154 vss.n162 vss.t9 245.618
+-R155 vss.n161 vss.t2 245.618
+-R156 vss vss.t14 219.8
+-R157 vss vss.t12 219.8
+-R158 vss vss.t8 219.8
+-R159 vss vss.t5 219.8
+-R160 vss vss.t1 219.8
+-R161 vss vss.t19 219.8
+-R162 vss vss.t24 219.8
+-R163 vss vss.t3 219.8
+-R164 vss vss.t10 219.8
++R149 vss.n176 vss.t31 245.618
++R150 vss.n171 vss.t31 245.618
++R151 vss.n170 vss.t7 245.618
++R152 vss.n43 vss.t7 245.618
++R153 vss.t20 vss.n45 245.618
++R154 vss.n162 vss.t20 245.618
++R155 vss.n161 vss.t16 245.618
++R156 vss vss.t25 219.8
++R157 vss vss.t23 219.8
++R158 vss vss.t30 219.8
++R159 vss vss.t27 219.8
++R160 vss vss.t19 219.8
++R161 vss vss.t15 219.8
++R162 vss vss.t6 219.8
++R163 vss vss.t17 219.8
++R164 vss vss.t21 219.8
+ R165 vss vss.n155 195
+ R166 vss.n153 vss.n152 195
+-R167 vss.t20 vss.n153 195
++R167 vss.t12 vss.n153 195
+ R168 vss vss.n134 195
+ R169 vss.n132 vss.n131 195
+-R170 vss.t31 vss.n132 195
++R170 vss.t11 vss.n132 195
+ R171 vss vss.n113 195
+ R172 vss.n111 vss.n110 195
+-R173 vss.t26 vss.n111 195
++R173 vss.t3 vss.n111 195
+ R174 vss vss.n92 195
+ R175 vss.n90 vss.n89 195
+-R176 vss.t17 vss.n90 195
++R176 vss.t9 vss.n90 195
+ R177 vss vss.n71 195
+ R178 vss.n69 vss.n68 195
+-R179 vss.t28 vss.n69 195
++R179 vss.t1 vss.n69 195
+ R180 vss.n13 vss.n0 163.012
+ R181 vss vss.n0 163.012
+ R182 vss.n13 vss.n2 163.012
+@@ -293,19 +293,19 @@
+ R253 vss vss.n65 144.189
+ R254 vss.n14 vss.n13 117.001
+ R255 vss vss.n1 117.001
+-R256 vss.t23 vss.n1 117.001
++R256 vss.t5 vss.n1 117.001
+ R257 vss.n155 vss.n154 111.203
+ R258 vss.n134 vss.n133 111.203
+ R259 vss.n113 vss.n112 111.203
+ R260 vss.n92 vss.n91 111.203
+ R261 vss.n71 vss.n70 111.203
+-R262 vss.n154 vss.t20 74.0279
+-R263 vss.n133 vss.t31 74.0279
+-R264 vss.n112 vss.t26 74.0279
+-R265 vss.n91 vss.t17 74.0279
+-R266 vss.n70 vss.t28 74.0279
++R262 vss.n154 vss.t12 74.0279
++R263 vss.n133 vss.t11 74.0279
++R264 vss.n112 vss.t3 74.0279
++R265 vss.n91 vss.t9 74.0279
++R266 vss.n70 vss.t1 74.0279
+ R267 vss.n14 vss.n12 65.9943
+-R268 vss.n12 vss.t23 47.9301
++R268 vss.n12 vss.t5 47.9301
+ R269 vss.n145 vss 36.1543
+ R270 vss.n124 vss 36.1543
+ R271 vss.n103 vss 36.1543
+@@ -328,34 +328,34 @@
+ R288 vss.n37 vss 27.8246
+ R289 vss.n166 vss 27.8246
+ R290 vss vss.n28 23.4005
+-R291 vss.n28 vss.t27 23.4005
++R291 vss.n28 vss.t31 23.4005
+ R292 vss.n29 vss.n27 23.4005
+-R293 vss.n27 vss.t27 23.4005
++R293 vss.n27 vss.t31 23.4005
+ R294 vss vss.n34 23.4005
+-R295 vss.n34 vss.t22 23.4005
++R295 vss.n34 vss.t7 23.4005
+ R296 vss.n35 vss.n33 23.4005
+-R297 vss.n33 vss.t22 23.4005
++R297 vss.n33 vss.t7 23.4005
+ R298 vss vss.n39 23.4005
+-R299 vss.t9 vss.n39 23.4005
++R299 vss.t20 vss.n39 23.4005
+ R300 vss.n41 vss.n40 23.4005
+-R301 vss.t9 vss.n41 23.4005
++R301 vss.t20 vss.n41 23.4005
+ R302 vss vss.n47 23.4005
+ R303 vss.n48 vss.n46 23.4005
+-R304 vss.n46 vss.t2 23.4005
++R304 vss.n46 vss.t16 23.4005
+ R305 vss vss.n143 23.4005
+-R306 vss.n143 vss.t13 23.4005
++R306 vss.n143 vss.t24 23.4005
+ R307 vss.n141 vss.n140 23.4005
+ R308 vss vss.n122 23.4005
+-R309 vss.n122 vss.t11 23.4005
++R309 vss.n122 vss.t22 23.4005
+ R310 vss.n120 vss.n119 23.4005
+ R311 vss vss.n101 23.4005
+-R312 vss.n101 vss.t7 23.4005
++R312 vss.n101 vss.t29 23.4005
+ R313 vss.n99 vss.n98 23.4005
+ R314 vss vss.n80 23.4005
+-R315 vss.n80 vss.t4 23.4005
++R315 vss.n80 vss.t26 23.4005
+ R316 vss.n78 vss.n77 23.4005
+ R317 vss vss.n59 23.4005
+-R318 vss.n59 vss.t0 23.4005
++R318 vss.n59 vss.t18 23.4005
+ R319 vss.n57 vss.n56 23.4005
+ R320 vss vss.n183 23.4005
+ R321 vss.n9 vss.n8 23.4005
+@@ -372,13 +372,13 @@
+ R332 vss.n63 vss.n62 18.1715
+ R333 vss.n32 vss.n31 16.8306
+ R334 vss vss.n157 15.432
+-R335 vss.t13 vss.n142 11.7554
+-R336 vss.t11 vss.n121 11.7554
+-R337 vss.t7 vss.n100 11.7554
+-R338 vss.t4 vss.n79 11.7554
+-R339 vss.t0 vss.n58 11.7554
+-R340 vss.n182 vss.t18 11.7554
+-R341 vss.t18 vss.n10 11.7554
++R335 vss.t24 vss.n142 11.7554
++R336 vss.t22 vss.n121 11.7554
++R337 vss.t29 vss.n100 11.7554
++R338 vss.t26 vss.n79 11.7554
++R339 vss.t18 vss.n58 11.7554
++R340 vss.n182 vss.t14 11.7554
++R341 vss.t14 vss.n10 11.7554
+ R342 vss.n142 vss.n141 11.6052
+ R343 vss.n121 vss.n120 11.6052
+ R344 vss.n100 vss.n99 11.6052
+@@ -398,12 +398,12 @@
+ R358 vss.n126 vss.n124 2.96326
+ R359 vss.n147 vss.n145 2.96326
+ R360 vss.n157 vss 2.703
+-R361 vss.t15 vss.n30 2.47435
++R361 vss.t0 vss.n30 2.47435
+ R362 vss.n158 vss 1.87051
+ R363 vss.n167 vss.n32 1.763
+ R364 vss.n167 vss.n166 1.39346
+ R365 vss.n165 vss.n37 1.39346
+-R366 vss.n49 vss.t2 1.31471
++R366 vss.n49 vss.t16 1.31471
+ R367 vss.n146 vss 0.6825
+ R368 vss.n125 vss 0.6825
+ R369 vss.n104 vss 0.6825
+@@ -424,15 +424,15 @@
+ R384 vss.n103 vss.n102 0.118
+ R385 vss.n124 vss.n123 0.118
+ R386 vss.n145 vss.n144 0.118
+-R387 vss.n146 vss.t30 0.053375
+-R388 vss.n125 vss.t25 0.053375
+-R389 vss.n104 vss.t16 0.053375
+-R390 vss.n83 vss.t29 0.053375
+-R391 vss.n62 vss.t21 0.0442586
+-R392 vss.n30 vss.t6 0.033527
+-R393 vss.n31 vss.t15 0.033527
+-R394 bias_n bias_n.t1 219.8
+-R395 bias_n bias_n.t2 219.8
++R387 vss.n146 vss.t10 0.053375
++R388 vss.n125 vss.t4 0.053375
++R389 vss.n104 vss.t8 0.053375
++R390 vss.n83 vss.t2 0.053375
++R391 vss.n62 vss.t13 0.0442586
++R392 vss.n30 vss.t28 0.033527
++R393 vss.n31 vss.t0 0.033527
++R394 bias_n bias_n.t2 219.8
++R395 bias_n bias_n.t0 219.8
+ R396 bias_n.t3 bias_n.n8 48.9879
+ R397 bias_n.n5 bias_n.t6 39.5879
+ R398 bias_n.n6 bias_n.t5 39.5879
+@@ -445,7 +445,7 @@
+ R405 bias_n.n0 bias_n 20.0305
+ R406 bias_n.n3 bias_n 16.2272
+ R407 bias_n.n4 bias_n 15.667
+-R408 bias_n bias_n.t0 9.77232
++R408 bias_n bias_n.t1 9.77232
+ R409 bias_n bias_n.t4 9.77232
+ R410 bias_n.t6 bias_n 9.77232
+ R411 bias_n.t5 bias_n 9.77232
+@@ -461,8 +461,8 @@
+ R421 bias_n.n2 bias_n.n1 0.370038
+ R422 bias_n bias_n.n3 0.259
+ R423 bias_n bias_n.t8 0.0180781
+-R424 bias_p bias_p.t1 223.565
+-R425 bias_p bias_p.t2 219.8
++R424 bias_p bias_p.t2 223.565
++R425 bias_p bias_p.t0 219.8
+ R426 bias_p.t4 bias_p.n7 51.1402
+ R427 bias_p.n4 bias_p.t5 41.7402
+ R428 bias_p.n5 bias_p.t8 41.7402
+@@ -474,7 +474,7 @@
+ R434 bias_p.n0 bias_p 18.5861
+ R435 bias_p.n3 bias_p 15.902
+ R436 bias_p.n4 bias_p.n3 15.1245
+-R437 bias_p bias_p.t0 11.5497
++R437 bias_p bias_p.t1 11.5497
+ R438 bias_p.t5 bias_p 11.5497
+ R439 bias_p.t8 bias_p 11.5497
+ R440 bias_p.t7 bias_p 11.5497
+@@ -488,43 +488,43 @@
+ R448 bias_p.n3 bias_p 2.233
+ R449 bias_p.n1 bias_p.n0 0.370038
+ R450 bias_p bias_p.t6 0.0180781
+-R451 Xc4.C1.n0 Xc4.C1.t3 273.445
+-R452 Xc4.C1.n0 Xc4.C1.t4 247.357
+-R453 Xc4.C1.t3 Xc4.C1 231.048
+-R454 Xc4.C1 Xc4.C1.t1 223.565
+-R455 Xc4.C1 Xc4.C1.t0 219.8
++R451 Xc4.C1.n0 Xc4.C1.t3 254.07
++R452 Xc4.C1.t3 Xc4.C1 231.048
++R453 Xc4.C1.n0 Xc4.C1.t4 227.982
++R454 Xc4.C1 Xc4.C1.t0 223.565
++R455 Xc4.C1 Xc4.C1.t1 219.8
+ R456 Xc4.C1.t4 Xc4.C1 202.611
+-R457 Xc4.C1 Xc4.C1.n3 41.7793
+-R458 Xc4.C1.n2 Xc4.C1 37.0371
+-R459 Xc4.C1.n1 Xc4.C1 23.4447
++R457 Xc4.C1.n2 Xc4.C1 22.4042
++R458 Xc4.C1 Xc4.C1.n3 17.6621
++R459 Xc4.C1.n1 Xc4.C1 12.9017
+ R460 Xc4.C1.n1 Xc4.C1.n0 6.55876
+ R461 Xc4.C1.n3 Xc4.C1.n2 2.3505
+-R462 Xc4.C1.n3 Xc4.C1.n1 0.374737
++R462 Xc4.C1.n2 Xc4.C1.n1 0.374737
+ R463 Xc4.C1 Xc4.C1.t2 0.28175
+-R464 Xc4.C1.n2 Xc4.C1 0.05925
+-R465 Xc1.C1.n0 Xc1.C1.t2 269.695
+-R466 Xc1.C1.n0 Xc1.C1.t4 243.607
+-R467 Xc1.C1.t2 Xc1.C1 231.048
+-R468 Xc1.C1 Xc1.C1.t0 223.565
+-R469 Xc1.C1 Xc1.C1.t1 219.8
++R464 Xc4.C1.n3 Xc4.C1 0.05925
++R465 Xc1.C1.n0 Xc1.C1.t2 252.195
++R466 Xc1.C1.t2 Xc1.C1 231.048
++R467 Xc1.C1.n0 Xc1.C1.t4 226.107
++R468 Xc1.C1 Xc1.C1.t1 223.565
++R469 Xc1.C1 Xc1.C1.t0 219.8
+ R470 Xc1.C1.t4 Xc1.C1 202.611
+-R471 Xc1.C1.n2 Xc1.C1 38.0293
+-R472 Xc1.C1 Xc1.C1.n3 33.2871
+-R473 Xc1.C1.n1 Xc1.C1 19.6947
++R471 Xc1.C1 Xc1.C1.n3 20.5292
++R472 Xc1.C1.n2 Xc1.C1 15.7871
++R473 Xc1.C1.n1 Xc1.C1 14.7767
+ R474 Xc1.C1.n1 Xc1.C1.n0 6.55876
+ R475 Xc1.C1.n3 Xc1.C1.n2 2.3505
+-R476 Xc1.C1.n2 Xc1.C1.n1 0.374737
++R476 Xc1.C1.n3 Xc1.C1.n1 0.374737
+ R477 Xc1.C1 Xc1.C1.t3 0.28175
+-R478 Xc1.C1.n3 Xc1.C1 0.05925
+-R479 Xc2.C1.n0 Xc2.C1.t2 271.195
+-R480 Xc2.C1.n0 Xc2.C1.t4 245.107
+-R481 Xc2.C1.t2 Xc2.C1 231.048
++R478 Xc1.C1.n2 Xc1.C1 0.05925
++R479 Xc2.C1.n0 Xc2.C1.t2 252.82
++R480 Xc2.C1.t2 Xc2.C1 231.048
++R481 Xc2.C1.n0 Xc2.C1.t4 226.732
+ R482 Xc2.C1 Xc2.C1.t1 223.565
+ R483 Xc2.C1 Xc2.C1.t0 219.8
+ R484 Xc2.C1.t4 Xc2.C1 202.611
+-R485 Xc2.C1 Xc2.C1.n3 39.5293
+-R486 Xc2.C1.n2 Xc2.C1 34.7871
+-R487 Xc2.C1.n1 Xc2.C1 21.1947
++R485 Xc2.C1 Xc2.C1.n3 21.1542
++R486 Xc2.C1.n2 Xc2.C1 16.4121
++R487 Xc2.C1.n1 Xc2.C1 14.1517
+ R488 Xc2.C1.n1 Xc2.C1.n0 6.55876
+ R489 Xc2.C1.n3 Xc2.C1.n2 2.3505
+ R490 Xc2.C1.n3 Xc2.C1.n1 0.374737
+@@ -532,8 +532,8 @@
+ R492 Xc2.C1.n2 Xc2.C1 0.05925
+ R493 X2_Xps.D X2_Xps.D.t1 223.565
+ R494 X2_Xps.D X2_Xps.D.t0 223.565
+-R495 X2_Xps.D X2_Xps.D.n0 37.2908
+-R496 X2_Xps.D.n0 X2_Xps.D 34.4121
++R495 X2_Xps.D.n0 X2_Xps.D 37.2908
++R496 X2_Xps.D X2_Xps.D.n0 34.4121
+ R497 X2_Xps.D.n0 X2_Xps.D 0.05925
+ R498 vdd.n16 vdd.n12 4207.06
+ R499 vdd.n13 vdd.n10 4207.06
+@@ -615,15 +615,15 @@
+ R575 vdd.n82 vdd.n81 255.901
+ R576 vdd.n103 vdd.n102 255.901
+ R577 vdd.n124 vdd.n123 255.901
+-R578 vdd vdd.t14 223.565
+-R579 vdd vdd.t8 223.565
++R578 vdd vdd.t8 223.565
++R579 vdd vdd.t12 223.565
+ R580 vdd vdd.t10 223.565
+ R581 vdd vdd.t16 223.565
+-R582 vdd vdd.t12 223.565
+-R583 vdd vdd.t18 223.565
+-R584 vdd vdd.t20 223.565
+-R585 vdd vdd.t22 223.565
+-R586 vdd vdd.t5 219.8
++R582 vdd vdd.t6 223.565
++R583 vdd vdd.t14 223.565
++R584 vdd vdd.t21 223.565
++R585 vdd vdd.t1 223.565
++R586 vdd vdd.t3 219.8
+ R587 vdd.n2 vdd.n0 185.225
+ R588 vdd vdd.n0 185.225
+ R589 vdd.n8 vdd.n2 185.225
+@@ -723,17 +723,17 @@
+ R683 vdd.n19 vdd 19.6555
+ R684 vdd.n22 vdd.n21 15.947
+ R685 vdd.n21 vdd 15.197
+-R686 vdd.t1 vdd.n38 10.1167
+-R687 vdd.t3 vdd.n59 10.1167
+-R688 vdd.t2 vdd.n80 10.1167
+-R689 vdd.t0 vdd.n101 10.1167
+-R690 vdd.t6 vdd.n122 10.1167
+-R691 vdd.n39 vdd.t1 10.1167
+-R692 vdd.n60 vdd.t3 10.1167
+-R693 vdd.n81 vdd.t2 10.1167
+-R694 vdd.n102 vdd.t0 10.1167
+-R695 vdd.n123 vdd.t6 10.1167
+-R696 vdd vdd.t4 9.77232
++R686 vdd.t22 vdd.n38 10.1167
++R687 vdd.t18 vdd.n59 10.1167
++R688 vdd.t19 vdd.n80 10.1167
++R689 vdd.t4 vdd.n101 10.1167
++R690 vdd.t17 vdd.n122 10.1167
++R691 vdd.n39 vdd.t22 10.1167
++R692 vdd.n60 vdd.t18 10.1167
++R693 vdd.n81 vdd.t19 10.1167
++R694 vdd.n102 vdd.t4 10.1167
++R695 vdd.n123 vdd.t17 10.1167
++R696 vdd vdd.t2 9.77232
+ R697 vdd.n127 vdd.n126 7.81425
+ R698 vdd.n106 vdd.n105 7.81425
+ R699 vdd.n85 vdd.n84 7.81425
+@@ -753,8 +753,8 @@
+ R713 vdd vdd.n108 7.4005
+ R714 vdd.n131 vdd.n130 7.4005
+ R715 vdd vdd.n129 7.4005
+-R716 vdd.n6 vdd.t21 6.70818
+-R717 vdd.t21 vdd.n5 6.70818
++R716 vdd.n6 vdd.t0 6.70818
++R717 vdd.t0 vdd.n5 6.70818
+ R718 vdd vdd.n20 6.55348
+ R719 vdd.n14 vdd.n12 5.51167
+ R720 vdd.n15 vdd.n10 5.51167
+@@ -773,20 +773,20 @@
+ R733 vdd.n138 vdd.n137 3.7605
+ R734 vdd.n21 vdd 2.938
+ R735 vdd.n19 vdd.n18 1.998
+-R736 vdd.n15 vdd.t13 1.88064
+-R737 vdd.t13 vdd.n14 1.88064
+-R738 vdd.n29 vdd.t7 1.88064
+-R739 vdd.t7 vdd.n28 1.88064
++R736 vdd.n15 vdd.t7 1.88064
++R737 vdd.t7 vdd.n14 1.88064
++R738 vdd.n29 vdd.t11 1.88064
++R739 vdd.t11 vdd.n28 1.88064
+ R740 vdd.n50 vdd.t9 1.88064
+ R741 vdd.t9 vdd.n49 1.88064
+ R742 vdd.n71 vdd.t15 1.88064
+ R743 vdd.t15 vdd.n70 1.88064
+-R744 vdd.n92 vdd.t11 1.88064
+-R745 vdd.t11 vdd.n91 1.88064
+-R746 vdd.n113 vdd.t17 1.88064
+-R747 vdd.t17 vdd.n112 1.88064
+-R748 vdd.n134 vdd.t19 1.88064
+-R749 vdd.t19 vdd.n133 1.88064
++R744 vdd.n92 vdd.t5 1.88064
++R745 vdd.t5 vdd.n91 1.88064
++R746 vdd.n113 vdd.t13 1.88064
++R747 vdd.t13 vdd.n112 1.88064
++R748 vdd.n134 vdd.t20 1.88064
++R749 vdd.t20 vdd.n133 1.88064
+ R750 vdd.n126 vdd.n116 1.46925
+ R751 vdd.n105 vdd.n95 1.46925
+ R752 vdd.n84 vdd.n74 1.46925
+@@ -801,26 +801,26 @@
+ R761 vdd.n32 vdd.n22 0.118
+ R762 X2_Xns.D X2_Xns.D.t1 219.8
+ R763 X2_Xns.D X2_Xns.D.t0 219.8
+-R764 X2_Xns.D.n0 X2_Xns.D 41.7255
+-R765 X2_Xns.D X2_Xns.D.n0 39.9043
++R764 X2_Xns.D X2_Xns.D.n0 41.7255
++R765 X2_Xns.D.n0 X2_Xns.D 39.9043
+ R766 X2_Xns.D.n0 X2_Xns.D 0.05925
+ R767 X1_Xps.D X1_Xps.D.t1 223.565
+ R768 X1_Xps.D X1_Xps.D.t0 223.565
+-R769 X1_Xps.D X1_Xps.D.n0 35.7908
+-R770 X1_Xps.D.n0 X1_Xps.D 32.9121
++R769 X1_Xps.D.n0 X1_Xps.D 35.7908
++R770 X1_Xps.D X1_Xps.D.n0 32.9121
+ R771 X1_Xps.D.n0 X1_Xps.D 0.05925
+-R772 X1_Xpi.G.n2 X1_Xpi.G.t6 270.07
+-R773 X1_Xpi.G.n3 X1_Xpi.G.t2 241.631
+-R774 X1_Xpi.G.t6 X1_Xpi.G 231.048
++R772 X1_Xpi.G.n2 X1_Xpi.G.t6 254.695
++R773 X1_Xpi.G.t6 X1_Xpi.G 231.048
++R774 X1_Xpi.G.n3 X1_Xpi.G.t2 226.256
+ R775 X1_Xpi.G X1_Xpi.G.t1 223.565
+ R776 X1_Xpi.G X1_Xpi.G.t0 219.8
+ R777 X1_Xpi.G.t2 X1_Xpi.G 202.611
+-R778 X1_Xpi.G.n0 X1_Xpi.G.t5 43.4379
+-R779 X1_Xpi.G.n0 X1_Xpi.G.t3 42.8652
+-R780 X1_Xpi.G X1_Xpi.G.n5 38.4043
+-R781 X1_Xpi.G.n4 X1_Xpi.G.n3 35.368
+-R782 X1_Xpi.G.n4 X1_Xpi.G 33.6621
+-R783 X1_Xpi.G.n1 X1_Xpi.G 20.0182
++R778 X1_Xpi.G.n4 X1_Xpi.G.n3 35.368
++R779 X1_Xpi.G.n0 X1_Xpi.G.t5 28.0629
++R780 X1_Xpi.G.n0 X1_Xpi.G.t3 27.4902
++R781 X1_Xpi.G X1_Xpi.G.n5 23.0292
++R782 X1_Xpi.G.n4 X1_Xpi.G 18.2871
++R783 X1_Xpi.G.n1 X1_Xpi.G 12.284
+ R784 X1_Xpi.G.t3 X1_Xpi.G 11.5497
+ R785 X1_Xpi.G.t5 X1_Xpi.G 9.77232
+ R786 X1_Xpi.G.n1 X1_Xpi.G.n0 4.20876
+@@ -836,20 +836,20 @@
+ R796 X1_Xns.D.n0 X1_Xns.D 0.05925
+ R797 X5_Xps.D X5_Xps.D.t1 223.565
+ R798 X5_Xps.D X5_Xps.D.t0 223.565
+-R799 X5_Xps.D X5_Xps.D.n0 40.6658
+-R800 X5_Xps.D.n0 X5_Xps.D 37.7871
++R799 X5_Xps.D.n0 X5_Xps.D 40.6658
++R800 X5_Xps.D X5_Xps.D.n0 37.7871
+ R801 X5_Xps.D.n0 X5_Xps.D 0.05925
+-R802 Xbp1.D Xbp1.D.t1 223.565
+-R803 Xbp1.D Xbp1.D.t0 219.8
++R802 Xbp1.D Xbp1.D.t0 223.565
++R803 Xbp1.D Xbp1.D.t1 219.8
+ R804 Xbp1.D.n0 Xbp1.D.t2 154.849
+ R805 Xbp1.D.n0 Xbp1.D.t3 142.98
+ R806 Xbp1.D.t2 Xbp1.D 115.525
+ R807 Xbp1.D.t3 Xbp1.D 101.305
+-R808 Xbp1.D Xbp1.D.n2 43.2793
+-R809 Xbp1.D.n1 Xbp1.D 38.5371
++R808 Xbp1.D.n1 Xbp1.D 43.2793
++R809 Xbp1.D Xbp1.D.n2 38.5371
+ R810 Xbp1.D.n2 Xbp1.D.n1 2.3505
+-R811 Xbp1.D.n2 Xbp1.D.n0 2.233
+-R812 Xbp1.D.n1 Xbp1.D 0.05925
++R811 Xbp1.D.n1 Xbp1.D.n0 2.233
++R812 Xbp1.D.n2 Xbp1.D 0.05925
+ R813 X4_Xps.D X4_Xps.D.t1 223.565
+ R814 X4_Xps.D X4_Xps.D.t0 223.565
+ R815 X4_Xps.D X4_Xps.D.n0 39.5408
+@@ -868,381 +868,381 @@
+ R828 Xbias.Xb2.D Xbias.Xb2.D.t0 9.77232
+ R829 Xbias.Xb2.D.n1 Xbias.Xb2.D 4.79097
+ R830 Xbias.Xb2.D.n1 Xbias.Xb2.D.n0 0.370038
+-R831 clk clk.t1 223.565
+-R832 clk clk.t0 219.8
++R831 clk clk.t0 223.565
++R832 clk clk.t1 219.8
+ R833 clk clk.n0 46.0042
+ R834 clk.n0 clk 38.9121
+ R835 clk.n0 clk 0.05925
+ R836 X5_Xns.D X5_Xns.D.t1 219.8
+ R837 X5_Xns.D X5_Xns.D.t0 219.8
+-R838 X5_Xns.D.n0 X5_Xns.D 44.7255
+-R839 X5_Xns.D X5_Xns.D.n0 42.9043
++R838 X5_Xns.D X5_Xns.D.n0 44.7255
++R839 X5_Xns.D.n0 X5_Xns.D 42.9043
+ R840 X5_Xns.D.n0 X5_Xns.D 0.05925
+ R841 X3_Xps.D X3_Xps.D.t1 223.565
+ R842 X3_Xps.D X3_Xps.D.t0 223.565
+-R843 X3_Xps.D X3_Xps.D.n0 38.4158
+-R844 X3_Xps.D.n0 X3_Xps.D 35.5371
++R843 X3_Xps.D.n0 X3_Xps.D 38.4158
++R844 X3_Xps.D X3_Xps.D.n0 35.5371
+ R845 X3_Xps.D.n0 X3_Xps.D 0.05925
+ R846 X3_Xns.D X3_Xns.D.t1 219.8
+ R847 X3_Xns.D X3_Xns.D.t0 219.8
+-R848 X3_Xns.D.n0 X3_Xns.D 42.8505
+-R849 X3_Xns.D X3_Xns.D.n0 41.0293
++R848 X3_Xns.D X3_Xns.D.n0 42.8505
++R849 X3_Xns.D.n0 X3_Xns.D 41.0293
+ R850 X3_Xns.D.n0 X3_Xns.D 0.05925
+-C0 vdd clk 0.91555f
+-C1 bias_n bias_p 37.396f
+-C2 vdd bias_p 23.7033f
+-C3 vdd bias_n 39.8723f
+-C4 Xbp1.D clk 10.9509f
+-C5 X5_Xns.D bias_n 3.83617f
+-C6 Xbp1.D vdd 1.05506f
+-C7 X5_Xps.D bias_p 3.73804f
+-C8 X5_Xns.D vdd 0.15838f
+-C9 X5_Xps.D bias_n 0.17152f
+-C10 X4_Xns.D bias_p 0.17288f
+-C11 Xc4.C1 bias_p 0.24257f
+-C12 X4_Xns.D bias_n 3.88396f
+-C13 X5_Xps.D vdd 3.87054f
+-C14 X4_Xns.D vdd 0.14906f
+-C15 Xc4.C1 bias_n 0.38307f
+-C16 X4_Xps.D bias_p 3.89108f
+-C17 X4_Xps.D bias_n 0.15386f
+-C18 X3_Xns.D bias_p 0.17288f
+-C19 Xc4.C1 vdd 1.43816f
+-C20 Xc3.C1 bias_p 0.40526f
+-C21 X4_Xps.D vdd 3.87054f
+-C22 X3_Xns.D bias_n 3.88396f
+-C23 X3_Xps.D bias_p 3.89108f
+-C24 Xc3.C1 bias_n 0.36542f
+-C25 X3_Xns.D vdd 0.14906f
+-C26 X2_Xns.D bias_p 0.17288f
+-C27 Xc4.C1 X5_Xns.D 0.12529f
+-C28 Xc3.C1 vdd 1.43816f
+-C29 X3_Xps.D bias_n 0.15386f
+-C30 Xc4.C1 X5_Xps.D 1.1225f
+-C31 X2_Xns.D bias_n 3.88396f
+-C32 Xc2.C1 bias_p 0.40349f
+-C33 X3_Xps.D vdd 3.87054f
+-C34 Xc2.C1 bias_n 0.36542f
+-C35 Xc4.C1 X4_Xns.D 3.18406f
+-C36 X2_Xps.D bias_p 3.88742f
+-C37 X2_Xns.D vdd 0.14906f
+-C38 Xc2.C1 vdd 1.43816f
+-C39 X1_Xns.D bias_p 0.16921f
+-C40 X2_Xps.D bias_n 0.15386f
+-C41 X1_Xns.D bias_n 3.88404f
+-C42 X4_Xps.D Xc4.C1 1.43565f
+-C43 Xc1.C1 bias_p 3.30423f
+-C44 X2_Xps.D vdd 3.87054f
+-C45 X1_Xns.D vdd 0.14906f
+-C46 Xc1.C1 bias_n 0.36564f
+-C47 X1_Xpi.G bias_p 4.26489f
+-C48 Xc3.C1 X4_Xns.D 0.02515f
+-C49 X1_Xps.D bias_p 5.47231f
+-C50 Xc1.C1 vdd 1.43865f
+-C51 Xc3.C1 Xc4.C1 9.14191f
+-C52 X1_Xpi.G bias_n 1.31751f
+-C53 Xbias.Xb2.D bias_p 6.27185f
+-C54 Xc3.C1 X4_Xps.D 1.02174f
+-C55 X1_Xps.D bias_n 0.15386f
+-C56 X1_Xpi.G vdd 6.22484f
+-C57 Xbias.Xb2.D bias_n 0.35421f
+-C58 Xc3.C1 X3_Xns.D 3.03546f
+-C59 X1_Xps.D vdd 3.87098f
+-C60 Xbias.Xb2.D vdd 0.34322f
+-C61 X1_Xpi.G Xbp1.D 8.03218f
+-C62 X3_Xps.D Xc3.C1 1.39474f
+-C63 X1_Xpi.G X5_Xns.D 1.71539f
+-C64 Xc2.C1 X3_Xns.D 0.02515f
+-C65 X1_Xpi.G X5_Xps.D 1.07324f
+-C66 Xc2.C1 Xc3.C1 8.74023f
+-C67 X1_Xpi.G X4_Xns.D 0.19262f
+-C68 Xc2.C1 X3_Xps.D 1.01839f
+-C69 X1_Xpi.G Xc4.C1 8.39237f
+-C70 Xc2.C1 X2_Xns.D 2.88396f
+-C71 X1_Xpi.G X4_Xps.D 0.19697f
+-C72 X1_Xpi.G X3_Xns.D 0.19217f
+-C73 X1_Xpi.G Xc3.C1 1.27404f
+-C74 X2_Xps.D Xc2.C1 1.35383f
+-C75 X1_Xpi.G X3_Xps.D 0.19362f
+-C76 Xc1.C1 X2_Xns.D 0.02515f
+-C77 X1_Xpi.G X2_Xns.D 0.18881f
+-C78 Xc1.C1 Xc2.C1 7.90077f
+-C79 X1_Xpi.G Xc2.C1 2.39356f
+-C80 Xc1.C1 X2_Xps.D 0.20357f
+-C81 Xc1.C1 X1_Xns.D 1.6406f
+-C82 X1_Xpi.G X2_Xps.D 0.9726f
+-C83 X1_Xpi.G X1_Xns.D 1.2403f
+-C84 X1_Xpi.G Xc1.C1 14.1024f
+-C85 X1_Xps.D Xc1.C1 1.28527f
+-C86 X1_Xps.D X1_Xpi.G 0.1402f
++C0 Xc1.C1 X1_Xns.D 0.79723f
++C1 X1_Xpi.G X1_Xns.D 0.20548f
++C2 X1_Xpi.G Xc1.C1 2.58133f
++C3 bias_p X4_Xns.D 0.18225f
++C4 bias_p Xc4.C1 0.08787f
++C5 bias_p X4_Xps.D 3.89566f
++C6 X1_Xps.D bias_n 0.15463f
++C7 Xbias.Xb2.D bias_n 0.35421f
++C8 X1_Xps.D vdd 3.87175f
++C9 Xbias.Xb2.D vdd 0.34322f
++C10 clk Xbp1.D 10.9509f
++C11 bias_p X3_Xns.D 0.18225f
++C12 bias_p bias_n 37.396f
++C13 clk vdd 0.91555f
++C14 bias_p Xc3.C1 0.09122f
++C15 bias_p vdd 23.7033f
++C16 bias_p X3_Xps.D 3.89566f
++C17 bias_p X5_Xps.D 3.73804f
++C18 Xc1.C1 X1_Xps.D 0.3164f
++C19 X1_Xpi.G X1_Xps.D 0.19601f
++C20 bias_p X1_Xns.D 0.44071f
++C21 bias_p Xc1.C1 0.09946f
++C22 X2_Xns.D bias_n 3.88953f
++C23 Xc2.C1 X3_Xns.D 0.02515f
++C24 bias_p X1_Xpi.G 0.36402f
++C25 Xc2.C1 bias_n 0.09257f
++C26 X2_Xns.D vdd 0.15463f
++C27 Xc2.C1 Xc3.C1 2.55994f
++C28 X2_Xps.D bias_n 0.15463f
++C29 Xc2.C1 vdd 1.0316f
++C30 Xc2.C1 X3_Xps.D 0.20936f
++C31 X2_Xps.D vdd 3.87131f
++C32 X2_Xns.D Xc1.C1 0.02515f
++C33 Xc2.C1 Xc1.C1 2.33705f
++C34 X2_Xns.D X1_Xpi.G 0.17954f
++C35 Xc2.C1 X1_Xpi.G 1.13555f
++C36 X2_Xps.D Xc1.C1 0.20987f
++C37 X2_Xps.D X1_Xpi.G 0.18563f
++C38 Xc4.C1 X4_Xns.D 0.60883f
++C39 bias_p X1_Xps.D 5.47308f
++C40 bias_p Xbias.Xb2.D 6.27185f
++C41 X4_Xps.D Xc4.C1 0.37484f
++C42 bias_n X4_Xns.D 3.88953f
++C43 Xc3.C1 X4_Xns.D 0.02515f
++C44 vdd X4_Xns.D 0.15463f
++C45 bias_n Xc4.C1 0.08822f
++C46 Xc3.C1 Xc4.C1 2.78377f
++C47 X5_Xns.D Xc4.C1 0.02515f
++C48 vdd Xc4.C1 1.05244f
++C49 bias_n X4_Xps.D 0.15463f
++C50 Xc3.C1 X4_Xps.D 0.20836f
++C51 X5_Xps.D Xc4.C1 0.20501f
++C52 vdd X4_Xps.D 3.87131f
++C53 bias_n X3_Xns.D 3.88953f
++C54 Xc3.C1 X3_Xns.D 0.6751f
++C55 bias_p X2_Xns.D 0.18225f
++C56 bias_n Xc3.C1 0.09157f
++C57 vdd X3_Xns.D 0.15463f
++C58 bias_n X5_Xns.D 3.84279f
++C59 vdd Xbp1.D 1.38423f
++C60 vdd bias_n 39.8723f
++C61 X1_Xpi.G X4_Xns.D 0.17084f
++C62 bias_p Xc2.C1 0.09223f
++C63 bias_n X3_Xps.D 0.15463f
++C64 vdd Xc3.C1 1.04553f
++C65 X3_Xps.D Xc3.C1 0.35545f
++C66 bias_n X5_Xps.D 0.17438f
++C67 vdd X5_Xns.D 0.16451f
++C68 X1_Xpi.G Xc4.C1 6.11589f
++C69 bias_p X2_Xps.D 4.21399f
++C70 vdd X3_Xps.D 3.87131f
++C71 vdd X5_Xps.D 3.87131f
++C72 X1_Xpi.G X4_Xps.D 0.17979f
++C73 X1_Xns.D bias_n 3.88961f
++C74 X1_Xns.D vdd 0.15463f
++C75 Xc1.C1 bias_n 0.09305f
++C76 X1_Xpi.G X3_Xns.D 0.17753f
++C77 X1_Xpi.G Xbp1.D 2.56606f
++C78 X1_Xpi.G bias_n 0.45854f
++C79 Xc1.C1 vdd 1.02414f
++C80 X1_Xpi.G Xc3.C1 1.62828f
++C81 Xc2.C1 X2_Xns.D 0.73669f
++C82 X1_Xpi.G X5_Xns.D 0.55905f
++C83 X1_Xpi.G vdd 5.85308f
++C84 X1_Xpi.G X3_Xps.D 0.18414f
++C85 X1_Xpi.G X5_Xps.D 0.49069f
++C86 X2_Xps.D Xc2.C1 0.33373f
+ C87 clk vss 13.21499f
+-C88 bias_p vss 79.52169f
+-C89 bias_n vss 0.10174p
+-C90 vdd vss 0.19708p
+-C91 Xbp1.D vss 27.21623f
+-C92 X5_Xns.D vss 14.86821f
+-C93 X5_Xps.D vss 12.89655f
+-C94 X4_Xns.D vss 14.86789f
+-C95 Xc4.C1 vss 30.25167f
+-C96 X4_Xps.D vss 12.12642f
+-C97 X3_Xns.D vss 14.2841f
+-C98 Xc3.C1 vss 27.55348f
+-C99 X3_Xps.D vss 11.55729f
+-C100 X2_Xns.D vss 13.73568f
+-C101 Xc2.C1 vss 26.37326f
+-C102 X2_Xps.D vss 10.98633f
+-C103 X1_Xns.D vss 12.23433f
+-C104 Xc1.C1 vss 23.33204f
+-C105 X1_Xpi.G vss 54.27979f
+-C106 X1_Xps.D vss 10.61548f
++C88 bias_p vss 85.13939f
++C89 bias_n vss 0.10308p
++C90 vdd vss 0.20051p
++C91 Xbp1.D vss 29.01101f
++C92 X5_Xns.D vss 16.01771f
++C93 X5_Xps.D vss 14.48746f
++C94 X4_Xns.D vss 15.61556f
++C95 Xc4.C1 vss 12.24405f
++C96 X4_Xps.D vss 13.97503f
++C97 X3_Xns.D vss 14.97498f
++C98 Xc3.C1 vss 12.21182f
++C99 X3_Xps.D vss 13.38248f
++C100 X2_Xns.D vss 14.33353f
++C101 Xc2.C1 vss 12.36318f
++C102 X2_Xps.D vss 12.48326f
++C103 X1_Xns.D vss 13.36924f
++C104 Xc1.C1 vss 12.75191f
++C105 X1_Xpi.G vss 44.60124f
++C106 X1_Xps.D vss 11.57546f
+ C107 Xbias.Xb2.D vss 20.79524f
+-C108 X3_Xns.D.t1 vss 0.01278f
+-C109 X3_Xns.D.n0 vss 4.41683f
+-C110 X3_Xns.D.t0 vss 0.01278f
++C108 X3_Xns.D.t1 vss 0.00723f
++C109 X3_Xns.D.n0 vss 2.49647f
++C110 X3_Xns.D.t0 vss 0.00723f
+ C111 X3_Xps.D.t1 vss 0.02895f
+ C112 X3_Xps.D.n0 vss 4.73701f
+ C113 X3_Xps.D.t0 vss 0.02895f
+ C114 X5_Xns.D.t1 vss 0.00658f
+ C115 X5_Xns.D.n0 vss 2.40932f
+ C116 X5_Xns.D.t0 vss 0.00658f
+-C117 clk.t0 vss 0.01814f
+-C118 clk.t1 vss 0.03723f
++C117 clk.t1 vss 0.01814f
++C118 clk.t0 vss 0.03723f
+ C119 clk.n0 vss 6.76593f
+ C120 Xbias.Xb2.D.t2 vss 0.0083f
+ C121 Xbias.Xb2.D.t0 vss 0.61427f
+ C122 Xbias.Xb2.D.n0 vss 2.41562f
+ C123 Xbias.Xb2.D.n1 vss 1.26168f
+ C124 Xbias.Xb2.D.t1 vss 0.0083f
+-C125 X4_Xns.D.t1 vss 0.01263f
+-C126 X4_Xns.D.n0 vss 4.51846f
+-C127 X4_Xns.D.t0 vss 0.01263f
++C125 X4_Xns.D.t1 vss 0.00694f
++C126 X4_Xns.D.n0 vss 2.48197f
++C127 X4_Xns.D.t0 vss 0.00694f
+ C128 X4_Xps.D.t1 vss 0.02782f
+ C129 X4_Xps.D.n0 vss 4.71163f
+ C130 X4_Xps.D.t0 vss 0.02782f
+-C131 Xbp1.D.t3 vss 0.68623f
+-C132 Xbp1.D.t2 vss 0.62547f
+-C133 Xbp1.D.n0 vss 8.43521f
+-C134 Xbp1.D.t1 vss 0.03024f
+-C135 Xbp1.D.n1 vss 2.68867f
+-C136 Xbp1.D.n2 vss 3.30312f
+-C137 Xbp1.D.t0 vss 0.01474f
++C131 Xbp1.D.t3 vss 0.4912f
++C132 Xbp1.D.t2 vss 0.4477f
++C133 Xbp1.D.n0 vss 6.03783f
++C134 Xbp1.D.t1 vss 0.01055f
++C135 Xbp1.D.n1 vss 2.36434f
++C136 Xbp1.D.n2 vss 1.92452f
++C137 Xbp1.D.t0 vss 0.02164f
+ C138 X5_Xps.D.t1 vss 0.02608f
+ C139 X5_Xps.D.n0 vss 4.56756f
+ C140 X5_Xps.D.t0 vss 0.02608f
+ C141 X1_Xns.D.t1 vss 0.00788f
+ C142 X1_Xns.D.n0 vss 2.528f
+ C143 X1_Xns.D.t0 vss 0.00788f
+-C144 X1_Xpi.G.t5 vss 2.41913f
+-C145 X1_Xpi.G.t3 vss 2.63101f
+-C146 X1_Xpi.G.n0 vss 5.95253f
+-C147 X1_Xpi.G.t4 vss 0.56109f
+-C148 X1_Xpi.G.n1 vss 1.63366f
+-C149 X1_Xpi.G.t6 vss 0.26106f
+-C150 X1_Xpi.G.n2 vss 3.48434f
+-C151 X1_Xpi.G.t2 vss 0.25755f
+-C152 X1_Xpi.G.n3 vss 10.2041f
+-C153 X1_Xpi.G.t1 vss 0.02942f
+-C154 X1_Xpi.G.n4 vss 8.99184f
+-C155 X1_Xpi.G.n5 vss 2.4728f
+-C156 X1_Xpi.G.t0 vss 0.01434f
++C144 X1_Xpi.G.t5 vss 0.88724f
++C145 X1_Xpi.G.t3 vss 1.04151f
++C146 X1_Xpi.G.n0 vss 2.0182f
++C147 X1_Xpi.G.t4 vss 0.33627f
++C148 X1_Xpi.G.n1 vss 0.59918f
++C149 X1_Xpi.G.t6 vss 0.0696f
++C150 X1_Xpi.G.n2 vss 0.85151f
++C151 X1_Xpi.G.t2 vss 0.05758f
++C152 X1_Xpi.G.n3 vss 4.88872f
++C153 X1_Xpi.G.t1 vss 0.01763f
++C154 X1_Xpi.G.n4 vss 4.65192f
++C155 X1_Xpi.G.n5 vss 0.69021f
++C156 X1_Xpi.G.t0 vss 0.00859f
+ C157 X1_Xps.D.t1 vss 0.03856f
+ C158 X1_Xps.D.n0 vss 5.78816f
+ C159 X1_Xps.D.t0 vss 0.03856f
+-C160 X2_Xns.D.t1 vss 0.01315f
+-C161 X2_Xns.D.n0 vss 4.37952f
+-C162 X2_Xns.D.t0 vss 0.01315f
+-C163 vdd.n0 vss 0.03202f
+-C164 vdd.n1 vss 0.03204f
+-C165 vdd.n2 vss 0.03204f
+-C166 vdd.n3 vss 0.03204f
+-C167 vdd.n4 vss 0.2219f
+-C168 vdd.t21 vss 0.31931f
+-C169 vdd.n7 vss 0.2219f
+-C170 vdd.n8 vss 0.03202f
+-C171 vdd.t14 vss 0.01941f
+-C172 vdd.n9 vss 0.07671f
+-C173 vdd.n10 vss 0.07546f
+-C174 vdd.n11 vss 0.07546f
+-C175 vdd.n12 vss 0.07546f
+-C176 vdd.n13 vss 0.68276f
+-C177 vdd.t13 vss 1.14017f
+-C178 vdd.n16 vss 0.68276f
+-C179 vdd.n17 vss 0.07671f
+-C180 vdd.n18 vss 1.96755f
+-C181 vdd.t4 vss 0.70053f
+-C182 vdd.n19 vss 0.87042f
+-C183 vdd.t5 vss 0.00946f
+-C184 vdd.n20 vss 1.59635f
+-C185 vdd.n21 vss 2.77264f
+-C186 vdd.t8 vss 0.01941f
+-C187 vdd.n22 vss 3.10891f
+-C188 vdd.n23 vss 0.07671f
+-C189 vdd.n24 vss 0.07546f
+-C190 vdd.n25 vss 0.07546f
+-C191 vdd.n26 vss 0.07546f
+-C192 vdd.n27 vss 0.68276f
+-C193 vdd.t7 vss 1.14017f
+-C194 vdd.n30 vss 0.68276f
+-C195 vdd.n31 vss 0.07671f
+-C196 vdd.n32 vss 1.26453f
+-C197 vdd.n33 vss 0.02875f
+-C198 vdd.n34 vss 0.02902f
+-C199 vdd.n35 vss 0.02902f
+-C200 vdd.n36 vss 0.02902f
+-C201 vdd.n37 vss 0.18818f
+-C202 vdd.t1 vss 0.26212f
+-C203 vdd.n40 vss 0.18818f
+-C204 vdd.n41 vss 0.02875f
+-C205 vdd.n42 vss 2.22476f
+-C206 vdd.t10 vss 0.01941f
+-C207 vdd.n43 vss 2.08404f
+-C208 vdd.n44 vss 0.07671f
+-C209 vdd.n45 vss 0.07546f
+-C210 vdd.n46 vss 0.07546f
+-C211 vdd.n47 vss 0.07546f
+-C212 vdd.n48 vss 0.68276f
+-C213 vdd.t9 vss 1.14017f
+-C214 vdd.n51 vss 0.68276f
+-C215 vdd.n52 vss 0.07671f
+-C216 vdd.n53 vss 1.26453f
+-C217 vdd.n54 vss 0.02875f
+-C218 vdd.n55 vss 0.02902f
+-C219 vdd.n56 vss 0.02902f
+-C220 vdd.n57 vss 0.02902f
+-C221 vdd.n58 vss 0.18818f
+-C222 vdd.t3 vss 0.26212f
+-C223 vdd.n61 vss 0.18818f
+-C224 vdd.n62 vss 0.02875f
+-C225 vdd.n63 vss 2.22476f
+-C226 vdd.t16 vss 0.01941f
+-C227 vdd.n64 vss 2.08404f
+-C228 vdd.n65 vss 0.07671f
+-C229 vdd.n66 vss 0.07546f
+-C230 vdd.n67 vss 0.07546f
+-C231 vdd.n68 vss 0.07546f
+-C232 vdd.n69 vss 0.68276f
+-C233 vdd.t15 vss 1.14017f
+-C234 vdd.n72 vss 0.68276f
+-C235 vdd.n73 vss 0.07671f
+-C236 vdd.n74 vss 1.26453f
+-C237 vdd.n75 vss 0.02875f
+-C238 vdd.n76 vss 0.02902f
+-C239 vdd.n77 vss 0.02902f
+-C240 vdd.n78 vss 0.02902f
+-C241 vdd.n79 vss 0.18818f
+-C242 vdd.t2 vss 0.26212f
+-C243 vdd.n82 vss 0.18818f
+-C244 vdd.n83 vss 0.02875f
+-C245 vdd.n84 vss 2.22476f
+-C246 vdd.t12 vss 0.01941f
+-C247 vdd.n85 vss 2.08404f
+-C248 vdd.n86 vss 0.07671f
+-C249 vdd.n87 vss 0.07546f
+-C250 vdd.n88 vss 0.07546f
+-C251 vdd.n89 vss 0.07546f
+-C252 vdd.n90 vss 0.68276f
+-C253 vdd.t11 vss 1.14017f
+-C254 vdd.n93 vss 0.68276f
+-C255 vdd.n94 vss 0.07671f
+-C256 vdd.n95 vss 1.26453f
+-C257 vdd.n96 vss 0.02875f
+-C258 vdd.n97 vss 0.02902f
+-C259 vdd.n98 vss 0.02902f
+-C260 vdd.n99 vss 0.02902f
+-C261 vdd.n100 vss 0.18818f
+-C262 vdd.t0 vss 0.26212f
+-C263 vdd.n103 vss 0.18818f
+-C264 vdd.n104 vss 0.02875f
+-C265 vdd.n105 vss 2.22476f
+-C266 vdd.t18 vss 0.01941f
+-C267 vdd.n106 vss 2.08404f
+-C268 vdd.n107 vss 0.07671f
+-C269 vdd.n108 vss 0.07546f
+-C270 vdd.n109 vss 0.07546f
+-C271 vdd.n110 vss 0.07546f
+-C272 vdd.n111 vss 0.68276f
+-C273 vdd.t17 vss 1.14017f
+-C274 vdd.n114 vss 0.68276f
+-C275 vdd.n115 vss 0.07671f
+-C276 vdd.n116 vss 1.26453f
+-C277 vdd.n117 vss 0.02875f
+-C278 vdd.n118 vss 0.02902f
+-C279 vdd.n119 vss 0.02902f
+-C280 vdd.n120 vss 0.02902f
+-C281 vdd.n121 vss 0.18818f
+-C282 vdd.t6 vss 0.26212f
+-C283 vdd.n124 vss 0.18818f
+-C284 vdd.n125 vss 0.02875f
+-C285 vdd.n126 vss 2.22476f
+-C286 vdd.t20 vss 0.01941f
+-C287 vdd.n127 vss 2.08404f
+-C288 vdd.n128 vss 0.07671f
+-C289 vdd.n129 vss 0.07546f
+-C290 vdd.n130 vss 0.07546f
+-C291 vdd.n131 vss 0.07546f
+-C292 vdd.n132 vss 0.68276f
+-C293 vdd.t19 vss 1.14017f
+-C294 vdd.n135 vss 0.68276f
+-C295 vdd.n136 vss 0.07671f
+-C296 vdd.n137 vss 1.55327f
+-C297 vdd.t22 vss 0.01941f
+-C298 vdd.n138 vss 2.65437f
+-C299 X2_Xps.D.t1 vss 0.03018f
+-C300 X2_Xps.D.n0 vss 4.76404f
+-C301 X2_Xps.D.t0 vss 0.03018f
+-C302 Xc2.C1.t4 vss 0.32192f
+-C303 Xc2.C1.t2 vss 0.28766f
+-C304 Xc2.C1.n0 vss 8.82234f
+-C305 Xc2.C1.t3 vss 0.46794f
+-C306 Xc2.C1.n1 vss 2.26993f
+-C307 Xc2.C1.t1 vss 0.03067f
+-C308 Xc2.C1.n2 vss 2.43222f
+-C309 Xc2.C1.n3 vss 2.6717f
+-C310 Xc2.C1.t0 vss 0.01495f
+-C311 Xc1.C1.t4 vss 0.36214f
+-C312 Xc1.C1.t2 vss 0.32526f
+-C313 Xc1.C1.n0 vss 10.2508f
+-C314 Xc1.C1.t3 vss 0.56981f
+-C315 Xc1.C1.n1 vss 2.60915f
+-C316 Xc1.C1.t1 vss 0.0182f
+-C317 Xc1.C1.n2 vss 3.10076f
+-C318 Xc1.C1.n3 vss 2.81668f
+-C319 Xc1.C1.t0 vss 0.03735f
+-C320 Xc4.C1.t4 vss 0.31659f
+-C321 Xc4.C1.t3 vss 0.28118f
+-C322 Xc4.C1.n0 vss 8.27197f
+-C323 Xc4.C1.t2 vss 0.41071f
+-C324 Xc4.C1.n1 vss 2.15667f
+-C325 Xc4.C1.t1 vss 0.02692f
+-C326 Xc4.C1.n2 vss 2.29062f
+-C327 Xc4.C1.n3 vss 2.50834f
+-C328 Xc4.C1.t0 vss 0.01312f
+-C329 bias_p.t6 vss 7.48045f
+-C330 bias_p.t0 vss 2.03368f
+-C331 bias_p.n0 vss 3.00854f
+-C332 bias_p.t1 vss 0.04003f
+-C333 bias_p.n1 vss 2.89352f
+-C334 bias_p.t2 vss 0.01951f
+-C335 bias_p.n2 vss 3.7427f
+-C336 bias_p.n3 vss 5.37481f
+-C337 bias_p.t5 vss 3.48314f
+-C338 bias_p.n4 vss 9.26942f
+-C339 bias_p.t8 vss 3.48314f
+-C340 bias_p.n5 vss 7.78202f
+-C341 bias_p.t7 vss 3.48314f
+-C342 bias_p.n6 vss 7.78202f
+-C343 bias_p.t3 vss 3.48314f
+-C344 bias_p.n7 vss 12.1749f
+-C345 bias_p.t4 vss 4.47244f
+-C346 bias_n.t2 vss 0.01916f
++C160 X2_Xns.D.t1 vss 0.00754f
++C161 X2_Xns.D.n0 vss 2.51179f
++C162 X2_Xns.D.t0 vss 0.00754f
++C163 vdd.n0 vss 0.03191f
++C164 vdd.n1 vss 0.03194f
++C165 vdd.n2 vss 0.03194f
++C166 vdd.n3 vss 0.03194f
++C167 vdd.n4 vss 0.22115f
++C168 vdd.t0 vss 0.31824f
++C169 vdd.n7 vss 0.22115f
++C170 vdd.n8 vss 0.03191f
++C171 vdd.t8 vss 0.01935f
++C172 vdd.n9 vss 0.07645f
++C173 vdd.n10 vss 0.07521f
++C174 vdd.n11 vss 0.07521f
++C175 vdd.n12 vss 0.07521f
++C176 vdd.n13 vss 0.68047f
++C177 vdd.t7 vss 1.13634f
++C178 vdd.n16 vss 0.68047f
++C179 vdd.n17 vss 0.07645f
++C180 vdd.n18 vss 1.96094f
++C181 vdd.t2 vss 0.69818f
++C182 vdd.n19 vss 0.86749f
++C183 vdd.t3 vss 0.00943f
++C184 vdd.n20 vss 1.59099f
++C185 vdd.n21 vss 2.76332f
++C186 vdd.t12 vss 0.01935f
++C187 vdd.n22 vss 3.09846f
++C188 vdd.n23 vss 0.07645f
++C189 vdd.n24 vss 0.07521f
++C190 vdd.n25 vss 0.07521f
++C191 vdd.n26 vss 0.07521f
++C192 vdd.n27 vss 0.68047f
++C193 vdd.t11 vss 1.13634f
++C194 vdd.n30 vss 0.68047f
++C195 vdd.n31 vss 0.07645f
++C196 vdd.n32 vss 1.26029f
++C197 vdd.n33 vss 0.02865f
++C198 vdd.n34 vss 0.02892f
++C199 vdd.n35 vss 0.02892f
++C200 vdd.n36 vss 0.02892f
++C201 vdd.n37 vss 0.18755f
++C202 vdd.t22 vss 0.26124f
++C203 vdd.n40 vss 0.18755f
++C204 vdd.n41 vss 0.02865f
++C205 vdd.n42 vss 2.21728f
++C206 vdd.t10 vss 0.01935f
++C207 vdd.n43 vss 2.07703f
++C208 vdd.n44 vss 0.07645f
++C209 vdd.n45 vss 0.07521f
++C210 vdd.n46 vss 0.07521f
++C211 vdd.n47 vss 0.07521f
++C212 vdd.n48 vss 0.68047f
++C213 vdd.t9 vss 1.13634f
++C214 vdd.n51 vss 0.68047f
++C215 vdd.n52 vss 0.07645f
++C216 vdd.n53 vss 1.26029f
++C217 vdd.n54 vss 0.02865f
++C218 vdd.n55 vss 0.02892f
++C219 vdd.n56 vss 0.02892f
++C220 vdd.n57 vss 0.02892f
++C221 vdd.n58 vss 0.18755f
++C222 vdd.t18 vss 0.26124f
++C223 vdd.n61 vss 0.18755f
++C224 vdd.n62 vss 0.02865f
++C225 vdd.n63 vss 2.21728f
++C226 vdd.t16 vss 0.01935f
++C227 vdd.n64 vss 2.07703f
++C228 vdd.n65 vss 0.07645f
++C229 vdd.n66 vss 0.07521f
++C230 vdd.n67 vss 0.07521f
++C231 vdd.n68 vss 0.07521f
++C232 vdd.n69 vss 0.68047f
++C233 vdd.t15 vss 1.13634f
++C234 vdd.n72 vss 0.68047f
++C235 vdd.n73 vss 0.07645f
++C236 vdd.n74 vss 1.26029f
++C237 vdd.n75 vss 0.02865f
++C238 vdd.n76 vss 0.02892f
++C239 vdd.n77 vss 0.02892f
++C240 vdd.n78 vss 0.02892f
++C241 vdd.n79 vss 0.18755f
++C242 vdd.t19 vss 0.26124f
++C243 vdd.n82 vss 0.18755f
++C244 vdd.n83 vss 0.02865f
++C245 vdd.n84 vss 2.21728f
++C246 vdd.t6 vss 0.01935f
++C247 vdd.n85 vss 2.07703f
++C248 vdd.n86 vss 0.07645f
++C249 vdd.n87 vss 0.07521f
++C250 vdd.n88 vss 0.07521f
++C251 vdd.n89 vss 0.07521f
++C252 vdd.n90 vss 0.68047f
++C253 vdd.t5 vss 1.13634f
++C254 vdd.n93 vss 0.68047f
++C255 vdd.n94 vss 0.07645f
++C256 vdd.n95 vss 1.26029f
++C257 vdd.n96 vss 0.02865f
++C258 vdd.n97 vss 0.02892f
++C259 vdd.n98 vss 0.02892f
++C260 vdd.n99 vss 0.02892f
++C261 vdd.n100 vss 0.18755f
++C262 vdd.t4 vss 0.26124f
++C263 vdd.n103 vss 0.18755f
++C264 vdd.n104 vss 0.02865f
++C265 vdd.n105 vss 2.21728f
++C266 vdd.t14 vss 0.01935f
++C267 vdd.n106 vss 2.07703f
++C268 vdd.n107 vss 0.07645f
++C269 vdd.n108 vss 0.07521f
++C270 vdd.n109 vss 0.07521f
++C271 vdd.n110 vss 0.07521f
++C272 vdd.n111 vss 0.68047f
++C273 vdd.t13 vss 1.13634f
++C274 vdd.n114 vss 0.68047f
++C275 vdd.n115 vss 0.07645f
++C276 vdd.n116 vss 1.26029f
++C277 vdd.n117 vss 0.02865f
++C278 vdd.n118 vss 0.02892f
++C279 vdd.n119 vss 0.02892f
++C280 vdd.n120 vss 0.02892f
++C281 vdd.n121 vss 0.18755f
++C282 vdd.t17 vss 0.26124f
++C283 vdd.n124 vss 0.18755f
++C284 vdd.n125 vss 0.02865f
++C285 vdd.n126 vss 2.21728f
++C286 vdd.t21 vss 0.01935f
++C287 vdd.n127 vss 2.07703f
++C288 vdd.n128 vss 0.07645f
++C289 vdd.n129 vss 0.07521f
++C290 vdd.n130 vss 0.07521f
++C291 vdd.n131 vss 0.07521f
++C292 vdd.n132 vss 0.68047f
++C293 vdd.t20 vss 1.13634f
++C294 vdd.n135 vss 0.68047f
++C295 vdd.n136 vss 0.07645f
++C296 vdd.n137 vss 1.54805f
++C297 vdd.t1 vss 0.01935f
++C298 vdd.n138 vss 2.64545f
++C299 X2_Xps.D.t1 vss 0.03135f
++C300 X2_Xps.D.n0 vss 4.94727f
++C301 X2_Xps.D.t0 vss 0.03135f
++C302 Xc2.C1.t4 vss 0.05252f
++C303 Xc2.C1.t2 vss 0.0574f
++C304 Xc2.C1.n0 vss 1.92268f
++C305 Xc2.C1.t3 vss 0.24209f
++C306 Xc2.C1.n1 vss 0.87345f
++C307 Xc2.C1.t1 vss 0.01587f
++C308 Xc2.C1.n2 vss 0.45929f
++C309 Xc2.C1.n3 vss 0.52258f
++C310 Xc2.C1.t0 vss 0.00773f
++C311 Xc1.C1.t4 vss 0.05189f
++C312 Xc1.C1.t2 vss 0.05759f
++C313 Xc1.C1.n0 vss 1.88542f
++C314 Xc1.C1.t3 vss 0.24948f
++C315 Xc1.C1.n1 vss 0.93073f
++C316 Xc1.C1.t1 vss 0.01635f
++C317 Xc1.C1.n2 vss 0.44163f
++C318 Xc1.C1.n3 vss 0.50362f
++C319 Xc1.C1.t0 vss 0.00797f
++C320 Xc4.C1.t4 vss 0.09812f
++C321 Xc4.C1.t3 vss 0.10421f
++C322 Xc4.C1.n0 vss 3.61499f
++C323 Xc4.C1.t2 vss 0.4151f
++C324 Xc4.C1.n1 vss 1.39314f
++C325 Xc4.C1.t1 vss 0.01326f
++C326 Xc4.C1.n2 vss 1.00951f
++C327 Xc4.C1.n3 vss 0.8906f
++C328 Xc4.C1.t0 vss 0.02721f
++C329 bias_p.t6 vss 6.91103f
++C330 bias_p.t1 vss 1.87887f
++C331 bias_p.n0 vss 2.77952f
++C332 bias_p.t2 vss 0.03698f
++C333 bias_p.n1 vss 2.67326f
++C334 bias_p.t0 vss 0.01802f
++C335 bias_p.n2 vss 3.4578f
++C336 bias_p.n3 vss 4.96567f
++C337 bias_p.t5 vss 3.218f
++C338 bias_p.n4 vss 8.56382f
++C339 bias_p.t8 vss 3.218f
++C340 bias_p.n5 vss 7.18965f
++C341 bias_p.t7 vss 3.218f
++C342 bias_p.n6 vss 7.18965f
++C343 bias_p.t3 vss 3.218f
++C344 bias_p.n7 vss 11.2481f
++C345 bias_p.t4 vss 4.13199f
++C346 bias_n.t0 vss 0.01916f
+ C347 bias_n.t4 vss 1.41862f
+ C348 bias_n.n0 vss 6.60252f
+-C349 bias_n.t0 vss 1.41862f
++C349 bias_n.t1 vss 1.41862f
+ C350 bias_n.n1 vss 1.74024f
+-C351 bias_n.t1 vss 0.01916f
++C351 bias_n.t2 vss 0.01916f
+ C352 bias_n.n2 vss 1.86121f
+ C353 bias_n.t8 vss 7.34634f
+-C354 bias_n.n3 vss 0.90346f
++C354 bias_n.n3 vss 0.90345f
+ C355 bias_n.n4 vss 7.05844f
+ C356 bias_n.t6 vss 2.91524f
+ C357 bias_n.n5 vss 10.6972f
+@@ -1253,14 +1253,14 @@
+ C362 bias_n.t7 vss 2.91524f
+ C363 bias_n.n8 vss 11.6516f
+ C364 bias_n.t3 vss 3.90164f
+-C365 Xc3.C1.t3 vss 0.3119f
+-C366 Xc3.C1.t4 vss 0.27779f
+-C367 Xc3.C1.n0 vss 8.34485f
+-C368 Xc3.C1.t2 vss 0.42798f
+-C369 Xc3.C1.n1 vss 2.16214f
+-C370 Xc3.C1.t1 vss 0.01367f
+-C371 Xc3.C1.n2 vss 2.52889f
+-C372 Xc3.C1.n3 vss 2.30585f
+-C373 Xc3.C1.t0 vss 0.02806f
++C365 Xc3.C1.t3 vss 0.05867f
++C366 Xc3.C1.t4 vss 0.06319f
++C367 Xc3.C1.n0 vss 2.15731f
++C368 Xc3.C1.t2 vss 0.25911f
++C369 Xc3.C1.n1 vss 0.90255f
++C370 Xc3.C1.t1 vss 0.00828f
++C371 Xc3.C1.n2 vss 0.59501f
++C372 Xc3.C1.n3 vss 0.52398f
++C373 Xc3.C1.t0 vss 0.01699f
+ .ends
+ 

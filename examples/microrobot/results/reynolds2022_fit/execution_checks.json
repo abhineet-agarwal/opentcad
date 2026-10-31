@@ -1,0 +1,23 @@
+{
+  "checks": "Source, frozen baseline, executing code identities and refusal preservation verified after actual analysis",
+  "targeted_tests": {
+    "command": ".venv/bin/python -m pytest tests/integration/test_reynolds_fit.py tests/integration/test_reynolds_data.py -q",
+    "passed": 34
+  },
+  "ruff_check": "Passed for owned candidate module and tests",
+  "artifact_sha256_before_archive_refusal": {
+    "fit_report.json": "9511f02cb56ff38e9e513ed0af7832919802f98b8cfb2f239793a446f92ba6ca",
+    "pv_candidates_and_residuals.png": "015031d217d67243968e0cddfe74f27bb749e39400c2d7274a76ab3c834c7ae3",
+    "README.md": "c900515c979eb84835fb2f3ff37f88940f1a04b994d291da17213770026dad2a"
+  },
+  "actual_archive_refusal_exit": 2,
+  "sources_unchanged": true,
+  "historical_fit_unchanged": true,
+  "candidate_code_matches_report_hash": true,
+  "loader_and_core_match_report_hashes": true,
+  "all_nine_fits_and_27_starts_converged": true,
+  "any_chosen_active_bounds": false,
+  "visual_check": "Viewed pv_candidates_and_residuals.png; four panels, legends, residual sign, heldout bands and axes readable",
+  "runtime_note": "Matplotlib default cache paths were unwritable in sandbox; automatic temporary font/cache fallback completed and produced PNG. No numerical analysis failure.",
+  "scope": "No full suite run by this worker; no default/core/circuit changes, simulator, refit of old raster data or raw-data copying"
+}

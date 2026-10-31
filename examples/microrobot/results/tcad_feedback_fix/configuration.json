@@ -1,0 +1,28 @@
+{
+  "source_deck_sha256": "9b48b749d8b41cd4f07bed234febfcc729e04ab0be9bed8d9e2be0ca90918d23",
+  "logic_history_sha256": "71faa27e2cde3f5896f32753749144bb93e66f33d3311ac59db736f613e66ccf",
+  "transform": "Delete the other active copy and its saved vectors only; names, definitions, options, OP and replay unchanged",
+  "initial_runs": [
+    "rc",
+    "stable"
+  ],
+  "stop_s": 0.00025,
+  "max_step_s": 2.5e-08,
+  "limits": {
+    "benchmark_eta_abs_V": 1e-06,
+    "benchmark_coverage_abs": 1e-08,
+    "benchmark_current_abs_A": 5e-12,
+    "benchmark_relative_peak": 0.02,
+    "model_eta_abs_V": 1e-07,
+    "model_coverage_abs": 1e-09,
+    "model_current_abs_A": 1e-12,
+    "model_relative_peak": 0.001
+  },
+  "final_source_dependency_sha256": {
+    "examples/microrobot/tcad_feedback_fix.py": "c97a499b01423bdef408810f8cfe49544d52b29426e0090934020595b992b165",
+    "tests/integration/test_tcad_feedback_fix.py": "59311466a148015eb39cc244e33c4c34a71ff47d5b53b08f1cbb0df571ce9a97",
+    "examples/microrobot/tcad_actuator_feedback_replay.py": "0966d6ecf4b3ef23ceed9a87a46e0946254c66c287b8266e92b63c366c302f4d",
+    "examples/microrobot/tcad_electrode_replay.py": "35c113e677a1aa7140155dad8d25c12134195d0016725ff87ec284c569b47234",
+    "examples/microrobot/tcad_controller.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4"
+  }
+}

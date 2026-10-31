@@ -1,0 +1,14 @@
+{
+  "default_routing_script_byte_identical_to_baseline": true,
+  "explicit_baseline_identical_to_default": true,
+  "unknown_variant_rejected": true,
+  "physical_gates_pass": true,
+  "full_transients_complete": true,
+  "new_variant_steady_q_count": 5,
+  "new_variant_exact_two_clock_rises_per_sustained_Q_period": true,
+  "paint_extent_unchanged": true,
+  "generator_snapshot_matches": true,
+  "previous_manifest_verified": true,
+  "raw_transient_and_PDF_not_exported": true,
+  "baseline_script_sha256": "6c014e250875d2a76fe854f54c678994e493aed408e0808276d91d8cd82859f2"
+}

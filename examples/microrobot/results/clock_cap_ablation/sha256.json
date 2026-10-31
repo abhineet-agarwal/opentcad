@@ -1,0 +1,13 @@
+{
+  ".spiceinit": "b507bb3081b1ab6e15858fe2315bcd1881ef24b2fdd57d997c4cef4ac85464fc",
+  "README.md": "a5fb0f4e5fb111881107602fe1091ad4071d2f9f3730f3321ebbf9620f87b5cc",
+  "clock.spice": "3958431caea79bcfb073e28d83ffdb0831ddb23bc6f612b19795b42a80ef972c",
+  "clock_rc_no_explicit_c.spice": "365de63975496d58b6d146957004d254ffa17e10ef3f9aaf6e3f893ccbb20126",
+  "deck.diff": "5e715a9d77362075850b357f14f7258440797a00cfbd5b16238076bf2dac5e8a",
+  "execution.json": "b6b5b814c87783013625253a37f16ea00a879eeedcbf02cd914212bd62cf3c47",
+  "metrics.json": "0cd61455d12d17152072d505c0a5bfdb4df011b28f7f96586944f6c6f64edb18",
+  "netlist.diff": "ebd57d324b7b9ea51a156ad636414210ad96a320291a7a1d483ff6c9db12c67a",
+  "ngspice.log": "ac2da0dd516979afb2fcbcd637a5c096e9a690b643df6f2998172494f5ccb70e",
+  "receiver_cells.spice": "ccc2090db2ee04c1370e33e07c95be0f4b2276e0c1b9ad1426a27eeaacd291ef",
+  "run_diagnostic.py": "05ab13974cd58d5fa52c8ade60d8ccb6edf6fbc5ef7f3c0f520171cb76baf6a9"
+}

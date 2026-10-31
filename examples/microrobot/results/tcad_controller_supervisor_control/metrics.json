@@ -1,0 +1,111 @@
+{
+  "complete": false,
+  "failure": "Transient did not reach its requested stop time",
+  "requested_stop_s": 0.008,
+  "actual_stop_s": 8.153384283850372e-05,
+  "rows": 4930,
+  "gates": {
+    "complete_finite": false,
+    "DD_domain": true,
+    "released_logic_1p4_to_1p94_V": true,
+    "native_DFF_maps_clock": false,
+    "three_complete_phase_cycles": false,
+    "quadrature_order": false,
+    "both_electrode_polarities": false,
+    "coverage_bounded": true,
+    "phase_correlated_coverage_curvature": false,
+    "reset_midpoint_clamp_50mV": true,
+    "electrode_rail_excursion_100mV": true,
+    "supply_energy_balance_2percent": true,
+    "electrode_energy_balance_2percent": true,
+    "solution_KCL_1pA": true,
+    "supervisor_matches_global_hysteresis": true,
+    "supervisor_off_before_200us": true,
+    "driver_not_released_before_200us": true
+  },
+  "all_gates_pass": false,
+  "cell_domain_min_max_V": [
+    -2.4187660091751094e-15,
+    0.4554041860715054
+  ],
+  "logic_min_max_V": [
+    -1.1748267562392627e-17,
+    1.6117600550343394
+  ],
+  "released_logic_min_max_V": null,
+  "qualified_start_s": 0.008,
+  "native_clock_rises": [],
+  "native_Q_rises": [],
+  "native_Q_falls": [],
+  "Q_changes_per_clock_rise": [],
+  "phase_A_rises_s": [],
+  "phase_B_rises_s": [],
+  "phase_B_lag_cycles": [],
+  "phase_states": [],
+  "reset_clamp_peak_V": 1.2019241675265135e-06,
+  "cold_0_to_40us_metal_error_V": 0.005736312304079949,
+  "rail_excursion_V": 1.6971620040651067e-15,
+  "theta_min_max": [
+    0.49999997150754383,
+    0.5000001424612917
+  ],
+  "coverage_swing": [
+    0,
+    0
+  ],
+  "curvature_swing_m_inv": [
+    0,
+    0
+  ],
+  "eta_vs_coverage_derivative_correlation": [
+    null,
+    null
+  ],
+  "energy_J": {
+    "PV_delivered": 5.163787135642904e-12,
+    "storage_delta": 3.319645893374012e-12,
+    "measured_load_ports": {
+      "clock": 1.4368040675885805e-12,
+      "first_DFF_feedback": 1.0115184427744716e-13,
+      "digital_proxy": 4.7604485907372306e-14,
+      "phase_bridge": 0.0,
+      "drivers_logic": 2.0691223119408363e-14,
+      "supervisor_reset_bridge": -8.208371862835752e-23,
+      "drivers_upper": 2.4007281023130113e-13,
+      "supervisor_driver_bridge": -2.5590679830776123e-23,
+      "drivers_mid": -1.8514206691923223e-15,
+      "Pt_return_port": -5.39706054299909e-16
+    },
+    "supply_balance_residual": 2.07937975949624e-16,
+    "electrode_metal_port_work": 5.3719515098107436e-18,
+    "double_layer_delta": 1.1603787619630657e-20,
+    "signed_adsorption_work": 1.568352348410316e-21,
+    "Faradaic_loss": 3.865556705560082e-24,
+    "solution_resistive_loss": 5.358731365038718e-18,
+    "phase_bridge_resistive_loss": 3.060830782699511e-20,
+    "electrode_balance_residual": 4.413924727883752e-23
+  },
+  "electrode_terminal_vs_solution_current_max_A": 1.0588866677163955e-14,
+  "solution_KCL_max_A": 5.10702441101233e-22,
+  "supervisor_contract": {
+    "scope": "Functional global supervisor; native reset/POR and supervisor quiescent power uncharacterized",
+    "gates": {
+      "supervisor_matches_global_hysteresis": true,
+      "supervisor_off_before_200us": true,
+      "driver_not_released_before_200us": true
+    },
+    "command_transition_samples": [],
+    "reference_mismatch_samples": 0,
+    "mismatch_away_from_threshold_samples": 0,
+    "reset_release_crossings_s": [
+      9.420187858671994e-14,
+      2.1973154877858162e-07
+    ],
+    "driver_release_crossings_s": [
+      9.281856387867774e-10
+    ]
+  },
+  "raw_local_path": "/Users/abhineet/Documents/opentcad_final/examples/microrobot/local_runs/tcad_controller_supervisor_control/controller.dat",
+  "raw_sha256": "3bcd5ef82139459ba043ab86a08d83ebe4f94ec93653e30429ab6d2de0f737f0",
+  "scope": "Complete experiment only if complete=true; all prefix checks otherwise prefix-only. Functional supervisor excludes native POR and uncharacterized quiescent power."
+}

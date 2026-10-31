@@ -1,0 +1,92 @@
+{
+  "scope": "Predefined nominal TT dark/recovery observation and numerical checks; no result recorded here",
+  "status": "Defined before review of simulated dark/recovery output",
+  "illumination_PWL_s_W_m2": [
+    [
+      0,
+      0
+    ],
+    [
+      0.0001,
+      0
+    ],
+    [
+      0.001,
+      1000
+    ],
+    [
+      0.0015,
+      1000
+    ],
+    [
+      0.0016,
+      0
+    ],
+    [
+      0.0031,
+      0
+    ],
+    [
+      0.004,
+      1000
+    ],
+    [
+      0.0045,
+      1000
+    ]
+  ],
+  "stimulus_provenance": "Our chosen 1.5ms fully dark interval and 900us relight ramp, not a published shadow/restart tolerance",
+  "requested_stop_s": 0.0045,
+  "reference_max_step_s": 5e-08,
+  "conditional_refinement_max_step_s": 2.5e-08,
+  "refinement_policy": "Run25ns only if50ns reaches requested stop with finite valid data; retain an abort without claiming qualification",
+  "completion": "Saved stop >= requested_stop*(1-1e-6), all columns finite and correct shape; simulator normal exit alone is insufficient",
+  "qualified_native_edges": {
+    "logic_min_V": 1.6,
+    "reset_high_fraction_of_instantaneous_logic": 0.9,
+    "threshold_definition": "Clock/Q at50% instantaneous logic; linear interpolation on full adaptive waveform",
+    "reset_high_is": "Diagnostic convention, not a characterized native reset input-high/removal limit",
+    "reset_guard_s": 1e-06,
+    "edge_match_tolerance_s": 5e-07,
+    "criterion": "Exactly one nativeQ transition per qualified clock rising edge; classify asynchronous-resetQ changes separately. Low-rail clocks are unqualified, not passes or misses. Report counts/window durations even if no qualified recovery window exists.",
+    "guard_definition": "Exclude edges within \u00b11us of reset10%/90% transitions or qualified-rail crossings; list each excluded edge and low-rail activity separately."
+  },
+  "electrode_checks": {
+    "cold_window_s": [
+      0,
+      0.0004
+    ],
+    "cold_peak_abs_metal_minus_mid_limit_V": 0.05,
+    "definite_reset_low_logic_min_V": 1.0,
+    "definite_reset_low_actuator_min_V": 0.5,
+    "definite_reset_low_reset_fraction_max": 0.1,
+    "definite_reset_low_peak_abs_metal_minus_mid_limit_V": 0.05,
+    "outside_actuator_rails_limit_V": 0.1,
+    "interpretation": "Engineering diagnostics reused fromM4, not electrochemical safety or PDK reliability specifications. Clamp masks do not require driverenable already low, which would hide a qualifier failure. Report low-supply intervals separately without assuming functional CMOS.",
+    "additional_driver_low_mask": "Also report actual-driver-low clamp mask using driver_ready<=0.1*actuator under the same meaningful-rail conditions; report mismatch intervals rather than replacing the native-reset-low mask."
+  },
+  "recovery_observation": "Record downward/upward logic1.6V crossings, native reset assertion/release, driverenable transitions, first qualified native edge after relight, and any qualified post-relight edge windows. Do not assume settled recovery by4.5ms or infer complete restart from one edge.",
+  "end_dark_observation_s": 0.0031,
+  "end_dark_required_fields": [
+    "logic_V",
+    "actuator_V",
+    "midpoint_V",
+    "electrode_A_V",
+    "electrode_B_V",
+    "solution_A_V",
+    "solution_B_V",
+    "local_eta_A_V",
+    "local_eta_B_V",
+    "native_reset_V",
+    "driver_ready_V"
+  ],
+  "energy_reporting": "Signed offline adaptive port delivery, with exact probe locations and signed returns. Vlogic is downstream ofClogic and is a load-port delivery; positive dark energy may come from storage. ActuatorPV probes are upstream of storage and cannot be combined uncritically with that logic port as total optical energy. Report boundary changes of explicitly selected2pF/1pF stores as partial storage, not complete energy closure.",
+  "dark_state_interpretation": "No expectation of zero stored rail voltage or instant neutral localeta while electrode metal is clamped to midpoint. Electrolyte/adsorption states retain memory.",
+  "acceptance_limit": "These scoped checks do not establish autonomous controller/PVT/gait/electrochemical-safety acceptance. Report failures and insufficient qualified windows explicitly.",
+  "event_phase_observation": {
+    "reset_clear_threshold_normalized": 0.5,
+    "functional_model_settling_guard_s": 2e-06,
+    "interpretation": "Check event-phase clear after the actual normalized reset input falls below0.5, allowing2us chosen event/DAC settling. Report end-dark/end-run phase state and restart; this is a functional-model observation, not analog settling or native timing signoff."
+  },
+  "review_status": "Reviewed and accepted by Astra coordinator before result review; guards, matching tolerance and reset fractions are declared diagnostic conventions, not measured PDK timing/input limits."
+}

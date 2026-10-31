@@ -1,0 +1,8 @@
+{
+  "scope": "Exploratory buffered-ready finite-PV startup; no gait or acceptance qualification",
+  "actual_stop_s": 0.0008,
+  "rows": 14314,
+  "wall_s": 77.78939345799154,
+  "netlist_sha256": "74e7958406b62cc0890d07a73577951c640731b4e005b247d83caf26e38acf57",
+  "buffer_power_source": "Vresetact measures entire Xready actuator port; en_resetact integrates signed source delivery; total actuator PV energy includes this load"
+}

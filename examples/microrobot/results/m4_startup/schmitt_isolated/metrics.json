@@ -1,0 +1,40 @@
+{
+  "status": "Isolated exploratory Schmittreceiver; not integratedPOR",
+  "stop_requested_s": 0.0003,
+  "stop_achieved_s": 0.0003,
+  "finite_rows": 6357,
+  "wall_s": 59.59812537499238,
+  "supply_V": 1.7,
+  "imposed_input_ramp_s": 0.0001,
+  "driver_gate_load_F": 1.9e-13,
+  "uncharacterized_native_reset_placeholder_F": 5e-14,
+  "rise_threshold_V": 0.9708925414519056,
+  "fall_threshold_V": 0.5196632425075838,
+  "rise_10_90_s": 2.3683863277973232e-08,
+  "rise_rail_energy_J": 9.898489646102056e-11,
+  "rise_peak_rail_current_A": 1.60391255e-05,
+  "fall_10_90_s": 1.1258259159321491e-08,
+  "fall_rail_energy_J": 1.8457768777805482e-11,
+  "fall_peak_rail_current_A": 1.78563736e-06,
+  "hysteresis_V": 0.45122929894432184,
+  "hold_high_mean_rail_current_A": 1.0115268113666667e-11,
+  "hold_low_mean_rail_current_A": 1.0986486321945139e-11,
+  "total_rail_energy_J": 1.1744411902907327e-10,
+  "input_port_net_energy_J": 1.0968814407941206e-15,
+  "final_output_minmax_V": [
+    -0.00471622339,
+    1.70302879
+  ],
+  "interpretation": "Isolated hysteresis/slew observed but supply energy grossly exceeds2pF logic reservoir budget. Reject coupling this sizing/topology without redesign. Slow-input crowbar remains in the Schmitt receiver despite fast final edges.",
+  "2pF_1p7V_initial_energy_J": 2.8899999999999996e-12,
+  "rise_energy_to_reservoir_ratio": 34.250829225266635,
+  "rising_ramp_sampled_supply_current_A": {
+    "0.4": 1.7465101223529483e-09,
+    "0.6": 1.5765690976470622e-07,
+    "0.8": 2.444201157058825e-06,
+    "0.9": 4.890410344705887e-06,
+    "0.95": 6.327906393823532e-06,
+    "1.0": 1.6523658083220251e-09,
+    "1.2": -2.4147834438394094e-11
+  }
+}

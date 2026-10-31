@@ -1,0 +1,19 @@
+{
+  "scope": "Post-frozen-snapshot compact follow-up only; no raw.dat files",
+  "sha256": {
+    "REPORT.md": "4d6bf390e783776ade0cab7ebce6a8358a8758c23eb79c21c2e74575bf7dd52c",
+    "gear1_50ns.diff": "34b11b7aca56eef6fea013cc57e1d5760378eafa93e63c3ea762b6be8e4ca14a",
+    "gear1_with_probe_50ns/bench.spice": "787c0786c0ca15b746fc11a688148db3d54c9124d2c66b1a3c90ae18eb15e9b3",
+    "gear1_with_probe_50ns/failure_review.json": "6a70f355bfac9dab72ddf9b22913fd44ec7a80a906612b263677e42a09d40bff",
+    "gear1_with_probe_50ns/ngspice.log": "a959ba1082d30a4e3f2f5d51091d0685fbbcc336b8b137e2661baade4f10f25e",
+    "gear2_with_probe/bench.spice": "34a64523a4ce794020a5be5bfd9421d638fd7af813c5aa3bf81ef5c0c56fdafb",
+    "gear2_with_probe/failure_review.json": "e75f2dec267f9e443155e0e1f024bf2cf775488091b0036c6c48c1b0ddf0d4b7",
+    "gear2_with_probe/ngspice.log": "52754af571b689bbbea9c6d4fc2583444ea48a71b1e54b73fe09977f5ee1ff92",
+    "gear2_without_probe/bench.spice": "a9ae0c47b8147aae2af52d1e11c99ca48af4544ee4e6dcab1cbd00e694344454",
+    "gear2_without_probe/failure_review.json": "2e6b843bb73201a22d954ad1782c2d191ce81b5048e103098f3f3901e6292cb6",
+    "gear2_without_probe/ngspice.log": "42e4cefe26b2efa52017c500636eeef3e3e678fe9497cb9c86f00387d0c52ffe",
+    "hot85_no_probe.diff": "9c74c6bb97d7069034076a092fe21992c9f0a3c26cf5bb492972846a406728ae",
+    "summary.json": "563ed4ec2412bc35b5e6335b018c3d44febb7f5dfabf811b9539bb372ede90e0"
+  },
+  "verification": "Recomputed every listed hash after writing; all match"
+}

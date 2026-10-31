@@ -1,0 +1,9 @@
+{
+  "scope": "Numerical conditioning control: auxiliary energy states removed only; offline current integration required; no qualification",
+  "actual_stop_s": 0.002,
+  "rows": 101808,
+  "wall_s": 172.98811400000704,
+  "netlist_sha256": "af12f2e546903248f72fc2dfbcfb2322b3d342a05691c70d919b068536788c00",
+  "bias_connection": "Candidate sixth port wired to native clock bp only in this generated deck",
+  "power_sources": "All auxiliary energy states removed; signed source energies require offline adaptive current integration; current probes remain physical zero-V sources"
+}

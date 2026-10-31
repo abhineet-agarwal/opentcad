@@ -1,0 +1,48 @@
+{
+  "scope": "Incomplete prefix entirely before scheduled supervisor release; ON/OFF operation and full chain untested",
+  "shape": [
+    4930,
+    49
+  ],
+  "finite": true,
+  "last_time_s": 8.153384283850372e-05,
+  "trouble_equation": "vsupervisor_driver#branch",
+  "trouble_equation_is_root_cause": false,
+  "ranges": {
+    "logic": {
+      "min_V": -1.1748267562392627e-17,
+      "max_V": 1.6117600550343394,
+      "final_V": 1.5779981976646982
+    },
+    "act": {
+      "min_V": 8.33627403308522e-17,
+      "max_V": 1.8216120597215657,
+      "final_V": 1.8216120130647833
+    },
+    "mid": {
+      "min_V": 4.920894758681071e-15,
+      "max_V": 0.9108036875785549,
+      "final_V": 0.9108036627613861
+    },
+    "reset_n": {
+      "min_V": -0.0013922235198593706,
+      "max_V": 0.00038134428962352583,
+      "final_V": -0.0013922235198593706
+    },
+    "driver_ready": {
+      "min_V": -0.0001256317323106381,
+      "max_V": 5.4044242189804215e-05,
+      "final_V": 5.231611150933511e-07
+    },
+    "supervisor_input": {
+      "min_V": -1.0,
+      "max_V": -1.0,
+      "final_V": -1.0
+    },
+    "supervisor_state": {
+      "min_V": 9.999999999999997e-22,
+      "max_V": 9.999999999999997e-22,
+      "final_V": 9.999999999999997e-22
+    }
+  }
+}

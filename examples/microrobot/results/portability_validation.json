@@ -1,0 +1,50 @@
+{
+  "python": "3.12.11",
+  "platform": "macOS-15.7.2-arm64-arm-64bit",
+  "executed_at_UTC": "2026-10-28T10:45:52.542652+00:00",
+  "source_checkout_required": false,
+  "colab_tested": false,
+  "notebooks": {
+    "microrobot.ipynb": {
+      "executed_code_cells": 9,
+      "errors": 0,
+      "embedded_plots": 6
+    },
+    "electrical_layout.ipynb": {
+      "executed_code_cells": 5,
+      "errors": 0,
+      "embedded_plots": 4
+    }
+  },
+  "archive_files_checked": 453,
+  "archive_files_changed": [],
+  "full_repository_tests": {
+    "python": "3.14.2",
+    "result": "175 passed; one pre-existing Auger diagnostic warning",
+    "log": "portability/full_tests.txt"
+  },
+  "standalone_tests": {
+    "python": "3.12.11",
+    "with_ngspice_and_icarus": "24 passed",
+    "without_optional_native_tools": "20 passed, 4 skipped",
+    "skips": {
+      "ngspice": 3,
+      "Icarus": 1
+    }
+  },
+  "dependency_check": "pip check: no broken requirements found",
+  "linux_executed": false,
+  "linux_limitation": "Docker daemon unavailable; apt prerequisite recipe documented but not executed",
+  "scope": "Both notebooks executed outside the checkout with included project source. Optional PDK circuits/layout reviewed from archive, not rerun in Python 3.12 validation.",
+  "upstream_rule_discrepancy": "README says ISSCC27/submitted_notebooks; howtoapply still says ISSCC26. Export follows README; organizers not contacted.",
+  "team": [
+    {
+      "name": "Abhineet Agarwal",
+      "affiliation": "IIT Bombay",
+      "ieee_member": false,
+      "sscs_member": false
+    }
+  ],
+  "current_run_medium_to_fine_Isc_relative_change": 0.0036560518952732934,
+  "note": "This records the executed snapshot before these validation records were added to the archive; 453 is the checked file count for that run."
+}

@@ -1,0 +1,49 @@
+{
+  "status": "REJECTED incomplete transient; no timestep convergence claim",
+  "requested_stop_s": 0.002,
+  "actual_stop_s": 0.000536320166,
+  "rows": 13021,
+  "finite": true,
+  "failure": "TRAN timestep too small at0.00053632s;6.25e-20s timestep; trouble node vmonitor#branch",
+  "reset_min_V": -0.37759247,
+  "reset_min_time_s": 0.000528530292,
+  "reset_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.000280349893,
+        "logic_V": 0.347628857,
+        "rising": false
+      },
+      {
+        "time_s": 0.000528637312,
+        "logic_V": 1.06265107,
+        "rising": true
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.000279847988,
+        "logic_V": 0.346143133,
+        "rising": false
+      },
+      {
+        "time_s": 0.000528664622,
+        "logic_V": 1.06241315,
+        "rising": true
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.000528689027,
+        "logic_V": 1.06218437,
+        "rising": true
+      }
+    ]
+  },
+  "droop": {
+    "peak_logic_V": 1.59951773,
+    "min_logic_V": 1.06214504,
+    "cap_loss_nJ": 0.0014303048825877512,
+    "reset_energy_nJ": 0.0013961575163
+  }
+}

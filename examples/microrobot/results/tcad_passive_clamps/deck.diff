@@ -1,0 +1,43 @@
+--- held_actuator_addback
++++ passive_clamps
+@@ -1429,11 +1429,8 @@
+ * Native first DFF remains held in reset; event counter is absent.
+ * Functional CMOS output bridges: conductances move charge from measured rails.
+ * DAC outputs pan/pbn control conductance only; they deliver no phase energy.
+-Vphase logic phase_supply 0
+-Bpahi phase_supply pa I={(v(phase_supply)-v(pa))*min(max(v(pan),0),1)/10000}
+-Bpalo pa 0 I={v(pa)*(1-min(max(v(pan),0),1))/10000}
+-Bpbhi phase_supply pb I={(v(phase_supply)-v(pb))*min(max(v(pbn),0),1)/10000}
+-Bpblo pb 0 I={v(pb)*(1-min(max(v(pbn),0),1))/10000}
++Rfixed_phase_A pa 0 10k
++Rfixed_phase_B pb 0 10k
+ Vdriverslogic logic drivers_logic 0
+ Vdriversact act drivers_act 0
+ Vdriversmid mid drivers_mid 0
+@@ -1450,12 +1447,8 @@
+ Rsr sr bulk 1meg
+ 
+ * Held-low reset and driver-ready bridges; supervisor state circuitry absent.
+-Vsupervisor_reset logic supervisor_reset_supply 0
+-Bsupervisor_reset_hi supervisor_reset_supply reset_n I={(v(supervisor_reset_supply)-v(reset_n))*v(supervisor_state)/10000}
+-Bsupervisor_reset_lo reset_n 0 I={v(reset_n)*(1-v(supervisor_state))/10000}
+-Vsupervisor_driver act supervisor_driver_supply 0
+-Bsupervisor_driver_hi supervisor_driver_supply driver_ready I={(v(supervisor_driver_supply)-v(driver_ready))*v(supervisor_state)/10000}
+-Bsupervisor_driver_lo driver_ready 0 I={v(driver_ready)*(1-v(supervisor_state))/10000}
++Rfixed_reset reset_n 0 10k
++Rfixed_ready driver_ready 0 10k
+ 
+ * Fixed signal-only commands. Gate charge comes only from existing rail-powered bridges.
+ Vreset_control supervisor_state 0 0
+@@ -1466,9 +1459,9 @@
+ set wr_vecnames
+ set wr_singlescale
+ set numdgt=17
+-save v(supervisor_state) i(Vsupervisor_reset) i(Vsupervisor_driver) v(light) v(logic_raw) v(logic) v(act_raw) v(act) v(mid) v(celllo) v(cellhi) v(clk) v(q0) v(bn) v(bp) v(reset_n) v(driver_ready) v(pan) v(pbn) v(pa) v(pb) v(ea_driver) v(eb_driver) v(ea) v(eb) v(er) v(sa) v(sb) v(sr) v(bulk) v(ta) v(tb) v(tr) i(Vlogic) i(Vact) i(Vpvlo) i(Vpvhi) i(Vclock) i(Vdigital) i(Vproxy) i(Vphase) i(Vdriverslogic) i(Vdriversact) i(Vdriversmid) i(Vea) i(Veb) i(Vreturn)
++save v(supervisor_state) v(light) v(logic_raw) v(logic) v(act_raw) v(act) v(mid) v(celllo) v(cellhi) v(clk) v(q0) v(bn) v(bp) v(reset_n) v(driver_ready) v(pan) v(pbn) v(pa) v(pb) v(ea_driver) v(eb_driver) v(ea) v(eb) v(er) v(sa) v(sb) v(sr) v(bulk) v(ta) v(tb) v(tr) i(Vlogic) i(Vact) i(Vpvlo) i(Vpvhi) i(Vclock) i(Vdigital) i(Vproxy) i(Vdriverslogic) i(Vdriversact) i(Vdriversmid) i(Vea) i(Veb) i(Vreturn)
+ tran 25n 0.00025000000000000001 0 25n
+-wrdata controller.dat v(supervisor_state) i(Vsupervisor_reset) i(Vsupervisor_driver) v(light) v(logic_raw) v(logic) v(act_raw) v(act) v(mid) v(celllo) v(cellhi) v(clk) v(q0) v(bn) v(bp) v(reset_n) v(driver_ready) v(pan) v(pbn) v(pa) v(pb) v(ea_driver) v(eb_driver) v(ea) v(eb) v(er) v(sa) v(sb) v(sr) v(bulk) v(ta) v(tb) v(tr) i(Vlogic) i(Vact) i(Vpvlo) i(Vpvhi) i(Vclock) i(Vdigital) i(Vproxy) i(Vphase) i(Vdriverslogic) i(Vdriversact) i(Vdriversmid) i(Vea) i(Veb) i(Vreturn)
++wrdata controller.dat v(supervisor_state) v(light) v(logic_raw) v(logic) v(act_raw) v(act) v(mid) v(celllo) v(cellhi) v(clk) v(q0) v(bn) v(bp) v(reset_n) v(driver_ready) v(pan) v(pbn) v(pa) v(pb) v(ea_driver) v(eb_driver) v(ea) v(eb) v(er) v(sa) v(sb) v(sr) v(bulk) v(ta) v(tb) v(tr) i(Vlogic) i(Vact) i(Vpvlo) i(Vpvhi) i(Vclock) i(Vdigital) i(Vproxy) i(Vdriverslogic) i(Vdriversact) i(Vdriversmid) i(Vea) i(Veb) i(Vreturn)
+ quit
+ .endc
+ .end

@@ -1,0 +1,42 @@
+{
+  "scope": "Single linear behavioral adsorption-current control, with held inputs.",
+  "source_deck_sha256": "b7e4e306190e3884791fcfc2e7b19a45f2f20f07ce10864f0857a79ee861dbd7",
+  "exact_replacement": {
+    "old": "Rads metal adsnode {tau*4*width/qmax}",
+    "new": "Bads_linear metal adsnode I={qmax/(4*width*tau)*v(metal,adsnode)}"
+  },
+  "terminal_relation": "I=Qmax/(4width*tau)*V(metal,adsnode)=V/Rads; no nonlinear or common-mode subtraction",
+  "voltage_grid_V": [
+    -2,
+    2
+  ],
+  "max_current_equivalence_error_A": [
+    1.3234889800848443e-23,
+    1.3234889800848443e-23,
+    1.0587911840678754e-22
+  ],
+  "Ca_F": [
+    8.124999999999999e-10,
+    8.124999999999999e-10,
+    8.125e-09
+  ],
+  "Rads_equivalent_ohm": [
+    24615384.61538462,
+    24615384.61538462,
+    2461538.4615384615
+  ],
+  "tau_s": 0.02,
+  "width_V": 0.08,
+  "energy_interpretation": "Equivalent passive RC bookkeeping under exact terminal-law assumption; behavioral source is not a calibrated physical heat device",
+  "unchanged": "All other source/deck/probe/model/timing/storage/solver lines",
+  "duration_s": 0.00025,
+  "max_step_s": 2.5e-08,
+  "source_dependency_sha256": {
+    "examples/microrobot/tcad_linear_bads.py": "b64cc5c7e09a40b381622d39bac87c3bfa0e324ef09562e92fad405c4b8477a8",
+    "tests/integration/test_tcad_linear_bads.py": "a79d76732d4b841f2f83ef94c6f33abfe39aaed489c96cc0bd7447a618833520",
+    "examples/microrobot/tcad_passive_adsorption.py": "7c86555be9e7fc54dfb946f482908f74571279de427c9264f7a477cdfd1ba576",
+    "examples/microrobot/tcad_passive_clamps.py": "09187a42e434f56233e42ae9e17e25d790f9827545ef31397be1f97d229eb3b4",
+    "examples/microrobot/tcad_actuator_startup.py": "cc3d0c4ba1e9a49a26ae6a9f390f3e8531ec29f1d82ad2cfd8b58d2265513cf1",
+    "examples/microrobot/tcad_controller.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4"
+  }
+}

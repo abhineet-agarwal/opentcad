@@ -1,0 +1,61 @@
+{
+  "scope": "Explicit nominal electrical checks; relative reset floors are diagnostic conventions, not native Vih",
+  "criteria": {
+    "definite_reset_low_midpoint_error_V": 0.05,
+    "electrode_outside_actuator_rails_V": 0.1
+  },
+  "electrodes": {
+    "ea": {
+      "outside_rails_max_V": 0.0098982542,
+      "cold_midpoint_error_peak_V": 0.0034220189999999984,
+      "definite_reset_low_midpoint_error_peak_V": 2.5268000000022717e-05,
+      "eta_range_V": [
+        -0.0024761830000000207,
+        0.533755448
+      ],
+      "clamp_pass": true,
+      "overshoot_pass": true
+    },
+    "eb": {
+      "outside_rails_max_V": 0.000260887222,
+      "cold_midpoint_error_peak_V": 0.0034220189999999984,
+      "definite_reset_low_midpoint_error_peak_V": 2.5268000000022717e-05,
+      "eta_range_V": [
+        -0.534479661469,
+        2.149700000009247e-05
+      ],
+      "clamp_pass": true,
+      "overshoot_pass": true
+    }
+  },
+  "supply_ranges_V": {
+    "v(logic)": [
+      -4.83477678e-16,
+      1.82375062
+    ],
+    "v(act)": [
+      -5.40721981e-15,
+      1.23036155
+    ],
+    "v(mid)": [
+      -7.18566162e-16,
+      0.615184494
+    ]
+  },
+  "reset_minus_logic_max_V": 0.1575529504,
+  "late_phase_ratio_ranges": {
+    "v(pa)": [
+      0.999999601973241,
+      1.0011423863745075
+    ],
+    "v(pb)": [
+      -0.0008475424828454875,
+      3.752386303696482e-07
+    ]
+  },
+  "driver_buffer_energy_nJ": 0.00010074395560676407,
+  "source_energy_method": "Signed adaptive trapezoid; driver buffer delivery is already within total actuator PV delivery",
+  "requested_stop_s": 0.002,
+  "actual_stop_s": 0.002,
+  "complete": true
+}

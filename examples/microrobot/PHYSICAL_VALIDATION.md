@@ -6,6 +6,18 @@ circuit or layout. The earlier device/fit/behavioral system remains in
 below. The notebooks distinguish measured-paper data, fitted PV parameters,
 our component choices and numerical verification.
 
+## Short coupled startup follow-up
+
+[M4_STARTUP_STATUS.md](M4_STARTUP_STATUS.md) records the newer short coupled
+finite-PV clock/reset/driver experiments, including failed candidates and a
+current-limited nominal reset reference. The original 2 pF logic storage is
+retained. A separate LVT driver-enable qualifier improves the early nominal
+clamp error and passes scoped nominal TT 2 ms / 50 ns and 25 ns checks. A single
+85 °C attempt aborts before powered operation; hot startup remains unresolved.
+The full controller is still unaccepted. These experiments add no
+controller layout, post-layout corner or fabrication qualification. The older
+standalone results below retain their original scope.
+
 ## Executed scope
 
 - Two transistor drivers, level conversion, reset-to-midpoint switches and a
@@ -22,7 +34,8 @@ our component choices and numerical verification.
 
 ## Reproduction
 
-Use the Python lock in this directory. Native tools used: ngspice 44.2,
+Use `requirements-notebook.txt` and the native prerequisites in `SETUP.md`.
+The old Python 3.14.2 lock records the historical environment only. Native tools used: ngspice 44.2,
 Magic 8.3.546 (Tcl 9.0.3), SKY130A/open_pdks 1.0.535, Netgen 1.5.325
 (commit `e5a185dcfa16ee6317883f02bfdc8cf10feabd0e`, Tcl 8.6.16).
 Model/generator/setup hashes are in the reports and the milestone manifest.
@@ -41,7 +54,7 @@ The layout flow requires a fresh destination to preserve existing work. It
 runs 2/3/5 pF storage cases, a longer 5 pF run, tight-tolerance checks and
 matched schematic comparisons, retaining all failures.
 `--no-postlayout` runs physical checks/extraction without ngspice. Full raw
-transients are generated locally and ignored; archived CSVs are decimated
+transients are generated locally and ignored; archived `.csv.gz` previews are losslessly compressed and decimated
 for plotting only. Metrics and edge counts use the full adaptive transients.
 The report notebook defaults to archived results and checks their hashes;
 its explicit regeneration cell runs the external tools in fresh directories.

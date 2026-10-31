@@ -1,0 +1,9 @@
+{
+  "scope": "Ideal diagnostic only: both physical driver ready inputs tied to0; AND qualifier retained but disconnected from driver inputs; not an autonomous solution",
+  "actual_stop_s": 0.0004,
+  "rows": 8248,
+  "wall_s": 94.59323399999994,
+  "netlist_sha256": "7351a5b8e0b29baf0d0459768b84a3d5a253637ff588be0d77f600ecbcd4b73b",
+  "only_physical_change": "Both driver ready pins moved from qualifier output to ground; all qualifier/PV/driver/electrode devices and probes retained",
+  "energy_method": "offline signed source powers; no auxiliary energy states"
+}

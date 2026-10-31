@@ -1,0 +1,35 @@
+{
+  "scope": "Single nominal late-window source current and PDK final-pulldown drain-current diagnostics; no leakage-corner qualification",
+  "drain_current_column": "@m.xdriverbuffer.xon.msky130_fd_pr__nfet_01v8_lvt[id]",
+  "late_window_s": [
+    0.00065,
+    0.0008
+  ],
+  "@m.xdriverbuffer.xon.msky130_fd_pr__nfet_01v8_lvt[id]": {
+    "range_A": [
+      1.82951842e-13,
+      1.89781232e-13
+    ],
+    "mean_A": 1.8741499268830193e-13
+  },
+  "i(Vdriverbuffer)": {
+    "range_A": [
+      -8.16797859e-07,
+      3.9879915e-07
+    ],
+    "mean_A": 1.6946562148870325e-11
+  },
+  "late_buffer_mean_source_power_W": 1.93302496205977e-11,
+  "late_nand_internal_range_V": [
+    -0.000396197082,
+    0.000552380235
+  ],
+  "late_driver_ready_ratio_range": [
+    0.9999819802813404,
+    1.0000138924290716
+  ],
+  "all_time_pulldown_current_range_A": [
+    7.85046516e-30,
+    4.89557504e-09
+  ]
+}

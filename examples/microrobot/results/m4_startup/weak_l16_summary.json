@@ -1,0 +1,30 @@
+{
+  "status": "Exploratory weak L16 candidate fails provisional1.5V release gate; no acceptance",
+  "cases": {
+    "v2_internal": {
+      "achieved_stop_s": 0.002,
+      "finite_rows": 55503,
+      "logic_min_after_0p5ms_V": 1.06220733,
+      "reset_min_V": -0.377601343,
+      "reset90_release_s": 0.000528694985,
+      "logic_at_release_V": 1.0622447,
+      "resetlogic_energy_0p5_to_0p55ms_J": 1.400096941087143e-12,
+      "logic_energy_0p5_to_0p55ms_J": 2.14227102667599e-12,
+      "clock_energy_0p5_to_0p55ms_J": 6.914463009614198e-13
+    },
+    "weak_l16_08ms": {
+      "achieved_stop_s": 0.0008,
+      "finite_rows": 14212,
+      "logic_min_after_0p5ms_V": 1.28870253,
+      "reset_min_V": -0.410851624,
+      "reset90_release_s": 0.0005320113,
+      "logic_at_release_V": 1.28885673,
+      "resetlogic_energy_0p5_to_0p55ms_J": 8.654903985289801e-13,
+      "logic_energy_0p5_to_0p55ms_J": 1.7040730471308406e-12,
+      "clock_energy_0p5_to_0p55ms_J": 7.745669666901804e-13,
+      "resetlogic_peak_supply_current_A": 1.08149974e-06
+    }
+  },
+  "PDK_sizing": "Installed TT pfet_01v8 model.100 line27836: L8\u201320um,W0.42\u20130.55um. L16/W0.42 is model-eligible, not physical signoff.",
+  "limitations": "No candidate timestep qualification; baseline50ns abort elsewhere. Undershoot exact magnitude is not physically established. No further simulations."
+}

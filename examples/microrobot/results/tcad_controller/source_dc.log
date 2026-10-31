@@ -1,0 +1,12 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * native dc verification of bounded dd pwl terminal sources
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 57
+ngspice-44.2 done

@@ -1,0 +1,68 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * isolated full electrode/solution networks with externally powered replay
+
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+rc_srca                           -1.13144e-14
+rc_srcb                           -1.13144e-14
+rc_srcr                            -1.1471e-14
+rc_a                              -1.13144e-14
+rc_sa                             -1.14448e-14
+rc_xa                             -1.13144e-14
+rc_bulk                           -1.14449e-14
+rc_b                              -1.13144e-14
+rc_sb                             -1.14448e-14
+rc_xb                             -1.13144e-14
+rc_r                               -1.1471e-14
+rc_sr                             -1.14449e-14
+rc_xr                              -1.1471e-14
+stable_srca                       -1.13144e-14
+stable_srcb                       -1.13144e-14
+stable_srcr                        -1.1471e-14
+stable_a                          -1.13144e-14
+stable_sa                         -1.14448e-14
+stable_xa                         -1.13144e-14
+stable_bulk                       -1.14449e-14
+stable_b                          -1.13144e-14
+stable_sb                         -1.14448e-14
+stable_xb                         -1.13144e-14
+stable_r                           -1.1471e-14
+stable_sr                         -1.14449e-14
+stable_xr                          -1.1471e-14
+vp_stable_r#branch                -2.60675e-26
+vp_stable_b#branch                  1.3034e-26
+vp_stable_a#branch                 1.30335e-26
+v.xstim_stable.vr#branch           2.60675e-26
+v.xstim_stable.vb#branch           -1.3034e-26
+v.xstim_stable.va#branch          -1.30335e-26
+vp_rc_r#branch                    -2.60675e-26
+vp_rc_b#branch                      1.3034e-26
+vp_rc_a#branch                     1.30335e-26
+v.xstim_rc.vr#branch               2.60675e-26
+v.xstim_rc.vb#branch               -1.3034e-26
+v.xstim_rc.va#branch              -1.30335e-26
+
+ Reference value :  3.70252e-05
+ Reference value :  6.33717e-05
+ Reference value :  8.17017e-05
+ Reference value :  1.03364e-04
+ Reference value :  1.29349e-04
+ Reference value :  1.51243e-04
+ Reference value :  1.66141e-04
+ Reference value :  1.85862e-04
+ Reference value :  2.03639e-04
+ Reference value :  2.13997e-04
+ Reference value :  2.26316e-04
+ Reference value :  2.39430e-04
+No. of Data Rows : 69575
+ngspice-44.2 done

@@ -1,0 +1,5 @@
+{
+  "status": "Both isolated electrode models complete replay",
+  "acceptance": "Reviewed and accepted as completed isolated replay evidence with failed current-agreement gates; end-to-end actuation remains unvalidated.",
+  "limit": "Neither outcome establishes a unique coupled failure cause"
+}

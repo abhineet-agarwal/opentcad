@@ -20,7 +20,7 @@ import numpy as np
 from .pv import PVTable, characterize
 from .system import Parameters, simulate
 
-DEFAULT_OUTPUT = Path(__file__).parent / "results"
+DEFAULT_OUTPUT = Path(__file__).parent / "local_runs/conceptual"
 
 
 def write_json(path, data):
@@ -108,7 +108,7 @@ def run(destination=DEFAULT_OUTPUT, *, with_spice=False):
     write_json(dest / "system_metrics.json", model["metrics"])
     write_json(dest / "sensitivities.json", sensitivity)
     columns = [key for key, value in model.items() if isinstance(value, np.ndarray)]
-    np.savetxt(dest / "system.csv", np.column_stack([model[k][::5] for k in columns]),
+    np.savetxt(dest / "system.csv.gz", np.column_stack([model[k][::5] for k in columns]),
                delimiter=",", header=",".join(columns), comments="")
     mesh_error = abs(pv["medium_mesh"]["isc_A_per_um2"]
                      / pv["light"]["isc_A_per_um2"] - 1)
@@ -139,8 +139,13 @@ def run(destination=DEFAULT_OUTPUT, *, with_spice=False):
     assert abs(validation["electrical_energy_balance_relative_residual"]) < 0.03
     assert 0 < pv["light"]["isc_A_per_um2"] <= pv["light"]["absorbed_photon_limit_A_per_um2"]
     plots(dest, pv, model, sensitivity)
+    def package_version(name):
+        try:
+            return importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            return None  # Process tools are optional for this device-only experiment.
     environment = {"python": platform.python_version(), "platform": platform.platform(),
-                   "packages": {name: importlib.metadata.version(name) for name in (
+                   "packages": {name: package_version(name) for name in (
                        "numpy", "scipy", "devsim", "gmsh", "pyvista", "matplotlib",
                        "pydantic", "PyYAML", "nbformat", "nbclient", "ipykernel", "ViennaLS")}}
     write_json(dest / "environment.json", environment)

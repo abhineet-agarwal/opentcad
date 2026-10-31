@@ -1,0 +1,91 @@
+* OpenTCAD microrobot interface experiment
+.lib /usr/local/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice tt
+.temp 26.85
+
+.func ads_c(z) {abs(z)<1e-3 ? -z*z*z*(1/3-z*z*(2/15-z*z*17/315)) : tanh(z)-z}
+.include "../logic_history.spice"
+.subckt microrobot_driver phase ready electrode vlogic vact vmid vss
+* Complementary logic input and static cross-coupled level converter.
+Xip phase_b phase vlogic vlogic sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xin phase_b phase vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xlsn phase_local_b phase vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xlsnb phase_local phase_b vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xlsp phase_local_b phase_local vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=4
+Xlspb phase_local phase_local_b vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=4
+* Actuator-domain logic: p_gate=!(ready & phase), n_gate=ready & !phase.
+Xhigh ready phase_local p_gate vact vss micro_nand2
+Xlow ready phase_local_b low_b vact vss micro_nand2
+Xlowinv low_b n_gate vact vss micro_inv
+Xoff ready off vact vss micro_inv
+Xdrivep electrode p_gate vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xdriven electrode n_gate vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+* A real transmission gate clamps the electrode to the Pt midpoint in reset.
+* Long-channel LVT clamp retains conduction at the ~0.6 V midpoint.
+* Standard-Vt clamps failed the 20 ms discharge limit in SS/FS.
+Xclampn electrode off vmid vss sky130_fd_pr__nfet_01v8_lvt w=0.42 l=8
+Xclampp electrode ready vmid vact sky130_fd_pr__pfet_01v8_lvt w=0.84 l=8
+* Explicit ~103 fF PDK MIM suppresses electrode gate-charge feedthrough.
+* This is our design component, not inferred electrode/PV capacitance.
+Xsnub electrode vmid sky130_fd_pr__cap_mim_m3_1 w=7 l=7
+.ends microrobot_driver
+.subckt micro_inv a y vdd vss
+Xp y a vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xn y a vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+.ends micro_inv
+.subckt micro_nand2 a b y vdd vss
+Xp1 y a vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xp2 y b vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xn1 y a series vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+Xn2 series b vss vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+.ends micro_nand2
+.subckt electrode_rc metal solution adsnode params: cdl=40p qmax=260p tau=20m rf=10g width=0.08 offset=0
+Cdouble metal solution {cdl}
+Rfaradaic metal solution {rf}
+Rads metal adsnode {tau*4*width/qmax}
+Cads adsnode solution {qmax/(4*width)}
+.ends electrode_rc
+.subckt electrode_stable metal solution adsnode params: cdl=40p qmax=260p tau=20m rf=10g width=0.08 offset=0
+Cdouble metal solution {cdl}
+Rfaradaic metal solution {rf}
+Bads_stable metal adsnode I={qmax/(4*width*tau)*(v(metal,adsnode)-offset+2*width*ads_c((v(metal,solution)-offset)/(2*width)))}
+Cads adsnode solution {qmax/(4*width)}
+.ends electrode_stable
+Xlogic_stable stable_logic logic_history
+Vlight_stable stable_light 0 PWL(0 0 1u 0 101u 1000)
+Bpvlo_stable 0 stable_celllo I={1080*(pwl(v(stable_celllo,0)/2,0,-0,0.025000000000000001,-5.1031397811909158e-18,0.050000000000000003,-1.6900886162475216e-17,0.075000000000000011,-4.5544351773723475e-17,0.10000000000000001,-1.1706894591230417e-16,0.125,-2.9905618250101119e-16,0.15000000000000002,-7.6734017987466285e-16,0.17500000000000002,-1.9811143841814144e-15,0.20000000000000001,-5.1413199188098177e-15,0.22500000000000001,-1.339248219197384e-14,0.25,-3.4973150376715681e-14,0.27500000000000002,-9.147661302376481e-14,0.30000000000000004,-2.395109599907038e-13,0.32500000000000001,-6.2749260021912781e-13,0.35000000000000003,-1.6445520176143913e-12,0.375,-4.3109100739383552e-12,0.40000000000000002,-1.1301168443375023e-11,0.42500000000000004,-2.9626190973570329e-11,0.45000000000000001,-7.7660228884154431e-11,0.47500000000000003,-2.0354713172770298e-10,0.5,-5.3338403005281748e-10,0.52500000000000002,-1.3972186876001106e-09,0.55000000000000004,-3.6577646074621611e-09,0.57500000000000007,-9.5634616726067801e-09,0.60000000000000009,-2.4934425046235657e-08,0.625,-6.4594783222970078e-08,0.65000000000000002,-1.6493085582319065e-07,0.67500000000000004,-4.0868130472980025e-07,0.70000000000000007,-9.6116247988053517e-07)+(v(stable_light)/1000)*pwl(v(stable_celllo,0)/2,0,1.3549730611554419e-10,0.025000000000000001,1.3530083740007976e-10,0.050000000000000003,1.3510067269867956e-10,0.075000000000000011,1.3489660604312171e-10,0.10000000000000001,1.3468840825548359e-10,0.125,1.3447582330367215e-10,0.15000000000000002,1.3425856378492235e-10,0.17500000000000002,1.3403630585283119e-10,0.20000000000000001,1.3380868292412021e-10,0.22500000000000001,1.3357527812743415e-10,0.25,1.3333561450239847e-10,0.27500000000000002,1.3308914246389753e-10,0.30000000000000004,1.3283522208410721e-10,0.32500000000000001,1.3257309692922724e-10,0.35000000000000003,1.3230185109608407e-10,0.375,1.3202033046964549e-10,0.40000000000000002,1.3172698169543378e-10,0.42500000000000004,1.3141949265403456e-10,0.45000000000000001,1.310939383324102e-10,0.47500000000000003,1.3074267257959103e-10,0.5,1.30349005494306e-10,0.52500000000000002,1.2987360928719349e-10,0.55000000000000004,1.292197028599079e-10,0.57500000000000007,1.2814464613602281e-10,0.60000000000000009,1.2604226983527328e-10,0.625,1.2145042997884143e-10,0.65000000000000002,1.111646447815761e-10,0.67500000000000004,8.9506181583909814e-11,0.70000000000000007,4.9789836233574323e-11))}
+Bpvhi_stable stable_mid stable_cellhi I={1080*(pwl(v(stable_cellhi,stable_mid)/2,0,-0,0.025000000000000001,-5.1031397811909158e-18,0.050000000000000003,-1.6900886162475216e-17,0.075000000000000011,-4.5544351773723475e-17,0.10000000000000001,-1.1706894591230417e-16,0.125,-2.9905618250101119e-16,0.15000000000000002,-7.6734017987466285e-16,0.17500000000000002,-1.9811143841814144e-15,0.20000000000000001,-5.1413199188098177e-15,0.22500000000000001,-1.339248219197384e-14,0.25,-3.4973150376715681e-14,0.27500000000000002,-9.147661302376481e-14,0.30000000000000004,-2.395109599907038e-13,0.32500000000000001,-6.2749260021912781e-13,0.35000000000000003,-1.6445520176143913e-12,0.375,-4.3109100739383552e-12,0.40000000000000002,-1.1301168443375023e-11,0.42500000000000004,-2.9626190973570329e-11,0.45000000000000001,-7.7660228884154431e-11,0.47500000000000003,-2.0354713172770298e-10,0.5,-5.3338403005281748e-10,0.52500000000000002,-1.3972186876001106e-09,0.55000000000000004,-3.6577646074621611e-09,0.57500000000000007,-9.5634616726067801e-09,0.60000000000000009,-2.4934425046235657e-08,0.625,-6.4594783222970078e-08,0.65000000000000002,-1.6493085582319065e-07,0.67500000000000004,-4.0868130472980025e-07,0.70000000000000007,-9.6116247988053517e-07)+(v(stable_light)/1000)*pwl(v(stable_cellhi,stable_mid)/2,0,1.3549730611554419e-10,0.025000000000000001,1.3530083740007976e-10,0.050000000000000003,1.3510067269867956e-10,0.075000000000000011,1.3489660604312171e-10,0.10000000000000001,1.3468840825548359e-10,0.125,1.3447582330367215e-10,0.15000000000000002,1.3425856378492235e-10,0.17500000000000002,1.3403630585283119e-10,0.20000000000000001,1.3380868292412021e-10,0.22500000000000001,1.3357527812743415e-10,0.25,1.3333561450239847e-10,0.27500000000000002,1.3308914246389753e-10,0.30000000000000004,1.3283522208410721e-10,0.32500000000000001,1.3257309692922724e-10,0.35000000000000003,1.3230185109608407e-10,0.375,1.3202033046964549e-10,0.40000000000000002,1.3172698169543378e-10,0.42500000000000004,1.3141949265403456e-10,0.45000000000000001,1.310939383324102e-10,0.47500000000000003,1.3074267257959103e-10,0.5,1.30349005494306e-10,0.52500000000000002,1.2987360928719349e-10,0.55000000000000004,1.292197028599079e-10,0.57500000000000007,1.2814464613602281e-10,0.60000000000000009,1.2604226983527328e-10,0.625,1.2145042997884143e-10,0.65000000000000002,1.111646447815761e-10,0.67500000000000004,8.9506181583909814e-11,0.70000000000000007,4.9789836233574323e-11))}
+Vpvlo_stable stable_celllo stable_mid 0
+Vpvhi_stable stable_cellhi stable_act_raw 0
+Vact_stable stable_act_raw stable_act 0
+Cstorelo_stable stable_mid 0 1p
+Cstorehi_stable stable_act_raw stable_mid 1p
+Rfixed_phase_A_stable stable_pa 0 10k
+Rfixed_phase_B_stable stable_pb 0 10k
+Vdriverslogic_stable stable_logic stable_drivers_logic 0
+Vdriversact_stable stable_act stable_drivers_act 0
+Vdriversmid_stable stable_mid stable_drivers_mid 0
+Xda_stable stable_pa stable_driver_ready stable_ea_driver stable_drivers_logic stable_drivers_act stable_drivers_mid 0 microrobot_driver
+Xdb_stable stable_pb stable_driver_ready stable_eb_driver stable_drivers_logic stable_drivers_act stable_drivers_mid 0 microrobot_driver
+Vp_stable_a stable_ea_driver stable_a 0
+Vp_stable_b stable_eb_driver stable_b 0
+Vp_stable_r stable_mid stable_r 0
+Xea_stable stable_a stable_sa stable_xa electrode_stable
+Xeb_stable stable_b stable_sb stable_xb electrode_stable
+Xreturn_stable stable_r stable_sr stable_xr electrode_stable cdl=400p qmax=2600p rf=1g
+Rsa_stable stable_sa stable_bulk 10meg
+Rsb_stable stable_sb stable_bulk 10meg
+Rsr_stable stable_sr stable_bulk 1meg
+Rfixed_ready_stable stable_driver_ready 0 10k
+.options method=gear maxord=2 reltol=1e-6 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+set numdgt=17
+option > options_before.txt
+save v(stable_a) v(stable_b) v(stable_r) v(stable_sa) v(stable_sb) v(stable_sr) v(stable_xa) v(stable_xb) v(stable_xr) v(stable_bulk) v(stable_logic) v(stable_act) v(stable_act_raw) v(stable_mid) v(stable_celllo) v(stable_cellhi) v(stable_driver_ready) v(stable_pa) v(stable_pb) i(Vp_stable_a) i(Vp_stable_b) i(Vp_stable_r) i(Vpvlo_stable) i(Vpvhi_stable) i(Vdriverslogic_stable) i(Vdriversact_stable) i(Vdriversmid_stable)
+tran 25n .00025 0 25n
+option > options_effective.txt
+wrdata feedback.dat v(stable_a) v(stable_b) v(stable_r) v(stable_sa) v(stable_sb) v(stable_sr) v(stable_xa) v(stable_xb) v(stable_xr) v(stable_bulk) v(stable_logic) v(stable_act) v(stable_act_raw) v(stable_mid) v(stable_celllo) v(stable_cellhi) v(stable_driver_ready) v(stable_pa) v(stable_pb) i(Vp_stable_a) i(Vp_stable_b) i(Vp_stable_r) i(Vpvlo_stable) i(Vpvhi_stable) i(Vdriverslogic_stable) i(Vdriversact_stable) i(Vdriversmid_stable)
+quit
+.endc
+.end

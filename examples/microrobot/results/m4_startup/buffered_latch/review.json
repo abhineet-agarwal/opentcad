@@ -1,0 +1,225 @@
+{
+  "scope": "Single nominal finite-PV candidate, diagnostic thresholds; no qualified startup acceptance",
+  "rows": 14314,
+  "actual_stop_s": 0.0008,
+  "finite": true,
+  "provisional_release_logic_gate_V": 1.5,
+  "buffer": "2 added actuator-domain inverters plus original converter input inverter; original ready controls drivers",
+  "reset_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.000527270155,
+        "logic_V": 1.24804593,
+        "actuator_V": 0.791773459,
+        "rising": true
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.000527279943,
+        "logic_V": 1.24726151,
+        "actuator_V": 0.792003923,
+        "rising": true
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.000527288765,
+        "logic_V": 1.2466052,
+        "actuator_V": 0.792231256,
+        "rising": true
+      }
+    ]
+  },
+  "ready_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.000510523125,
+        "logic_V": 1.59872289,
+        "actuator_V": 1.19266246,
+        "rising": true
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.000526050932,
+        "logic_V": 1.54184665,
+        "actuator_V": 0.764491076,
+        "rising": true
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.000530368922,
+        "logic_V": 1.27582552,
+        "actuator_V": 0.871392962,
+        "rising": true
+      }
+    ]
+  },
+  "buffered_ready_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.000526301098,
+        "logic_V": 1.54273966,
+        "actuator_V": 0.769372961,
+        "rising": true
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.000526602264,
+        "logic_V": 1.54385531,
+        "actuator_V": 0.775818486,
+        "rising": true
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.000526953858,
+        "logic_V": 1.51340118,
+        "actuator_V": 0.78349102,
+        "rising": true
+      }
+    ]
+  },
+  "reset_min_V": -0.380965604,
+  "reset_min_time_s": 0.000527224248,
+  "prior_release": {
+    "logic_range_V": [
+      0.426506056,
+      1.57088664
+    ],
+    "actuator_range_V": [
+      1.12665636,
+      1.19415883
+    ],
+    "reset_ratio_range": [
+      -6.272231981094613e-05,
+      8.128913748759692e-06
+    ]
+  },
+  "release_window": {
+    "logic_range_V": [
+      1.24638421,
+      1.78879431
+    ],
+    "actuator_range_V": [
+      0.753051512,
+      1.1940757
+    ],
+    "reset_ratio_range": [
+      -0.29791298183197557,
+      1.0053148284379791
+    ]
+  },
+  "late": {
+    "logic_range_V": [
+      1.62007273,
+      1.78879431
+    ],
+    "actuator_range_V": [
+      1.09390651,
+      1.18908982
+    ],
+    "reset_ratio_range": [
+      0.9984994515278302,
+      1.0053148284379791
+    ]
+  },
+  "reset_driver_clamp_peak_errors_V": [
+    0.002579756000000044,
+    0.0028475019999999462
+  ],
+  "intermediate_ready_driver_peak_midpoint_errors_V": [
+    0.48408993352,
+    0.48409280639999996
+  ],
+  "end_integrated_energy_nJ": {
+    "v(en_resetact)": 2.65746791e-05,
+    "v(en_logic)": 0.00880517942,
+    "v(en_actuator)": 0.0212548405,
+    "v(en_clock)": 0.00749150006,
+    "v(en_firstff)": 0.000189795645,
+    "v(en_proxy)": 0.000180410326,
+    "v(en_resetlogic)": 0.000925783603,
+    "v(en_monitor)": 0.00695442914,
+    "v(en_phase)": 1.17853627e-05
+  },
+  "peak_source_current_A": {
+    "i(Vresetlogic)": 2.15205956e-06,
+    "i(Vresetact)": 5.13314015e-08
+  },
+  "end_V": {
+    "v(logic)": 1.76173727,
+    "v(act)": 1.18459074,
+    "v(ready)": 1.18394477,
+    "v(xready.ready_fast)": 1.18459085,
+    "v(reset_n)": 1.76173343,
+    "v(ea)": 1.18220631,
+    "v(eb)": 0.000599312167
+  },
+  "release_internal_samples": [
+    {
+      "time": 0.000526301098,
+      "v(logic)": 1.54273966,
+      "v(act)": 0.769372961,
+      "v(xready.ready_fast)": 0.0870130111,
+      "v(xready.input_b)": 0.774502944,
+      "v(xready.output_b)": 1.54275126,
+      "v(reset_n)": 9.81789195e-06,
+      "i(Vresetlogic)": -3.61705702e-11
+    },
+    {
+      "time": 0.000526602264,
+      "v(logic)": 1.54385531,
+      "v(act)": 0.775818486,
+      "v(xready.ready_fast)": 0.388007385,
+      "v(xready.input_b)": 0.803168938,
+      "v(xready.output_b)": 1.54365078,
+      "v(reset_n)": -1.55258685e-05,
+      "i(Vresetlogic)": 1.12827724e-09
+    },
+    {
+      "time": 0.000526950121,
+      "v(logic)": 1.51502162,
+      "v(act)": 0.783405174,
+      "v(xready.ready_fast)": 0.70374845,
+      "v(xready.input_b)": 9.75273239e-05,
+      "v(xready.output_b)": 1.3362956,
+      "v(reset_n)": -0.115032182,
+      "i(Vresetlogic)": 9.19200607e-07
+    },
+    {
+      "time": 0.000527097791,
+      "v(logic)": 1.40561199,
+      "v(act)": 0.787113351,
+      "v(xready.ready_fast)": 0.778755961,
+      "v(xready.input_b)": -3.60957504e-05,
+      "v(xready.output_b)": 0.907934421,
+      "v(reset_n)": -0.298057965,
+      "i(Vresetlogic)": 2.06036569e-06
+    },
+    {
+      "time": 0.000527219806,
+      "v(logic)": 1.28507328,
+      "v(act)": 0.790562954,
+      "v(xready.ready_fast)": 0.787209795,
+      "v(xready.input_b)": -1.39552811e-05,
+      "v(xready.output_b)": 0.425690654,
+      "v(reset_n)": -0.380513912,
+      "i(Vresetlogic)": 2.08764414e-06
+    },
+    {
+      "time": 0.000527289889,
+      "v(logic)": 1.24654708,
+      "v(act)": 0.792259549,
+      "v(xready.ready_fast)": 0.779288784,
+      "v(xready.input_b)": 0.000142182657,
+      "v(xready.output_b)": 0.00637358374,
+      "v(reset_n)": 1.14971469,
+      "i(Vresetlogic)": 1.42866462e-07
+    }
+  ],
+  "decision": "Rejected: release below provisional1.5V and substantial negative reset excursion; no next variant executed"
+}

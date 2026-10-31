@@ -1,0 +1,400 @@
+* Isolated adsorption source current and native AC Jacobian audit
+.temp 26.85
+.func ads_c(z) {abs(z)<1e-3 ? -z*z*z*(1/3-z*z*(2/15-z*z*17/315)) : tanh(z)-z}
+.subckt audit_resistor metal adsnode solution params: qmax=260p width=0.08 tau=20m offset=0
+Rads metal adsnode {tau*4*width/qmax}
+.ends audit_resistor
+.subckt audit_linear_B metal adsnode solution params: qmax=260p width=0.08 tau=20m offset=0
+Bads_linear metal adsnode I={qmax/(4*width*tau)*v(metal,adsnode)}
+.ends audit_linear_B
+.subckt audit_stable_B metal adsnode solution params: qmax=260p width=0.08 tau=20m offset=0
+Bads_stable metal adsnode I={qmax/(4*width*tau)*(v(metal,adsnode)-offset+2*width*ads_c((v(metal,solution)-offset)/(2*width)))}
+.ends audit_stable_B
+Vmk000 dk000 0 DC 0 AC 1
+Vxk000 xk000 0 DC 0 AC 0
+Vsk000 sk000 0 DC 0 AC 0
+Vpk000 dk000 mk000 0
+Xk000 mk000 xk000 sk000 audit_resistor qmax=260p
+Vmk001 dk001 0 DC 0 AC 0
+Vxk001 xk001 0 DC 0 AC 1
+Vsk001 sk001 0 DC 0 AC 0
+Vpk001 dk001 mk001 0
+Xk001 mk001 xk001 sk001 audit_resistor qmax=260p
+Vmk002 dk002 0 DC 0 AC 0
+Vxk002 xk002 0 DC 0 AC 0
+Vsk002 sk002 0 DC 0 AC 1
+Vpk002 dk002 mk002 0
+Xk002 mk002 xk002 sk002 audit_resistor qmax=260p
+Vmk003 dk003 0 DC 0 AC 1
+Vxk003 xk003 0 DC 0 AC 0
+Vsk003 sk003 0 DC 0 AC 0
+Vpk003 dk003 mk003 0
+Xk003 mk003 xk003 sk003 audit_linear_B qmax=260p
+Vmk004 dk004 0 DC 0 AC 0
+Vxk004 xk004 0 DC 0 AC 1
+Vsk004 sk004 0 DC 0 AC 0
+Vpk004 dk004 mk004 0
+Xk004 mk004 xk004 sk004 audit_linear_B qmax=260p
+Vmk005 dk005 0 DC 0 AC 0
+Vxk005 xk005 0 DC 0 AC 0
+Vsk005 sk005 0 DC 0 AC 1
+Vpk005 dk005 mk005 0
+Xk005 mk005 xk005 sk005 audit_linear_B qmax=260p
+Vmk006 dk006 0 DC 0 AC 1
+Vxk006 xk006 0 DC 0 AC 0
+Vsk006 sk006 0 DC 0 AC 0
+Vpk006 dk006 mk006 0
+Xk006 mk006 xk006 sk006 audit_stable_B qmax=260p
+Vmk007 dk007 0 DC 0 AC 0
+Vxk007 xk007 0 DC 0 AC 1
+Vsk007 sk007 0 DC 0 AC 0
+Vpk007 dk007 mk007 0
+Xk007 mk007 xk007 sk007 audit_stable_B qmax=260p
+Vmk008 dk008 0 DC 0 AC 0
+Vxk008 xk008 0 DC 0 AC 0
+Vsk008 sk008 0 DC 0 AC 1
+Vpk008 dk008 mk008 0
+Xk008 mk008 xk008 sk008 audit_stable_B qmax=260p
+Vmk009 dk009 0 DC 0.68659773254173717 AC 1
+Vxk009 xk009 0 DC 0.68657921011486678 AC 0
+Vsk009 sk009 0 DC 0.68657920492152857 AC 0
+Vpk009 dk009 mk009 0
+Xk009 mk009 xk009 sk009 audit_resistor qmax=260p
+Vmk010 dk010 0 DC 0.68659773254173717 AC 0
+Vxk010 xk010 0 DC 0.68657921011486678 AC 1
+Vsk010 sk010 0 DC 0.68657920492152857 AC 0
+Vpk010 dk010 mk010 0
+Xk010 mk010 xk010 sk010 audit_resistor qmax=260p
+Vmk011 dk011 0 DC 0.68659773254173717 AC 0
+Vxk011 xk011 0 DC 0.68657921011486678 AC 0
+Vsk011 sk011 0 DC 0.68657920492152857 AC 1
+Vpk011 dk011 mk011 0
+Xk011 mk011 xk011 sk011 audit_resistor qmax=260p
+Vmk012 dk012 0 DC 0.68659773254173717 AC 1
+Vxk012 xk012 0 DC 0.68657921011486678 AC 0
+Vsk012 sk012 0 DC 0.68657920492152857 AC 0
+Vpk012 dk012 mk012 0
+Xk012 mk012 xk012 sk012 audit_linear_B qmax=260p
+Vmk013 dk013 0 DC 0.68659773254173717 AC 0
+Vxk013 xk013 0 DC 0.68657921011486678 AC 1
+Vsk013 sk013 0 DC 0.68657920492152857 AC 0
+Vpk013 dk013 mk013 0
+Xk013 mk013 xk013 sk013 audit_linear_B qmax=260p
+Vmk014 dk014 0 DC 0.68659773254173717 AC 0
+Vxk014 xk014 0 DC 0.68657921011486678 AC 0
+Vsk014 sk014 0 DC 0.68657920492152857 AC 1
+Vpk014 dk014 mk014 0
+Xk014 mk014 xk014 sk014 audit_linear_B qmax=260p
+Vmk015 dk015 0 DC 0.68659773254173717 AC 1
+Vxk015 xk015 0 DC 0.68657921011486678 AC 0
+Vsk015 sk015 0 DC 0.68657920492152857 AC 0
+Vpk015 dk015 mk015 0
+Xk015 mk015 xk015 sk015 audit_stable_B qmax=260p
+Vmk016 dk016 0 DC 0.68659773254173717 AC 0
+Vxk016 xk016 0 DC 0.68657921011486678 AC 1
+Vsk016 sk016 0 DC 0.68657920492152857 AC 0
+Vpk016 dk016 mk016 0
+Xk016 mk016 xk016 sk016 audit_stable_B qmax=260p
+Vmk017 dk017 0 DC 0.68659773254173717 AC 0
+Vxk017 xk017 0 DC 0.68657921011486678 AC 0
+Vsk017 sk017 0 DC 0.68657920492152857 AC 1
+Vpk017 dk017 mk017 0
+Xk017 mk017 xk017 sk017 audit_stable_B qmax=260p
+Vmk018 dk018 0 DC 0.92115141498725828 AC 1
+Vxk018 xk018 0 DC 0.92113934119162921 AC 0
+Vsk018 sk018 0 DC 0.92113924761698851 AC 0
+Vpk018 dk018 mk018 0
+Xk018 mk018 xk018 sk018 audit_resistor qmax=260p
+Vmk019 dk019 0 DC 0.92115141498725828 AC 0
+Vxk019 xk019 0 DC 0.92113934119162921 AC 1
+Vsk019 sk019 0 DC 0.92113924761698851 AC 0
+Vpk019 dk019 mk019 0
+Xk019 mk019 xk019 sk019 audit_resistor qmax=260p
+Vmk020 dk020 0 DC 0.92115141498725828 AC 0
+Vxk020 xk020 0 DC 0.92113934119162921 AC 0
+Vsk020 sk020 0 DC 0.92113924761698851 AC 1
+Vpk020 dk020 mk020 0
+Xk020 mk020 xk020 sk020 audit_resistor qmax=260p
+Vmk021 dk021 0 DC 0.92115141498725828 AC 1
+Vxk021 xk021 0 DC 0.92113934119162921 AC 0
+Vsk021 sk021 0 DC 0.92113924761698851 AC 0
+Vpk021 dk021 mk021 0
+Xk021 mk021 xk021 sk021 audit_linear_B qmax=260p
+Vmk022 dk022 0 DC 0.92115141498725828 AC 0
+Vxk022 xk022 0 DC 0.92113934119162921 AC 1
+Vsk022 sk022 0 DC 0.92113924761698851 AC 0
+Vpk022 dk022 mk022 0
+Xk022 mk022 xk022 sk022 audit_linear_B qmax=260p
+Vmk023 dk023 0 DC 0.92115141498725828 AC 0
+Vxk023 xk023 0 DC 0.92113934119162921 AC 0
+Vsk023 sk023 0 DC 0.92113924761698851 AC 1
+Vpk023 dk023 mk023 0
+Xk023 mk023 xk023 sk023 audit_linear_B qmax=260p
+Vmk024 dk024 0 DC 0.92115141498725828 AC 1
+Vxk024 xk024 0 DC 0.92113934119162921 AC 0
+Vsk024 sk024 0 DC 0.92113924761698851 AC 0
+Vpk024 dk024 mk024 0
+Xk024 mk024 xk024 sk024 audit_stable_B qmax=260p
+Vmk025 dk025 0 DC 0.92115141498725828 AC 0
+Vxk025 xk025 0 DC 0.92113934119162921 AC 1
+Vsk025 sk025 0 DC 0.92113924761698851 AC 0
+Vpk025 dk025 mk025 0
+Xk025 mk025 xk025 sk025 audit_stable_B qmax=260p
+Vmk026 dk026 0 DC 0.92115141498725828 AC 0
+Vxk026 xk026 0 DC 0.92113934119162921 AC 0
+Vsk026 sk026 0 DC 0.92113924761698851 AC 1
+Vpk026 dk026 mk026 0
+Xk026 mk026 xk026 sk026 audit_stable_B qmax=260p
+Vmk027 dk027 0 DC 0.92115124740811327 AC 1
+Vxk027 xk027 0 DC 0.92115366218264449 AC 0
+Vsk027 sk027 0 DC 0.92115368089714811 AC 0
+Vpk027 dk027 mk027 0
+Xk027 mk027 xk027 sk027 audit_resistor qmax=2600p
+Vmk028 dk028 0 DC 0.92115124740811327 AC 0
+Vxk028 xk028 0 DC 0.92115366218264449 AC 1
+Vsk028 sk028 0 DC 0.92115368089714811 AC 0
+Vpk028 dk028 mk028 0
+Xk028 mk028 xk028 sk028 audit_resistor qmax=2600p
+Vmk029 dk029 0 DC 0.92115124740811327 AC 0
+Vxk029 xk029 0 DC 0.92115366218264449 AC 0
+Vsk029 sk029 0 DC 0.92115368089714811 AC 1
+Vpk029 dk029 mk029 0
+Xk029 mk029 xk029 sk029 audit_resistor qmax=2600p
+Vmk030 dk030 0 DC 0.92115124740811327 AC 1
+Vxk030 xk030 0 DC 0.92115366218264449 AC 0
+Vsk030 sk030 0 DC 0.92115368089714811 AC 0
+Vpk030 dk030 mk030 0
+Xk030 mk030 xk030 sk030 audit_linear_B qmax=2600p
+Vmk031 dk031 0 DC 0.92115124740811327 AC 0
+Vxk031 xk031 0 DC 0.92115366218264449 AC 1
+Vsk031 sk031 0 DC 0.92115368089714811 AC 0
+Vpk031 dk031 mk031 0
+Xk031 mk031 xk031 sk031 audit_linear_B qmax=2600p
+Vmk032 dk032 0 DC 0.92115124740811327 AC 0
+Vxk032 xk032 0 DC 0.92115366218264449 AC 0
+Vsk032 sk032 0 DC 0.92115368089714811 AC 1
+Vpk032 dk032 mk032 0
+Xk032 mk032 xk032 sk032 audit_linear_B qmax=2600p
+Vmk033 dk033 0 DC 0.92115124740811327 AC 1
+Vxk033 xk033 0 DC 0.92115366218264449 AC 0
+Vsk033 sk033 0 DC 0.92115368089714811 AC 0
+Vpk033 dk033 mk033 0
+Xk033 mk033 xk033 sk033 audit_stable_B qmax=2600p
+Vmk034 dk034 0 DC 0.92115124740811327 AC 0
+Vxk034 xk034 0 DC 0.92115366218264449 AC 1
+Vsk034 sk034 0 DC 0.92115368089714811 AC 0
+Vpk034 dk034 mk034 0
+Xk034 mk034 xk034 sk034 audit_stable_B qmax=2600p
+Vmk035 dk035 0 DC 0.92115124740811327 AC 0
+Vxk035 xk035 0 DC 0.92115366218264449 AC 0
+Vsk035 sk035 0 DC 0.92115368089714811 AC 1
+Vpk035 dk035 mk035 0
+Xk035 mk035 xk035 sk035 audit_stable_B qmax=2600p
+Vmk036 dk036 0 DC 0.42115141498725828 AC 1
+Vxk036 xk036 0 DC 0.42113934119162921 AC 0
+Vsk036 sk036 0 DC 0.42113924761698851 AC 0
+Vpk036 dk036 mk036 0
+Xk036 mk036 xk036 sk036 audit_resistor qmax=260p
+Vmk037 dk037 0 DC 0.42115141498725828 AC 0
+Vxk037 xk037 0 DC 0.42113934119162921 AC 1
+Vsk037 sk037 0 DC 0.42113924761698851 AC 0
+Vpk037 dk037 mk037 0
+Xk037 mk037 xk037 sk037 audit_resistor qmax=260p
+Vmk038 dk038 0 DC 0.42115141498725828 AC 0
+Vxk038 xk038 0 DC 0.42113934119162921 AC 0
+Vsk038 sk038 0 DC 0.42113924761698851 AC 1
+Vpk038 dk038 mk038 0
+Xk038 mk038 xk038 sk038 audit_resistor qmax=260p
+Vmk039 dk039 0 DC 0.42115141498725828 AC 1
+Vxk039 xk039 0 DC 0.42113934119162921 AC 0
+Vsk039 sk039 0 DC 0.42113924761698851 AC 0
+Vpk039 dk039 mk039 0
+Xk039 mk039 xk039 sk039 audit_linear_B qmax=260p
+Vmk040 dk040 0 DC 0.42115141498725828 AC 0
+Vxk040 xk040 0 DC 0.42113934119162921 AC 1
+Vsk040 sk040 0 DC 0.42113924761698851 AC 0
+Vpk040 dk040 mk040 0
+Xk040 mk040 xk040 sk040 audit_linear_B qmax=260p
+Vmk041 dk041 0 DC 0.42115141498725828 AC 0
+Vxk041 xk041 0 DC 0.42113934119162921 AC 0
+Vsk041 sk041 0 DC 0.42113924761698851 AC 1
+Vpk041 dk041 mk041 0
+Xk041 mk041 xk041 sk041 audit_linear_B qmax=260p
+Vmk042 dk042 0 DC 0.42115141498725828 AC 1
+Vxk042 xk042 0 DC 0.42113934119162921 AC 0
+Vsk042 sk042 0 DC 0.42113924761698851 AC 0
+Vpk042 dk042 mk042 0
+Xk042 mk042 xk042 sk042 audit_stable_B qmax=260p
+Vmk043 dk043 0 DC 0.42115141498725828 AC 0
+Vxk043 xk043 0 DC 0.42113934119162921 AC 1
+Vsk043 sk043 0 DC 0.42113924761698851 AC 0
+Vpk043 dk043 mk043 0
+Xk043 mk043 xk043 sk043 audit_stable_B qmax=260p
+Vmk044 dk044 0 DC 0.42115141498725828 AC 0
+Vxk044 xk044 0 DC 0.42113934119162921 AC 0
+Vsk044 sk044 0 DC 0.42113924761698851 AC 1
+Vpk044 dk044 mk044 0
+Xk044 mk044 xk044 sk044 audit_stable_B qmax=260p
+Vmk045 dk045 0 DC 0.56000000000000005 AC 1
+Vxk045 xk045 0 DC 0.40000000000000002 AC 0
+Vsk045 sk045 0 DC 0.40000000000000002 AC 0
+Vpk045 dk045 mk045 0
+Xk045 mk045 xk045 sk045 audit_resistor qmax=260p
+Vmk046 dk046 0 DC 0.56000000000000005 AC 0
+Vxk046 xk046 0 DC 0.40000000000000002 AC 1
+Vsk046 sk046 0 DC 0.40000000000000002 AC 0
+Vpk046 dk046 mk046 0
+Xk046 mk046 xk046 sk046 audit_resistor qmax=260p
+Vmk047 dk047 0 DC 0.56000000000000005 AC 0
+Vxk047 xk047 0 DC 0.40000000000000002 AC 0
+Vsk047 sk047 0 DC 0.40000000000000002 AC 1
+Vpk047 dk047 mk047 0
+Xk047 mk047 xk047 sk047 audit_resistor qmax=260p
+Vmk048 dk048 0 DC 0.56000000000000005 AC 1
+Vxk048 xk048 0 DC 0.40000000000000002 AC 0
+Vsk048 sk048 0 DC 0.40000000000000002 AC 0
+Vpk048 dk048 mk048 0
+Xk048 mk048 xk048 sk048 audit_linear_B qmax=260p
+Vmk049 dk049 0 DC 0.56000000000000005 AC 0
+Vxk049 xk049 0 DC 0.40000000000000002 AC 1
+Vsk049 sk049 0 DC 0.40000000000000002 AC 0
+Vpk049 dk049 mk049 0
+Xk049 mk049 xk049 sk049 audit_linear_B qmax=260p
+Vmk050 dk050 0 DC 0.56000000000000005 AC 0
+Vxk050 xk050 0 DC 0.40000000000000002 AC 0
+Vsk050 sk050 0 DC 0.40000000000000002 AC 1
+Vpk050 dk050 mk050 0
+Xk050 mk050 xk050 sk050 audit_linear_B qmax=260p
+Vmk051 dk051 0 DC 0.56000000000000005 AC 1
+Vxk051 xk051 0 DC 0.40000000000000002 AC 0
+Vsk051 sk051 0 DC 0.40000000000000002 AC 0
+Vpk051 dk051 mk051 0
+Xk051 mk051 xk051 sk051 audit_stable_B qmax=260p
+Vmk052 dk052 0 DC 0.56000000000000005 AC 0
+Vxk052 xk052 0 DC 0.40000000000000002 AC 1
+Vsk052 sk052 0 DC 0.40000000000000002 AC 0
+Vpk052 dk052 mk052 0
+Xk052 mk052 xk052 sk052 audit_stable_B qmax=260p
+Vmk053 dk053 0 DC 0.56000000000000005 AC 0
+Vxk053 xk053 0 DC 0.40000000000000002 AC 0
+Vsk053 sk053 0 DC 0.40000000000000002 AC 1
+Vpk053 dk053 mk053 0
+Xk053 mk053 xk053 sk053 audit_stable_B qmax=260p
+.options method=gear maxord=2 reltol=1e-6 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+set numdgt=17
+op
+wrdata k000_op.dat i(Vpk000) v(mk000) v(xk000) v(sk000) i(Vmk000) i(Vxk000) i(Vsk000)
+wrdata k001_op.dat i(Vpk001) v(mk001) v(xk001) v(sk001) i(Vmk001) i(Vxk001) i(Vsk001)
+wrdata k002_op.dat i(Vpk002) v(mk002) v(xk002) v(sk002) i(Vmk002) i(Vxk002) i(Vsk002)
+wrdata k003_op.dat i(Vpk003) v(mk003) v(xk003) v(sk003) i(Vmk003) i(Vxk003) i(Vsk003)
+wrdata k004_op.dat i(Vpk004) v(mk004) v(xk004) v(sk004) i(Vmk004) i(Vxk004) i(Vsk004)
+wrdata k005_op.dat i(Vpk005) v(mk005) v(xk005) v(sk005) i(Vmk005) i(Vxk005) i(Vsk005)
+wrdata k006_op.dat i(Vpk006) v(mk006) v(xk006) v(sk006) i(Vmk006) i(Vxk006) i(Vsk006)
+wrdata k007_op.dat i(Vpk007) v(mk007) v(xk007) v(sk007) i(Vmk007) i(Vxk007) i(Vsk007)
+wrdata k008_op.dat i(Vpk008) v(mk008) v(xk008) v(sk008) i(Vmk008) i(Vxk008) i(Vsk008)
+wrdata k009_op.dat i(Vpk009) v(mk009) v(xk009) v(sk009) i(Vmk009) i(Vxk009) i(Vsk009)
+wrdata k010_op.dat i(Vpk010) v(mk010) v(xk010) v(sk010) i(Vmk010) i(Vxk010) i(Vsk010)
+wrdata k011_op.dat i(Vpk011) v(mk011) v(xk011) v(sk011) i(Vmk011) i(Vxk011) i(Vsk011)
+wrdata k012_op.dat i(Vpk012) v(mk012) v(xk012) v(sk012) i(Vmk012) i(Vxk012) i(Vsk012)
+wrdata k013_op.dat i(Vpk013) v(mk013) v(xk013) v(sk013) i(Vmk013) i(Vxk013) i(Vsk013)
+wrdata k014_op.dat i(Vpk014) v(mk014) v(xk014) v(sk014) i(Vmk014) i(Vxk014) i(Vsk014)
+wrdata k015_op.dat i(Vpk015) v(mk015) v(xk015) v(sk015) i(Vmk015) i(Vxk015) i(Vsk015)
+wrdata k016_op.dat i(Vpk016) v(mk016) v(xk016) v(sk016) i(Vmk016) i(Vxk016) i(Vsk016)
+wrdata k017_op.dat i(Vpk017) v(mk017) v(xk017) v(sk017) i(Vmk017) i(Vxk017) i(Vsk017)
+wrdata k018_op.dat i(Vpk018) v(mk018) v(xk018) v(sk018) i(Vmk018) i(Vxk018) i(Vsk018)
+wrdata k019_op.dat i(Vpk019) v(mk019) v(xk019) v(sk019) i(Vmk019) i(Vxk019) i(Vsk019)
+wrdata k020_op.dat i(Vpk020) v(mk020) v(xk020) v(sk020) i(Vmk020) i(Vxk020) i(Vsk020)
+wrdata k021_op.dat i(Vpk021) v(mk021) v(xk021) v(sk021) i(Vmk021) i(Vxk021) i(Vsk021)
+wrdata k022_op.dat i(Vpk022) v(mk022) v(xk022) v(sk022) i(Vmk022) i(Vxk022) i(Vsk022)
+wrdata k023_op.dat i(Vpk023) v(mk023) v(xk023) v(sk023) i(Vmk023) i(Vxk023) i(Vsk023)
+wrdata k024_op.dat i(Vpk024) v(mk024) v(xk024) v(sk024) i(Vmk024) i(Vxk024) i(Vsk024)
+wrdata k025_op.dat i(Vpk025) v(mk025) v(xk025) v(sk025) i(Vmk025) i(Vxk025) i(Vsk025)
+wrdata k026_op.dat i(Vpk026) v(mk026) v(xk026) v(sk026) i(Vmk026) i(Vxk026) i(Vsk026)
+wrdata k027_op.dat i(Vpk027) v(mk027) v(xk027) v(sk027) i(Vmk027) i(Vxk027) i(Vsk027)
+wrdata k028_op.dat i(Vpk028) v(mk028) v(xk028) v(sk028) i(Vmk028) i(Vxk028) i(Vsk028)
+wrdata k029_op.dat i(Vpk029) v(mk029) v(xk029) v(sk029) i(Vmk029) i(Vxk029) i(Vsk029)
+wrdata k030_op.dat i(Vpk030) v(mk030) v(xk030) v(sk030) i(Vmk030) i(Vxk030) i(Vsk030)
+wrdata k031_op.dat i(Vpk031) v(mk031) v(xk031) v(sk031) i(Vmk031) i(Vxk031) i(Vsk031)
+wrdata k032_op.dat i(Vpk032) v(mk032) v(xk032) v(sk032) i(Vmk032) i(Vxk032) i(Vsk032)
+wrdata k033_op.dat i(Vpk033) v(mk033) v(xk033) v(sk033) i(Vmk033) i(Vxk033) i(Vsk033)
+wrdata k034_op.dat i(Vpk034) v(mk034) v(xk034) v(sk034) i(Vmk034) i(Vxk034) i(Vsk034)
+wrdata k035_op.dat i(Vpk035) v(mk035) v(xk035) v(sk035) i(Vmk035) i(Vxk035) i(Vsk035)
+wrdata k036_op.dat i(Vpk036) v(mk036) v(xk036) v(sk036) i(Vmk036) i(Vxk036) i(Vsk036)
+wrdata k037_op.dat i(Vpk037) v(mk037) v(xk037) v(sk037) i(Vmk037) i(Vxk037) i(Vsk037)
+wrdata k038_op.dat i(Vpk038) v(mk038) v(xk038) v(sk038) i(Vmk038) i(Vxk038) i(Vsk038)
+wrdata k039_op.dat i(Vpk039) v(mk039) v(xk039) v(sk039) i(Vmk039) i(Vxk039) i(Vsk039)
+wrdata k040_op.dat i(Vpk040) v(mk040) v(xk040) v(sk040) i(Vmk040) i(Vxk040) i(Vsk040)
+wrdata k041_op.dat i(Vpk041) v(mk041) v(xk041) v(sk041) i(Vmk041) i(Vxk041) i(Vsk041)
+wrdata k042_op.dat i(Vpk042) v(mk042) v(xk042) v(sk042) i(Vmk042) i(Vxk042) i(Vsk042)
+wrdata k043_op.dat i(Vpk043) v(mk043) v(xk043) v(sk043) i(Vmk043) i(Vxk043) i(Vsk043)
+wrdata k044_op.dat i(Vpk044) v(mk044) v(xk044) v(sk044) i(Vmk044) i(Vxk044) i(Vsk044)
+wrdata k045_op.dat i(Vpk045) v(mk045) v(xk045) v(sk045) i(Vmk045) i(Vxk045) i(Vsk045)
+wrdata k046_op.dat i(Vpk046) v(mk046) v(xk046) v(sk046) i(Vmk046) i(Vxk046) i(Vsk046)
+wrdata k047_op.dat i(Vpk047) v(mk047) v(xk047) v(sk047) i(Vmk047) i(Vxk047) i(Vsk047)
+wrdata k048_op.dat i(Vpk048) v(mk048) v(xk048) v(sk048) i(Vmk048) i(Vxk048) i(Vsk048)
+wrdata k049_op.dat i(Vpk049) v(mk049) v(xk049) v(sk049) i(Vmk049) i(Vxk049) i(Vsk049)
+wrdata k050_op.dat i(Vpk050) v(mk050) v(xk050) v(sk050) i(Vmk050) i(Vxk050) i(Vsk050)
+wrdata k051_op.dat i(Vpk051) v(mk051) v(xk051) v(sk051) i(Vmk051) i(Vxk051) i(Vsk051)
+wrdata k052_op.dat i(Vpk052) v(mk052) v(xk052) v(sk052) i(Vmk052) i(Vxk052) i(Vsk052)
+wrdata k053_op.dat i(Vpk053) v(mk053) v(xk053) v(sk053) i(Vmk053) i(Vxk053) i(Vsk053)
+ac lin 1 1 1
+wrdata k000_ac.dat real(i(Vpk000)) imag(i(Vpk000)) real(v(mk000)) imag(v(mk000)) real(v(xk000)) imag(v(xk000)) real(v(sk000)) imag(v(sk000)) real(i(Vmk000)) imag(i(Vmk000)) real(i(Vxk000)) imag(i(Vxk000)) real(i(Vsk000)) imag(i(Vsk000))
+wrdata k001_ac.dat real(i(Vpk001)) imag(i(Vpk001)) real(v(mk001)) imag(v(mk001)) real(v(xk001)) imag(v(xk001)) real(v(sk001)) imag(v(sk001)) real(i(Vmk001)) imag(i(Vmk001)) real(i(Vxk001)) imag(i(Vxk001)) real(i(Vsk001)) imag(i(Vsk001))
+wrdata k002_ac.dat real(i(Vpk002)) imag(i(Vpk002)) real(v(mk002)) imag(v(mk002)) real(v(xk002)) imag(v(xk002)) real(v(sk002)) imag(v(sk002)) real(i(Vmk002)) imag(i(Vmk002)) real(i(Vxk002)) imag(i(Vxk002)) real(i(Vsk002)) imag(i(Vsk002))
+wrdata k003_ac.dat real(i(Vpk003)) imag(i(Vpk003)) real(v(mk003)) imag(v(mk003)) real(v(xk003)) imag(v(xk003)) real(v(sk003)) imag(v(sk003)) real(i(Vmk003)) imag(i(Vmk003)) real(i(Vxk003)) imag(i(Vxk003)) real(i(Vsk003)) imag(i(Vsk003))
+wrdata k004_ac.dat real(i(Vpk004)) imag(i(Vpk004)) real(v(mk004)) imag(v(mk004)) real(v(xk004)) imag(v(xk004)) real(v(sk004)) imag(v(sk004)) real(i(Vmk004)) imag(i(Vmk004)) real(i(Vxk004)) imag(i(Vxk004)) real(i(Vsk004)) imag(i(Vsk004))
+wrdata k005_ac.dat real(i(Vpk005)) imag(i(Vpk005)) real(v(mk005)) imag(v(mk005)) real(v(xk005)) imag(v(xk005)) real(v(sk005)) imag(v(sk005)) real(i(Vmk005)) imag(i(Vmk005)) real(i(Vxk005)) imag(i(Vxk005)) real(i(Vsk005)) imag(i(Vsk005))
+wrdata k006_ac.dat real(i(Vpk006)) imag(i(Vpk006)) real(v(mk006)) imag(v(mk006)) real(v(xk006)) imag(v(xk006)) real(v(sk006)) imag(v(sk006)) real(i(Vmk006)) imag(i(Vmk006)) real(i(Vxk006)) imag(i(Vxk006)) real(i(Vsk006)) imag(i(Vsk006))
+wrdata k007_ac.dat real(i(Vpk007)) imag(i(Vpk007)) real(v(mk007)) imag(v(mk007)) real(v(xk007)) imag(v(xk007)) real(v(sk007)) imag(v(sk007)) real(i(Vmk007)) imag(i(Vmk007)) real(i(Vxk007)) imag(i(Vxk007)) real(i(Vsk007)) imag(i(Vsk007))
+wrdata k008_ac.dat real(i(Vpk008)) imag(i(Vpk008)) real(v(mk008)) imag(v(mk008)) real(v(xk008)) imag(v(xk008)) real(v(sk008)) imag(v(sk008)) real(i(Vmk008)) imag(i(Vmk008)) real(i(Vxk008)) imag(i(Vxk008)) real(i(Vsk008)) imag(i(Vsk008))
+wrdata k009_ac.dat real(i(Vpk009)) imag(i(Vpk009)) real(v(mk009)) imag(v(mk009)) real(v(xk009)) imag(v(xk009)) real(v(sk009)) imag(v(sk009)) real(i(Vmk009)) imag(i(Vmk009)) real(i(Vxk009)) imag(i(Vxk009)) real(i(Vsk009)) imag(i(Vsk009))
+wrdata k010_ac.dat real(i(Vpk010)) imag(i(Vpk010)) real(v(mk010)) imag(v(mk010)) real(v(xk010)) imag(v(xk010)) real(v(sk010)) imag(v(sk010)) real(i(Vmk010)) imag(i(Vmk010)) real(i(Vxk010)) imag(i(Vxk010)) real(i(Vsk010)) imag(i(Vsk010))
+wrdata k011_ac.dat real(i(Vpk011)) imag(i(Vpk011)) real(v(mk011)) imag(v(mk011)) real(v(xk011)) imag(v(xk011)) real(v(sk011)) imag(v(sk011)) real(i(Vmk011)) imag(i(Vmk011)) real(i(Vxk011)) imag(i(Vxk011)) real(i(Vsk011)) imag(i(Vsk011))
+wrdata k012_ac.dat real(i(Vpk012)) imag(i(Vpk012)) real(v(mk012)) imag(v(mk012)) real(v(xk012)) imag(v(xk012)) real(v(sk012)) imag(v(sk012)) real(i(Vmk012)) imag(i(Vmk012)) real(i(Vxk012)) imag(i(Vxk012)) real(i(Vsk012)) imag(i(Vsk012))
+wrdata k013_ac.dat real(i(Vpk013)) imag(i(Vpk013)) real(v(mk013)) imag(v(mk013)) real(v(xk013)) imag(v(xk013)) real(v(sk013)) imag(v(sk013)) real(i(Vmk013)) imag(i(Vmk013)) real(i(Vxk013)) imag(i(Vxk013)) real(i(Vsk013)) imag(i(Vsk013))
+wrdata k014_ac.dat real(i(Vpk014)) imag(i(Vpk014)) real(v(mk014)) imag(v(mk014)) real(v(xk014)) imag(v(xk014)) real(v(sk014)) imag(v(sk014)) real(i(Vmk014)) imag(i(Vmk014)) real(i(Vxk014)) imag(i(Vxk014)) real(i(Vsk014)) imag(i(Vsk014))
+wrdata k015_ac.dat real(i(Vpk015)) imag(i(Vpk015)) real(v(mk015)) imag(v(mk015)) real(v(xk015)) imag(v(xk015)) real(v(sk015)) imag(v(sk015)) real(i(Vmk015)) imag(i(Vmk015)) real(i(Vxk015)) imag(i(Vxk015)) real(i(Vsk015)) imag(i(Vsk015))
+wrdata k016_ac.dat real(i(Vpk016)) imag(i(Vpk016)) real(v(mk016)) imag(v(mk016)) real(v(xk016)) imag(v(xk016)) real(v(sk016)) imag(v(sk016)) real(i(Vmk016)) imag(i(Vmk016)) real(i(Vxk016)) imag(i(Vxk016)) real(i(Vsk016)) imag(i(Vsk016))
+wrdata k017_ac.dat real(i(Vpk017)) imag(i(Vpk017)) real(v(mk017)) imag(v(mk017)) real(v(xk017)) imag(v(xk017)) real(v(sk017)) imag(v(sk017)) real(i(Vmk017)) imag(i(Vmk017)) real(i(Vxk017)) imag(i(Vxk017)) real(i(Vsk017)) imag(i(Vsk017))
+wrdata k018_ac.dat real(i(Vpk018)) imag(i(Vpk018)) real(v(mk018)) imag(v(mk018)) real(v(xk018)) imag(v(xk018)) real(v(sk018)) imag(v(sk018)) real(i(Vmk018)) imag(i(Vmk018)) real(i(Vxk018)) imag(i(Vxk018)) real(i(Vsk018)) imag(i(Vsk018))
+wrdata k019_ac.dat real(i(Vpk019)) imag(i(Vpk019)) real(v(mk019)) imag(v(mk019)) real(v(xk019)) imag(v(xk019)) real(v(sk019)) imag(v(sk019)) real(i(Vmk019)) imag(i(Vmk019)) real(i(Vxk019)) imag(i(Vxk019)) real(i(Vsk019)) imag(i(Vsk019))
+wrdata k020_ac.dat real(i(Vpk020)) imag(i(Vpk020)) real(v(mk020)) imag(v(mk020)) real(v(xk020)) imag(v(xk020)) real(v(sk020)) imag(v(sk020)) real(i(Vmk020)) imag(i(Vmk020)) real(i(Vxk020)) imag(i(Vxk020)) real(i(Vsk020)) imag(i(Vsk020))
+wrdata k021_ac.dat real(i(Vpk021)) imag(i(Vpk021)) real(v(mk021)) imag(v(mk021)) real(v(xk021)) imag(v(xk021)) real(v(sk021)) imag(v(sk021)) real(i(Vmk021)) imag(i(Vmk021)) real(i(Vxk021)) imag(i(Vxk021)) real(i(Vsk021)) imag(i(Vsk021))
+wrdata k022_ac.dat real(i(Vpk022)) imag(i(Vpk022)) real(v(mk022)) imag(v(mk022)) real(v(xk022)) imag(v(xk022)) real(v(sk022)) imag(v(sk022)) real(i(Vmk022)) imag(i(Vmk022)) real(i(Vxk022)) imag(i(Vxk022)) real(i(Vsk022)) imag(i(Vsk022))
+wrdata k023_ac.dat real(i(Vpk023)) imag(i(Vpk023)) real(v(mk023)) imag(v(mk023)) real(v(xk023)) imag(v(xk023)) real(v(sk023)) imag(v(sk023)) real(i(Vmk023)) imag(i(Vmk023)) real(i(Vxk023)) imag(i(Vxk023)) real(i(Vsk023)) imag(i(Vsk023))
+wrdata k024_ac.dat real(i(Vpk024)) imag(i(Vpk024)) real(v(mk024)) imag(v(mk024)) real(v(xk024)) imag(v(xk024)) real(v(sk024)) imag(v(sk024)) real(i(Vmk024)) imag(i(Vmk024)) real(i(Vxk024)) imag(i(Vxk024)) real(i(Vsk024)) imag(i(Vsk024))
+wrdata k025_ac.dat real(i(Vpk025)) imag(i(Vpk025)) real(v(mk025)) imag(v(mk025)) real(v(xk025)) imag(v(xk025)) real(v(sk025)) imag(v(sk025)) real(i(Vmk025)) imag(i(Vmk025)) real(i(Vxk025)) imag(i(Vxk025)) real(i(Vsk025)) imag(i(Vsk025))
+wrdata k026_ac.dat real(i(Vpk026)) imag(i(Vpk026)) real(v(mk026)) imag(v(mk026)) real(v(xk026)) imag(v(xk026)) real(v(sk026)) imag(v(sk026)) real(i(Vmk026)) imag(i(Vmk026)) real(i(Vxk026)) imag(i(Vxk026)) real(i(Vsk026)) imag(i(Vsk026))
+wrdata k027_ac.dat real(i(Vpk027)) imag(i(Vpk027)) real(v(mk027)) imag(v(mk027)) real(v(xk027)) imag(v(xk027)) real(v(sk027)) imag(v(sk027)) real(i(Vmk027)) imag(i(Vmk027)) real(i(Vxk027)) imag(i(Vxk027)) real(i(Vsk027)) imag(i(Vsk027))
+wrdata k028_ac.dat real(i(Vpk028)) imag(i(Vpk028)) real(v(mk028)) imag(v(mk028)) real(v(xk028)) imag(v(xk028)) real(v(sk028)) imag(v(sk028)) real(i(Vmk028)) imag(i(Vmk028)) real(i(Vxk028)) imag(i(Vxk028)) real(i(Vsk028)) imag(i(Vsk028))
+wrdata k029_ac.dat real(i(Vpk029)) imag(i(Vpk029)) real(v(mk029)) imag(v(mk029)) real(v(xk029)) imag(v(xk029)) real(v(sk029)) imag(v(sk029)) real(i(Vmk029)) imag(i(Vmk029)) real(i(Vxk029)) imag(i(Vxk029)) real(i(Vsk029)) imag(i(Vsk029))
+wrdata k030_ac.dat real(i(Vpk030)) imag(i(Vpk030)) real(v(mk030)) imag(v(mk030)) real(v(xk030)) imag(v(xk030)) real(v(sk030)) imag(v(sk030)) real(i(Vmk030)) imag(i(Vmk030)) real(i(Vxk030)) imag(i(Vxk030)) real(i(Vsk030)) imag(i(Vsk030))
+wrdata k031_ac.dat real(i(Vpk031)) imag(i(Vpk031)) real(v(mk031)) imag(v(mk031)) real(v(xk031)) imag(v(xk031)) real(v(sk031)) imag(v(sk031)) real(i(Vmk031)) imag(i(Vmk031)) real(i(Vxk031)) imag(i(Vxk031)) real(i(Vsk031)) imag(i(Vsk031))
+wrdata k032_ac.dat real(i(Vpk032)) imag(i(Vpk032)) real(v(mk032)) imag(v(mk032)) real(v(xk032)) imag(v(xk032)) real(v(sk032)) imag(v(sk032)) real(i(Vmk032)) imag(i(Vmk032)) real(i(Vxk032)) imag(i(Vxk032)) real(i(Vsk032)) imag(i(Vsk032))
+wrdata k033_ac.dat real(i(Vpk033)) imag(i(Vpk033)) real(v(mk033)) imag(v(mk033)) real(v(xk033)) imag(v(xk033)) real(v(sk033)) imag(v(sk033)) real(i(Vmk033)) imag(i(Vmk033)) real(i(Vxk033)) imag(i(Vxk033)) real(i(Vsk033)) imag(i(Vsk033))
+wrdata k034_ac.dat real(i(Vpk034)) imag(i(Vpk034)) real(v(mk034)) imag(v(mk034)) real(v(xk034)) imag(v(xk034)) real(v(sk034)) imag(v(sk034)) real(i(Vmk034)) imag(i(Vmk034)) real(i(Vxk034)) imag(i(Vxk034)) real(i(Vsk034)) imag(i(Vsk034))
+wrdata k035_ac.dat real(i(Vpk035)) imag(i(Vpk035)) real(v(mk035)) imag(v(mk035)) real(v(xk035)) imag(v(xk035)) real(v(sk035)) imag(v(sk035)) real(i(Vmk035)) imag(i(Vmk035)) real(i(Vxk035)) imag(i(Vxk035)) real(i(Vsk035)) imag(i(Vsk035))
+wrdata k036_ac.dat real(i(Vpk036)) imag(i(Vpk036)) real(v(mk036)) imag(v(mk036)) real(v(xk036)) imag(v(xk036)) real(v(sk036)) imag(v(sk036)) real(i(Vmk036)) imag(i(Vmk036)) real(i(Vxk036)) imag(i(Vxk036)) real(i(Vsk036)) imag(i(Vsk036))
+wrdata k037_ac.dat real(i(Vpk037)) imag(i(Vpk037)) real(v(mk037)) imag(v(mk037)) real(v(xk037)) imag(v(xk037)) real(v(sk037)) imag(v(sk037)) real(i(Vmk037)) imag(i(Vmk037)) real(i(Vxk037)) imag(i(Vxk037)) real(i(Vsk037)) imag(i(Vsk037))
+wrdata k038_ac.dat real(i(Vpk038)) imag(i(Vpk038)) real(v(mk038)) imag(v(mk038)) real(v(xk038)) imag(v(xk038)) real(v(sk038)) imag(v(sk038)) real(i(Vmk038)) imag(i(Vmk038)) real(i(Vxk038)) imag(i(Vxk038)) real(i(Vsk038)) imag(i(Vsk038))
+wrdata k039_ac.dat real(i(Vpk039)) imag(i(Vpk039)) real(v(mk039)) imag(v(mk039)) real(v(xk039)) imag(v(xk039)) real(v(sk039)) imag(v(sk039)) real(i(Vmk039)) imag(i(Vmk039)) real(i(Vxk039)) imag(i(Vxk039)) real(i(Vsk039)) imag(i(Vsk039))
+wrdata k040_ac.dat real(i(Vpk040)) imag(i(Vpk040)) real(v(mk040)) imag(v(mk040)) real(v(xk040)) imag(v(xk040)) real(v(sk040)) imag(v(sk040)) real(i(Vmk040)) imag(i(Vmk040)) real(i(Vxk040)) imag(i(Vxk040)) real(i(Vsk040)) imag(i(Vsk040))
+wrdata k041_ac.dat real(i(Vpk041)) imag(i(Vpk041)) real(v(mk041)) imag(v(mk041)) real(v(xk041)) imag(v(xk041)) real(v(sk041)) imag(v(sk041)) real(i(Vmk041)) imag(i(Vmk041)) real(i(Vxk041)) imag(i(Vxk041)) real(i(Vsk041)) imag(i(Vsk041))
+wrdata k042_ac.dat real(i(Vpk042)) imag(i(Vpk042)) real(v(mk042)) imag(v(mk042)) real(v(xk042)) imag(v(xk042)) real(v(sk042)) imag(v(sk042)) real(i(Vmk042)) imag(i(Vmk042)) real(i(Vxk042)) imag(i(Vxk042)) real(i(Vsk042)) imag(i(Vsk042))
+wrdata k043_ac.dat real(i(Vpk043)) imag(i(Vpk043)) real(v(mk043)) imag(v(mk043)) real(v(xk043)) imag(v(xk043)) real(v(sk043)) imag(v(sk043)) real(i(Vmk043)) imag(i(Vmk043)) real(i(Vxk043)) imag(i(Vxk043)) real(i(Vsk043)) imag(i(Vsk043))
+wrdata k044_ac.dat real(i(Vpk044)) imag(i(Vpk044)) real(v(mk044)) imag(v(mk044)) real(v(xk044)) imag(v(xk044)) real(v(sk044)) imag(v(sk044)) real(i(Vmk044)) imag(i(Vmk044)) real(i(Vxk044)) imag(i(Vxk044)) real(i(Vsk044)) imag(i(Vsk044))
+wrdata k045_ac.dat real(i(Vpk045)) imag(i(Vpk045)) real(v(mk045)) imag(v(mk045)) real(v(xk045)) imag(v(xk045)) real(v(sk045)) imag(v(sk045)) real(i(Vmk045)) imag(i(Vmk045)) real(i(Vxk045)) imag(i(Vxk045)) real(i(Vsk045)) imag(i(Vsk045))
+wrdata k046_ac.dat real(i(Vpk046)) imag(i(Vpk046)) real(v(mk046)) imag(v(mk046)) real(v(xk046)) imag(v(xk046)) real(v(sk046)) imag(v(sk046)) real(i(Vmk046)) imag(i(Vmk046)) real(i(Vxk046)) imag(i(Vxk046)) real(i(Vsk046)) imag(i(Vsk046))
+wrdata k047_ac.dat real(i(Vpk047)) imag(i(Vpk047)) real(v(mk047)) imag(v(mk047)) real(v(xk047)) imag(v(xk047)) real(v(sk047)) imag(v(sk047)) real(i(Vmk047)) imag(i(Vmk047)) real(i(Vxk047)) imag(i(Vxk047)) real(i(Vsk047)) imag(i(Vsk047))
+wrdata k048_ac.dat real(i(Vpk048)) imag(i(Vpk048)) real(v(mk048)) imag(v(mk048)) real(v(xk048)) imag(v(xk048)) real(v(sk048)) imag(v(sk048)) real(i(Vmk048)) imag(i(Vmk048)) real(i(Vxk048)) imag(i(Vxk048)) real(i(Vsk048)) imag(i(Vsk048))
+wrdata k049_ac.dat real(i(Vpk049)) imag(i(Vpk049)) real(v(mk049)) imag(v(mk049)) real(v(xk049)) imag(v(xk049)) real(v(sk049)) imag(v(sk049)) real(i(Vmk049)) imag(i(Vmk049)) real(i(Vxk049)) imag(i(Vxk049)) real(i(Vsk049)) imag(i(Vsk049))
+wrdata k050_ac.dat real(i(Vpk050)) imag(i(Vpk050)) real(v(mk050)) imag(v(mk050)) real(v(xk050)) imag(v(xk050)) real(v(sk050)) imag(v(sk050)) real(i(Vmk050)) imag(i(Vmk050)) real(i(Vxk050)) imag(i(Vxk050)) real(i(Vsk050)) imag(i(Vsk050))
+wrdata k051_ac.dat real(i(Vpk051)) imag(i(Vpk051)) real(v(mk051)) imag(v(mk051)) real(v(xk051)) imag(v(xk051)) real(v(sk051)) imag(v(sk051)) real(i(Vmk051)) imag(i(Vmk051)) real(i(Vxk051)) imag(i(Vxk051)) real(i(Vsk051)) imag(i(Vsk051))
+wrdata k052_ac.dat real(i(Vpk052)) imag(i(Vpk052)) real(v(mk052)) imag(v(mk052)) real(v(xk052)) imag(v(xk052)) real(v(sk052)) imag(v(sk052)) real(i(Vmk052)) imag(i(Vmk052)) real(i(Vxk052)) imag(i(Vxk052)) real(i(Vsk052)) imag(i(Vsk052))
+wrdata k053_ac.dat real(i(Vpk053)) imag(i(Vpk053)) real(v(mk053)) imag(v(mk053)) real(v(xk053)) imag(v(xk053)) real(v(sk053)) imag(v(sk053)) real(i(Vmk053)) imag(i(Vmk053)) real(i(Vxk053)) imag(i(Vxk053)) real(i(Vsk053)) imag(i(Vsk053))
+quit
+.endc
+.end

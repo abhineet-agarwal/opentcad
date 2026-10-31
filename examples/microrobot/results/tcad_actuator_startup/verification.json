@@ -1,0 +1,30 @@
+{
+  "tests": {
+    "passed": 2,
+    "seconds": 1.26,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "clock_identical_to_accepted_logic_isolation": true,
+  "DD_sources_identical_to_verified_sources": true,
+  "held_controls": true,
+  "event_and_supervisor_state_absent": true,
+  "no_extra_simulation": true,
+  "counts": {
+    "transients": 1,
+    "fine": 0,
+    "rescue": 0,
+    "DC": 0,
+    "DD": 0,
+    "layout": 0
+  },
+  "raw_exported": false,
+  "scope": "Failed add-back prefix only; passing bookkeeping/clamp/domain checks do not validate full startup or released function",
+  "review_acceptance": "Reviewed and accepted as failed actuator-network add-back evidence; complete startup and actuator operation remain unvalidated.",
+  "offline_fixed_zero_bridge_equivalence": {
+    "high_side_currents": "Exactly zero under fixed zero commands",
+    "low_side_relation": "I=V(output)/10000; mathematically a 10k resistor to ground",
+    "caveat": "Auxiliary equation/probe removal changes numerical conditioning; no root cause or trajectory equivalence proved",
+    "new_deck_or_simulation": false
+  }
+}

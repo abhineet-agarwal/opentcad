@@ -1,0 +1,11 @@
+--- passed_passive_adsorption
++++ linear_behavioral_adsorption
+@@ -1315,7 +1315,7 @@
+ .subckt micro_electrode metal solution adsnode params: cdl=40p qmax=260p tau=20m rf=10g width=0.08 offset=0
+ Cdouble metal solution {cdl}
+ Rfaradaic metal solution {rf}
+-Rads metal adsnode {tau*4*width/qmax}
++Bads_linear metal adsnode I={qmax/(4*width*tau)*v(metal,adsnode)}
+ Cads adsnode solution {qmax/(4*width)}
+ .ends micro_electrode
+ 

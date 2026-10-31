@@ -1,0 +1,19 @@
+{
+  "grid_points": 451,
+  "eta_range_V": [
+    -2,
+    2
+  ],
+  "theta_range": [
+    0,
+    1
+  ],
+  "maximum_abs_dtheta_error_per_s": 1.4210854715202004e-14,
+  "theta0_boundary_derivative_nonnegative": true,
+  "theta1_boundary_derivative_nonpositive": true,
+  "charge_identity": "Ia=Ca*du/dt=Qmax*dtheta/dt, with u=4width*(theta-.5)",
+  "tau_sign": "Ia/Qmax=(logistic((eta-offset)/width)-theta)/tau; positive tau pulls state toward equilibrium",
+  "native_expression": "Bads_series metal adsnode I={qmax/(4*width*tau)*(2*width*tanh((v(metal,solution)-offset)/(2*width))-v(adsnode,solution))}",
+  "native_expression_notes": "ngspice behavioral current uses existing v() and parameter syntax plus tanh(); no ideal coverage voltage or duplicate direct adsorption branch",
+  "passed": true
+}

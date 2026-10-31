@@ -1,0 +1,678 @@
+--- reviewed/routing
++++ stage_local/routing
+@@ -800,21 +800,21 @@
+ paint metal3
+ box values -11.150um 48.450um -10.850um 48.750um
+ paint via2
+-box values 155.000um 36.000um 155.400um 55.200um
++box values 155.000um 29.800um 155.400um 36.400um
+ paint metal4
+-box values 155.000um 54.800um 162.100um 55.200um
++box values 155.000um 29.800um 162.100um 30.200um
+ paint metal4
+-box values 161.600um 54.700um 162.200um 55.300um
+-paint metal3
+-box values 161.700um 54.800um 162.100um 55.200um
++box values 161.600um 29.700um 162.200um 30.300um
++paint metal3
++box values 161.700um 29.800um 162.100um 30.200um
+ paint metal4
+-box values 161.730um 54.830um 162.070um 55.170um
++box values 161.730um 29.830um 162.070um 30.170um
+ paint via3
+-box values 161.700um 54.800um 162.100um 55.200um
+-paint metal2
+-box values 161.700um 54.800um 162.100um 55.200um
+-paint metal3
+-box values 161.750um 54.850um 162.050um 55.150um
++box values 161.700um 29.800um 162.100um 30.200um
++paint metal2
++box values 161.700um 29.800um 162.100um 30.200um
++paint metal3
++box values 161.750um 29.850um 162.050um 30.150um
+ paint via2
+ box values 157.700um 36.000um 165.700um 36.400um
+ paint metal3
+@@ -824,21 +824,21 @@
+ paint metal3
+ box values 165.350um 36.050um 165.650um 36.350um
+ paint via2
+-box values 235.000um 36.000um 235.400um 55.200um
++box values 235.000um 29.800um 235.400um 36.400um
+ paint metal4
+-box values 235.000um 54.800um 242.100um 55.200um
++box values 235.000um 29.800um 242.100um 30.200um
+ paint metal4
+-box values 241.600um 54.700um 242.200um 55.300um
+-paint metal3
+-box values 241.700um 54.800um 242.100um 55.200um
++box values 241.600um 29.700um 242.200um 30.300um
++paint metal3
++box values 241.700um 29.800um 242.100um 30.200um
+ paint metal4
+-box values 241.730um 54.830um 242.070um 55.170um
++box values 241.730um 29.830um 242.070um 30.170um
+ paint via3
+-box values 241.700um 54.800um 242.100um 55.200um
+-paint metal2
+-box values 241.700um 54.800um 242.100um 55.200um
+-paint metal3
+-box values 241.750um 54.850um 242.050um 55.150um
++box values 241.700um 29.800um 242.100um 30.200um
++paint metal2
++box values 241.700um 29.800um 242.100um 30.200um
++paint metal3
++box values 241.750um 29.850um 242.050um 30.150um
+ paint via2
+ box values 237.700um 36.000um 245.700um 36.400um
+ paint metal3
+@@ -848,21 +848,21 @@
+ paint metal3
+ box values 245.350um 36.050um 245.650um 36.350um
+ paint via2
+-box values 315.000um 36.000um 315.400um 55.200um
++box values 315.000um 29.800um 315.400um 36.400um
+ paint metal4
+-box values 315.000um 54.800um 322.100um 55.200um
++box values 315.000um 29.800um 322.100um 30.200um
+ paint metal4
+-box values 321.600um 54.700um 322.200um 55.300um
+-paint metal3
+-box values 321.700um 54.800um 322.100um 55.200um
++box values 321.600um 29.700um 322.200um 30.300um
++paint metal3
++box values 321.700um 29.800um 322.100um 30.200um
+ paint metal4
+-box values 321.730um 54.830um 322.070um 55.170um
++box values 321.730um 29.830um 322.070um 30.170um
+ paint via3
+-box values 321.700um 54.800um 322.100um 55.200um
+-paint metal2
+-box values 321.700um 54.800um 322.100um 55.200um
+-paint metal3
+-box values 321.750um 54.850um 322.050um 55.150um
++box values 321.700um 29.800um 322.100um 30.200um
++paint metal2
++box values 321.700um 29.800um 322.100um 30.200um
++paint metal3
++box values 321.750um 29.850um 322.050um 30.150um
+ paint via2
+ box values 317.700um 36.000um 325.700um 36.400um
+ paint metal3
+@@ -872,21 +872,21 @@
+ paint metal3
+ box values 325.350um 36.050um 325.650um 36.350um
+ paint via2
+-box values 395.000um 36.000um 395.400um 55.200um
++box values 395.000um 29.800um 395.400um 36.400um
+ paint metal4
+-box values 395.000um 54.800um 402.100um 55.200um
++box values 395.000um 29.800um 402.100um 30.200um
+ paint metal4
+-box values 401.600um 54.700um 402.200um 55.300um
+-paint metal3
+-box values 401.700um 54.800um 402.100um 55.200um
++box values 401.600um 29.700um 402.200um 30.300um
++paint metal3
++box values 401.700um 29.800um 402.100um 30.200um
+ paint metal4
+-box values 401.730um 54.830um 402.070um 55.170um
++box values 401.730um 29.830um 402.070um 30.170um
+ paint via3
+-box values 401.700um 54.800um 402.100um 55.200um
+-paint metal2
+-box values 401.700um 54.800um 402.100um 55.200um
+-paint metal3
+-box values 401.750um 54.850um 402.050um 55.150um
++box values 401.700um 29.800um 402.100um 30.200um
++paint metal2
++box values 401.700um 29.800um 402.100um 30.200um
++paint metal3
++box values 401.750um 29.850um 402.050um 30.150um
+ paint via2
+ box values 397.700um 36.000um 405.700um 36.400um
+ paint metal3
+@@ -896,21 +896,21 @@
+ paint metal3
+ box values 405.350um 36.050um 405.650um 36.350um
+ paint via2
+-box values 475.000um 36.250um 475.400um 55.200um
++box values 475.000um 29.800um 475.400um 36.650um
+ paint metal4
+-box values 475.000um 54.800um 482.100um 55.200um
++box values 475.000um 29.800um 482.100um 30.200um
+ paint metal4
+-box values 481.600um 54.700um 482.200um 55.300um
+-paint metal3
+-box values 481.700um 54.800um 482.100um 55.200um
++box values 481.600um 29.700um 482.200um 30.300um
++paint metal3
++box values 481.700um 29.800um 482.100um 30.200um
+ paint metal4
+-box values 481.730um 54.830um 482.070um 55.170um
++box values 481.730um 29.830um 482.070um 30.170um
+ paint via3
+-box values 481.700um 54.800um 482.100um 55.200um
+-paint metal2
+-box values 481.700um 54.800um 482.100um 55.200um
+-paint metal3
+-box values 481.750um 54.850um 482.050um 55.150um
++box values 481.700um 29.800um 482.100um 30.200um
++paint metal2
++box values 481.700um 29.800um 482.100um 30.200um
++paint metal3
++box values 481.750um 29.850um 482.050um 30.150um
+ paint via2
+ box values 477.700um 36.250um 485.700um 36.650um
+ paint metal3
+@@ -1164,113 +1164,113 @@
+ box values -30.000um 71.000um -29.600um 71.400um
+ label vdd center metal3
+ port make 2
+-box values 138.515um 11.130um 138.915um 76.200um
+-paint metal2
+-box values 138.515um 75.800um 138.915um 76.200um
+-paint metal2
+-box values 138.515um 75.800um 138.915um 76.200um
+-paint metal3
+-box values 138.565um 75.850um 138.865um 76.150um
+-paint via2
+-box values 158.515um 10.835um 158.915um 76.200um
+-paint metal2
+-box values 158.515um 75.800um 158.915um 76.200um
+-paint metal2
+-box values 158.515um 75.800um 158.915um 76.200um
+-paint metal3
+-box values 158.565um 75.850um 158.865um 76.150um
+-paint via2
+-box values 217.515um 10.255um 217.915um 76.200um
+-paint metal2
+-box values 217.515um 75.800um 217.915um 76.200um
+-paint metal2
+-box values 217.515um 75.800um 217.915um 76.200um
+-paint metal3
+-box values 217.565um 75.850um 217.865um 76.150um
+-paint via2
+-box values 237.515um 10.255um 237.915um 76.200um
+-paint metal2
+-box values 237.515um 75.800um 237.915um 76.200um
+-paint metal2
+-box values 237.515um 75.800um 237.915um 76.200um
+-paint metal3
+-box values 237.565um 75.850um 237.865um 76.150um
+-paint via2
+-box values 161.700um 54.800um 162.100um 76.200um
+-paint metal2
+-box values 161.700um 75.800um 162.100um 76.200um
+-paint metal2
+-box values 161.700um 75.800um 162.100um 76.200um
+-paint metal3
+-box values 161.750um 75.850um 162.050um 76.150um
+-paint via2
+-box values 138.015um 75.800um 238.415um 76.200um
+-paint metal3
+-box values 138.215um 75.800um 138.615um 76.200um
+-paint metal3
+-box values 138.215um 75.800um 138.615um 76.200um
++box values 138.515um 11.130um 138.915um 20.200um
++paint metal2
++box values 138.515um 19.800um 138.915um 20.200um
++paint metal2
++box values 138.515um 19.800um 138.915um 20.200um
++paint metal3
++box values 138.565um 19.850um 138.865um 20.150um
++paint via2
++box values 158.515um 10.835um 158.915um 20.200um
++paint metal2
++box values 158.515um 19.800um 158.915um 20.200um
++paint metal2
++box values 158.515um 19.800um 158.915um 20.200um
++paint metal3
++box values 158.565um 19.850um 158.865um 20.150um
++paint via2
++box values 217.515um 10.255um 217.915um 20.200um
++paint metal2
++box values 217.515um 19.800um 217.915um 20.200um
++paint metal2
++box values 217.515um 19.800um 217.915um 20.200um
++paint metal3
++box values 217.565um 19.850um 217.865um 20.150um
++paint via2
++box values 237.515um 10.255um 237.915um 20.200um
++paint metal2
++box values 237.515um 19.800um 237.915um 20.200um
++paint metal2
++box values 237.515um 19.800um 237.915um 20.200um
++paint metal3
++box values 237.565um 19.850um 237.865um 20.150um
++paint via2
++box values 161.700um 19.800um 162.100um 30.200um
++paint metal2
++box values 161.700um 19.800um 162.100um 20.200um
++paint metal2
++box values 161.700um 19.800um 162.100um 20.200um
++paint metal3
++box values 161.750um 19.850um 162.050um 20.150um
++paint via2
++box values 138.015um 19.800um 238.415um 20.200um
++paint metal3
++box values 138.215um 19.800um 138.615um 20.200um
++paint metal3
++box values 138.215um 19.800um 138.615um 20.200um
+ label a center metal3
+-box values 137.515um 10.255um 137.915um 77.400um
+-paint metal2
+-box values 137.515um 77.000um 137.915um 77.400um
+-paint metal2
+-box values 137.515um 77.000um 137.915um 77.400um
+-paint metal3
+-box values 137.565um 77.050um 137.865um 77.350um
+-paint via2
+-box values 157.515um 10.255um 157.915um 77.400um
+-paint metal2
+-box values 157.515um 77.000um 157.915um 77.400um
+-paint metal2
+-box values 157.515um 77.000um 157.915um 77.400um
+-paint metal3
+-box values 157.565um 77.050um 157.865um 77.350um
+-paint via2
+-box values 458.515um 11.130um 458.915um 77.400um
+-paint metal2
+-box values 458.515um 77.000um 458.915um 77.400um
+-paint metal2
+-box values 458.515um 77.000um 458.915um 77.400um
+-paint metal3
+-box values 458.565um 77.050um 458.865um 77.350um
+-paint via2
+-box values 478.515um 10.835um 478.915um 77.400um
+-paint metal2
+-box values 478.515um 77.000um 478.915um 77.400um
+-paint metal2
+-box values 478.515um 77.000um 478.915um 77.400um
+-paint metal3
+-box values 478.565um 77.050um 478.865um 77.350um
+-paint via2
+-box values 517.515um 10.255um 517.915um 77.400um
+-paint metal2
+-box values 517.515um 77.000um 517.915um 77.400um
+-paint metal2
+-box values 517.515um 77.000um 517.915um 77.400um
+-paint metal3
+-box values 517.565um 77.050um 517.865um 77.350um
+-paint via2
+-box values 537.515um 10.255um 537.915um 77.400um
+-paint metal2
+-box values 537.515um 77.000um 537.915um 77.400um
+-paint metal2
+-box values 537.515um 77.000um 537.915um 77.400um
+-paint metal3
+-box values 537.565um 77.050um 537.865um 77.350um
+-paint via2
+-box values 481.700um 54.800um 482.100um 77.400um
+-paint metal2
+-box values 481.700um 77.000um 482.100um 77.400um
+-paint metal2
+-box values 481.700um 77.000um 482.100um 77.400um
+-paint metal3
+-box values 481.750um 77.050um 482.050um 77.350um
+-paint via2
+-box values 137.015um 77.000um 538.415um 77.400um
+-paint metal3
+-box values 137.215um 77.000um 137.615um 77.400um
+-paint metal3
+-box values 137.215um 77.000um 137.615um 77.400um
++box values 137.515um 10.255um 137.915um 28.200um
++paint metal2
++box values 137.515um 27.800um 137.915um 28.200um
++paint metal2
++box values 137.515um 27.800um 137.915um 28.200um
++paint metal3
++box values 137.565um 27.850um 137.865um 28.150um
++paint via2
++box values 157.515um 10.255um 157.915um 28.200um
++paint metal2
++box values 157.515um 27.800um 157.915um 28.200um
++paint metal2
++box values 157.515um 27.800um 157.915um 28.200um
++paint metal3
++box values 157.565um 27.850um 157.865um 28.150um
++paint via2
++box values 458.515um 11.130um 458.915um 28.200um
++paint metal2
++box values 458.515um 27.800um 458.915um 28.200um
++paint metal2
++box values 458.515um 27.800um 458.915um 28.200um
++paint metal3
++box values 458.565um 27.850um 458.865um 28.150um
++paint via2
++box values 478.515um 10.835um 478.915um 28.200um
++paint metal2
++box values 478.515um 27.800um 478.915um 28.200um
++paint metal2
++box values 478.515um 27.800um 478.915um 28.200um
++paint metal3
++box values 478.565um 27.850um 478.865um 28.150um
++paint via2
++box values 517.515um 10.255um 517.915um 28.200um
++paint metal2
++box values 517.515um 27.800um 517.915um 28.200um
++paint metal2
++box values 517.515um 27.800um 517.915um 28.200um
++paint metal3
++box values 517.565um 27.850um 517.865um 28.150um
++paint via2
++box values 537.515um 10.255um 537.915um 28.200um
++paint metal2
++box values 537.515um 27.800um 537.915um 28.200um
++paint metal2
++box values 537.515um 27.800um 537.915um 28.200um
++paint metal3
++box values 537.565um 27.850um 537.865um 28.150um
++paint via2
++box values 481.700um 27.800um 482.100um 30.200um
++paint metal2
++box values 481.700um 27.800um 482.100um 28.200um
++paint metal2
++box values 481.700um 27.800um 482.100um 28.200um
++paint metal3
++box values 481.750um 27.850um 482.050um 28.150um
++paint via2
++box values 137.015um 27.800um 538.415um 28.200um
++paint metal3
++box values 137.215um 27.800um 137.615um 28.200um
++paint metal3
++box values 137.215um 27.800um 137.615um 28.200um
+ label raw center metal3
+ box values 163.015um 10.835um 163.415um 78.600um
+ paint metal2
+@@ -1578,51 +1578,51 @@
+ paint metal3
+ box values 198.215um 79.400um 198.615um 79.800um
+ label X2_ps center metal3
+-box values 218.515um 11.130um 218.915um 81.000um
+-paint metal2
+-box values 218.515um 80.600um 218.915um 81.000um
+-paint metal2
+-box values 218.515um 80.600um 218.915um 81.000um
+-paint metal3
+-box values 218.565um 80.650um 218.865um 80.950um
+-paint via2
+-box values 238.515um 10.835um 238.915um 81.000um
+-paint metal2
+-box values 238.515um 80.600um 238.915um 81.000um
+-paint metal2
+-box values 238.515um 80.600um 238.915um 81.000um
+-paint metal3
+-box values 238.565um 80.650um 238.865um 80.950um
+-paint via2
+-box values 297.515um 10.255um 297.915um 81.000um
+-paint metal2
+-box values 297.515um 80.600um 297.915um 81.000um
+-paint metal2
+-box values 297.515um 80.600um 297.915um 81.000um
+-paint metal3
+-box values 297.565um 80.650um 297.865um 80.950um
+-paint via2
+-box values 317.515um 10.255um 317.915um 81.000um
+-paint metal2
+-box values 317.515um 80.600um 317.915um 81.000um
+-paint metal2
+-box values 317.515um 80.600um 317.915um 81.000um
+-paint metal3
+-box values 317.565um 80.650um 317.865um 80.950um
+-paint via2
+-box values 241.700um 54.800um 242.100um 81.000um
+-paint metal2
+-box values 241.700um 80.600um 242.100um 81.000um
+-paint metal2
+-box values 241.700um 80.600um 242.100um 81.000um
+-paint metal3
+-box values 241.750um 80.650um 242.050um 80.950um
+-paint via2
+-box values 218.015um 80.600um 318.415um 81.000um
+-paint metal3
+-box values 218.215um 80.600um 218.615um 81.000um
+-paint metal3
+-box values 218.215um 80.600um 218.615um 81.000um
++box values 218.515um 11.130um 218.915um 22.200um
++paint metal2
++box values 218.515um 21.800um 218.915um 22.200um
++paint metal2
++box values 218.515um 21.800um 218.915um 22.200um
++paint metal3
++box values 218.565um 21.850um 218.865um 22.150um
++paint via2
++box values 238.515um 10.835um 238.915um 22.200um
++paint metal2
++box values 238.515um 21.800um 238.915um 22.200um
++paint metal2
++box values 238.515um 21.800um 238.915um 22.200um
++paint metal3
++box values 238.565um 21.850um 238.865um 22.150um
++paint via2
++box values 297.515um 10.255um 297.915um 22.200um
++paint metal2
++box values 297.515um 21.800um 297.915um 22.200um
++paint metal2
++box values 297.515um 21.800um 297.915um 22.200um
++paint metal3
++box values 297.565um 21.850um 297.865um 22.150um
++paint via2
++box values 317.515um 10.255um 317.915um 22.200um
++paint metal2
++box values 317.515um 21.800um 317.915um 22.200um
++paint metal2
++box values 317.515um 21.800um 317.915um 22.200um
++paint metal3
++box values 317.565um 21.850um 317.865um 22.150um
++paint via2
++box values 241.700um 21.800um 242.100um 30.200um
++paint metal2
++box values 241.700um 21.800um 242.100um 22.200um
++paint metal2
++box values 241.700um 21.800um 242.100um 22.200um
++paint metal3
++box values 241.750um 21.850um 242.050um 22.150um
++paint via2
++box values 218.015um 21.800um 318.415um 22.200um
++paint metal3
++box values 218.215um 21.800um 218.615um 22.200um
++paint metal3
++box values 218.215um 21.800um 218.615um 22.200um
+ label b center metal3
+ box values 243.015um 10.835um 243.415um 82.200um
+ paint metal2
+@@ -1668,51 +1668,51 @@
+ paint metal3
+ box values 278.215um 83.000um 278.615um 83.400um
+ label X3_ps center metal3
+-box values 298.515um 11.130um 298.915um 84.600um
+-paint metal2
+-box values 298.515um 84.200um 298.915um 84.600um
+-paint metal2
+-box values 298.515um 84.200um 298.915um 84.600um
+-paint metal3
+-box values 298.565um 84.250um 298.865um 84.550um
+-paint via2
+-box values 318.515um 10.835um 318.915um 84.600um
+-paint metal2
+-box values 318.515um 84.200um 318.915um 84.600um
+-paint metal2
+-box values 318.515um 84.200um 318.915um 84.600um
+-paint metal3
+-box values 318.565um 84.250um 318.865um 84.550um
+-paint via2
+-box values 377.515um 10.255um 377.915um 84.600um
+-paint metal2
+-box values 377.515um 84.200um 377.915um 84.600um
+-paint metal2
+-box values 377.515um 84.200um 377.915um 84.600um
+-paint metal3
+-box values 377.565um 84.250um 377.865um 84.550um
+-paint via2
+-box values 397.515um 10.255um 397.915um 84.600um
+-paint metal2
+-box values 397.515um 84.200um 397.915um 84.600um
+-paint metal2
+-box values 397.515um 84.200um 397.915um 84.600um
+-paint metal3
+-box values 397.565um 84.250um 397.865um 84.550um
+-paint via2
+-box values 321.700um 54.800um 322.100um 84.600um
+-paint metal2
+-box values 321.700um 84.200um 322.100um 84.600um
+-paint metal2
+-box values 321.700um 84.200um 322.100um 84.600um
+-paint metal3
+-box values 321.750um 84.250um 322.050um 84.550um
+-paint via2
+-box values 298.015um 84.200um 398.415um 84.600um
+-paint metal3
+-box values 298.215um 84.200um 298.615um 84.600um
+-paint metal3
+-box values 298.215um 84.200um 298.615um 84.600um
++box values 298.515um 11.130um 298.915um 24.200um
++paint metal2
++box values 298.515um 23.800um 298.915um 24.200um
++paint metal2
++box values 298.515um 23.800um 298.915um 24.200um
++paint metal3
++box values 298.565um 23.850um 298.865um 24.150um
++paint via2
++box values 318.515um 10.835um 318.915um 24.200um
++paint metal2
++box values 318.515um 23.800um 318.915um 24.200um
++paint metal2
++box values 318.515um 23.800um 318.915um 24.200um
++paint metal3
++box values 318.565um 23.850um 318.865um 24.150um
++paint via2
++box values 377.515um 10.255um 377.915um 24.200um
++paint metal2
++box values 377.515um 23.800um 377.915um 24.200um
++paint metal2
++box values 377.515um 23.800um 377.915um 24.200um
++paint metal3
++box values 377.565um 23.850um 377.865um 24.150um
++paint via2
++box values 397.515um 10.255um 397.915um 24.200um
++paint metal2
++box values 397.515um 23.800um 397.915um 24.200um
++paint metal2
++box values 397.515um 23.800um 397.915um 24.200um
++paint metal3
++box values 397.565um 23.850um 397.865um 24.150um
++paint via2
++box values 321.700um 23.800um 322.100um 30.200um
++paint metal2
++box values 321.700um 23.800um 322.100um 24.200um
++paint metal2
++box values 321.700um 23.800um 322.100um 24.200um
++paint metal3
++box values 321.750um 23.850um 322.050um 24.150um
++paint via2
++box values 298.015um 23.800um 398.415um 24.200um
++paint metal3
++box values 298.215um 23.800um 298.615um 24.200um
++paint metal3
++box values 298.215um 23.800um 298.615um 24.200um
+ label c center metal3
+ box values 323.015um 10.835um 323.415um 85.800um
+ paint metal2
+@@ -1758,51 +1758,51 @@
+ paint metal3
+ box values 358.215um 86.600um 358.615um 87.000um
+ label X4_ps center metal3
+-box values 378.515um 11.130um 378.915um 88.200um
+-paint metal2
+-box values 378.515um 87.800um 378.915um 88.200um
+-paint metal2
+-box values 378.515um 87.800um 378.915um 88.200um
+-paint metal3
+-box values 378.565um 87.850um 378.865um 88.150um
+-paint via2
+-box values 398.515um 10.835um 398.915um 88.200um
+-paint metal2
+-box values 398.515um 87.800um 398.915um 88.200um
+-paint metal2
+-box values 398.515um 87.800um 398.915um 88.200um
+-paint metal3
+-box values 398.565um 87.850um 398.865um 88.150um
+-paint via2
+-box values 457.515um 10.255um 457.915um 88.200um
+-paint metal2
+-box values 457.515um 87.800um 457.915um 88.200um
+-paint metal2
+-box values 457.515um 87.800um 457.915um 88.200um
+-paint metal3
+-box values 457.565um 87.850um 457.865um 88.150um
+-paint via2
+-box values 477.515um 10.255um 477.915um 88.200um
+-paint metal2
+-box values 477.515um 87.800um 477.915um 88.200um
+-paint metal2
+-box values 477.515um 87.800um 477.915um 88.200um
+-paint metal3
+-box values 477.565um 87.850um 477.865um 88.150um
+-paint via2
+-box values 401.700um 54.800um 402.100um 88.200um
+-paint metal2
+-box values 401.700um 87.800um 402.100um 88.200um
+-paint metal2
+-box values 401.700um 87.800um 402.100um 88.200um
+-paint metal3
+-box values 401.750um 87.850um 402.050um 88.150um
+-paint via2
+-box values 378.015um 87.800um 478.415um 88.200um
+-paint metal3
+-box values 378.215um 87.800um 378.615um 88.200um
+-paint metal3
+-box values 378.215um 87.800um 378.615um 88.200um
++box values 378.515um 11.130um 378.915um 26.200um
++paint metal2
++box values 378.515um 25.800um 378.915um 26.200um
++paint metal2
++box values 378.515um 25.800um 378.915um 26.200um
++paint metal3
++box values 378.565um 25.850um 378.865um 26.150um
++paint via2
++box values 398.515um 10.835um 398.915um 26.200um
++paint metal2
++box values 398.515um 25.800um 398.915um 26.200um
++paint metal2
++box values 398.515um 25.800um 398.915um 26.200um
++paint metal3
++box values 398.565um 25.850um 398.865um 26.150um
++paint via2
++box values 457.515um 10.255um 457.915um 26.200um
++paint metal2
++box values 457.515um 25.800um 457.915um 26.200um
++paint metal2
++box values 457.515um 25.800um 457.915um 26.200um
++paint metal3
++box values 457.565um 25.850um 457.865um 26.150um
++paint via2
++box values 477.515um 10.255um 477.915um 26.200um
++paint metal2
++box values 477.515um 25.800um 477.915um 26.200um
++paint metal2
++box values 477.515um 25.800um 477.915um 26.200um
++paint metal3
++box values 477.565um 25.850um 477.865um 26.150um
++paint via2
++box values 401.700um 25.800um 402.100um 30.200um
++paint metal2
++box values 401.700um 25.800um 402.100um 26.200um
++paint metal2
++box values 401.700um 25.800um 402.100um 26.200um
++paint metal3
++box values 401.750um 25.850um 402.050um 26.150um
++paint via2
++box values 378.015um 25.800um 478.415um 26.200um
++paint metal3
++box values 378.215um 25.800um 378.615um 26.200um
++paint metal3
++box values 378.215um 25.800um 378.615um 26.200um
+ label d center metal3
+ box values 403.015um 10.835um 403.415um 89.400um
+ paint metal2

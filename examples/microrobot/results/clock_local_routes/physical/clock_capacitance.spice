@@ -1,0 +1,149 @@
+* NGSPICE file created from microrobot_clock.ext - technology: sky130A
+
+.subckt microrobot_clock clk vdd vss bias_n bias_p
+X0 Xc3.C1 vss sky130_fd_pr__cap_mim_m3_1 l=2 w=2
+X1 vss bias_n bias_p vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X2 Xc4.C1 vss sky130_fd_pr__cap_mim_m3_1 l=2 w=2
+X3 X2_Xps.D Xc1.C1 Xc2.C1 vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+X4 vss bias_n X2_Xns.D vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X5 vdd bias_p X1_Xps.D vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X6 X1_Xns.D X1_Xpi.G Xc1.C1 vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+X7 vdd bias_p bias_p vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X8 X5_Xps.D Xc4.C1 X1_Xpi.G vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+X9 vdd X1_Xpi.G Xbp1.D vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X10 vdd bias_p X4_Xps.D vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X11 X4_Xns.D Xc3.C1 Xc4.C1 vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+X12 vss bias_n bias_n vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X13 Xbias.Xb2.D vdd vdd vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X14 vdd Xbp1.D clk vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=1
+X15 vss bias_n X5_Xns.D vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X16 X3_Xps.D Xc2.C1 Xc3.C1 vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+X17 Xc1.C1 vss sky130_fd_pr__cap_mim_m3_1 l=2 w=2
+X18 vdd bias_p X2_Xps.D vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X19 bias_n vss sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+X20 Xc2.C1 vss sky130_fd_pr__cap_mim_m3_1 l=2 w=2
+X21 vss bias_n X3_Xns.D vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X22 X1_Xpi.G vss sky130_fd_pr__cap_mim_m3_1 l=2.5 w=2
+X23 bias_p vss sky130_fd_pr__cap_mim_m3_1 l=7 w=7
+X24 X2_Xns.D Xc1.C1 Xc2.C1 vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+X25 vdd bias_p X5_Xps.D vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X26 X5_Xns.D Xc4.C1 X1_Xpi.G vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+X27 vss X1_Xpi.G Xbp1.D vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X28 bias_n Xbias.Xb2.D Xbias.Xb2.D vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X29 X1_Xps.D X1_Xpi.G Xc1.C1 vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+X30 vss bias_n X1_Xns.D vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X31 vss Xbp1.D clk vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=1
+X32 X4_Xps.D Xc3.C1 Xc4.C1 vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=0.5
+X33 vss bias_n X4_Xns.D vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=8
+X34 vdd bias_p X3_Xps.D vdd sky130_fd_pr__pfet_01v8 ad=0.29 pd=2.58 as=0.29 ps=2.58 w=1 l=8
+X35 X3_Xns.D Xc2.C1 Xc3.C1 vss sky130_fd_pr__nfet_01v8 ad=0.145 pd=1.58 as=0.145 ps=1.58 w=0.5 l=0.5
+C0 X1_Xns.D X1_Xpi.G 0.20548f
+C1 Xc4.C1 X1_Xpi.G 6.11589f
+C2 Xc3.C1 X1_Xpi.G 1.62828f
+C3 vdd Xbp1.D 1.38423f
+C4 X1_Xns.D bias_n 3.88961f
+C5 Xc4.C1 bias_n 0.08822f
+C6 Xbias.Xb2.D vdd 0.34322f
+C7 Xc3.C1 bias_n 0.09157f
+C8 X2_Xps.D X1_Xpi.G 0.18563f
+C9 Xc3.C1 Xc2.C1 2.55994f
+C10 X1_Xps.D bias_p 5.47308f
+C11 X2_Xps.D bias_n 0.15463f
+C12 X1_Xpi.G bias_n 0.45854f
+C13 Xc2.C1 X2_Xps.D 0.33373f
+C14 Xc2.C1 X1_Xpi.G 1.13555f
+C15 Xc2.C1 bias_n 0.09257f
+C16 X3_Xns.D bias_p 0.18225f
+C17 X1_Xns.D vdd 0.15463f
+C18 Xc4.C1 vdd 1.05244f
+C19 Xc3.C1 vdd 1.04553f
+C20 X4_Xns.D bias_p 0.18225f
+C21 X2_Xns.D bias_p 0.18225f
+C22 X4_Xps.D bias_p 3.89566f
+C23 X2_Xps.D vdd 3.87131f
+C24 X1_Xpi.G vdd 5.85308f
+C25 bias_n vdd 39.8723f
+C26 Xc1.C1 bias_p 0.09946f
+C27 Xc2.C1 vdd 1.0316f
+C28 X3_Xps.D bias_p 3.89566f
+C29 X1_Xpi.G X1_Xps.D 0.19601f
+C30 X1_Xps.D bias_n 0.15463f
+C31 X3_Xns.D Xc3.C1 0.6751f
+C32 Xc4.C1 X4_Xns.D 0.60883f
+C33 Xc3.C1 X4_Xns.D 0.02515f
+C34 Xc4.C1 X4_Xps.D 0.37484f
+C35 X3_Xns.D X1_Xpi.G 0.17753f
+C36 X4_Xps.D Xc3.C1 0.20836f
+C37 X3_Xns.D bias_n 3.88953f
+C38 X1_Xpi.G X4_Xns.D 0.17084f
+C39 X1_Xns.D Xc1.C1 0.79723f
+C40 X2_Xns.D X1_Xpi.G 0.17954f
+C41 X3_Xns.D Xc2.C1 0.02515f
+C42 X4_Xns.D bias_n 3.88953f
+C43 X4_Xps.D X1_Xpi.G 0.17979f
+C44 X2_Xns.D bias_n 3.88953f
+C45 X1_Xps.D vdd 3.87175f
+C46 X4_Xps.D bias_n 0.15463f
+C47 X3_Xps.D Xc3.C1 0.35545f
+C48 X2_Xns.D Xc2.C1 0.73669f
+C49 X2_Xps.D Xc1.C1 0.20987f
+C50 Xc1.C1 X1_Xpi.G 2.58133f
+C51 X3_Xps.D X1_Xpi.G 0.18414f
+C52 Xc1.C1 bias_n 0.09305f
+C53 Xc2.C1 Xc1.C1 2.33705f
+C54 X3_Xns.D vdd 0.15463f
+C55 X3_Xps.D bias_n 0.15463f
+C56 X3_Xps.D Xc2.C1 0.20936f
+C57 X4_Xns.D vdd 0.15463f
+C58 X2_Xns.D vdd 0.15463f
+C59 X4_Xps.D vdd 3.87131f
+C60 clk Xbp1.D 10.9509f
+C61 Xc1.C1 vdd 1.02414f
+C62 bias_p X5_Xps.D 3.73804f
+C63 X3_Xps.D vdd 3.87131f
+C64 Xc4.C1 X5_Xns.D 0.02515f
+C65 Xbias.Xb2.D bias_p 6.27185f
+C66 Xc1.C1 X1_Xps.D 0.3164f
+C67 X1_Xpi.G X5_Xns.D 0.55905f
+C68 bias_n X5_Xns.D 3.84279f
+C69 Xc4.C1 X5_Xps.D 0.20501f
+C70 X1_Xns.D bias_p 0.44071f
+C71 Xc4.C1 bias_p 0.08787f
+C72 X2_Xns.D Xc1.C1 0.02515f
+C73 Xc3.C1 bias_p 0.09122f
+C74 X2_Xps.D bias_p 4.21399f
+C75 X1_Xpi.G X5_Xps.D 0.49069f
+C76 X1_Xpi.G bias_p 0.36402f
+C77 bias_n X5_Xps.D 0.17438f
+C78 vdd X5_Xns.D 0.16451f
+C79 clk vdd 0.91555f
+C80 bias_p bias_n 37.396f
+C81 Xc2.C1 bias_p 0.09223f
+C82 X1_Xpi.G Xbp1.D 2.56606f
+C83 Xbias.Xb2.D bias_n 0.35421f
+C84 vdd X5_Xps.D 3.87131f
+C85 Xc4.C1 Xc3.C1 2.78377f
+C86 bias_p vdd 23.7033f
+C87 clk vss 9.03629f
+C88 bias_p vss 70.4558f
+C89 bias_n vss 87.6708f
+C90 vdd vss 0.17957p
+C91 Xbp1.D vss 26.7088f
+C92 X5_Xns.D vss 14.6402f
+C93 X5_Xps.D vss 11.5072f
+C94 X4_Xns.D vss 14.2114f
+C95 Xc4.C1 vss 10.9102f
+C96 X4_Xps.D vss 10.9423f
+C97 X3_Xns.D vss 13.5859f
+C98 Xc3.C1 vss 11.3969f
+C99 X3_Xps.D vss 10.3774f
+C100 X2_Xns.D vss 12.9604f
+C101 Xc2.C1 vss 11.6168f
+C102 X2_Xps.D vss 9.39323f
+C103 X1_Xns.D vss 12.013f
+C104 Xc1.C1 vss 11.9966f
+C105 X1_Xpi.G vss 43.5194f
+C106 X1_Xps.D vss 8.04074f
+C107 Xbias.Xb2.D vss 18.8034f
+.ends
+

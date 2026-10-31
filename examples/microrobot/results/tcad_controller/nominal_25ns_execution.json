@@ -1,0 +1,8 @@
+{
+  "returncode": 0,
+  "seconds": 45.11866491596447,
+  "netlist_sha256": "818bd8ad921df472cfb0304cb20a128fce40ce1f0fdb1a221f7f0817aa0f0e48",
+  "aborted": true,
+  "completed_UTC": "2026-10-31T11:54:37.149714+00:00",
+  "timestamp_provenance": "Original runner mislabeled this post-process timestamp started_UTC; relabeled completed_UTC without inferring an exact start time"
+}

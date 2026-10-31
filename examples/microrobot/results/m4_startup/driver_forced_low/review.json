@@ -1,0 +1,69 @@
+{
+  "scope": "Ideal diagnostic: actual driver ready inputs are node0; saved driver_ready is unloaded qualifier output, not the driver input",
+  "requested_stop_s": 0.0004,
+  "actual_stop_s": 0.0004,
+  "rows": 8248,
+  "finite": true,
+  "complete": true,
+  "actual_driver_ready_V": 0.0,
+  "actuator_range_V": [
+    -1.29313949e-14,
+    1.17769836
+  ],
+  "logic_range_V": [
+    -1.11163645e-16,
+    0.948454
+  ],
+  "electrodes": {
+    "ea": {
+      "metal_range_V": [
+        -7.11479886e-15,
+        0.588851109
+      ],
+      "metal_midpoint_error_peak_V": 0.0031791939999999963,
+      "peak_time_s": 0.000171190939,
+      "logic_at_peak_V": 0.0543586625,
+      "actuator_at_peak_V": 0.700534541,
+      "midpoint_at_peak_V": 0.351485938,
+      "metal_at_peak_V": 0.354665132,
+      "eta_range_V": [
+        -3.1970000000103305e-06,
+        2.17099999999526e-05
+      ],
+      "maximum_outside_rails_V": 7.11479886e-15
+    },
+    "eb": {
+      "metal_range_V": [
+        -2.2066974e-15,
+        0.588851109
+      ],
+      "metal_midpoint_error_peak_V": 0.0031791939999999963,
+      "peak_time_s": 0.000171190939,
+      "logic_at_peak_V": 0.0543586625,
+      "actuator_at_peak_V": 0.700534541,
+      "midpoint_at_peak_V": 0.351485938,
+      "metal_at_peak_V": 0.354665132,
+      "eta_range_V": [
+        -3.1970000000103305e-06,
+        2.17099999999526e-05
+      ],
+      "maximum_outside_rails_V": 1.1118004169999999e-14
+    }
+  },
+  "source_energy_nJ": {
+    "logic": 6.47105930223735e-05,
+    "actuator": 0.0008327992722386972,
+    "clock": 4.6292537146180105e-05,
+    "firstff": 7.332363857263986e-06,
+    "proxy": 4.0894778001811925e-06,
+    "resetlogic": 1.5314869399590959e-06,
+    "monitor": 0.00039217200939287497,
+    "phase": -5.336012785369701e-09,
+    "resetact": 5.639194500797699e-06
+  },
+  "retained_qualifier_actuator_energy_nJ": 5.898178205303725e-06,
+  "unloaded_qualifier_output_range_V": [
+    -6.79979634e-07,
+    0.122748313
+  ]
+}

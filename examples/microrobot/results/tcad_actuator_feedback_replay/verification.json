@@ -1,0 +1,30 @@
+{
+  "tests": {
+    "passed": 1,
+    "seconds": 1.36,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "exact_retained_component_lines_verified": true,
+  "electrode_midpoint_not_replayed": true,
+  "effective_options_confirmed_from_native_log": true,
+  "no_tolerance_change": true,
+  "one_two_copy_transient": true,
+  "counts": {
+    "transient_processes": 1,
+    "transients": 1,
+    "copies": 2,
+    "no_analysis_options_queries": 1,
+    "version_queries": 1,
+    "fine": 0,
+    "rescue": 0,
+    "DC_sweeps": 0,
+    "DD": 0,
+    "layout": 0
+  },
+  "powered_clamps": "null/untested before global abort",
+  "waveform_exported": false,
+  "limits_relaxed": false,
+  "frozen_runner_preserved": true,
+  "review_acceptance": "Reviewed and accepted as failed reduced actuator-feedback diagnostic evidence; global abort prevents model-specific completion claims and end-to-end validation remains blocked."
+}

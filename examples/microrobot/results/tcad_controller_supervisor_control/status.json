@@ -1,0 +1,4 @@
+{
+  "status": "Blocked: provisional supervisor control did not pass complete functional gates; no further run",
+  "acceptance": "Reviewed and accepted as failed functional-supervisor control evidence; end-to-end operation remains unvalidated."
+}

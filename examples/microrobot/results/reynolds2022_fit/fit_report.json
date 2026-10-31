@@ -1,0 +1,3572 @@
+{
+  "status": "Separate training-only PV candidates; both main hypotheses retained; no application default changes",
+  "analysis_code_sha256": "bb0c5b14a36d45dfb027aba498dd8373cc33a69f203166e87fb037bbfec568c2",
+  "loader_code_sha256": "12f10d9d9b6b1fc633677286df6e76039b85c6c81bca1abf3f939edb02f12f6b",
+  "core_model_code_sha256": "e7e6b55bf39ebf5c8243e3b0fd6783a045a7f383c3add970db582e6e6f9fc0c7",
+  "sources": {
+    "Fig3_PurcellBot.csv": {
+      "sha256": "701190d1410ef7bf0096aec793ed5935fa297297861e0cfb900f8ca22554e002",
+      "size_bytes": 3649
+    },
+    "Fig4_PurcellBot.csv": {
+      "sha256": "b24a3ce6161d367a872b3edcc6ab2b2b9f9d2e302bbe5ad97f6cf13f690270de",
+      "size_bytes": 20039
+    },
+    "Fig5_Dogbot.csv": {
+      "sha256": "bd65fa42919ee50473beb0517bda3bb650029167f9f1be344871ec547144e4fb",
+      "size_bytes": 2695
+    },
+    "FigS2_CircuitTesting.csv": {
+      "sha256": "fe9899154837d6e3d02e33c5bdf6e59f4c4754f2ad017d4c2f45d62dd94eee02",
+      "size_bytes": 7487131
+    },
+    "FigS4_LEGO_purcell.csv": {
+      "sha256": "f2c30e5a1779f9e9eb90d3852782bd8d92cfeb84d48f54cbc28bd4b3ea491716",
+      "size_bytes": 183
+    },
+    "FigS6_DogbotCircuit.csv": {
+      "sha256": "d53e17cbac42ab6e70fd40f58de9cdd1ec23658640f32ed7c6502fbf9475a727",
+      "size_bytes": 5436998
+    }
+  },
+  "provenance": "User-supplied local files; claimed Zenodo origin, archive identity and license unverified; no raw arrays copied",
+  "model_assumptions": {
+    "temperature_K": 300.0,
+    "temperature_measured": false,
+    "series_cells": 2,
+    "each_cell_area_um2": 540,
+    "reference_irradiance_W_m2": 1000.0,
+    "area_role": "Caption context only; no area scaling fitted",
+    "absent": [
+      "Rs",
+      "Rsh",
+      "breakdown",
+      "junction charge",
+      "temperature dependence"
+    ]
+  },
+  "method": {
+    "objective": "Equal branch mean of equal occupied voltage-bin mean squared native entering-current residuals divided by (1 nA)^2",
+    "bin_origin_V": 0,
+    "bin_boundary": "[k*width, (k+1)*width); k=floor(V/width)",
+    "residual_scale_A": 1e-09,
+    "scale_is_experimental_sigma": false,
+    "main_bin_width_V": 0.025,
+    "sensitivity_bin_widths_V": [
+      0.025,
+      0.0125,
+      0.05
+    ],
+    "offset_hypotheses": [
+      "zero",
+      "shared_fit",
+      "fixed_dark_median"
+    ],
+    "offset_bounds_A": [
+      -1e-08,
+      1e-08
+    ],
+    "entering_prediction": "-SingleDiodePV.current_A(V, irradiance) + shared_offset_A",
+    "heldout_regions_V": [
+      [
+        0.9,
+        1.05
+      ],
+      [
+        1.15,
+        1.25
+      ]
+    ],
+    "heldout_boundary": "lower inclusive, upper exclusive",
+    "holdout_current_use": "Evaluation only, never optimizer, initial guesses, scales, fixed offset or hypothesis selection",
+    "selection": "Both main hypotheses retained; sensitivities not used to select a holdout winner; no all-data refit",
+    "native_data": "Original points/order and currents retained; weights only; no sorting, deduplication, normalization or offset subtraction",
+    "uncertainty": "No measurement sigma supplied; numerical objective and sensitivity are not confidence intervals or validation guarantees"
+  },
+  "split_counts": {
+    "iv_dark": {
+      "train": 13583,
+      "heldout_combined": 1420,
+      "heldout_0.90_1.05V": 857,
+      "heldout_1.15_1.25V": 563,
+      "all_diagnostic": 15003
+    },
+    "iv_1sun": {
+      "train": 13581,
+      "heldout_combined": 1422,
+      "heldout_0.90_1.05V": 848,
+      "heldout_1.15_1.25V": 574,
+      "all_diagnostic": 15003
+    }
+  },
+  "historical": {
+    "path": "/Users/abhineet/Documents/opentcad_final/examples/microrobot/results/published/pv_fit.json",
+    "sha256": "f9dae2a338d94e74282078f26b45561fa8e81d42bb289ec969a6275632918016",
+    "model": {
+      "saturation_A": 1.0585988034104368e-16,
+      "ideality": 1.1447088539600483,
+      "photocurrent_A": 1.4526236906638614e-07,
+      "reference_irradiance_W_m2": 1000.0,
+      "series_cells": 2,
+      "temperature_K": 300
+    },
+    "observation_offset_A": 0.0,
+    "baseline_caveat": "Frozen historical raster fit used full plotted curve including candidate-heldout voltages; not a holdout-trained baseline or fairness-controlled benchmark",
+    "evaluation": {
+      "bin_width_V": 0.025,
+      "branches": {
+        "iv_dark": {
+          "train": {
+            "points": 13583,
+            "occupied_bins": 96,
+            "rms_A": 1.3759359399145655e-08,
+            "mae_A": 3.849203439628536e-09,
+            "bias_A": -3.7473067673532655e-09,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_bin_rms_A": 1.4464263818114878e-08
+          },
+          "heldout_combined": {
+            "points": 1420,
+            "occupied_bins": 10,
+            "rms_A": 1.1433897211254476e-08,
+            "mae_A": 6.40774903724337e-09,
+            "bias_A": -5.853114753954599e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_bin_rms_A": 1.15674065643755e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 857,
+            "occupied_bins": 6,
+            "rms_A": 2.1120165356019537e-09,
+            "mae_A": 2.0551250140524397e-09,
+            "bias_A": -2.0551250140524397e-09,
+            "max_abs_A": 4.018229853619005e-09,
+            "equal_bin_rms_A": 2.1084963414423277e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 563,
+            "occupied_bins": 4,
+            "rms_A": 1.7970745007330512e-08,
+            "mae_A": 1.3033324148921214e-08,
+            "bias_A": -1.1634424180413125e-08,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_bin_rms_A": 1.81064519255176e-08
+          },
+          "all_diagnostic": {
+            "points": 15003,
+            "occupied_bins": 106,
+            "rms_A": 1.3556361680050414e-08,
+            "mae_A": 4.091363990759181e-09,
+            "bias_A": -3.946616728092711e-09,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_bin_rms_A": 1.4216215168847298e-08
+          }
+        },
+        "iv_1sun": {
+          "train": {
+            "points": 13581,
+            "occupied_bins": 96,
+            "rms_A": 1.1733860068795539e-08,
+            "mae_A": 4.957810928604596e-09,
+            "bias_A": 2.331263262956321e-09,
+            "max_abs_A": 2.0876148319801074e-07,
+            "equal_bin_rms_A": 1.3213283402425899e-08
+          },
+          "heldout_combined": {
+            "points": 1422,
+            "occupied_bins": 10,
+            "rms_A": 1.0904353832034258e-08,
+            "mae_A": 8.17540427664704e-09,
+            "bias_A": 5.894562757806126e-09,
+            "max_abs_A": 5.7362167647868765e-08,
+            "equal_bin_rms_A": 1.0807088741772122e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 848,
+            "occupied_bins": 6,
+            "rms_A": 4.673031281708192e-09,
+            "mae_A": 4.483122467348961e-09,
+            "bias_A": 4.483122467348961e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_bin_rms_A": 4.682028631550277e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 574,
+            "occupied_bins": 4,
+            "rms_A": 1.6195928548769094e-08,
+            "mae_A": 1.3630203883414938e-08,
+            "bias_A": 7.979756775763753e-09,
+            "max_abs_A": 5.7362167647868765e-08,
+            "equal_bin_rms_A": 1.6096609255410268e-08
+          },
+          "all_diagnostic": {
+            "points": 15003,
+            "occupied_bins": 106,
+            "rms_A": 1.16577709073402e-08,
+            "mae_A": 5.262777784627815e-09,
+            "bias_A": 2.6689965084189904e-09,
+            "max_abs_A": 2.0876148319801074e-07,
+            "equal_bin_rms_A": 1.3005316062881295e-08
+          }
+        }
+      },
+      "aggregate": {
+        "train": {
+          "points": 27164,
+          "rms_A": 1.278685350315246e-08,
+          "mae_A": 4.403466372472884e-09,
+          "bias_A": -7.082455252079822e-10,
+          "max_abs_A": 2.497705514066652e-07,
+          "equal_branch_bin_rms_A": 1.3852901971660142e-08
+        },
+        "heldout_combined": {
+          "points": 2842,
+          "rms_A": 1.1172077100095975e-08,
+          "mae_A": 7.292198632750766e-09,
+          "bias_A": 2.4857597109353598e-11,
+          "max_abs_A": 1.0054745386221393e-07,
+          "equal_branch_bin_rms_A": 1.1193704965249333e-08
+        },
+        "heldout_0.90_1.05V": {
+          "points": 1705,
+          "rms_A": 3.6198143031480665e-09,
+          "mae_A": 3.2627155362785104e-09,
+          "bias_A": 1.196742354996468e-09,
+          "max_abs_A": 7.819224874207052e-09,
+          "equal_branch_bin_rms_A": 3.6309192313057747e-09
+        },
+        "heldout_1.15_1.25V": {
+          "points": 1137,
+          "rms_A": 1.7097793938467615e-08,
+          "mae_A": 1.3334651297205643e-08,
+          "bias_A": -1.7324541990186417e-09,
+          "max_abs_A": 1.0054745386221393e-07,
+          "equal_branch_bin_rms_A": 1.713103077535674e-08
+        },
+        "all_diagnostic": {
+          "points": 30006,
+          "rms_A": 1.2642756118196042e-08,
+          "mae_A": 4.677070887693497e-09,
+          "bias_A": -6.388101098368607e-10,
+          "max_abs_A": 2.497705514066652e-07,
+          "equal_branch_bin_rms_A": 1.3624225108651175e-08
+        }
+      }
+    }
+  },
+  "candidates": [
+    {
+      "bin_width_V": 0.025,
+      "offset_mode": "zero",
+      "fitted_on": "Training only; no all-data refit or holdout-based hypothesis selection",
+      "model": {
+        "saturation_A": 4.794792221872395e-15,
+        "ideality": 1.377236320280772,
+        "photocurrent_A": 1.4972475777066895e-07,
+        "reference_irradiance_W_m2": 1000.0,
+        "series_cells": 2,
+        "temperature_K": 300.0
+      },
+      "shared_entering_observation_offset_A": 0.0,
+      "offset_role": "Observation hypothesis, excluded from device-only Voc/MPP; no source correction applied",
+      "device_only_Voc_1sun_V": 1.228831514879842,
+      "device_only_MPP_1sun_V_A_W": [
+        1.0335913066747753,
+        1.4007442287831584e-07,
+        1.447797057745135e-07
+      ],
+      "objective_dimensionless": 121.68476069387006,
+      "training_equal_branch_bin_rms_A": 1.103108157407378e-08,
+      "training_counts": {
+        "iv_dark": {
+          "points": 13583,
+          "occupied_bins": 96
+        },
+        "iv_1sun": {
+          "points": 13581,
+          "occupied_bins": 96
+        }
+      },
+      "optimizer": {
+        "method": "scipy.optimize.least_squares; linear loss; log positive parameters; offset in nA",
+        "parameter_bounds": {
+          "saturation_A": [
+            1e-30,
+            1e-06
+          ],
+          "ideality": [
+            0.5,
+            4.0
+          ],
+          "photocurrent_A": [
+            1e-12,
+            1e-05
+          ],
+          "shared_offset_A": [
+            -1e-08,
+            1e-08
+          ]
+        },
+        "multistarts": [
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 27,
+            "objective": 121.68476069387006,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 15,
+            "objective": 121.68476069387069,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 19,
+            "objective": 121.68476069387118,
+            "message": "`ftol` termination condition is satisfied."
+          }
+        ],
+        "chosen_active_mask": [
+          0,
+          0,
+          0
+        ],
+        "chosen_optimality": 2.2346647749928717e-05,
+        "chosen_jacobian_rank": 3
+      },
+      "role": "main retained hypothesis",
+      "evaluation": {
+        "bin_width_V": 0.025,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 96,
+              "rms_A": 9.917931704049457e-09,
+              "mae_A": 3.473660933057316e-09,
+              "bias_A": -1.941407602338249e-09,
+              "max_abs_A": 2.0457124526254279e-07,
+              "equal_bin_rms_A": 1.0628165750818135e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 10,
+              "rms_A": 1.5304966883102574e-08,
+              "mae_A": 9.406208420901241e-09,
+              "bias_A": 8.82686235633575e-09,
+              "max_abs_A": 6.063095331045867e-08,
+              "equal_bin_rms_A": 1.5375494191703318e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 6,
+              "rms_A": 1.8526418189099624e-09,
+              "mae_A": 1.3773673005163358e-09,
+              "bias_A": 1.0793870706958974e-09,
+              "max_abs_A": 5.508656899380873e-09,
+              "equal_bin_rms_A": 1.823695028564829e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 4,
+              "rms_A": 2.419878417637459e-08,
+              "mae_A": 2.1627730339497807e-08,
+              "bias_A": 2.0620088501617018e-08,
+              "max_abs_A": 6.063095331045867e-08,
+              "equal_bin_rms_A": 2.420796891029766e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.0546363637741818e-08,
+              "mae_A": 4.035163128134193e-09,
+              "bias_A": -9.222152180606322e-10,
+              "max_abs_A": 2.0457124526254279e-07,
+              "equal_bin_rms_A": 1.116261335388786e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 96,
+              "rms_A": 9.718352958324826e-09,
+              "mae_A": 3.0182598703440152e-09,
+              "bias_A": -3.4207512944645657e-10,
+              "max_abs_A": 1.698268377062124e-07,
+              "equal_bin_rms_A": 1.1419790460462772e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 10,
+              "rms_A": 2.4583486834875694e-08,
+              "mae_A": 1.6577060890214567e-08,
+              "bias_A": 1.6388592159093633e-08,
+              "max_abs_A": 7.71828210496871e-08,
+              "equal_bin_rms_A": 2.4423803582984208e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 6,
+              "rms_A": 4.230361385018025e-09,
+              "mae_A": 3.2369705298203425e-09,
+              "bias_A": 3.1141268048094213e-09,
+              "max_abs_A": 9.963189128711916e-09,
+              "equal_bin_rms_A": 4.2410004877281195e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 4,
+              "rms_A": 3.835027529617997e-08,
+              "mae_A": 3.628506894877607e-08,
+              "bias_A": 3.599964898911631e-08,
+              "max_abs_A": 7.71828210496871e-08,
+              "equal_bin_rms_A": 3.826651703441424e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.194886500912867e-08,
+              "mae_A": 4.303377183565099e-09,
+              "bias_A": 1.2436749794853578e-09,
+              "max_abs_A": 1.698268377062124e-07,
+              "equal_bin_rms_A": 1.3205465125814911e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 9.818656783168746e-09,
+            "mae_A": 3.2459771665756e-09,
+            "bias_A": -1.1418002428056533e-09,
+            "max_abs_A": 2.0457124526254279e-07,
+            "equal_branch_bin_rms_A": 1.1031081574073781e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 2.0479871712631348e-08,
+            "mae_A": 1.2994157826729375e-08,
+            "bias_A": 1.2610387964893707e-08,
+            "max_abs_A": 7.71828210496871e-08,
+            "equal_branch_bin_rms_A": 2.040744965814316e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.25974625611808e-09,
+            "mae_A": 2.3022608714546337e-09,
+            "bias_A": 2.091386656929486e-09,
+            "max_abs_A": 9.963189128711916e-09,
+            "equal_branch_bin_rms_A": 3.264348992840856e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 3.213166933038266e-08,
+            "mae_A": 2.9027301457990092e-08,
+            "bias_A": 2.8384264156695817e-08,
+            "max_abs_A": 7.71828210496871e-08,
+            "equal_branch_bin_rms_A": 3.20183703887866e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.1269453424764273e-08,
+            "mae_A": 4.169270155849645e-09,
+            "bias_A": 1.6072988071236265e-10,
+            "max_abs_A": 2.0457124526254279e-07,
+            "equal_branch_bin_rms_A": 1.2226778931458388e-08
+          }
+        }
+      },
+      "historical_evaluation_same_bin_width": {
+        "bin_width_V": 0.025,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 96,
+              "rms_A": 1.3759359399145655e-08,
+              "mae_A": 3.849203439628536e-09,
+              "bias_A": -3.7473067673532655e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.4464263818114878e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 10,
+              "rms_A": 1.1433897211254476e-08,
+              "mae_A": 6.40774903724337e-09,
+              "bias_A": -5.853114753954599e-09,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.15674065643755e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 6,
+              "rms_A": 2.1120165356019537e-09,
+              "mae_A": 2.0551250140524397e-09,
+              "bias_A": -2.0551250140524397e-09,
+              "max_abs_A": 4.018229853619005e-09,
+              "equal_bin_rms_A": 2.1084963414423277e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 4,
+              "rms_A": 1.7970745007330512e-08,
+              "mae_A": 1.3033324148921214e-08,
+              "bias_A": -1.1634424180413125e-08,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.81064519255176e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.3556361680050414e-08,
+              "mae_A": 4.091363990759181e-09,
+              "bias_A": -3.946616728092711e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.4216215168847298e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 96,
+              "rms_A": 1.1733860068795539e-08,
+              "mae_A": 4.957810928604596e-09,
+              "bias_A": 2.331263262956321e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.3213283402425899e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 10,
+              "rms_A": 1.0904353832034258e-08,
+              "mae_A": 8.17540427664704e-09,
+              "bias_A": 5.894562757806126e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.0807088741772122e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 6,
+              "rms_A": 4.673031281708192e-09,
+              "mae_A": 4.483122467348961e-09,
+              "bias_A": 4.483122467348961e-09,
+              "max_abs_A": 7.819224874207052e-09,
+              "equal_bin_rms_A": 4.682028631550277e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 4,
+              "rms_A": 1.6195928548769094e-08,
+              "mae_A": 1.3630203883414938e-08,
+              "bias_A": 7.979756775763753e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.6096609255410268e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.16577709073402e-08,
+              "mae_A": 5.262777784627815e-09,
+              "bias_A": 2.6689965084189904e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.3005316062881295e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 1.278685350315246e-08,
+            "mae_A": 4.403466372472884e-09,
+            "bias_A": -7.082455252079822e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.3852901971660142e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.1172077100095975e-08,
+            "mae_A": 7.292198632750766e-09,
+            "bias_A": 2.4857597109353598e-11,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.1193704965249333e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.6198143031480665e-09,
+            "mae_A": 3.2627155362785104e-09,
+            "bias_A": 1.196742354996468e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_branch_bin_rms_A": 3.6309192313057747e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 1.7097793938467615e-08,
+            "mae_A": 1.3334651297205643e-08,
+            "bias_A": -1.7324541990186417e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.713103077535674e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.2642756118196042e-08,
+            "mae_A": 4.677070887693497e-09,
+            "bias_A": -6.388101098368607e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.3624225108651175e-08
+          }
+        }
+      }
+    },
+    {
+      "bin_width_V": 0.025,
+      "offset_mode": "shared_fit",
+      "fitted_on": "Training only; no all-data refit or holdout-based hypothesis selection",
+      "model": {
+        "saturation_A": 4.3885939213645715e-15,
+        "ideality": 1.370815286448161,
+        "photocurrent_A": 1.5158522156422958e-07,
+        "reference_irradiance_W_m2": 1000.0,
+        "series_cells": 2,
+        "temperature_K": 300.0
+      },
+      "shared_entering_observation_offset_A": 1.9251452874344435e-09,
+      "offset_role": "Observation hypothesis, excluded from device-only Voc/MPP; no source correction applied",
+      "device_only_Voc_1sun_V": 1.2302517664019044,
+      "device_only_MPP_1sun_V_A_W": [
+        1.0354901531082727,
+        1.418742959422213e-07,
+        1.4690943642733914e-07
+      ],
+      "objective_dimensionless": 119.89367085760902,
+      "training_equal_branch_bin_rms_A": 1.0949596835391201e-08,
+      "training_counts": {
+        "iv_dark": {
+          "points": 13583,
+          "occupied_bins": 96
+        },
+        "iv_1sun": {
+          "points": 13581,
+          "occupied_bins": 96
+        }
+      },
+      "optimizer": {
+        "method": "scipy.optimize.least_squares; linear loss; log positive parameters; offset in nA",
+        "parameter_bounds": {
+          "saturation_A": [
+            1e-30,
+            1e-06
+          ],
+          "ideality": [
+            0.5,
+            4.0
+          ],
+          "photocurrent_A": [
+            1e-12,
+            1e-05
+          ],
+          "shared_offset_A": [
+            -1e-08,
+            1e-08
+          ]
+        },
+        "multistarts": [
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 28,
+            "objective": 119.89367085760986,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 15,
+            "objective": 119.8936708576122,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 20,
+            "objective": 119.89367085760902,
+            "message": "`ftol` termination condition is satisfied."
+          }
+        ],
+        "chosen_active_mask": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "chosen_optimality": 2.1393396278576993e-05,
+        "chosen_jacobian_rank": 4
+      },
+      "role": "main retained hypothesis",
+      "evaluation": {
+        "bin_width_V": 0.025,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 96,
+              "rms_A": 9.765052800252688e-09,
+              "mae_A": 1.986153610465082e-09,
+              "bias_A": -7.167039651914696e-11,
+              "max_abs_A": 2.0395966558010056e-07,
+              "equal_bin_rms_A": 1.0498045039508959e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 10,
+              "rms_A": 1.595525789972295e-08,
+              "mae_A": 1.0677292980665328e-08,
+              "bias_A": 1.0305838442654941e-08,
+              "max_abs_A": 6.136803826213714e-08,
+              "equal_bin_rms_A": 1.6023267520060557e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 6,
+              "rms_A": 3.235264472365108e-09,
+              "mae_A": 2.8899215763314597e-09,
+              "bias_A": 2.8899215763314597e-09,
+              "max_abs_A": 7.205410162606972e-09,
+              "equal_bin_rms_A": 3.203465848524549e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 4,
+              "rms_A": 2.5022888182288484e-08,
+              "mae_A": 2.2531249097031444e-08,
+              "bias_A": 2.1594365537573634e-08,
+              "max_abs_A": 6.136803826213714e-08,
+              "equal_bin_rms_A": 2.502937204335287e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.0508353860771457e-08,
+              "mae_A": 2.8087502848424967e-09,
+              "bias_A": 9.105373320436209e-10,
+              "max_abs_A": 2.0395966558010056e-07,
+              "equal_bin_rms_A": 1.1137015532416312e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 96,
+              "rms_A": 9.692005489540483e-09,
+              "mae_A": 2.9483191248534126e-09,
+              "bias_A": -3.322973278852074e-10,
+              "max_abs_A": 1.7104185150175293e-07,
+              "equal_bin_rms_A": 1.1383250505179066e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 10,
+              "rms_A": 2.404411700740257e-08,
+              "mae_A": 1.620189159661156e-08,
+              "bias_A": 1.5999473881197613e-08,
+              "max_abs_A": 7.610455910595205e-08,
+              "equal_bin_rms_A": 2.3888970836811794e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 6,
+              "rms_A": 4.158974638534427e-09,
+              "mae_A": 3.1847527947861522e-09,
+              "bias_A": 3.0655638322881013e-09,
+              "max_abs_A": 9.79947859837738e-09,
+              "equal_bin_rms_A": 4.169470636802427e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 4,
+              "rms_A": 3.7505356242639005e-08,
+              "mae_A": 3.543278655122472e-08,
+              "bias_A": 3.5107410678192854e-08,
+              "max_abs_A": 7.610455910595205e-08,
+              "equal_bin_rms_A": 3.742499954600366e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.1824825218622878e-08,
+              "mae_A": 4.2045065576895174e-09,
+              "bias_A": 1.2156449942714127e-09,
+              "max_abs_A": 1.7104185150175293e-07,
+              "equal_bin_rms_A": 1.3084037125275308e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 9.72860039383399e-09,
+            "mae_A": 2.4672009470468786e-09,
+            "bias_A": -2.019742676310033e-10,
+            "max_abs_A": 2.0395966558010056e-07,
+            "equal_branch_bin_rms_A": 1.0949596835391203e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 2.0407321095525145e-08,
+            "mae_A": 1.3441536200888954e-08,
+            "bias_A": 1.3154659552298742e-08,
+            "max_abs_A": 7.610455910595205e-08,
+            "equal_branch_bin_rms_A": 2.0339961033166607e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.7234360983989896e-09,
+            "mae_A": 3.0365590386479286e-09,
+            "bias_A": 2.9772791323732374e-09,
+            "max_abs_A": 9.79947859837738e-09,
+            "equal_branch_bin_rms_A": 3.7179751770164324e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 3.1940160904618533e-08,
+            "mae_A": 2.904442631665056e-08,
+            "bias_A": 2.8416254641105238e-08,
+            "max_abs_A": 7.610455910595205e-08,
+            "equal_branch_bin_rms_A": 3.1836300475266816e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.1185973187751032e-08,
+            "mae_A": 3.506628421266007e-09,
+            "bias_A": 1.0630911631575168e-09,
+            "max_abs_A": 2.0395966558010056e-07,
+            "equal_branch_bin_rms_A": 1.2149591401871602e-08
+          }
+        }
+      },
+      "historical_evaluation_same_bin_width": {
+        "bin_width_V": 0.025,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 96,
+              "rms_A": 1.3759359399145655e-08,
+              "mae_A": 3.849203439628536e-09,
+              "bias_A": -3.7473067673532655e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.4464263818114878e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 10,
+              "rms_A": 1.1433897211254476e-08,
+              "mae_A": 6.40774903724337e-09,
+              "bias_A": -5.853114753954599e-09,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.15674065643755e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 6,
+              "rms_A": 2.1120165356019537e-09,
+              "mae_A": 2.0551250140524397e-09,
+              "bias_A": -2.0551250140524397e-09,
+              "max_abs_A": 4.018229853619005e-09,
+              "equal_bin_rms_A": 2.1084963414423277e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 4,
+              "rms_A": 1.7970745007330512e-08,
+              "mae_A": 1.3033324148921214e-08,
+              "bias_A": -1.1634424180413125e-08,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.81064519255176e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.3556361680050414e-08,
+              "mae_A": 4.091363990759181e-09,
+              "bias_A": -3.946616728092711e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.4216215168847298e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 96,
+              "rms_A": 1.1733860068795539e-08,
+              "mae_A": 4.957810928604596e-09,
+              "bias_A": 2.331263262956321e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.3213283402425899e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 10,
+              "rms_A": 1.0904353832034258e-08,
+              "mae_A": 8.17540427664704e-09,
+              "bias_A": 5.894562757806126e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.0807088741772122e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 6,
+              "rms_A": 4.673031281708192e-09,
+              "mae_A": 4.483122467348961e-09,
+              "bias_A": 4.483122467348961e-09,
+              "max_abs_A": 7.819224874207052e-09,
+              "equal_bin_rms_A": 4.682028631550277e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 4,
+              "rms_A": 1.6195928548769094e-08,
+              "mae_A": 1.3630203883414938e-08,
+              "bias_A": 7.979756775763753e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.6096609255410268e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.16577709073402e-08,
+              "mae_A": 5.262777784627815e-09,
+              "bias_A": 2.6689965084189904e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.3005316062881295e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 1.278685350315246e-08,
+            "mae_A": 4.403466372472884e-09,
+            "bias_A": -7.082455252079822e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.3852901971660142e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.1172077100095975e-08,
+            "mae_A": 7.292198632750766e-09,
+            "bias_A": 2.4857597109353598e-11,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.1193704965249333e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.6198143031480665e-09,
+            "mae_A": 3.2627155362785104e-09,
+            "bias_A": 1.196742354996468e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_branch_bin_rms_A": 3.6309192313057747e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 1.7097793938467615e-08,
+            "mae_A": 1.3334651297205643e-08,
+            "bias_A": -1.7324541990186417e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.713103077535674e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.2642756118196042e-08,
+            "mae_A": 4.677070887693497e-09,
+            "bias_A": -6.388101098368607e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.3624225108651175e-08
+          }
+        }
+      }
+    },
+    {
+      "bin_width_V": 0.025,
+      "offset_mode": "fixed_dark_median",
+      "fitted_on": "Training only; no all-data refit or holdout-based hypothesis selection",
+      "model": {
+        "saturation_A": 4.401404900807304e-15,
+        "ideality": 1.3710257505193448,
+        "photocurrent_A": 1.5152383314530641e-07,
+        "reference_irradiance_W_m2": 1000.0,
+        "series_cells": 2,
+        "temperature_K": 300.0
+      },
+      "shared_entering_observation_offset_A": 1.86163e-09,
+      "offset_role": "Observation hypothesis, excluded from device-only Voc/MPP; no source correction applied",
+      "device_only_Voc_1sun_V": 1.2302053058057976,
+      "device_only_MPP_1sun_V_A_W": [
+        1.0354279606985346,
+        1.418148996196389e-07,
+        1.468391123098301e-07
+      ],
+      "objective_dimensionless": 119.89562060550699,
+      "training_equal_branch_bin_rms_A": 1.094968586789169e-08,
+      "training_counts": {
+        "iv_dark": {
+          "points": 13583,
+          "occupied_bins": 96
+        },
+        "iv_1sun": {
+          "points": 13581,
+          "occupied_bins": 96
+        }
+      },
+      "optimizer": {
+        "method": "scipy.optimize.least_squares; linear loss; log positive parameters; offset in nA",
+        "parameter_bounds": {
+          "saturation_A": [
+            1e-30,
+            1e-06
+          ],
+          "ideality": [
+            0.5,
+            4.0
+          ],
+          "photocurrent_A": [
+            1e-12,
+            1e-05
+          ],
+          "shared_offset_A": [
+            -1e-08,
+            1e-08
+          ]
+        },
+        "multistarts": [
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 29,
+            "objective": 119.8956206055075,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 15,
+            "objective": 119.89562060550989,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 20,
+            "objective": 119.89562060550699,
+            "message": "`ftol` termination condition is satisfied."
+          }
+        ],
+        "chosen_active_mask": [
+          0,
+          0,
+          0
+        ],
+        "chosen_optimality": 4.9467271965471634e-05,
+        "chosen_jacobian_rank": 3
+      },
+      "role": "sensitivity only",
+      "evaluation": {
+        "bin_width_V": 0.025,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 96,
+              "rms_A": 9.764337689247894e-09,
+              "mae_A": 1.993196701890798e-09,
+              "bias_A": -1.3336607965427804e-10,
+              "max_abs_A": 2.039799278098419e-07,
+              "equal_bin_rms_A": 1.0497014938061848e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 10,
+              "rms_A": 1.593175309785259e-08,
+              "mae_A": 1.0629329862395702e-08,
+              "bias_A": 1.0256944905911753e-08,
+              "max_abs_A": 6.134354685557246e-08,
+              "equal_bin_rms_A": 1.599985795612708e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 6,
+              "rms_A": 3.1827422380310183e-09,
+              "mae_A": 2.830139360575505e-09,
+              "bias_A": 2.830139360575505e-09,
+              "max_abs_A": 7.149346831885385e-09,
+              "equal_bin_rms_A": 3.1509098246267316e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 4,
+              "rms_A": 2.499535284505833e-08,
+              "mae_A": 2.250127703834581e-08,
+              "bias_A": 2.156204677510032e-08,
+              "max_abs_A": 6.134354685557246e-08,
+              "equal_bin_rms_A": 2.500192567495979e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.050437617012187e-08,
+              "mae_A": 2.8105871629930423e-09,
+              "bias_A": 8.500533430947563e-10,
+              "max_abs_A": 2.039799278098419e-07,
+              "equal_bin_rms_A": 1.1132960377250786e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 96,
+              "rms_A": 9.692780882304136e-09,
+              "mae_A": 2.9505814524592717e-09,
+              "bias_A": -3.3262120217988655e-10,
+              "max_abs_A": 1.7100181873565517e-07,
+              "equal_bin_rms_A": 1.1384371682316088e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 10,
+              "rms_A": 2.4061776988057768e-08,
+              "mae_A": 1.621418270376113e-08,
+              "bias_A": 1.6012219819392874e-08,
+              "max_abs_A": 7.613996284789499e-08,
+              "equal_bin_rms_A": 2.390648251068913e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 6,
+              "rms_A": 4.16128768624533e-09,
+              "mae_A": 3.186440140722289e-09,
+              "bias_A": 3.067125396784133e-09,
+              "max_abs_A": 9.804803686578968e-09,
+              "equal_bin_rms_A": 4.171788305244343e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 4,
+              "rms_A": 3.753302475475158e-08,
+              "mae_A": 3.546074314532373e-08,
+              "bias_A": 3.513667987230614e-08,
+              "max_abs_A": 7.613996284789499e-08,
+              "equal_bin_rms_A": 3.745255717022608e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.1828804622312585e-08,
+              "mae_A": 4.207719423488482e-09,
+              "bias_A": 1.216559890446686e-09,
+              "max_abs_A": 1.7100181873565517e-07,
+              "equal_bin_rms_A": 1.308793742706533e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 9.72862771031747e-09,
+            "mae_A": 2.4718538325589777e-09,
+            "bias_A": -2.329863056526689e-10,
+            "max_abs_A": 2.039799278098419e-07,
+            "equal_branch_bin_rms_A": 1.094968586789169e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 2.040856052212347e-08,
+            "mae_A": 1.3423721396674954e-08,
+            "bias_A": 1.3136607441791468e-08,
+            "max_abs_A": 7.613996284789499e-08,
+            "equal_branch_bin_rms_A": 2.034103439663441e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.701906868847925e-09,
+            "mae_A": 3.007349367358187e-09,
+            "bias_A": 2.9480069023379196e-09,
+            "max_abs_A": 9.804803686578968e-09,
+            "equal_branch_bin_rms_A": 3.6967587415669098e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 3.194589253190138e-08,
+            "mae_A": 2.9043698802114788e-08,
+            "bias_A": 2.8415027775800526e-08,
+            "max_abs_A": 7.613996284789499e-08,
+            "equal_branch_bin_rms_A": 3.1841720478369776e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.1186208864406827e-08,
+            "mae_A": 3.509153293240762e-09,
+            "bias_A": 1.033306616770721e-09,
+            "max_abs_A": 2.039799278098419e-07,
+            "equal_branch_bin_rms_A": 1.2149833596724965e-08
+          }
+        }
+      },
+      "historical_evaluation_same_bin_width": {
+        "bin_width_V": 0.025,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 96,
+              "rms_A": 1.3759359399145655e-08,
+              "mae_A": 3.849203439628536e-09,
+              "bias_A": -3.7473067673532655e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.4464263818114878e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 10,
+              "rms_A": 1.1433897211254476e-08,
+              "mae_A": 6.40774903724337e-09,
+              "bias_A": -5.853114753954599e-09,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.15674065643755e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 6,
+              "rms_A": 2.1120165356019537e-09,
+              "mae_A": 2.0551250140524397e-09,
+              "bias_A": -2.0551250140524397e-09,
+              "max_abs_A": 4.018229853619005e-09,
+              "equal_bin_rms_A": 2.1084963414423277e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 4,
+              "rms_A": 1.7970745007330512e-08,
+              "mae_A": 1.3033324148921214e-08,
+              "bias_A": -1.1634424180413125e-08,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.81064519255176e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.3556361680050414e-08,
+              "mae_A": 4.091363990759181e-09,
+              "bias_A": -3.946616728092711e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.4216215168847298e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 96,
+              "rms_A": 1.1733860068795539e-08,
+              "mae_A": 4.957810928604596e-09,
+              "bias_A": 2.331263262956321e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.3213283402425899e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 10,
+              "rms_A": 1.0904353832034258e-08,
+              "mae_A": 8.17540427664704e-09,
+              "bias_A": 5.894562757806126e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.0807088741772122e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 6,
+              "rms_A": 4.673031281708192e-09,
+              "mae_A": 4.483122467348961e-09,
+              "bias_A": 4.483122467348961e-09,
+              "max_abs_A": 7.819224874207052e-09,
+              "equal_bin_rms_A": 4.682028631550277e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 4,
+              "rms_A": 1.6195928548769094e-08,
+              "mae_A": 1.3630203883414938e-08,
+              "bias_A": 7.979756775763753e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.6096609255410268e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 106,
+              "rms_A": 1.16577709073402e-08,
+              "mae_A": 5.262777784627815e-09,
+              "bias_A": 2.6689965084189904e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.3005316062881295e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 1.278685350315246e-08,
+            "mae_A": 4.403466372472884e-09,
+            "bias_A": -7.082455252079822e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.3852901971660142e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.1172077100095975e-08,
+            "mae_A": 7.292198632750766e-09,
+            "bias_A": 2.4857597109353598e-11,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.1193704965249333e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.6198143031480665e-09,
+            "mae_A": 3.2627155362785104e-09,
+            "bias_A": 1.196742354996468e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_branch_bin_rms_A": 3.6309192313057747e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 1.7097793938467615e-08,
+            "mae_A": 1.3334651297205643e-08,
+            "bias_A": -1.7324541990186417e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.713103077535674e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.2642756118196042e-08,
+            "mae_A": 4.677070887693497e-09,
+            "bias_A": -6.388101098368607e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.3624225108651175e-08
+          }
+        }
+      }
+    },
+    {
+      "bin_width_V": 0.0125,
+      "offset_mode": "zero",
+      "fitted_on": "Training only; no all-data refit or holdout-based hypothesis selection",
+      "model": {
+        "saturation_A": 2.6119560935094957e-15,
+        "ideality": 1.3324806365811819,
+        "photocurrent_A": 1.4958273623629558e-07,
+        "reference_irradiance_W_m2": 1000.0,
+        "series_cells": 2,
+        "temperature_K": 300.0
+      },
+      "shared_entering_observation_offset_A": 0.0,
+      "offset_role": "Observation hypothesis, excluded from device-only Voc/MPP; no source correction applied",
+      "device_only_Voc_1sun_V": 1.2306818215260902,
+      "device_only_MPP_1sun_V_A_W": [
+        1.0392989503200873,
+        1.402834247457926e-07,
+        1.4579641608560921e-07
+      ],
+      "objective_dimensionless": 103.81404733779368,
+      "training_equal_branch_bin_rms_A": 1.0188917868831493e-08,
+      "training_counts": {
+        "iv_dark": {
+          "points": 13583,
+          "occupied_bins": 191
+        },
+        "iv_1sun": {
+          "points": 13581,
+          "occupied_bins": 191
+        }
+      },
+      "optimizer": {
+        "method": "scipy.optimize.least_squares; linear loss; log positive parameters; offset in nA",
+        "parameter_bounds": {
+          "saturation_A": [
+            1e-30,
+            1e-06
+          ],
+          "ideality": [
+            0.5,
+            4.0
+          ],
+          "photocurrent_A": [
+            1e-12,
+            1e-05
+          ],
+          "shared_offset_A": [
+            -1e-08,
+            1e-08
+          ]
+        },
+        "multistarts": [
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 26,
+            "objective": 103.81404733779368,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 14,
+            "objective": 103.81404733779445,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 19,
+            "objective": 103.81404733779536,
+            "message": "`ftol` termination condition is satisfied."
+          }
+        ],
+        "chosen_active_mask": [
+          0,
+          0,
+          0
+        ],
+        "chosen_optimality": 3.65163906621461e-05,
+        "chosen_jacobian_rank": 3
+      },
+      "role": "sensitivity only",
+      "evaluation": {
+        "bin_width_V": 0.0125,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 191,
+              "rms_A": 9.683867263049435e-09,
+              "mae_A": 3.3673644041082405e-09,
+              "bias_A": -2.036678087544264e-09,
+              "max_abs_A": 2.0500628164483434e-07,
+              "equal_bin_rms_A": 1.0130688455399956e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 20,
+              "rms_A": 1.3262055373994875e-08,
+              "mae_A": 7.835663059438687e-09,
+              "bias_A": 6.9180688550617174e-09,
+              "max_abs_A": 6.15052354606513e-08,
+              "equal_bin_rms_A": 1.3299253589459828e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 12,
+              "rms_A": 1.3018372314581583e-09,
+              "mae_A": 9.978872955556274e-10,
+              "bias_A": 4.3294324188030004e-10,
+              "max_abs_A": 4.2936033928120705e-09,
+              "equal_bin_rms_A": 1.2771517015873402e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 8,
+              "rms_A": 2.1000726261782103e-08,
+              "mae_A": 1.824414233057152e-08,
+              "bias_A": 1.6789743189868958e-08,
+              "max_abs_A": 6.15052354606513e-08,
+              "equal_bin_rms_A": 2.0969708877058814e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.0077118700544165e-08,
+              "mae_A": 3.790278760608223e-09,
+              "bias_A": -1.1891315529511501e-09,
+              "max_abs_A": 2.0500628164483434e-07,
+              "equal_bin_rms_A": 1.0472237049131707e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 191,
+              "rms_A": 9.370179709527936e-09,
+              "mae_A": 2.797130190284052e-09,
+              "bias_A": -2.9542287111769065e-10,
+              "max_abs_A": 1.6887650160997153e-07,
+              "equal_bin_rms_A": 1.0246816388284385e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 20,
+              "rms_A": 2.2339801654843692e-08,
+              "mae_A": 1.4878949656607249e-08,
+              "bias_A": 1.4599748265700854e-08,
+              "max_abs_A": 7.321240555261103e-08,
+              "equal_bin_rms_A": 2.2154511385828042e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 12,
+              "rms_A": 3.6716995736715346e-09,
+              "mae_A": 2.7944614902569352e-09,
+              "bias_A": 2.6171425232962676e-09,
+              "max_abs_A": 8.845575897601124e-09,
+              "equal_bin_rms_A": 3.6941935915383145e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 8,
+              "rms_A": 3.487760313526108e-08,
+              "mae_A": 3.2731991407591684e-08,
+              "bias_A": 3.230227382242401e-08,
+              "max_abs_A": 7.321240555261103e-08,
+              "equal_bin_rms_A": 3.4735937261348175e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.1259686190551374e-08,
+              "mae_A": 3.942257650199509e-09,
+              "bias_A": 1.1163569966791481e-09,
+              "max_abs_A": 1.6887650160997153e-07,
+              "equal_bin_rms_A": 1.1898249801415286e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 9.528326007915186e-09,
+            "mae_A": 3.0822682894731976e-09,
+            "bias_A": -1.1661145809071973e-09,
+            "max_abs_A": 2.0500628164483434e-07,
+            "equal_branch_bin_rms_A": 1.0188917868831493e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.837357185418674e-08,
+            "mae_A": 1.1359784643243647e-08,
+            "bias_A": 1.076161147361515e-08,
+            "max_abs_A": 7.321240555261103e-08,
+            "equal_branch_bin_rms_A": 1.8271460269797056e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 2.7489944791125028e-09,
+            "mae_A": 1.891432701483316e-09,
+            "bias_A": 1.5192781337517024e-09,
+            "max_abs_A": 8.845575897601124e-09,
+            "equal_branch_bin_rms_A": 2.7638906237973843e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 2.8852898784898433e-08,
+            "mae_A": 2.555814881272594e-08,
+            "bias_A": 2.4621047132777134e-08,
+            "max_abs_A": 7.321240555261103e-08,
+            "equal_branch_bin_rms_A": 2.8690713025410465e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.0684775486984982e-08,
+            "mae_A": 3.866268205403866e-09,
+            "bias_A": -3.638727813600089e-11,
+            "max_abs_A": 2.0500628164483434e-07,
+            "equal_branch_bin_rms_A": 1.1207945778555623e-08
+          }
+        }
+      },
+      "historical_evaluation_same_bin_width": {
+        "bin_width_V": 0.0125,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 191,
+              "rms_A": 1.3759359399145655e-08,
+              "mae_A": 3.849203439628536e-09,
+              "bias_A": -3.7473067673532655e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.3991122630124704e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 20,
+              "rms_A": 1.1433897211254476e-08,
+              "mae_A": 6.40774903724337e-09,
+              "bias_A": -5.853114753954599e-09,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.1394086456172358e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 12,
+              "rms_A": 2.1120165356019537e-09,
+              "mae_A": 2.0551250140524397e-09,
+              "bias_A": -2.0551250140524397e-09,
+              "max_abs_A": 4.018229853619005e-09,
+              "equal_bin_rms_A": 2.107220207426749e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 8,
+              "rms_A": 1.7970745007330512e-08,
+              "mae_A": 1.3033324148921214e-08,
+              "bias_A": -1.1634424180413125e-08,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.78298191219918e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.3556361680050414e-08,
+              "mae_A": 4.091363990759181e-09,
+              "bias_A": -3.946616728092711e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.3765993370158872e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 191,
+              "rms_A": 1.1733860068795539e-08,
+              "mae_A": 4.957810928604596e-09,
+              "bias_A": 2.331263262956321e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.208751368655168e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 20,
+              "rms_A": 1.0904353832034258e-08,
+              "mae_A": 8.17540427664704e-09,
+              "bias_A": 5.894562757806126e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.083421150849279e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 12,
+              "rms_A": 4.673031281708192e-09,
+              "mae_A": 4.483122467348961e-09,
+              "bias_A": 4.483122467348961e-09,
+              "max_abs_A": 7.819224874207052e-09,
+              "equal_bin_rms_A": 4.684836266051176e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 8,
+              "rms_A": 1.6195928548769094e-08,
+              "mae_A": 1.3630203883414938e-08,
+              "bias_A": 7.979756775763753e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.6140904908564807e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.16577709073402e-08,
+              "mae_A": 5.262777784627815e-09,
+              "bias_A": 2.6689965084189904e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.1974346259575217e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 1.278685350315246e-08,
+            "mae_A": 4.403466372472884e-09,
+            "bias_A": -7.082455252079822e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.3074010470658225e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.1172077100095975e-08,
+            "mae_A": 7.292198632750766e-09,
+            "bias_A": 2.4857597109353598e-11,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.1117673883989581e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.6198143031480665e-09,
+            "mae_A": 3.2627155362785104e-09,
+            "bias_A": 1.196742354996468e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_branch_bin_rms_A": 3.6323592775423494e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 1.7097793938467615e-08,
+            "mae_A": 1.3334651297205643e-08,
+            "bias_A": -1.7324541990186417e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.700634089377071e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.2642756118196042e-08,
+            "mae_A": 4.677070887693497e-09,
+            "bias_A": -6.388101098368607e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.2901308883432352e-08
+          }
+        }
+      }
+    },
+    {
+      "bin_width_V": 0.0125,
+      "offset_mode": "shared_fit",
+      "fitted_on": "Training only; no all-data refit or holdout-based hypothesis selection",
+      "model": {
+        "saturation_A": 2.3713633142485774e-15,
+        "ideality": 1.325899817574878,
+        "photocurrent_A": 1.5147124865813144e-07,
+        "reference_irradiance_W_m2": 1000.0,
+        "series_cells": 2,
+        "temperature_K": 300.0
+      },
+      "shared_entering_observation_offset_A": 1.9481208656068285e-09,
+      "offset_role": "Observation hypothesis, excluded from device-only Voc/MPP; no source correction applied",
+      "device_only_Voc_1sun_V": 1.232088561923916,
+      "device_only_MPP_1sun_V_A_W": [
+        1.0412141171670932,
+        1.4211433585877944e-07,
+        1.479714527479868e-07
+      ],
+      "objective_dimensionless": 101.97432775503015,
+      "training_equal_branch_bin_rms_A": 1.0098233892866127e-08,
+      "training_counts": {
+        "iv_dark": {
+          "points": 13583,
+          "occupied_bins": 191
+        },
+        "iv_1sun": {
+          "points": 13581,
+          "occupied_bins": 191
+        }
+      },
+      "optimizer": {
+        "method": "scipy.optimize.least_squares; linear loss; log positive parameters; offset in nA",
+        "parameter_bounds": {
+          "saturation_A": [
+            1e-30,
+            1e-06
+          ],
+          "ideality": [
+            0.5,
+            4.0
+          ],
+          "photocurrent_A": [
+            1e-12,
+            1e-05
+          ],
+          "shared_offset_A": [
+            -1e-08,
+            1e-08
+          ]
+        },
+        "multistarts": [
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 26,
+            "objective": 101.97432775503015,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 14,
+            "objective": 101.97432775503405,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 22,
+            "objective": 101.97432775503148,
+            "message": "`ftol` termination condition is satisfied."
+          }
+        ],
+        "chosen_active_mask": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "chosen_optimality": 1.1991241134688064e-05,
+        "chosen_jacobian_rank": 4
+      },
+      "role": "sensitivity only",
+      "evaluation": {
+        "bin_width_V": 0.0125,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 191,
+              "rms_A": 9.51207332350879e-09,
+              "mae_A": 1.865677480784683e-09,
+              "bias_A": -1.438433600659063e-10,
+              "max_abs_A": 2.043918084382272e-07,
+              "equal_bin_rms_A": 9.98573146696034e-09
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 20,
+              "rms_A": 1.385752294113826e-08,
+              "mae_A": 8.951921588851898e-09,
+              "bias_A": 8.416871032018524e-09,
+              "max_abs_A": 6.082028992682152e-08,
+              "equal_bin_rms_A": 1.3895770474201074e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 12,
+              "rms_A": 2.560741447108904e-09,
+              "mae_A": 2.273171317840872e-09,
+              "bias_A": 2.273171317840872e-09,
+              "max_abs_A": 6.0334764723486895e-09,
+              "equal_bin_rms_A": 2.5285962860058413e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 8,
+              "rms_A": 2.1779789575220322e-08,
+              "mae_A": 1.9118331859289642e-08,
+              "bias_A": 1.7768826014345783e-08,
+              "max_abs_A": 6.082028992682152e-08,
+              "equal_bin_rms_A": 2.175179059095577e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.0004556433019052e-08,
+              "mae_A": 2.536374450287812e-09,
+              "bias_A": 6.664088852690194e-10,
+              "max_abs_A": 2.043918084382272e-07,
+              "equal_bin_rms_A": 1.0419490902571329e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 191,
+              "rms_A": 9.34637947748299e-09,
+              "mae_A": 2.7333154926484075e-09,
+              "bias_A": -2.9059255302180567e-10,
+              "max_abs_A": 1.7010663130088652e-07,
+              "equal_bin_rms_A": 1.020949668592034e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 20,
+              "rms_A": 2.179406400933096e-08,
+              "mae_A": 1.4500733291769569e-08,
+              "bias_A": 1.4202081026915256e-08,
+              "max_abs_A": 7.210030688294713e-08,
+              "equal_bin_rms_A": 2.1613689897994633e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 12,
+              "rms_A": 3.602315838270728e-09,
+              "mae_A": 2.743873259533484e-09,
+              "bias_A": 2.5701964573554436e-09,
+              "max_abs_A": 8.68526611113235e-09,
+              "equal_bin_rms_A": 3.6243742472405375e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 8,
+              "rms_A": 3.402241214849603e-08,
+              "mae_A": 3.1869752990961554e-08,
+              "bias_A": 3.1386467986822435e-08,
+              "max_abs_A": 7.210030688294713e-08,
+              "equal_bin_rms_A": 3.388472877994743e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.113976865619481e-08,
+              "mae_A": 3.848643634376748e-09,
+              "bias_A": 1.0830381762103818e-09,
+              "max_abs_A": 1.7010663130088652e-07,
+              "equal_bin_rms_A": 1.1774277517380748e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 9.429596447169593e-09,
+            "mae_A": 2.29946454598573e-09,
+            "bias_A": -2.172125542027812e-10,
+            "max_abs_A": 2.043918084382272e-07,
+            "equal_branch_bin_rms_A": 1.0098233892866127e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.826487460461504e-08,
+            "mae_A": 1.172827987229628e-08,
+            "bias_A": 1.1311511641709992e-08,
+            "max_abs_A": 7.210030688294713e-08,
+            "equal_branch_bin_rms_A": 1.8169260140115137e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.1225143219207357e-09,
+            "mae_A": 2.5072799668469336e-09,
+            "bias_A": 2.420899950279791e-09,
+            "max_abs_A": 8.68526611113235e-09,
+            "equal_branch_bin_rms_A": 3.1248910270330187e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 2.8622483305643235e-08,
+            "mae_A": 2.555572476129464e-08,
+            "bias_A": 2.464351949913171e-08,
+            "max_abs_A": 7.210030688294713e-08,
+            "equal_branch_bin_rms_A": 2.8472049789252877e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.0587388609449527e-08,
+            "mae_A": 3.19250904233228e-09,
+            "bias_A": 8.747235307397004e-10,
+            "max_abs_A": 2.043918084382272e-07,
+            "equal_branch_bin_rms_A": 1.111754023435635e-08
+          }
+        }
+      },
+      "historical_evaluation_same_bin_width": {
+        "bin_width_V": 0.0125,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 191,
+              "rms_A": 1.3759359399145655e-08,
+              "mae_A": 3.849203439628536e-09,
+              "bias_A": -3.7473067673532655e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.3991122630124704e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 20,
+              "rms_A": 1.1433897211254476e-08,
+              "mae_A": 6.40774903724337e-09,
+              "bias_A": -5.853114753954599e-09,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.1394086456172358e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 12,
+              "rms_A": 2.1120165356019537e-09,
+              "mae_A": 2.0551250140524397e-09,
+              "bias_A": -2.0551250140524397e-09,
+              "max_abs_A": 4.018229853619005e-09,
+              "equal_bin_rms_A": 2.107220207426749e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 8,
+              "rms_A": 1.7970745007330512e-08,
+              "mae_A": 1.3033324148921214e-08,
+              "bias_A": -1.1634424180413125e-08,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.78298191219918e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.3556361680050414e-08,
+              "mae_A": 4.091363990759181e-09,
+              "bias_A": -3.946616728092711e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.3765993370158872e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 191,
+              "rms_A": 1.1733860068795539e-08,
+              "mae_A": 4.957810928604596e-09,
+              "bias_A": 2.331263262956321e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.208751368655168e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 20,
+              "rms_A": 1.0904353832034258e-08,
+              "mae_A": 8.17540427664704e-09,
+              "bias_A": 5.894562757806126e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.083421150849279e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 12,
+              "rms_A": 4.673031281708192e-09,
+              "mae_A": 4.483122467348961e-09,
+              "bias_A": 4.483122467348961e-09,
+              "max_abs_A": 7.819224874207052e-09,
+              "equal_bin_rms_A": 4.684836266051176e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 8,
+              "rms_A": 1.6195928548769094e-08,
+              "mae_A": 1.3630203883414938e-08,
+              "bias_A": 7.979756775763753e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.6140904908564807e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.16577709073402e-08,
+              "mae_A": 5.262777784627815e-09,
+              "bias_A": 2.6689965084189904e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.1974346259575217e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 1.278685350315246e-08,
+            "mae_A": 4.403466372472884e-09,
+            "bias_A": -7.082455252079822e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.3074010470658225e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.1172077100095975e-08,
+            "mae_A": 7.292198632750766e-09,
+            "bias_A": 2.4857597109353598e-11,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.1117673883989581e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.6198143031480665e-09,
+            "mae_A": 3.2627155362785104e-09,
+            "bias_A": 1.196742354996468e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_branch_bin_rms_A": 3.6323592775423494e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 1.7097793938467615e-08,
+            "mae_A": 1.3334651297205643e-08,
+            "bias_A": -1.7324541990186417e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.700634089377071e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.2642756118196042e-08,
+            "mae_A": 4.677070887693497e-09,
+            "bias_A": -6.388101098368607e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.2901308883432352e-08
+          }
+        }
+      }
+    },
+    {
+      "bin_width_V": 0.0125,
+      "offset_mode": "fixed_dark_median",
+      "fitted_on": "Training only; no all-data refit or holdout-based hypothesis selection",
+      "model": {
+        "saturation_A": 2.3815394521303123e-15,
+        "ideality": 1.3261900254093177,
+        "photocurrent_A": 1.5138739451151902e-07,
+        "reference_irradiance_W_m2": 1000.0,
+        "series_cells": 2,
+        "temperature_K": 300.0
+      },
+      "shared_entering_observation_offset_A": 1.86163e-09,
+      "offset_role": "Observation hypothesis, excluded from device-only Voc/MPP; no source correction applied",
+      "device_only_Voc_1sun_V": 1.2320266470723193,
+      "device_only_MPP_1sun_V_A_W": [
+        1.04112971875617,
+        1.420330298914602e-07,
+        1.4787480846498266e-07
+      ],
+      "objective_dimensionless": 101.9779543709032,
+      "training_equal_branch_bin_rms_A": 1.009841345810832e-08,
+      "training_counts": {
+        "iv_dark": {
+          "points": 13583,
+          "occupied_bins": 191
+        },
+        "iv_1sun": {
+          "points": 13581,
+          "occupied_bins": 191
+        }
+      },
+      "optimizer": {
+        "method": "scipy.optimize.least_squares; linear loss; log positive parameters; offset in nA",
+        "parameter_bounds": {
+          "saturation_A": [
+            1e-30,
+            1e-06
+          ],
+          "ideality": [
+            0.5,
+            4.0
+          ],
+          "photocurrent_A": [
+            1e-12,
+            1e-05
+          ],
+          "shared_offset_A": [
+            -1e-08,
+            1e-08
+          ]
+        },
+        "multistarts": [
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 26,
+            "objective": 101.9779543709032,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 14,
+            "objective": 101.97795437090724,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 18,
+            "objective": 101.97795437090521,
+            "message": "`ftol` termination condition is satisfied."
+          }
+        ],
+        "chosen_active_mask": [
+          0,
+          0,
+          0
+        ],
+        "chosen_optimality": 3.8296818832834254e-05,
+        "chosen_jacobian_rank": 3
+      },
+      "role": "sensitivity only",
+      "evaluation": {
+        "bin_width_V": 0.0125,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 191,
+              "rms_A": 9.511659150487751e-09,
+              "mae_A": 1.8740956642011363e-09,
+              "bias_A": -2.2789099847859638e-10,
+              "max_abs_A": 2.0441919721097412e-07,
+              "equal_bin_rms_A": 9.984520843299567e-09
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 20,
+              "rms_A": 1.3827752186594187e-08,
+              "mae_A": 8.886933234138094e-09,
+              "bias_A": 8.350191589877272e-09,
+              "max_abs_A": 6.085093314270095e-08,
+              "equal_bin_rms_A": 1.3865970222514844e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 12,
+              "rms_A": 2.489454405135453e-09,
+              "mae_A": 2.191406056086457e-09,
+              "bias_A": 2.191406056086457e-09,
+              "max_abs_A": 5.956121837909162e-09,
+              "equal_bin_rms_A": 2.4572399115846455e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 8,
+              "rms_A": 2.1744618162905858e-08,
+              "mae_A": 1.907888135419183e-08,
+              "bias_A": 1.772511024433327e-08,
+              "max_abs_A": 6.085093314270095e-08,
+              "equal_bin_rms_A": 2.1716486445890462e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.0000300309942292e-08,
+              "mae_A": 2.537844870980479e-09,
+              "bias_A": 5.840051073312636e-10,
+              "max_abs_A": 2.0441919721097412e-07,
+              "equal_bin_rms_A": 1.041467657224832e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 191,
+              "rms_A": 9.34730570216823e-09,
+              "mae_A": 2.7361007406505967e-09,
+              "bias_A": -2.908085566588642e-10,
+              "max_abs_A": 1.700520785813533e-07,
+              "equal_bin_rms_A": 1.0211035807963995e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 20,
+              "rms_A": 2.1818091360214085e-08,
+              "mae_A": 1.4517406580667104e-08,
+              "bias_A": 1.4219607987279871e-08,
+              "max_abs_A": 7.21494391587536e-08,
+              "equal_bin_rms_A": 2.16375004058403e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 12,
+              "rms_A": 3.6053400202453546e-09,
+              "mae_A": 2.746074657434323e-09,
+              "bias_A": 2.572226541856162e-09,
+              "max_abs_A": 8.692279319371141e-09,
+              "equal_bin_rms_A": 3.627417552356162e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 8,
+              "rms_A": 3.406006906916688e-08,
+              "mae_A": 3.1907806355756645e-08,
+              "bias_A": 3.1426889286442424e-08,
+              "max_abs_A": 7.21494391587536e-08,
+              "equal_bin_rms_A": 3.392220986880329e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.1144928836344831e-08,
+              "mae_A": 3.852745205391214e-09,
+              "bias_A": 1.0845038692213517e-09,
+              "max_abs_A": 1.700520785813533e-07,
+              "equal_bin_rms_A": 1.177962971040653e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 9.429846549492133e-09,
+            "mae_A": 2.3050664690627224e-09,
+            "bias_A": -2.5934746135763546e-10,
+            "max_abs_A": 2.0441919721097412e-07,
+            "equal_branch_bin_rms_A": 1.0098413458108318e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.826795389642598e-08,
+            "mae_A": 1.1704151073252892e-08,
+            "bias_A": 1.1286965030097712e-08,
+            "max_abs_A": 7.21494391587536e-08,
+            "equal_branch_bin_rms_A": 1.817204658293071e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.0951542527737352e-09,
+            "mae_A": 2.467276422035425e-09,
+            "bias_A": 2.3808112009150257e-09,
+            "max_abs_A": 8.692279319371141e-09,
+            "equal_branch_bin_rms_A": 3.0980789275150888e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 2.8631850065352665e-08,
+            "mae_A": 2.5555401099924644e-08,
+            "bias_A": 2.464227925943499e-08,
+            "max_abs_A": 7.21494391587536e-08,
+            "equal_branch_bin_rms_A": 2.8480889258744008e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.0588093432158182e-08,
+            "mae_A": 3.1952950381858467e-09,
+            "bias_A": 8.342544882763076e-10,
+            "max_abs_A": 2.0441919721097412e-07,
+            "equal_branch_bin_rms_A": 1.1118119540165734e-08
+          }
+        }
+      },
+      "historical_evaluation_same_bin_width": {
+        "bin_width_V": 0.0125,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 191,
+              "rms_A": 1.3759359399145655e-08,
+              "mae_A": 3.849203439628536e-09,
+              "bias_A": -3.7473067673532655e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.3991122630124704e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 20,
+              "rms_A": 1.1433897211254476e-08,
+              "mae_A": 6.40774903724337e-09,
+              "bias_A": -5.853114753954599e-09,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.1394086456172358e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 12,
+              "rms_A": 2.1120165356019537e-09,
+              "mae_A": 2.0551250140524397e-09,
+              "bias_A": -2.0551250140524397e-09,
+              "max_abs_A": 4.018229853619005e-09,
+              "equal_bin_rms_A": 2.107220207426749e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 8,
+              "rms_A": 1.7970745007330512e-08,
+              "mae_A": 1.3033324148921214e-08,
+              "bias_A": -1.1634424180413125e-08,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.78298191219918e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.3556361680050414e-08,
+              "mae_A": 4.091363990759181e-09,
+              "bias_A": -3.946616728092711e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.3765993370158872e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 191,
+              "rms_A": 1.1733860068795539e-08,
+              "mae_A": 4.957810928604596e-09,
+              "bias_A": 2.331263262956321e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.208751368655168e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 20,
+              "rms_A": 1.0904353832034258e-08,
+              "mae_A": 8.17540427664704e-09,
+              "bias_A": 5.894562757806126e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.083421150849279e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 12,
+              "rms_A": 4.673031281708192e-09,
+              "mae_A": 4.483122467348961e-09,
+              "bias_A": 4.483122467348961e-09,
+              "max_abs_A": 7.819224874207052e-09,
+              "equal_bin_rms_A": 4.684836266051176e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 8,
+              "rms_A": 1.6195928548769094e-08,
+              "mae_A": 1.3630203883414938e-08,
+              "bias_A": 7.979756775763753e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.6140904908564807e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 211,
+              "rms_A": 1.16577709073402e-08,
+              "mae_A": 5.262777784627815e-09,
+              "bias_A": 2.6689965084189904e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.1974346259575217e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 1.278685350315246e-08,
+            "mae_A": 4.403466372472884e-09,
+            "bias_A": -7.082455252079822e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.3074010470658225e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.1172077100095975e-08,
+            "mae_A": 7.292198632750766e-09,
+            "bias_A": 2.4857597109353598e-11,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.1117673883989581e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.6198143031480665e-09,
+            "mae_A": 3.2627155362785104e-09,
+            "bias_A": 1.196742354996468e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_branch_bin_rms_A": 3.6323592775423494e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 1.7097793938467615e-08,
+            "mae_A": 1.3334651297205643e-08,
+            "bias_A": -1.7324541990186417e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.700634089377071e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.2642756118196042e-08,
+            "mae_A": 4.677070887693497e-09,
+            "bias_A": -6.388101098368607e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.2901308883432352e-08
+          }
+        }
+      }
+    },
+    {
+      "bin_width_V": 0.05,
+      "offset_mode": "zero",
+      "fitted_on": "Training only; no all-data refit or holdout-based hypothesis selection",
+      "model": {
+        "saturation_A": 4.907712618153845e-16,
+        "ideality": 1.2214412027144088,
+        "photocurrent_A": 1.4934108158458335e-07,
+        "reference_irradiance_W_m2": 1000.0,
+        "series_cells": 2,
+        "temperature_K": 300.0
+      },
+      "shared_entering_observation_offset_A": 0.0,
+      "offset_role": "Observation hypothesis, excluded from device-only Voc/MPP; no source correction applied",
+      "device_only_Voc_1sun_V": 1.2336081448353757,
+      "device_only_MPP_1sun_V_A_W": [
+        1.0522681546194907,
+        1.408856273561005e-07,
+        1.4824945911041312e-07
+      ],
+      "objective_dimensionless": 122.0964590004616,
+      "training_equal_branch_bin_rms_A": 1.1049726648223548e-08,
+      "training_counts": {
+        "iv_dark": {
+          "points": 13583,
+          "occupied_bins": 48
+        },
+        "iv_1sun": {
+          "points": 13581,
+          "occupied_bins": 48
+        }
+      },
+      "optimizer": {
+        "method": "scipy.optimize.least_squares; linear loss; log positive parameters; offset in nA",
+        "parameter_bounds": {
+          "saturation_A": [
+            1e-30,
+            1e-06
+          ],
+          "ideality": [
+            0.5,
+            4.0
+          ],
+          "photocurrent_A": [
+            1e-12,
+            1e-05
+          ],
+          "shared_offset_A": [
+            -1e-08,
+            1e-08
+          ]
+        },
+        "multistarts": [
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 27,
+            "objective": 122.0964590004616,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 8,
+            "objective": 122.09645900046227,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 24,
+            "objective": 122.09645900046203,
+            "message": "`ftol` termination condition is satisfied."
+          }
+        ],
+        "chosen_active_mask": [
+          0,
+          0,
+          0
+        ],
+        "chosen_optimality": 2.330084845996967e-06,
+        "chosen_jacobian_rank": 3
+      },
+      "role": "sensitivity only",
+      "evaluation": {
+        "bin_width_V": 0.05,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 48,
+              "rms_A": 8.904340346134995e-09,
+              "mae_A": 3.109168554661572e-09,
+              "bias_A": -1.958266273769911e-09,
+              "max_abs_A": 1.9711827026399977e-07,
+              "equal_bin_rms_A": 1.1041812320896042e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 5,
+              "rms_A": 9.960905124119872e-09,
+              "mae_A": 5.558868319691038e-09,
+              "bias_A": 3.2227266850341213e-09,
+              "max_abs_A": 6.708335295836132e-08,
+              "equal_bin_rms_A": 9.949975002682424e-09
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 3,
+              "rms_A": 1.115741040700949e-09,
+              "mae_A": 1.000830842739712e-09,
+              "bias_A": -8.821295364916731e-10,
+              "max_abs_A": 2.0860354738830073e-09,
+              "equal_bin_rms_A": 1.118751425098043e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 2,
+              "rms_A": 1.575934780594659e-08,
+              "mae_A": 1.2497124301480181e-08,
+              "bias_A": 9.471149032898431e-09,
+              "max_abs_A": 6.708335295836132e-08,
+              "equal_bin_rms_A": 1.567251094299425e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 9.009652001666697e-09,
+              "mae_A": 3.3410270940431518e-09,
+              "bias_A": -1.467897014188379e-09,
+              "max_abs_A": 1.9711827026399977e-07,
+              "equal_bin_rms_A": 1.094346340662619e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 48,
+              "rms_A": 8.735201011609379e-09,
+              "mae_A": 2.419797742277771e-09,
+              "bias_A": 2.0462208941228512e-11,
+              "max_abs_A": 1.7374274090933567e-07,
+              "equal_bin_rms_A": 1.1057635310998084e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 5,
+              "rms_A": 1.8159717883518244e-08,
+              "mae_A": 1.1621792188326379e-08,
+              "bias_A": 1.1113839552333904e-08,
+              "max_abs_A": 6.624997183046995e-08,
+              "equal_bin_rms_A": 1.8025553858297806e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 3,
+              "rms_A": 2.507270422921575e-09,
+              "mae_A": 1.9188925439798227e-09,
+              "bias_A": 1.5597146431549394e-09,
+              "max_abs_A": 6.447350178532023e-09,
+              "equal_bin_rms_A": 2.481167223535601e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 2,
+              "rms_A": 2.8419753197413793e-08,
+              "mae_A": 2.595638957230875e-08,
+              "bias_A": 2.5228644296208053e-08,
+              "max_abs_A": 6.624997183046995e-08,
+              "equal_bin_rms_A": 2.8338440210415008e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 1.001638862734741e-08,
+              "mae_A": 3.2919723808354677e-09,
+              "bias_A": 1.071904092718099e-09,
+              "max_abs_A": 1.7374274090933567e-07,
+              "equal_bin_rms_A": 1.1890717241725569e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 8.82018235020482e-09,
+            "mae_A": 2.7645085265734993e-09,
+            "bias_A": -9.689748761959166e-10,
+            "max_abs_A": 1.9711827026399977e-07,
+            "equal_branch_bin_rms_A": 1.1049726648223551e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.464850220032573e-08,
+            "mae_A": 8.592463584011748e-09,
+            "bias_A": 7.171059724196785e-09,
+            "max_abs_A": 6.708335295836132e-08,
+            "equal_branch_bin_rms_A": 1.4558890659188288e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 1.9370945870152304e-09,
+            "mae_A": 1.4574386566116264e-09,
+            "bias_A": 3.3234780329737536e-10,
+            "max_abs_A": 6.447350178532023e-09,
+            "equal_branch_bin_rms_A": 1.9245513168406635e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 2.3037476575757265e-08,
+            "mae_A": 1.9291863321230046e-08,
+            "bias_A": 1.7426120256416218e-08,
+            "max_abs_A": 6.708335295836132e-08,
+            "equal_branch_bin_rms_A": 2.2898633068564823e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 9.526328524809315e-09,
+            "mae_A": 3.3164997374393098e-09,
+            "bias_A": -1.979964607351401e-10,
+            "max_abs_A": 1.9711827026399977e-07,
+            "equal_branch_bin_rms_A": 1.1426910077856486e-08
+          }
+        }
+      },
+      "historical_evaluation_same_bin_width": {
+        "bin_width_V": 0.05,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 48,
+              "rms_A": 1.3759359399145655e-08,
+              "mae_A": 3.849203439628536e-09,
+              "bias_A": -3.7473067673532655e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.711277136552365e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 5,
+              "rms_A": 1.1433897211254476e-08,
+              "mae_A": 6.40774903724337e-09,
+              "bias_A": -5.853114753954599e-09,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.1405017043751448e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 3,
+              "rms_A": 2.1120165356019537e-09,
+              "mae_A": 2.0551250140524397e-09,
+              "bias_A": -2.0551250140524397e-09,
+              "max_abs_A": 4.018229853619005e-09,
+              "equal_bin_rms_A": 2.108394393233678e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 2,
+              "rms_A": 1.7970745007330512e-08,
+              "mae_A": 1.3033324148921214e-08,
+              "bias_A": -1.1634424180413125e-08,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.7847073823025546e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 1.3556361680050414e-08,
+              "mae_A": 4.091363990759181e-09,
+              "bias_A": -3.946616728092711e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.665806245480754e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 48,
+              "rms_A": 1.1733860068795539e-08,
+              "mae_A": 4.957810928604596e-09,
+              "bias_A": 2.331263262956321e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.536795676020087e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 5,
+              "rms_A": 1.0904353832034258e-08,
+              "mae_A": 8.17540427664704e-09,
+              "bias_A": 5.894562757806126e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.0834191378034491e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 3,
+              "rms_A": 4.673031281708192e-09,
+              "mae_A": 4.483122467348961e-09,
+              "bias_A": 4.483122467348961e-09,
+              "max_abs_A": 7.819224874207052e-09,
+              "equal_bin_rms_A": 4.659650772529188e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 2,
+              "rms_A": 1.6195928548769094e-08,
+              "mae_A": 1.3630203883414938e-08,
+              "bias_A": 7.979756775763753e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.6151802966133364e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 1.16577709073402e-08,
+              "mae_A": 5.262777784627815e-09,
+              "bias_A": 2.6689965084189904e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.499890252166443e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 1.278685350315246e-08,
+            "mae_A": 4.403466372472884e-09,
+            "bias_A": -7.082455252079822e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.6263779370000222e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.1172077100095975e-08,
+            "mae_A": 7.292198632750766e-09,
+            "bias_A": 2.4857597109353598e-11,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.1123266529759545e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.6198143031480665e-09,
+            "mae_A": 3.2627155362785104e-09,
+            "bias_A": 1.196742354996468e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_branch_bin_rms_A": 3.6164673536028964e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 1.7097793938467615e-08,
+            "mae_A": 1.3334651297205643e-08,
+            "bias_A": -1.7324541990186417e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.7020557909500474e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.2642756118196042e-08,
+            "mae_A": 4.677070887693497e-09,
+            "bias_A": -6.388101098368607e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.5850206963990412e-08
+          }
+        }
+      }
+    },
+    {
+      "bin_width_V": 0.05,
+      "offset_mode": "shared_fit",
+      "fitted_on": "Training only; no all-data refit or holdout-based hypothesis selection",
+      "model": {
+        "saturation_A": 4.377863588129625e-16,
+        "ideality": 1.2148627431934966,
+        "photocurrent_A": 1.5129570694552162e-07,
+        "reference_irradiance_W_m2": 1000.0,
+        "series_cells": 2,
+        "temperature_K": 300.0
+      },
+      "shared_entering_observation_offset_A": 2.019309937440459e-09,
+      "offset_role": "Observation hypothesis, excluded from device-only Voc/MPP; no source correction applied",
+      "device_only_Voc_1sun_V": 1.2349571785401998,
+      "device_only_MPP_1sun_V_A_W": [
+        1.054166926253319,
+        1.4278760928531628e-07,
+        1.5052197518736175e-07
+      ],
+      "objective_dimensionless": 120.12233634211344,
+      "training_equal_branch_bin_rms_A": 1.096003359219822e-08,
+      "training_counts": {
+        "iv_dark": {
+          "points": 13583,
+          "occupied_bins": 48
+        },
+        "iv_1sun": {
+          "points": 13581,
+          "occupied_bins": 48
+        }
+      },
+      "optimizer": {
+        "method": "scipy.optimize.least_squares; linear loss; log positive parameters; offset in nA",
+        "parameter_bounds": {
+          "saturation_A": [
+            1e-30,
+            1e-06
+          ],
+          "ideality": [
+            0.5,
+            4.0
+          ],
+          "photocurrent_A": [
+            1e-12,
+            1e-05
+          ],
+          "shared_offset_A": [
+            -1e-08,
+            1e-08
+          ]
+        },
+        "multistarts": [
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 27,
+            "objective": 120.12233634211344,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 9,
+            "objective": 120.12233634211564,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 25,
+            "objective": 120.12233634211485,
+            "message": "`ftol` termination condition is satisfied."
+          }
+        ],
+        "chosen_active_mask": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "chosen_optimality": 3.983198128561678e-06,
+        "chosen_jacobian_rank": 4
+      },
+      "role": "sensitivity only",
+      "evaluation": {
+        "bin_width_V": 0.05,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 48,
+              "rms_A": 8.709459721077157e-09,
+              "mae_A": 1.5834301021787687e-09,
+              "bias_A": 7.315625762685392e-12,
+              "max_abs_A": 1.964667671402761e-07,
+              "equal_bin_rms_A": 1.0890843755284801e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 5,
+              "rms_A": 1.0356443172006177e-08,
+              "mae_A": 5.880470471162845e-09,
+              "bias_A": 4.796770306041514e-09,
+              "max_abs_A": 6.63878806983719e-08,
+              "equal_bin_rms_A": 1.0348696089290477e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 3,
+              "rms_A": 1.234202154672507e-09,
+              "mae_A": 1.050305040713816e-09,
+              "bias_A": 1.049778298059353e-09,
+              "max_abs_A": 3.6279553837151904e-09,
+              "equal_bin_rms_A": 1.2249658135443195e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 2,
+              "rms_A": 1.6376887173071802e-08,
+              "mae_A": 1.3232960300460922e-08,
+              "bias_A": 1.0500450858156454e-08,
+              "max_abs_A": 6.63878806983719e-08,
+              "equal_bin_rms_A": 1.6293801428908837e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 8.878442637536585e-09,
+              "mae_A": 1.9901352494131477e-09,
+              "bias_A": 4.6062667328624314e-10,
+              "max_abs_A": 1.964667671402761e-07,
+              "equal_bin_rms_A": 1.0840856057752106e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 48,
+              "rms_A": 8.684684686236944e-09,
+              "mae_A": 2.355856306746249e-09,
+              "bias_A": 3.1920299842514696e-11,
+              "max_abs_A": 1.727739096178836e-07,
+              "equal_bin_rms_A": 1.1028789370651747e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 5,
+              "rms_A": 1.762556117764239e-08,
+              "mae_A": 1.1255757725994255e-08,
+              "bias_A": 1.0724590389552937e-08,
+              "max_abs_A": 6.509481144853144e-08,
+              "equal_bin_rms_A": 1.7495363702849916e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 3,
+              "rms_A": 2.458659045739028e-09,
+              "mae_A": 1.8835137217978294e-09,
+              "bias_A": 1.538200878446341e-09,
+              "max_abs_A": 6.322334356140762e-09,
+              "equal_bin_rms_A": 2.433225967252448e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 2,
+              "rms_A": 2.7580510428612905e-08,
+              "mae_A": 2.5101860366340195e-08,
+              "bias_A": 2.429612053836547e-08,
+              "max_abs_A": 6.509481144853144e-08,
+              "equal_bin_rms_A": 2.7501608949767434e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 9.885328732597157e-09,
+              "mae_A": 3.1993982529017283e-09,
+              "bias_A": 1.045382731860659e-09,
+              "max_abs_A": 1.727739096178836e-07,
+              "equal_bin_rms_A": 1.1791330453378311e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 8.697081937673747e-09,
+            "mae_A": 1.9696147688048528e-09,
+            "bias_A": 1.9617057020164485e-11,
+            "max_abs_A": 1.964667671402761e-07,
+            "equal_branch_bin_rms_A": 1.0960033592198222e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.4457860557452499e-08,
+            "mae_A": 8.570005473404317e-09,
+            "bias_A": 7.762766139522598e-09,
+            "max_abs_A": 6.63878806983719e-08,
+            "equal_branch_bin_rms_A": 1.4373295757123597e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 1.942214044612347e-09,
+            "mae_A": 1.464710296760293e-09,
+            "bias_A": 1.2927004963984534e-09,
+            "max_abs_A": 6.322334356140762e-09,
+            "equal_branch_bin_rms_A": 1.9262826703347445e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 2.2733802451092657e-08,
+            "mae_A": 1.9224823658257495e-08,
+            "bias_A": 1.746501936865775e-08,
+            "max_abs_A": 6.63878806983719e-08,
+            "equal_branch_bin_rms_A": 2.2603389788156113e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 9.39538364888679e-09,
+            "mae_A": 2.594766751157438e-09,
+            "bias_A": 7.53004702573451e-10,
+            "max_abs_A": 1.964667671402761e-07,
+            "equal_branch_bin_rms_A": 1.1326068027468035e-08
+          }
+        }
+      },
+      "historical_evaluation_same_bin_width": {
+        "bin_width_V": 0.05,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 48,
+              "rms_A": 1.3759359399145655e-08,
+              "mae_A": 3.849203439628536e-09,
+              "bias_A": -3.7473067673532655e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.711277136552365e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 5,
+              "rms_A": 1.1433897211254476e-08,
+              "mae_A": 6.40774903724337e-09,
+              "bias_A": -5.853114753954599e-09,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.1405017043751448e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 3,
+              "rms_A": 2.1120165356019537e-09,
+              "mae_A": 2.0551250140524397e-09,
+              "bias_A": -2.0551250140524397e-09,
+              "max_abs_A": 4.018229853619005e-09,
+              "equal_bin_rms_A": 2.108394393233678e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 2,
+              "rms_A": 1.7970745007330512e-08,
+              "mae_A": 1.3033324148921214e-08,
+              "bias_A": -1.1634424180413125e-08,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.7847073823025546e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 1.3556361680050414e-08,
+              "mae_A": 4.091363990759181e-09,
+              "bias_A": -3.946616728092711e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.665806245480754e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 48,
+              "rms_A": 1.1733860068795539e-08,
+              "mae_A": 4.957810928604596e-09,
+              "bias_A": 2.331263262956321e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.536795676020087e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 5,
+              "rms_A": 1.0904353832034258e-08,
+              "mae_A": 8.17540427664704e-09,
+              "bias_A": 5.894562757806126e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.0834191378034491e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 3,
+              "rms_A": 4.673031281708192e-09,
+              "mae_A": 4.483122467348961e-09,
+              "bias_A": 4.483122467348961e-09,
+              "max_abs_A": 7.819224874207052e-09,
+              "equal_bin_rms_A": 4.659650772529188e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 2,
+              "rms_A": 1.6195928548769094e-08,
+              "mae_A": 1.3630203883414938e-08,
+              "bias_A": 7.979756775763753e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.6151802966133364e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 1.16577709073402e-08,
+              "mae_A": 5.262777784627815e-09,
+              "bias_A": 2.6689965084189904e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.499890252166443e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 1.278685350315246e-08,
+            "mae_A": 4.403466372472884e-09,
+            "bias_A": -7.082455252079822e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.6263779370000222e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.1172077100095975e-08,
+            "mae_A": 7.292198632750766e-09,
+            "bias_A": 2.4857597109353598e-11,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.1123266529759545e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.6198143031480665e-09,
+            "mae_A": 3.2627155362785104e-09,
+            "bias_A": 1.196742354996468e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_branch_bin_rms_A": 3.6164673536028964e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 1.7097793938467615e-08,
+            "mae_A": 1.3334651297205643e-08,
+            "bias_A": -1.7324541990186417e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.7020557909500474e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.2642756118196042e-08,
+            "mae_A": 4.677070887693497e-09,
+            "bias_A": -6.388101098368607e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.5850206963990412e-08
+          }
+        }
+      }
+    },
+    {
+      "bin_width_V": 0.05,
+      "offset_mode": "fixed_dark_median",
+      "fitted_on": "Training only; no all-data refit or holdout-based hypothesis selection",
+      "model": {
+        "saturation_A": 4.4169887375117823e-16,
+        "ideality": 1.215372468002726,
+        "photocurrent_A": 1.5114306001662678e-07,
+        "reference_irradiance_W_m2": 1000.0,
+        "series_cells": 2,
+        "temperature_K": 300.0
+      },
+      "shared_entering_observation_offset_A": 1.86163e-09,
+      "offset_role": "Observation hypothesis, excluded from device-only Voc/MPP; no source correction applied",
+      "device_only_Voc_1sun_V": 1.2348527959989666,
+      "device_only_MPP_1sun_V_A_W": [
+        1.054019841608971,
+        1.4263906110639088e-07,
+        1.5034440059461044e-07
+      ],
+      "objective_dimensionless": 120.13437439535082,
+      "training_equal_branch_bin_rms_A": 1.0960582758017514e-08,
+      "training_counts": {
+        "iv_dark": {
+          "points": 13583,
+          "occupied_bins": 48
+        },
+        "iv_1sun": {
+          "points": 13581,
+          "occupied_bins": 48
+        }
+      },
+      "optimizer": {
+        "method": "scipy.optimize.least_squares; linear loss; log positive parameters; offset in nA",
+        "parameter_bounds": {
+          "saturation_A": [
+            1e-30,
+            1e-06
+          ],
+          "ideality": [
+            0.5,
+            4.0
+          ],
+          "photocurrent_A": [
+            1e-12,
+            1e-05
+          ],
+          "shared_offset_A": [
+            -1e-08,
+            1e-08
+          ]
+        },
+        "multistarts": [
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 26,
+            "objective": 120.1343743953511,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 9,
+            "objective": 120.13437439535213,
+            "message": "`ftol` termination condition is satisfied."
+          },
+          {
+            "success": true,
+            "status": 2,
+            "evaluations": 25,
+            "objective": 120.13437439535082,
+            "message": "`ftol` termination condition is satisfied."
+          }
+        ],
+        "chosen_active_mask": [
+          0,
+          0,
+          0
+        ],
+        "chosen_optimality": 2.113589430914263e-05,
+        "chosen_jacobian_rank": 3
+      },
+      "role": "sensitivity only",
+      "evaluation": {
+        "bin_width_V": 0.05,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 48,
+              "rms_A": 8.70866345915603e-09,
+              "mae_A": 1.5909972532306535e-09,
+              "bias_A": -1.4618973197307154e-10,
+              "max_abs_A": 1.9651785762829656e-07,
+              "equal_bin_rms_A": 1.0889882524741865e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 5,
+              "rms_A": 1.0316493245590023e-08,
+              "mae_A": 5.769937981769814e-09,
+              "bias_A": 4.673589906367124e-09,
+              "max_abs_A": 6.64426942916261e-08,
+              "equal_bin_rms_A": 1.0308513625436127e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 3,
+              "rms_A": 1.1101555156901342e-09,
+              "mae_A": 9.065113796860614e-10,
+              "bias_A": 8.988173599636158e-10,
+              "max_abs_A": 3.4840277637623685e-09,
+              "equal_bin_rms_A": 1.1008305319967152e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 2,
+              "rms_A": 1.6326728464389903e-08,
+              "mae_A": 1.3173058049240113e-08,
+              "bias_A": 1.0419558063148308e-08,
+              "max_abs_A": 6.64426942916261e-08,
+              "equal_bin_rms_A": 1.624333374416229e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 8.873331904998328e-09,
+              "mae_A": 1.9865245367423256e-09,
+              "bias_A": 3.099915042092306e-10,
+              "max_abs_A": 1.9651785762829656e-07,
+              "equal_bin_rms_A": 1.083636892916676e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 48,
+              "rms_A": 8.688401198113401e-09,
+              "mae_A": 2.360759374904841e-09,
+              "bias_A": 3.102280810045391e-11,
+              "max_abs_A": 1.7284967201642655e-07,
+              "equal_bin_rms_A": 1.1030829859445e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 5,
+              "rms_A": 1.7666805734620157e-08,
+              "mae_A": 1.1284043685123052e-08,
+              "bias_A": 1.0754731137337324e-08,
+              "max_abs_A": 6.518449013023441e-08,
+              "equal_bin_rms_A": 1.7536302807046285e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 3,
+              "rms_A": 2.462362285072393e-09,
+              "mae_A": 1.8862019025534397e-09,
+              "bias_A": 1.5397940307064518e-09,
+              "max_abs_A": 6.331914109750151e-09,
+              "equal_bin_rms_A": 2.436877506358217e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 2,
+              "rms_A": 2.764531987138979e-08,
+              "mae_A": 2.5167963252403595e-08,
+              "bias_A": 2.4368436131105583e-08,
+              "max_abs_A": 6.518449013023441e-08,
+              "equal_bin_rms_A": 2.7566233554469436e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 9.895258292451899e-09,
+              "mae_A": 3.206517575873334e-09,
+              "bias_A": 1.0474270768583579e-09,
+              "max_abs_A": 1.7284967201642655e-07,
+              "equal_bin_rms_A": 1.1798793938466778e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 8.698538974390191e-09,
+            "mae_A": 1.975849976484119e-09,
+            "bias_A": -5.758998573766619e-11,
+            "max_abs_A": 1.9651785762829656e-07,
+            "equal_branch_bin_rms_A": 1.0960582758017514e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.4468773360352298e-08,
+            "mae_A": 8.528931053609472e-09,
+            "bias_A": 7.716300261905344e-09,
+            "max_abs_A": 6.64426942916261e-08,
+            "equal_branch_bin_rms_A": 1.4383799381704086e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 1.906590354396064e-09,
+            "mae_A": 1.3937709476576374e-09,
+            "bias_A": 1.2176139680515482e-09,
+            "max_abs_A": 6.331914109750151e-09,
+            "equal_branch_bin_rms_A": 1.890793463227913e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 2.2755667740885986e-08,
+            "mae_A": 1.9228533499210067e-08,
+            "bias_A": 1.746147188109684e-08,
+            "max_abs_A": 6.64426942916261e-08,
+            "equal_branch_bin_rms_A": 2.26245787088268e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 9.398195458985712e-09,
+            "mae_A": 2.59652105630783e-09,
+            "bias_A": 6.787092905337942e-10,
+            "max_abs_A": 1.9651785762829656e-07,
+            "equal_branch_bin_rms_A": 1.132780715697904e-08
+          }
+        }
+      },
+      "historical_evaluation_same_bin_width": {
+        "bin_width_V": 0.05,
+        "branches": {
+          "iv_dark": {
+            "train": {
+              "points": 13583,
+              "occupied_bins": 48,
+              "rms_A": 1.3759359399145655e-08,
+              "mae_A": 3.849203439628536e-09,
+              "bias_A": -3.7473067673532655e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.711277136552365e-08
+            },
+            "heldout_combined": {
+              "points": 1420,
+              "occupied_bins": 5,
+              "rms_A": 1.1433897211254476e-08,
+              "mae_A": 6.40774903724337e-09,
+              "bias_A": -5.853114753954599e-09,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.1405017043751448e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 857,
+              "occupied_bins": 3,
+              "rms_A": 2.1120165356019537e-09,
+              "mae_A": 2.0551250140524397e-09,
+              "bias_A": -2.0551250140524397e-09,
+              "max_abs_A": 4.018229853619005e-09,
+              "equal_bin_rms_A": 2.108394393233678e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 563,
+              "occupied_bins": 2,
+              "rms_A": 1.7970745007330512e-08,
+              "mae_A": 1.3033324148921214e-08,
+              "bias_A": -1.1634424180413125e-08,
+              "max_abs_A": 1.0054745386221393e-07,
+              "equal_bin_rms_A": 1.7847073823025546e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 1.3556361680050414e-08,
+              "mae_A": 4.091363990759181e-09,
+              "bias_A": -3.946616728092711e-09,
+              "max_abs_A": 2.497705514066652e-07,
+              "equal_bin_rms_A": 1.665806245480754e-08
+            }
+          },
+          "iv_1sun": {
+            "train": {
+              "points": 13581,
+              "occupied_bins": 48,
+              "rms_A": 1.1733860068795539e-08,
+              "mae_A": 4.957810928604596e-09,
+              "bias_A": 2.331263262956321e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.536795676020087e-08
+            },
+            "heldout_combined": {
+              "points": 1422,
+              "occupied_bins": 5,
+              "rms_A": 1.0904353832034258e-08,
+              "mae_A": 8.17540427664704e-09,
+              "bias_A": 5.894562757806126e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.0834191378034491e-08
+            },
+            "heldout_0.90_1.05V": {
+              "points": 848,
+              "occupied_bins": 3,
+              "rms_A": 4.673031281708192e-09,
+              "mae_A": 4.483122467348961e-09,
+              "bias_A": 4.483122467348961e-09,
+              "max_abs_A": 7.819224874207052e-09,
+              "equal_bin_rms_A": 4.659650772529188e-09
+            },
+            "heldout_1.15_1.25V": {
+              "points": 574,
+              "occupied_bins": 2,
+              "rms_A": 1.6195928548769094e-08,
+              "mae_A": 1.3630203883414938e-08,
+              "bias_A": 7.979756775763753e-09,
+              "max_abs_A": 5.7362167647868765e-08,
+              "equal_bin_rms_A": 1.6151802966133364e-08
+            },
+            "all_diagnostic": {
+              "points": 15003,
+              "occupied_bins": 53,
+              "rms_A": 1.16577709073402e-08,
+              "mae_A": 5.262777784627815e-09,
+              "bias_A": 2.6689965084189904e-09,
+              "max_abs_A": 2.0876148319801074e-07,
+              "equal_bin_rms_A": 1.499890252166443e-08
+            }
+          }
+        },
+        "aggregate": {
+          "train": {
+            "points": 27164,
+            "rms_A": 1.278685350315246e-08,
+            "mae_A": 4.403466372472884e-09,
+            "bias_A": -7.082455252079822e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.6263779370000222e-08
+          },
+          "heldout_combined": {
+            "points": 2842,
+            "rms_A": 1.1172077100095975e-08,
+            "mae_A": 7.292198632750766e-09,
+            "bias_A": 2.4857597109353598e-11,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.1123266529759545e-08
+          },
+          "heldout_0.90_1.05V": {
+            "points": 1705,
+            "rms_A": 3.6198143031480665e-09,
+            "mae_A": 3.2627155362785104e-09,
+            "bias_A": 1.196742354996468e-09,
+            "max_abs_A": 7.819224874207052e-09,
+            "equal_branch_bin_rms_A": 3.6164673536028964e-09
+          },
+          "heldout_1.15_1.25V": {
+            "points": 1137,
+            "rms_A": 1.7097793938467615e-08,
+            "mae_A": 1.3334651297205643e-08,
+            "bias_A": -1.7324541990186417e-09,
+            "max_abs_A": 1.0054745386221393e-07,
+            "equal_branch_bin_rms_A": 1.7020557909500474e-08
+          },
+          "all_diagnostic": {
+            "points": 30006,
+            "rms_A": 1.2642756118196042e-08,
+            "mae_A": 4.677070887693497e-09,
+            "bias_A": -6.388101098368607e-10,
+            "max_abs_A": 2.497705514066652e-07,
+            "equal_branch_bin_rms_A": 1.5850206963990412e-08
+          }
+        }
+      }
+    }
+  ],
+  "limitations": [
+    "Effective terminal fit does not identify unique physical TCAD parameters or logic PV scaling",
+    "300 K assumed; slope constrains n*T at fixed series count, not measured temperature or unique ideality",
+    "Unmodeled structural discrepancy and repeated-voltage scatter remain; offset hypotheses are not established instrument corrections",
+    "Device-only Voc/MPP exclude observation offset; no charge, transient, actuator or robot-mechanics calibration",
+    "Heldout voltage-region comparisons are conditional diagnostics, not independent final accuracy guarantees"
+  ]
+}

@@ -1,0 +1,16 @@
+--- hot85_original
++++ hot85_no_probe
+@@ -273,4 +273,3 @@
+ 
+-Vdriverbuffer act driverbuffer_supply 0
+-Xdriverbuffer reset_n ready driver_ready driverbuffer_supply 0 microrobot_ready_driver_qualified_lvt
++Xdriverbuffer reset_n ready driver_ready act 0 microrobot_ready_driver_qualified_lvt
+ .options method=gear maxord=2 reltol=1e-6 abstol=1e-15
+@@ -279,5 +278,5 @@
+ set wr_singlescale
+-save i(Vdriverbuffer) v(driver_ready) v(xdriverbuffer.nand_b) v(xdriverbuffer.series) @m.xdriverbuffer.xon.msky130_fd_pr__nfet_01v8_lvt[id] i(Vpvlo) i(Vpvhi) i(Vclock) i(Vproxy) i(Vmonitor) i(Vpa) i(Vpb) v(pa_source) v(pb_source) i(Vresetlogic) i(Vresetact) i(Vdigital) i(Vlogic) v(bp) v(xready.input_b) v(light) v(logic) v(act) v(mid) v(ready) v(reset_n) v(pa) v(pb) v(ea) v(eb) v(sa) v(sb) v(ta) v(tb) v(clk) v(q0) v(bn)
++save v(driver_ready) v(xdriverbuffer.nand_b) v(xdriverbuffer.series) @m.xdriverbuffer.xon.msky130_fd_pr__nfet_01v8_lvt[id] i(Vpvlo) i(Vpvhi) i(Vclock) i(Vproxy) i(Vmonitor) i(Vpa) i(Vpb) v(pa_source) v(pb_source) i(Vresetlogic) i(Vresetact) i(Vdigital) i(Vlogic) v(bp) v(xready.input_b) v(light) v(logic) v(act) v(mid) v(ready) v(reset_n) v(pa) v(pb) v(ea) v(eb) v(sa) v(sb) v(ta) v(tb) v(clk) v(q0) v(bn)
+ tran 1e-06 0.0008 0 5e-08
+-wrdata controller.dat i(Vdriverbuffer) v(driver_ready) v(xdriverbuffer.nand_b) v(xdriverbuffer.series) @m.xdriverbuffer.xon.msky130_fd_pr__nfet_01v8_lvt[id] i(Vpvlo) i(Vpvhi) i(Vclock) i(Vproxy) i(Vmonitor) i(Vpa) i(Vpb) v(pa_source) v(pb_source) i(Vresetlogic) i(Vresetact) i(Vdigital) i(Vlogic) v(bp) v(xready.input_b) v(light) v(logic) v(act) v(mid) v(ready) v(reset_n) v(pa) v(pb) v(ea) v(eb) v(sa) v(sb) v(ta) v(tb) v(clk) v(q0) v(bn)
++wrdata controller.dat v(driver_ready) v(xdriverbuffer.nand_b) v(xdriverbuffer.series) @m.xdriverbuffer.xon.msky130_fd_pr__nfet_01v8_lvt[id] i(Vpvlo) i(Vpvhi) i(Vclock) i(Vproxy) i(Vmonitor) i(Vpa) i(Vpb) v(pa_source) v(pb_source) i(Vresetlogic) i(Vresetact) i(Vdigital) i(Vlogic) v(bp) v(xready.input_b) v(light) v(logic) v(act) v(mid) v(ready) v(reset_n) v(pa) v(pb) v(ea) v(eb) v(sa) v(sb) v(ta) v(tb) v(clk) v(q0) v(bn)
+ quit

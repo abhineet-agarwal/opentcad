@@ -23,6 +23,8 @@ produce IV / CV / Vth characteristics.
 
 ## Status
 
+The [executed microrobot notebook](submission.ipynb) embeds the complete mixed-abstraction demonstration, plots and numerical evidence. Its [scope and limitations](examples/microrobot/SUBMISSION_STATUS.md) identify the unresolved transistor-coupled startup and assumed physics.
+
 **Microrobot/PV development:** prescribed monochromatic optical generation,
 explicit 2D current scaling, ideal-diode terminal fitting/SPICE export and a
 paper-inspired application are documented in
@@ -35,6 +37,9 @@ PV/actuator models distinct from foundry-model circuit and layout verification.
 The first bias macro now has DRC/LVS, GDS round-trip and extracted electrical
 checks; [scope and remaining work](examples/microrobot/PHYSICAL_VALIDATION.md)
 include the rejected brownout candidate and unfinished controller assembly.
+A [standalone notebook export](examples/microrobot/SETUP.md) includes the required
+project source and separates new run outputs from archived evidence; Python 3.12
+portability checks and optional-tool skips are recorded explicitly.
 
 Phases 0 and 1 are complete: process topography (deposit, etch,
 oxidation) and device simulation both work end-to-end and are joined

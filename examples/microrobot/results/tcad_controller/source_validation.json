@@ -1,0 +1,22 @@
+{
+  "execution": {
+    "returncode": 0,
+    "seconds": 0.05666229099733755,
+    "netlist_sha256": "ca4e9f344e3749486aaf12fee5298a14c28e1ef5ae57e88660868d8c6830e8a7",
+    "aborted": false,
+    "completed_UTC": "2026-10-31T11:53:52.019637+00:00",
+    "timestamp_provenance": "Post-process timestamp originally mislabeled started_UTC; exact start not claimed"
+  },
+  "rows": 57,
+  "knot_and_midpoint_count": 57,
+  "voltage_grid_max_error_V": 5.551115123125783e-16,
+  "max_absolute_current_error_A": {
+    "i(Vn2f0)": 3.4466787063314186e-15,
+    "i(Vn2f5)": 3.4458926597563666e-15,
+    "i(Vn2f10)": 3.444971087909754e-15,
+    "i(Vn4f0)": 3.4466787063314186e-15,
+    "i(Vn4f5)": 3.4458926597563666e-15,
+    "i(Vn4f10)": 3.444971087909754e-15
+  },
+  "passed": true
+}

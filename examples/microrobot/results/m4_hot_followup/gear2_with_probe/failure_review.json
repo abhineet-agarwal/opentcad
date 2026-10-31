@@ -1,0 +1,21 @@
+{
+  "status": "REJECTED incomplete hot sensitivity; no rescue run",
+  "temperature_C": 85,
+  "PV_fit_temperature_C": 26.85,
+  "requested_stop_s": 0.0008,
+  "actual_stop_s": 0.000101757103,
+  "rows": 2230,
+  "finite": true,
+  "failure": "TRAN timestep too small6.25e-20s; node vdriverbuffer#branch; dynamicgminstepping had completed",
+  "netlist_sha256": "34a64523a4ce794020a5be5bfd9421d638fd7af813c5aa3bf81ef5c0c56fdafb",
+  "physical_failure_not_established": true,
+  "hot_leakage_estimate_available": false,
+  "last_values": {
+    "v(light)": 1.95233667,
+    "v(logic)": 3.31003755e-05,
+    "v(act)": 0.000447873263,
+    "v(ready)": 0.000182394933,
+    "v(reset_n)": 0.000161644527,
+    "v(driver_ready)": 0.000356093545
+  }
+}

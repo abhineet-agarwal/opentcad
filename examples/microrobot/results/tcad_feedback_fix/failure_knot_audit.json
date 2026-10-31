@@ -1,0 +1,163 @@
+{
+  "source": {
+    "raw_file": "examples/microrobot/local_runs/tcad_passive_adsorption/controller.dat",
+    "columns": [
+      "time",
+      "v(logic)"
+    ],
+    "PWL_file": "examples/microrobot/local_runs/tcad_feedback_fix/logic_history.spice",
+    "raw_sha256": "60c5bebe6f26885cc3bd4eb7d15f45f3d8dd220260415f37ebe367bc3c80d2f5",
+    "PWL_sha256": "71faa27e2cde3f5896f32753749144bb93e66f33d3311ac59db736f613e66ccf",
+    "format": "All original adaptive knots written17significant digits; no duplicates removed"
+  },
+  "global": {
+    "knots": 14298,
+    "intervals": 14297,
+    "min_interval_s": 1.1793146212184247e-12,
+    "max_interval_s": 2.500000000001416e-08,
+    "intervals_lt_1ns": 848,
+    "intervals_lt_10ps": 24,
+    "intervals_lt_1ps": 0,
+    "interval_quantiles_s": {
+      "1percent": 4.173264638376861e-11,
+      "median": 2.4999999999987055e-08,
+      "99percent": 2.500000000001416e-08
+    },
+    "voltage_min_max_V": [
+      -1.3145608815252066e-17,
+      1.8311362239859388
+    ],
+    "slope_min_max_V_per_s": [
+      -7065105.062994011,
+      35816.303467144586
+    ],
+    "strict_slope_sign_reversals": 45
+  },
+  "failures": {
+    "stable": {
+      "raw_file": "examples/microrobot/local_runs/tcad_feedback_fix/stable/feedback.dat",
+      "last_accepted_time_s": 6.0406096197408286e-05,
+      "nearest_knot_index": 3056,
+      "nearest_knot_time_s": 6.040609697865829e-05,
+      "last_minus_nearest_s": -7.812500036545426e-13,
+      "before_knot_time_s": 6.0405999322408287e-05,
+      "after_knot_time_s": 6.040609697865829e-05,
+      "last_minus_before_s": 9.687499999915363e-11,
+      "after_minus_last_s": 7.812500036545426e-13,
+      "neighbor_intervals": [
+        {
+          "left_knot_index": 3054,
+          "left_time_s": 6.0405950494283285e-05,
+          "right_time_s": 6.0405999322408287e-05,
+          "left_logic_V": 1.0268072876907954,
+          "right_logic_V": 1.0268088698542082,
+          "dt_s": 4.8828125001404085e-11,
+          "dV_V": 1.5821634127277662e-06,
+          "slope_V_per_s": 32402.70669173289
+        },
+        {
+          "left_knot_index": 3055,
+          "left_time_s": 6.0405999322408287e-05,
+          "right_time_s": 6.040609697865829e-05,
+          "left_logic_V": 1.0268088698542082,
+          "right_logic_V": 1.0268120341837368,
+          "dt_s": 9.765625000280817e-11,
+          "dV_V": 3.1643295286265527e-06,
+          "slope_V_per_s": 32402.734372204137
+        },
+        {
+          "left_knot_index": 3056,
+          "left_time_s": 6.040609697865829e-05,
+          "right_time_s": 6.040629229115829e-05,
+          "left_logic_V": 1.0268120341837368,
+          "right_logic_V": 1.0268183628532164,
+          "dt_s": 1.9531249999884008e-10,
+          "dV_V": 6.328669479582771e-06,
+          "slope_V_per_s": 32402.787735656224
+        },
+        {
+          "left_knot_index": 3057,
+          "left_time_s": 6.040629229115829e-05,
+          "right_time_s": 6.0406682916158286e-05,
+          "left_logic_V": 1.0268183628532164,
+          "right_logic_V": 1.0268310202357565,
+          "dt_s": 3.9062499999768015e-10,
+          "dV_V": 1.2657382540082196e-05,
+          "slope_V_per_s": 32402.899302802856
+        }
+      ],
+      "adjacent_slope_jump_V_per_s": 0.05336345208706916,
+      "minimum_accepted_dt_s": 9.765624994859806e-13,
+      "RC_control": {
+        "complete_stop_s": 0.00024999999999999995,
+        "nearest_accepted_sample_s": 6.0406096197408286e-05,
+        "sample_minus_failed_last_s": 0.0,
+        "saved_samples_across_neighborhood": 24,
+        "traversed_same_PWL_region": true
+      }
+    },
+    "stable_chgtol20": {
+      "raw_file": "examples/microrobot/local_runs/tcad_feedback_fix/stable_chgtol20/feedback.dat",
+      "last_accepted_time_s": 5.187438464295229e-05,
+      "nearest_knot_index": 2536,
+      "nearest_knot_time_s": 5.1874380736702296e-05,
+      "last_minus_nearest_s": 3.906249991167659e-12,
+      "before_knot_time_s": 5.1874380736702296e-05,
+      "after_knot_time_s": 5.187594323670229e-05,
+      "last_minus_before_s": 3.906249991167659e-12,
+      "after_minus_last_s": 1.5585937500063292e-09,
+      "neighbor_intervals": [
+        {
+          "left_knot_index": 2534,
+          "left_time_s": 5.1873208861702296e-05,
+          "right_time_s": 5.1873599486702294e-05,
+          "left_logic_V": 0.7653409287768214,
+          "right_logic_V": 0.7653524186401404,
+          "dt_s": 3.9062499999768015e-10,
+          "dV_V": 1.1489863319003035e-05,
+          "slope_V_per_s": 29414.050096822455
+        },
+        {
+          "left_knot_index": 2535,
+          "left_time_s": 5.1873599486702294e-05,
+          "right_time_s": 5.1874380736702296e-05,
+          "left_logic_V": 0.7653524186401404,
+          "right_logic_V": 0.765375398518359,
+          "dt_s": 7.812500000021366e-10,
+          "dV_V": 2.2979878218643002e-05,
+          "slope_V_per_s": 29414.2441197826
+        },
+        {
+          "left_knot_index": 2536,
+          "left_time_s": 5.1874380736702296e-05,
+          "right_time_s": 5.187594323670229e-05,
+          "left_logic_V": 0.765375398518359,
+          "right_logic_V": 0.7654213590051357,
+          "dt_s": 1.5624999999974969e-09,
+          "dV_V": 4.596048677674158e-05,
+          "slope_V_per_s": 29414.711537161736
+        },
+        {
+          "left_knot_index": 2537,
+          "left_time_s": 5.187594323670229e-05,
+          "right_time_s": 5.1879068236702295e-05,
+          "left_logic_V": 0.7654213590051357,
+          "right_logic_V": 0.7655132830040307,
+          "dt_s": 3.12500000000177e-09,
+          "dV_V": 9.192399889490499e-05,
+          "slope_V_per_s": 29415.679646352935
+        }
+      ],
+      "adjacent_slope_jump_V_per_s": 0.46741737913544057,
+      "minimum_accepted_dt_s": 2.5000000000000003e-12,
+      "RC_control": {
+        "complete_stop_s": 0.00024999999999999995,
+        "nearest_accepted_sample_s": 5.187438073670229e-05,
+        "sample_minus_failed_last_s": -3.9062499979439225e-12,
+        "saved_samples_across_neighborhood": 22,
+        "traversed_same_PWL_region": true
+      }
+    }
+  },
+  "interpretation": "Knot proximity and small intervals are associations only. Completed RC traverses the identical knots; no unique failure cause or input/solver change is established."
+}

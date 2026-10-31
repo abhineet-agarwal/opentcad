@@ -1,0 +1,56 @@
+{
+  "scope": "Distinct powerdown-prefix repeatability only; original4.5msfailureunchanged; no recovery or solver-rescue qualification",
+  "requested_stop_s": 0.0022,
+  "actual_stop_s": 0.0022,
+  "rows": 63758,
+  "wall_s": 29.23538579099113,
+  "illumination_history_s_W_m2": [
+    [
+      0,
+      0
+    ],
+    [
+      0.0001,
+      0
+    ],
+    [
+      0.001,
+      1000
+    ],
+    [
+      0.0015,
+      1000
+    ],
+    [
+      0.0016,
+      0
+    ],
+    [
+      0.0031,
+      0
+    ],
+    [
+      0.004,
+      1000
+    ],
+    [
+      0.0045,
+      1000
+    ]
+  ],
+  "netlist_sha256": "666af4d5d7ed454d4ddafd241442f92ff26e11321bdc0446c4032ce237d4a887",
+  "source_energy_nJ": {
+    "logic": 0.0417901313726533,
+    "actuator": 0.07042649451846315,
+    "clock": 0.03998205459714702,
+    "firstff": 0.000964530633366226,
+    "proxy": 0.0007491478638050385,
+    "resetlogic": 6.132358409238063e-05,
+    "monitor": 0.04005076529531311,
+    "phase": 8.02057513576188e-06,
+    "resetact": 5.4693434803453204e-05,
+    "driverbuffer": 8.819363801097723e-05
+  },
+  "logic_energy_definition": "Load-port delivery after2pF storage, not photogeneratedPVenergy",
+  "energy_method": "Signed adaptive source-port trapezoid; separate known-storage changes required"
+}

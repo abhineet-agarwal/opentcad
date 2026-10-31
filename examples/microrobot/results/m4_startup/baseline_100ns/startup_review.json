@@ -1,0 +1,195 @@
+{
+  "rows": 55503,
+  "actual_stop_s": 0.002,
+  "all_finite": true,
+  "threshold_scope": "Relative10/50/90% crossings are diagnostic thresholds, not PDK input-voltage qualification;1.5V is a provisional engineering gate only.",
+  "reset_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.000280338251,
+        "logic_V": 0.347602818,
+        "actuator_V": 0.787139809,
+        "rising": false
+      },
+      {
+        "time_s": 0.000528644236,
+        "logic_V": 1.06268803,
+        "actuator_V": 0.885135791,
+        "rising": true
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.000279878805,
+        "logic_V": 0.346248231,
+        "actuator_V": 0.782682297,
+        "rising": false
+      },
+      {
+        "time_s": 0.000528670205,
+        "logic_V": 1.06247646,
+        "actuator_V": 0.885561036,
+        "rising": true
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.000528694985,
+        "logic_V": 1.0622447,
+        "actuator_V": 0.885973974,
+        "rising": true
+      }
+    ]
+  },
+  "ready_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.000290398044,
+        "logic_V": 0.386910386,
+        "actuator_V": 1.0020421,
+        "rising": false
+      },
+      {
+        "time_s": 0.000510573531,
+        "logic_V": 1.598783,
+        "actuator_V": 1.19264917,
+        "rising": true
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.000228016111,
+        "logic_V": 0.175427646,
+        "actuator_V": 0.680304217,
+        "rising": false
+      },
+      {
+        "time_s": 0.0005248275,
+        "logic_V": 1.53435707,
+        "actuator_V": 0.807879931,
+        "rising": true
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.000529280037,
+        "logic_V": 1.06841961,
+        "actuator_V": 0.882055237,
+        "rising": true
+      },
+      {
+        "time_s": 0.000565765529,
+        "logic_V": 1.39868787,
+        "actuator_V": 1.12270985,
+        "rising": false
+      },
+      {
+        "time_s": 0.00059166172,
+        "logic_V": 1.61216558,
+        "actuator_V": 1.13367884,
+        "rising": true
+      }
+    ]
+  },
+  "clock_rising_s": [
+    0.000358769488,
+    0.000635004189,
+    0.000739545683,
+    0.000832829396,
+    0.000918365008,
+    0.000998059123,
+    0.00107468958,
+    0.00115125358,
+    0.00122781437,
+    0.00130437989,
+    0.00138094192,
+    0.00145750847,
+    0.00153407121,
+    0.00161063837,
+    0.00168720163,
+    0.00176376908,
+    0.00184033271,
+    0.00191690061,
+    0.00199346447
+  ],
+  "clock_first_rising_logic_V": 0.708357726,
+  "clock_periods_after_1ms_s": [
+    7.656399999999989e-05,
+    7.656079000000014e-05,
+    7.656551999999988e-05,
+    7.656202999999995e-05,
+    7.65665500000001e-05,
+    7.656273999999993e-05,
+    7.656716000000005e-05,
+    7.656326000000002e-05,
+    7.656744999999998e-05,
+    7.656363000000006e-05,
+    7.656789999999991e-05,
+    7.656386000000023e-05
+  ],
+  "Q_rising_s": [
+    0.000635003776,
+    0.000832829063,
+    0.000998058851,
+    0.00115125331,
+    0.00130437962,
+    0.0014575082,
+    0.00161063809,
+    0.00176376881,
+    0.00191690033
+  ],
+  "Q_first_rising_logic_V": 1.64982349,
+  "Q_periods_after_1ms_s": [
+    0.00015312631000000002,
+    0.00015312858000000006,
+    0.00015312989000000003,
+    0.00015313071999999996,
+    0.00015313152000000002
+  ],
+  "phase_A_rising_s": [
+    0.000529172954
+  ],
+  "phase_A_first_rising_logic_V": 1.06735595,
+  "phase_A_periods_after_1ms_s": [],
+  "phase_B_rising_s": [],
+  "phase_B_first_rising_logic_V": null,
+  "phase_B_periods_after_1ms_s": [],
+  "release_droop": {
+    "peak_time_s": 0.000512073531,
+    "peak_logic_V": 1.59951512,
+    "min_time_s": 0.000528703988,
+    "min_logic_V": 1.06220733,
+    "storage_energy_decrease_nJ": 0.0014301642072028858,
+    "integrated_load_energy_nJ": {
+      "logic": 0.00188007864,
+      "actuator": 0.00028594574999999994,
+      "clock": 0.00044331359899999997,
+      "ff": 1.57669059e-05,
+      "proxy": 3.8810951029999994e-05,
+      "reset": 0.0013961074961,
+      "monitor": 8.105711399999992e-05,
+      "phase": 4.246268399999997e-09
+    }
+  },
+  "reset_min_V": -0.377601343,
+  "reset_min_time_s": 0.000528536971,
+  "after_1ms": {
+    "logic_range_V": [
+      1.6801653,
+      1.82370307
+    ],
+    "reset_ratio_range": [
+      0.9986420070130843,
+      1.0054739206559864
+    ],
+    "ready_ratio_range": [
+      0.9972967533631879,
+      0.9997022496403243
+    ]
+  },
+  "limitations": [
+    "No full gait cycle or darkness/recovery",
+    "PDK clock and first DFF; later counter event models and separate digital power proxy",
+    "Thresholds are diagnostic conventions; no qualified autonomous startup acceptance"
+  ]
+}

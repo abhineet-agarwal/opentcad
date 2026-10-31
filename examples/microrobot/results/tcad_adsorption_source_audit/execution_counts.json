@@ -1,0 +1,10 @@
+{
+  "ngspice_processes": 1,
+  "explicit_OP": 1,
+  "AC": 1,
+  "AC_internal_DC_operating_point": 1,
+  "controller_transients": 0,
+  "DC_sweeps": 0,
+  "DD": 0,
+  "layout": 0
+}

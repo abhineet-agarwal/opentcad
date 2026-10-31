@@ -1,0 +1,9 @@
+{
+  "byte_identical": true,
+  "deck_sha256": {
+    "legacy_default": "2c841115b0494257ac23fdf4aca7c278fb09f284f65e6f0ab7841818e6f846b6",
+    "legacy_no_dark": "fcc555d75423c0e6c041ecfce8abd56c36b9372015f0758aa60c7a5d7eca44b8",
+    "diagnostic_default": "9d2eea50c8e5face12adcf7467783326f4bad4b56aeff04c1b1c05c6aa503d41",
+    "diagnostic_qualified_lvt": "40204ff3358e0b01b7bf9ce6d3e948f491d74d3b2549dbec04d8820b64a7096a"
+  }
+}

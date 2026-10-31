@@ -1,0 +1,8 @@
+{
+  "scope": "Analysis-only correction; rawwaveform/netlist unchanged",
+  "prior_matching_s": 1e-06,
+  "final_fixed_matching_s": 5e-07,
+  "rail_reset_guard_unchanged_s": 1e-06,
+  "superseded_local_record": "analysis_history/edge_review_initial_1us_superseded.json",
+  "reason": "Use coordinator-approved fixed criterion; no simulation repeated"
+}

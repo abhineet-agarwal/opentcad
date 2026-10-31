@@ -1,0 +1,114 @@
+{
+  "scope": "Isolated native OP/AC audit of exact adsorption current expressions.",
+  "cases": [
+    {
+      "name": "zero",
+      "m": 0.0,
+      "x": 0.0,
+      "s": 0.0,
+      "qmax": "260p"
+    },
+    {
+      "name": "working_peak_eta",
+      "m": 0.6865977325417372,
+      "x": 0.6865792101148668,
+      "s": 0.6865792049215286,
+      "qmax": "260p",
+      "saved_row": 1388,
+      "saved_time_s": 3.384804687500059e-05,
+      "saved_columns": [
+        "v(ea)",
+        "v(ta)",
+        "v(sa)"
+      ]
+    },
+    {
+      "name": "working_last",
+      "m": 0.9211514149872583,
+      "x": 0.9211393411916292,
+      "s": 0.9211392476169885,
+      "qmax": "260p",
+      "saved_row": 8514,
+      "saved_time_s": 0.00015154115448994557,
+      "saved_columns": [
+        "v(ea)",
+        "v(ta)",
+        "v(sa)"
+      ]
+    },
+    {
+      "name": "return_last",
+      "m": 0.9211512474081133,
+      "x": 0.9211536621826445,
+      "s": 0.9211536808971481,
+      "qmax": "2600p",
+      "saved_row": 8514,
+      "saved_time_s": 0.00015154115448994557,
+      "saved_columns": [
+        "v(er)",
+        "v(tr)",
+        "v(sr)"
+      ]
+    },
+    {
+      "name": "working_last_common_mode_shift",
+      "m": 0.4211514149872583,
+      "x": 0.4211393411916292,
+      "s": 0.4211392476169885,
+      "qmax": "260p",
+      "saved_row": 8514,
+      "saved_time_s": 0.00015154115448994557,
+      "saved_columns": [
+        "v(ea)",
+        "v(ta)",
+        "v(sa)"
+      ],
+      "common_mode_shift_V": -0.5
+    },
+    {
+      "name": "nonlinear_eta_0p16",
+      "m": 0.56,
+      "x": 0.4,
+      "s": 0.4,
+      "qmax": "260p"
+    }
+  ],
+  "exact_laws": {
+    "resistor": "Rads metal adsnode {tau*4*width/qmax}",
+    "linear_B": "Bads_linear metal adsnode I={qmax/(4*width*tau)*v(metal,adsnode)}",
+    "stable_B": "Bads_stable metal adsnode I={qmax/(4*width*tau)*(v(metal,adsnode)-offset+2*width*ads_c((v(metal,solution)-offset)/(2*width)))}"
+  },
+  "source_deck_sha256": {
+    "resistor": "b7e4e306190e3884791fcfc2e7b19a45f2f20f07ce10864f0857a79ee861dbd7",
+    "linear_B": "8479caf73f917236d263c0822ea3245fbb785305bfb3b63102b4eda149f87291",
+    "stable_B": "0d44de1af9dc2f32509abb28ce3f8acb07202d53a615247d7fb22a042db31243"
+  },
+  "saved_trace_sha256": "91ff828c796a3203367386478d396e1294818ca5fdd69d0881fca6271f9c8352",
+  "thresholds": {
+    "DC_abs_A": 1e-22,
+    "DC_rel": 1e-10,
+    "AC_abs_S": 1e-20,
+    "AC_rel": 1e-08,
+    "input_voltage_abs_V": 1e-12,
+    "imaginary_current_abs_A_per_V": 1e-20
+  },
+  "AC_frequency_Hz": 1,
+  "AC_input": "Each isolated clone has one independent1V input; othersAC0",
+  "probe_sign": "Vp from metal-drive node into branch metal; I(Vp)>0 is metal\u2192state current",
+  "manual": {
+    "url": "https://ngspice.sourceforge.io/docs/ngspice-44-manual.pdf",
+    "sections": "5.1.1 (printed page106),1.2.2 (page40)",
+    "meaning": "B-source AC coefficients are derivatives at the DC operating point; unity excitation gives the partial directly"
+  },
+  "limit": "Only isolated branch law/linearization; no coupled controller transient, capacitance dynamics or root-cause inference",
+  "source_dependency_sha256": {
+    "examples/microrobot/tcad_adsorption_source_audit.py": "e2162f5501e47df3119b52afbb4e0f4763dff9a4f22fda0673a38895a4d83d55",
+    "tests/integration/test_tcad_adsorption_source_audit.py": "9aa8d295333a6dab91bdcf9e1422c47972e918c92336fa9b450325a844990bc4",
+    "examples/microrobot/tcad_controller.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4"
+  },
+  "installed_ngspice": {
+    "path": "/opt/homebrew/Cellar/ngspice/44.2/bin/ngspice",
+    "sha256": "defef9f2c390313b4a4e93ddef551b3b6c4f38caeee67e4c3445212ac88aaeec",
+    "version_from_execution_log": "44.2"
+  }
+}

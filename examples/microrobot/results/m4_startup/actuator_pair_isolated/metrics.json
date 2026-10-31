@@ -1,0 +1,32 @@
+{
+  "status": "Isolated exploratory actuator receiver; no integrated qualification",
+  "stop_requested_s": 0.0003,
+  "stop_achieved_s": 0.0003,
+  "finite_rows": 6239,
+  "wall_s": 57.920362208009465,
+  "actuator_supply_V": 1.2,
+  "raw_input_high_V": 1.7,
+  "imposed_input_ramp_s": 0.0001,
+  "load_F": 1.9e-13,
+  "native_reset_provisional_release_raw_V": 1.53,
+  "rise_raw_at_out_0.1_V": 0.46782139544307944,
+  "rise_raw_at_out_0.5_V": 0.47023230187697723,
+  "rise_raw_at_out_0.9_V": 0.47154527191703327,
+  "rise_10_90_s": 2.1905160239669828e-07,
+  "rise_actuator_energy_J": 3.097631982993199e-13,
+  "rise_peak_supply_current_A": 1.30159934e-06,
+  "fall_raw_at_out_0.1_V": 0.4150578779611357,
+  "fall_raw_at_out_0.5_V": 0.4161409793768402,
+  "fall_raw_at_out_0.9_V": 0.41819583742400873,
+  "fall_10_90_s": 1.845861188066165e-07,
+  "fall_actuator_energy_J": 4.164524510963977e-14,
+  "fall_peak_supply_current_A": 8.53493452e-09,
+  "total_actuator_energy_J": 3.51655037086173e-13,
+  "input_port_energy_J": 9.083053882513825e-18,
+  "output_minmax_V": [
+    -0.000343764459,
+    1.20049534
+  ],
+  "hold_high_mean_supply_current_A": 2.6664009533333333e-12,
+  "hold_low_mean_supply_current_A": 2.5074671651870324e-12
+}

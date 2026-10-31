@@ -1,0 +1,76 @@
+{
+  "precision_decimal_digits": 80,
+  "grid_cases": 684,
+  "z_values": [
+    -20,
+    -5,
+    -1,
+    -0.01,
+    -0.00100000001,
+    -0.001,
+    -0.00099999999,
+    -1e-06,
+    -1e-12,
+    0,
+    1e-12,
+    1e-06,
+    0.00099999999,
+    0.001,
+    0.00100000001,
+    0.01,
+    1,
+    5,
+    20
+  ],
+  "offsets_V": [
+    -0.1,
+    0,
+    0.05
+  ],
+  "coverage_grid": [
+    0,
+    0.5,
+    1
+  ],
+  "solution_common_modes_V": [
+    0,
+    0.93
+  ],
+  "max_current_error_A": 1.93592314459887e-22,
+  "max_voltage_offset_partial_error_A_per_V": 4.911071109400254e-23,
+  "max_tau_partial_error_A_per_s": 9.679615722994349e-21,
+  "partials_checked": [
+    "metal",
+    "solution",
+    "state",
+    "offset",
+    "tau"
+  ],
+  "crossover": 0.001,
+  "ninth_derivative_polynomial_coefficients": [
+    7936,
+    0,
+    -176896,
+    0,
+    814080,
+    0,
+    -1491840,
+    0,
+    1209600,
+    0,
+    -362880
+  ],
+  "uniform_remainder_derivation": "|tanh z|<=|z|; tanh^(9)=P9(tanh z), so M9=sum|P9k|r^k. Taylor through degree8 bounds c-p7 by M9*r^9/9! and cprime-p7prime by M9*r^8/8!. Floating arithmetic has separately measured error.",
+  "uniform_c_remainder_bound": "2.1869976016352737797181463845797178130511463844797178130511463844797178130511464E-29",
+  "uniform_cprime_remainder_bound": "1.9682978414717464017463317461217460317460317460317460317460317460317460317460317E-25",
+  "high_precision_sample_max_c_remainder": "2.186947967292326504625365835691248192936199347245330994396825E-29",
+  "high_precision_sample_max_cprime_remainder": "1.9682529932985269411530107580771820607055591520352547924534710E-25",
+  "float_c_switch_gap": 1.7800616589411448e-20,
+  "float_cprime_switch_gap": 6.118330736254625e-18,
+  "boundary_signs_pass": true,
+  "partial_method": "Symbolic piecewise-expression voltage/offset partials in float64, including outside-branch subtraction; native automatic derivatives are not separately instrumented",
+  "native_syntax": "ngspice .func, abs, ternary, multiplication and tanh; no extra native preflight run",
+  "passed": true,
+  "boundary_sign_numerical_tolerance_A": 1e-21,
+  "boundary_grid_note": "Requested theta boundaries can shift by a floating-node-construction ulp; sign check uses explicit absolute current tolerance. Offline floating errors apply to the stated finite grid, not every possible input."
+}

@@ -1,0 +1,21 @@
+{
+  "focused_tests": {
+    "command": "MPLCONFIGDIR=/tmp/opentcad-mpl .venv/bin/python -m pytest tests/integration/test_tcad_controller.py -q",
+    "passed": 7,
+    "seconds": 2.2,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed for new module, focused tests and saved-data audit",
+  "full_suite_run": false,
+  "plot_visual_check": "Viewed five-panel partial prefix; legible labels, no sustained phase or mechanical behavior established",
+  "timestamp_correction": "Original runner wrote current UTC after subprocess return under started_UTC. Relabeled completed_UTC in execution records and nested source-validation copies; original runner preserved in runner_as_executed.py. Final module fixes label only; no new simulation.",
+  "counts": {
+    "source_native_DC_runs": 2,
+    "nominal_transients": 1,
+    "fine_transients": 0,
+    "rescue_runs": 0
+  },
+  "raw_exported": false,
+  "runner_as_executed_sha256": "e98a35ec487e20b02995a5cb651288b531e7670d5277a71149f1e9e6dafc6120",
+  "runner_final_sha256": "305aa18dc646287e36b1cfbd2e315fb7baa29b522c33387e64e07d7f3d87426d"
+}

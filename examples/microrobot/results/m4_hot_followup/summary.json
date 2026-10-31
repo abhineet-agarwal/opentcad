@@ -1,0 +1,31 @@
+{
+  "scope": "Supplement after frozen M4 17-case archive/670-file-hash export; no changes to that snapshot",
+  "status": "Hot numerical branch stopped after bounded failures; no hot qualification",
+  "raw_data_bundled": false,
+  "cases": {
+    "gear2_with_probe": {
+      "raw_local_directory": "examples/microrobot/local_runs/driver_ready_qualified_lvt_control/finite_pv_hot85_08ms",
+      "actual_stop_s": 0.000101757103,
+      "requested_stop_s": 0.0008,
+      "rows": 2230,
+      "netlist_sha256": "34a64523a4ce794020a5be5bfd9421d638fd7af813c5aa3bf81ef5c0c56fdafb",
+      "physical_failure_not_established": true
+    },
+    "gear2_without_probe": {
+      "raw_local_directory": "examples/microrobot/local_runs/driver_ready_qualified_lvt_control/finite_pv_hot85_no_probe_08ms",
+      "actual_stop_s": 8.12994395e-05,
+      "requested_stop_s": 0.0008,
+      "rows": 1778,
+      "netlist_sha256": "a9ae0c47b8147aae2af52d1e11c99ca48af4544ee4e6dcab1cbd00e694344454",
+      "physical_failure_not_established": true
+    },
+    "gear1_with_probe_50ns": {
+      "raw_local_directory": "examples/microrobot/local_runs/m4_hot_gear1_followup/gear1_50ns",
+      "actual_stop_s": 0.000101750561,
+      "requested_stop_s": 0.0008,
+      "rows": 3734,
+      "netlist_sha256": "787c0786c0ca15b746fc11a688148db3d54c9124d2c66b1a3c90ae18eb15e9b3",
+      "physical_failure_not_established": true
+    }
+  }
+}

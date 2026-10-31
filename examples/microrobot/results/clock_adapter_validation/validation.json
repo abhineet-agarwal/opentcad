@@ -1,0 +1,99 @@
+{
+  "recorded_at_utc": "2026-10-29T22:48:18.454047+00:00",
+  "scope": "Adapter closure for already reviewed transient guards, optional bias probe, exact installed notice and supplied-netlist metadata. Focused synthetic/software validation only; final acceptance belongs to Astra.",
+  "status": "focused_and_full_suite_checks_passed_final_acceptance_pending_astra",
+  "source_edits_this_closure": [],
+  "test_edits": [
+    "tests/integration/test_clock_completion.py"
+  ],
+  "verified_existing_adapter_behavior": [
+    "Reject simulator abort text even with exit status zero and a complete final timestamp.",
+    "Reject incomplete/overshoot time, nonfinite data, wrong column count, one-row data, backwards time, late or negative start before metrics or preview emission.",
+    "Accept endpoint rounding within rtol=1e-8 and atol=1e-12; tested +/-4 ps at requested 4 ms.",
+    "Optional measure_bias_current=False removes only internal Vbias probe, expects eight columns, and records bias reference power as null/unavailable while preserving whole-clock and receiver power.",
+    "Canonical schematic routing limitation is conditional; caller-supplied netlist coverage follows its provenance without filename inference.",
+    "Receiver cells retain the complete installed preamble before the first subcircuit."
+  ],
+  "executed_checks": [
+    {
+      "command": ".venv/bin/python -m ruff check examples/microrobot/clock.py tests/integration/test_clock_completion.py",
+      "exit_code": 0,
+      "result": "All checks passed"
+    },
+    {
+      "command": ".venv/bin/python -m pytest tests/integration/test_clock_completion.py tests/integration/test_microrobot.py",
+      "exit_code": 0,
+      "passed": 19,
+      "failed": 0,
+      "adapter_passed": 14,
+      "microrobot_passed": 5,
+      "reported_elapsed_s": 4.89
+    },
+    {
+      "command": "git diff --check -- examples/microrobot/clock.py tests/integration/test_clock_completion.py",
+      "exit_code": 0
+    },
+    {
+      "command": "Read-only Python verification of actual clock.py preamble assignments against installed SKY130 HD source",
+      "exit_code": 0,
+      "preamble_bytes": 631,
+      "preamble_sha256": "52ecc6a8bd8e0f8ae4d80a1907d9898a4c24224eca2b9ce23235fcb9cf8c5996",
+      "selected_receiver_cells_sha256": "ccc2090db2ee04c1370e33e07c95be0f4b2276e0c1b9ad1426a27eeaacd291ef"
+    }
+  ],
+  "synthetic_numerical_evidence": {
+    "requested_stop_s": 0.004,
+    "nominal_rows": 4001,
+    "nominal_columns_with_bias_probe": 9,
+    "nominal_columns_without_bias_probe": 8,
+    "supply_V": 1.8,
+    "whole_clock_current_A": 3e-08,
+    "receiver_current_A": 1e-09,
+    "bias_probe_current_A": 5e-09,
+    "asserted_total_power_W": 5.58e-08,
+    "asserted_whole_clock_power_W": 5.4e-08,
+    "asserted_receiver_power_W": 1.8e-09,
+    "asserted_bias_probe_power_W": 9e-09,
+    "bias_power_without_probe": null,
+    "rejected_incomplete_stop_s": 0.003999,
+    "rejected_overshoot_stop_s": 0.004001,
+    "accepted_endpoint_rounding_offsets_s": [
+      -4e-12,
+      4e-12
+    ]
+  },
+  "file_sha256": {
+    "examples/microrobot/clock.py": "9570b1ea37c4babed418494162337b98ba6e81052d9a046a353085f28bbc4be5",
+    "tests/integration/test_clock_completion.py": "0918cf65ec949e88fdb03c36aa7a6a44a5bc780011be1d353d8b6490fffaabea",
+    "examples/microrobot/circuits/starved_clock.spice": "dc606bcaa35616e6412c2b8d8c63e17175f6b53d6baad820a222b66b74dc29de"
+  },
+  "milestone3_manifest_read_only_audit": {
+    "path": "examples/microrobot/results/milestone3_manifest.json",
+    "clock_workflow_matches": true,
+    "canonical_circuit_matches": true,
+    "historical_clock_workflow_sha256": {
+      "clock.py_before_completion_optional_bias_probe": "38b3f22b7c3c8ed95e788630cba99e623e550fc719cb97af97bbcc570dc9752e",
+      "clock.py_before_netlist_coverage_metadata": "64323101544de51575a1e4a4fb251de9820d3c2e5b784d5b9e418f8df0dc7b77"
+    },
+    "required_action": "None for this closure: current adapter hash already matches; preserve historical workflow hashes and no-rerun note."
+  },
+  "installed_cell_source": "/usr/local/share/pdk/sky130A/libs.ref/sky130_fd_sc_hd/spice/sky130_fd_sc_hd.spice",
+  "limitations": [
+    "All clock adapter outputs in focused tests are synthetic; they do not establish physical clock frequency, PVT behavior, extraction coverage or PV power feasibility.",
+    "No circuit, layout or notebook was launched; the separate physical/electrical evidence task owns those results.",
+    "No clock.py, canonical circuit, shared manifest or shared documentation edits were made during this closure; earlier reviewed source changes were verified in place.",
+    "No publish, push, commit or fabrication action was performed."
+  ],
+  "full_suite_checkpoint": {
+    "record": "examples/microrobot/results/clock_adapter_validation/full_suite_checkpoint.json",
+    "log": "examples/microrobot/results/clock_adapter_validation/full_pytest.log",
+    "python_version": "3.14.2",
+    "passed": 220,
+    "failed": 0,
+    "skipped": 0,
+    "warnings": 1,
+    "pytest_duration_s": 109.11,
+    "source_changes_during_run": [],
+    "status": "passed_final_acceptance_pending_astra"
+  }
+}

@@ -1,0 +1,25 @@
+{
+  "status": "REJECTED incomplete Gear1 hot numerical control; branch stopped; no25ns attempt",
+  "scope": "Post-frozen-snapshot numerical damping follow-up, not a physical fix",
+  "temperature_C": 85,
+  "PV_fit_temperature_C": 26.85,
+  "requested_stop_s": 0.0008,
+  "actual_stop_s": 0.000101750561,
+  "rows": 3734,
+  "finite": true,
+  "netlist_sha256": "787c0786c0ca15b746fc11a688148db3d54c9124d2c66b1a3c90ae18eb15e9b3",
+  "last_values": {
+    "v(light)": 1.94506753,
+    "v(logic)": 3.30366432e-05,
+    "v(act)": 0.000447016812,
+    "v(ready)": 0.000182044129,
+    "v(reset_n)": 0.000161324638,
+    "v(driver_ready)": 0.000355409745,
+    "v(clk)": 1.84592601e-05,
+    "v(q0)": 2.01643987e-05
+  },
+  "physical_failure_not_established": true,
+  "powered_leakage_or_startup_qualification_available": false,
+  "failure": "TRAN timestep too small6.25e-20s; node vdriverbuffer#branch; dynamicgminstepping completed",
+  "only_change_from_original": "maxord2 to1; all probes and physical topology retained"
+}

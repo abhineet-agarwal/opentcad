@@ -1,0 +1,17 @@
+{
+  "tests": {
+    "passed": 10,
+    "seconds": 2.15,
+    "simulator_calls": 0,
+    "scope": "Contract/reference state and deck preservation; no simulated ON/OFF/restart qualification"
+  },
+  "ruff": "All checks passed",
+  "full_suite_run": false,
+  "plot_visual_check": "Viewed five-panel plot; partial prefix, held-off controls and absence of useful phase/actuator behavior are visible",
+  "source_expressions_unchanged": true,
+  "initial_evidence_preserved": true,
+  "one_transient_only": true,
+  "no_additional_source_DC_or_DD_or_layout_runs": true,
+  "raw_transients_exported": false,
+  "scope": "Reviewed and accepted as failed functional-supervisor control evidence; end-to-end operation remains unvalidated. Prefix energy and assumed curvature do not validate complete operation."
+}

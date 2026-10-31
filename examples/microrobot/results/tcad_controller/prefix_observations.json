@@ -1,0 +1,53 @@
+{
+  "scope": "Saved prefix only; no physical root cause or sustained behavior inferred",
+  "trouble_equation": "vreturn#branch",
+  "last_time_s": 8.75048974811126e-05,
+  "finite": true,
+  "shape": [
+    5482,
+    50
+  ],
+  "rail_reset_ranges": {
+    "logic": {
+      "minimum_V": -4.036556710309184e-17,
+      "maximum_V": 1.6293614624669321,
+      "final_V": 1.590415911396509
+    },
+    "act": {
+      "minimum_V": -6.840040842546456e-14,
+      "maximum_V": 1.6135330231281162,
+      "final_V": 1.6135241269761715
+    },
+    "mid": {
+      "minimum_V": -1.9416424927094713e-13,
+      "maximum_V": 0.8067557774234958,
+      "final_V": 0.8067512195147478
+    },
+    "ready": {
+      "minimum_V": -4.7058413263239895e-05,
+      "maximum_V": 0.23426108728380735,
+      "final_V": -4.0203200014192025e-05
+    },
+    "reset_n": {
+      "minimum_V": -0.0012139101597293542,
+      "maximum_V": 0.2698963026496727,
+      "final_V": -0.0012139101597293542
+    },
+    "driver_ready": {
+      "minimum_V": -0.00013636113869511428,
+      "maximum_V": 0.3272152767071561,
+      "final_V": -5.6965413503415735e-06
+    }
+  },
+  "early_release_definition": "act >= 0.5 V AND driver_ready > act/2 AND logic < 1.4 V; sampled interval bounds",
+  "early_release_intervals": [
+    {
+      "first_saved_s": 2.042793668333567e-05,
+      "last_saved_s": 2.1302936683335693e-05,
+      "samples": 36,
+      "logic_min_V": 0.07399990341458036,
+      "logic_max_V": 0.08434691690321215
+    }
+  ],
+  "supply_energy_relative_residual": 1.7471368819157346e-05
+}

@@ -35,8 +35,9 @@ def run_deck(destination, deck, *, filename="bench.spice", timeout=180):
     result = subprocess.run(
         [executable, "-b", filename], cwd=dest, capture_output=True, text=True, timeout=timeout
     )
-    (dest / "ngspice.log").write_text(result.stdout + result.stderr)
-    if result.returncode:
+    log = result.stdout + result.stderr
+    (dest / "ngspice.log").write_text(log)
+    if result.returncode or "simulation(s) aborted" in log or "doAnalyses:" in log:
         raise RuntimeError(f"ngspice failed; see {dest / 'ngspice.log'}")
     return dest
 
@@ -196,7 +197,7 @@ quit
     (dest / "metrics.json").write_text(json.dumps(metrics, indent=2) + "\n")
     names = "time_s,act_V,mid_V,logic_V,ready_V,phase_A_V,phase_B_V,electrode_A_V,electrode_B_V,solution_A_V,solution_B_V,bulk_V,theta_A,theta_B,actuator_rail_A,logic_A,pv_lower_A,pv_upper_A,phase_A_A,phase_B_A,ready_A"
     np.savetxt(
-        dest / "waveform.csv",
+        dest / "waveform.csv.gz",
         data[:: max(1, len(data) // 2000)],
         delimiter=",",
         header=names,
@@ -206,9 +207,10 @@ quit
 
 
 def brownout_case(
-    destination, *, corner="tt", temperature_C=26.85, actuator_V=1.245, timestep_s=20e-6
+    destination, *, corner="tt", temperature_C=26.85, actuator_V=1.245, timestep_s=20e-6,
+    circuit_path=None,
 ):
-    circuit = (HERE / "circuits/brownout_candidate.spice").read_text()
+    circuit = Path(circuit_path or HERE / "circuits/brownout_candidate.spice").read_text()
     deck = (
         header(corner, temperature_C)
         + circuit
@@ -266,7 +268,7 @@ quit
     )
     (dest / "metrics.json").write_text(json.dumps(result, indent=2) + "\n")
     np.savetxt(
-        dest / "waveform.csv",
+        dest / "waveform.csv.gz",
         data[:: max(1, len(data) // 1500)],
         delimiter=",",
         header="time_s,logic_V,bias_n_V,ready_V,reference_V,sense_V,actuator_current_A",
@@ -275,7 +277,7 @@ quit
     return result, data
 
 
-def run(destination=HERE / "results/electrical_v2"):
+def run(destination=HERE / "local_runs/electrical_v2"):
     dest = Path(destination)
     drivers = []
     nominal = None
@@ -344,5 +346,5 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=HERE / "results/electrical_v2")
+    parser.add_argument("--output", type=Path, default=HERE / "local_runs/electrical_v2")
     run(parser.parse_args().output)

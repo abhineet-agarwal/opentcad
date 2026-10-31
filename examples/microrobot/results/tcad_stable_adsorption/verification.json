@@ -1,0 +1,24 @@
+{
+  "tests": {
+    "passed": 2,
+    "seconds": 1.46,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "exact_bounded_transformation_verified": true,
+  "offline_precision_current_partials_remainder_pass": true,
+  "native_syntax_executed": true,
+  "native_automatic_derivatives_separately_verified": false,
+  "counts": {
+    "transients": 1,
+    "fine": 0,
+    "rescue": 0,
+    "DC": 0,
+    "DD": 0,
+    "layout": 0
+  },
+  "raw_exported": false,
+  "peak_local_current_discrepancy_A": 2.4179410839081297e-13,
+  "scope": "Failed startup prefix despite passed offline expression checks; no unique cause, simulator-defect, exact-conservation or released-operation conclusion",
+  "review_acceptance": "Reviewed and accepted as failed stable nonlinear-formulation evidence; native startup and end-to-end actuation remain unvalidated."
+}

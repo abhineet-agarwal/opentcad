@@ -1,0 +1,590 @@
+{
+  "scope": "All observed native threshold edges; no recovery claim",
+  "qualified_logic_floor_V": 1.6,
+  "reset_high_ratio": 0.9,
+  "guard_s": 1e-06,
+  "guard_definition": "\u00b11us around logic1.6V crossings or native reset10/90% crossings atlogic>=1V; exclusions reported",
+  "Q_matching_window_s": 5e-07,
+  "reset_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.00011404132787444769,
+        "rising": true,
+        "logic_V": 0.002112202428297392,
+        "actuator_V": 0.029123158494555323
+      },
+      {
+        "time_s": 0.0001738216169943674,
+        "rising": false,
+        "logic_V": 0.05837875771683013,
+        "actuator_V": 0.7457094995477852
+      },
+      {
+        "time_s": 0.0005139079591951838,
+        "rising": true,
+        "logic_V": 1.560822782626109,
+        "actuator_V": 1.1915906847559947
+      },
+      {
+        "time_s": 0.0005163888204035234,
+        "rising": false,
+        "logic_V": 1.5433131276534757,
+        "actuator_V": 1.1862051425918119
+      },
+      {
+        "time_s": 0.0005238715564131163,
+        "rising": true,
+        "logic_V": 1.5300915112920057,
+        "actuator_V": 1.189781221808626
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.00013218337491705779,
+        "rising": true,
+        "logic_V": 0.011095844750321292,
+        "actuator_V": 0.1536890267253737
+      },
+      {
+        "time_s": 0.0001737405012980402,
+        "rising": false,
+        "logic_V": 0.058269325256289015,
+        "actuator_V": 0.7444041293529355
+      },
+      {
+        "time_s": 0.0005294920907799519,
+        "rising": true,
+        "logic_V": 1.5536993967116075,
+        "actuator_V": 1.0507592478854528
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.0001441207799677044,
+        "rising": true,
+        "logic_V": 0.020877653803683716,
+        "actuator_V": 0.2891626841419929
+      },
+      {
+        "time_s": 0.00017369000443482273,
+        "rising": false,
+        "logic_V": 0.05820291164266065,
+        "actuator_V": 0.7435994152740537
+      },
+      {
+        "time_s": 0.0005346977990867369,
+        "rising": true,
+        "logic_V": 1.5776373137535196,
+        "actuator_V": 1.0355733263195173
+      }
+    ]
+  },
+  "monitor_ready_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.00011228157704824795,
+        "rising": true,
+        "logic_V": 0.00161597941448856,
+        "actuator_V": 0.022267561196797046
+      },
+      {
+        "time_s": 0.0001742319971432893,
+        "rising": false,
+        "logic_V": 0.05899981924835434,
+        "actuator_V": 0.7531596915873346
+      },
+      {
+        "time_s": 0.0005089592362407583,
+        "rising": true,
+        "logic_V": 1.5746962365864607,
+        "actuator_V": 1.1920311995099269
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.0005288917008750859,
+        "rising": true,
+        "logic_V": 1.550917845915645,
+        "actuator_V": 1.053350955498149
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.0005323512284230248,
+        "rising": true,
+        "logic_V": 1.5653559967873958,
+        "actuator_V": 0.9939974718240988
+      }
+    ]
+  },
+  "driver_ready_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.00010912422592864903,
+        "rising": true,
+        "logic_V": 0.000891947197337738,
+        "actuator_V": 0.012274352691372394
+      },
+      {
+        "time_s": 0.00016139092891474775,
+        "rising": false,
+        "logic_V": 0.04042011773895689,
+        "actuator_V": 0.5342838671653766
+      },
+      {
+        "time_s": 0.000527463140271944,
+        "rising": true,
+        "logic_V": 1.5445108472030753,
+        "actuator_V": 1.1828270960106193
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.00012035092056306687,
+        "rising": true,
+        "logic_V": 0.004436798939605548,
+        "actuator_V": 0.0612852402650315
+      },
+      {
+        "time_s": 0.0001567874896138708,
+        "rising": false,
+        "logic_V": 0.03458607220369463,
+        "actuator_V": 0.4683769713854533
+      },
+      {
+        "time_s": 0.0005275232933049134,
+        "rising": true,
+        "logic_V": 1.544770119741038,
+        "actuator_V": 1.1713435628514322
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.0005275782004975133,
+        "rising": true,
+        "logic_V": 1.5449881896462303,
+        "actuator_V": 1.0455091093901412
+      }
+    ]
+  },
+  "logic_engineering1p5V_crossings": [
+    {
+      "time_s": 0.000485504348670194,
+      "rising": true,
+      "logic_V": 1.5,
+      "actuator_V": 1.1927753304479718
+    },
+    {
+      "time_s": 0.0016428886322838994,
+      "rising": false,
+      "logic_V": 1.5000000000000002,
+      "actuator_V": 0.8899382528737918
+    }
+  ],
+  "qualified_rail_crossings": [
+    {
+      "time_s": 0.0005386469510866228,
+      "rising": true,
+      "logic_V": 1.6,
+      "actuator_V": 1.0689814140885416
+    },
+    {
+      "time_s": 0.00160330069707634,
+      "rising": false,
+      "logic_V": 1.6,
+      "actuator_V": 0.9333645830687601
+    }
+  ],
+  "clock_edges": [
+    {
+      "time_s": 0.000185816426818168,
+      "rising": true,
+      "logic_V": 0.07881765451883715,
+      "actuator_V": 0.9771820614792951,
+      "reset_ratio": 2.088019630818248e-05,
+      "classification": "low_rail_not_qualified"
+    },
+    {
+      "time_s": 0.0002695211316186522,
+      "rising": false,
+      "logic_V": 0.3077697493531184,
+      "actuator_V": 1.1428436199163319,
+      "reset_ratio": 2.9433722892576564e-07,
+      "classification": "low_rail_not_qualified"
+    },
+    {
+      "time_s": 0.00035845680158006296,
+      "rising": true,
+      "logic_V": 0.7081750007864497,
+      "actuator_V": 1.168654969448431,
+      "reset_ratio": 1.7127862768483128e-07,
+      "classification": "low_rail_not_qualified"
+    },
+    {
+      "time_s": 0.0005164104965592772,
+      "rising": false,
+      "logic_V": 1.541015940627598,
+      "actuator_V": 1.185594120134559,
+      "reset_ratio": 0.01619467388299009,
+      "classification": "low_rail_not_qualified"
+    },
+    {
+      "time_s": 0.0005958475794864426,
+      "rising": true,
+      "logic_V": 1.643014226104326,
+      "actuator_V": 1.075859864683661,
+      "reset_ratio": 1.0064069416991694,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        2
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0006561802442153246,
+      "rising": false,
+      "logic_V": 1.6784361832414572,
+      "actuator_V": 1.1243409713244725,
+      "reset_ratio": 1.0056354575480713,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0007047392094815399,
+      "rising": true,
+      "logic_V": 1.662062995307682,
+      "actuator_V": 1.1505113002319343,
+      "reset_ratio": 1.01255521301159,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        3
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0007578092530064782,
+      "rising": false,
+      "logic_V": 1.6962352043470366,
+      "actuator_V": 1.166409868190652,
+      "reset_ratio": 1.005712287113135,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0008012543339757483,
+      "rising": true,
+      "logic_V": 1.67865777815584,
+      "actuator_V": 1.1793099003476306,
+      "reset_ratio": 1.006671485798749,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        4
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0008492473056479134,
+      "rising": false,
+      "logic_V": 1.709945478664094,
+      "actuator_V": 1.1880045608883376,
+      "reset_ratio": 1.005817191947568,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0008891136378655037,
+      "rising": true,
+      "logic_V": 1.6904214126330064,
+      "actuator_V": 1.1964735586550366,
+      "reset_ratio": 1.0127207443981558,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        5
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0009334473779761667,
+      "rising": false,
+      "logic_V": 1.721109530102235,
+      "actuator_V": 1.2021253683200925,
+      "reset_ratio": 1.0058600450707609,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0009705833445699942,
+      "rising": true,
+      "logic_V": 1.701648234913371,
+      "actuator_V": 1.2083355260998003,
+      "reset_ratio": 1.006872095042544,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        6
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0010120741094569914,
+      "rising": false,
+      "logic_V": 1.7298040747809609,
+      "actuator_V": 1.2112772743479967,
+      "reset_ratio": 1.0059368874079018,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0010476227484843813,
+      "rising": true,
+      "logic_V": 1.7052116944759157,
+      "actuator_V": 1.213289657671939,
+      "reset_ratio": 1.0128097352392371,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        7
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0010885475444398001,
+      "rising": false,
+      "logic_V": 1.7298948078769831,
+      "actuator_V": 1.2133006228879601,
+      "reset_ratio": 1.005910339009733,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0011240745637756905,
+      "rising": true,
+      "logic_V": 1.7060036208974405,
+      "actuator_V": 1.2150624373517465,
+      "reset_ratio": 1.006904692750698,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        8
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0011649823751693042,
+      "rising": false,
+      "logic_V": 1.7298987956247878,
+      "actuator_V": 1.2149589210338607,
+      "reset_ratio": 1.0059332670050267,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0012005232669851003,
+      "rising": true,
+      "logic_V": 1.705212646533009,
+      "actuator_V": 1.2166013375226357,
+      "reset_ratio": 1.012807669509388,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        9
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0012414484370429947,
+      "rising": false,
+      "logic_V": 1.7298902227057917,
+      "actuator_V": 1.2163023678404992,
+      "reset_ratio": 1.0059081390860547,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0012769767879597554,
+      "rising": true,
+      "logic_V": 1.7060058033445427,
+      "actuator_V": 1.2177470683902165,
+      "reset_ratio": 1.0069016097614136,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        10
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.001317884785796545,
+      "rising": false,
+      "logic_V": 1.7298937153359,
+      "actuator_V": 1.217399401159309,
+      "reset_ratio": 1.0059319664701578,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0013534267506411434,
+      "rising": true,
+      "logic_V": 1.705215589235054,
+      "actuator_V": 1.2187894899584817,
+      "reset_ratio": 1.0128059307738053,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        11
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0013943520355272803,
+      "rising": false,
+      "logic_V": 1.7298862911541808,
+      "actuator_V": 1.21829621,
+      "reset_ratio": 1.0059070160039236,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0014298812592207987,
+      "rising": true,
+      "logic_V": 1.7060058294273794,
+      "actuator_V": 1.219538724221551,
+      "reset_ratio": 1.0068998285890804,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        12
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0014707894281315323,
+      "rising": false,
+      "logic_V": 1.7298909209571796,
+      "actuator_V": 1.2190350142057331,
+      "reset_ratio": 1.0059308767537476,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0015063644880505664,
+      "rising": true,
+      "logic_V": 1.7027115599412375,
+      "actuator_V": 1.215105695138619,
+      "reset_ratio": 1.012789824170299,
+      "classification": "qualified",
+      "Q_edge_indices_within0p5us": [
+        13
+      ],
+      "one_Q_transition": true
+    },
+    {
+      "time_s": 0.0015546668122226371,
+      "rising": false,
+      "logic_V": 1.6696332462844934,
+      "actuator_V": 1.1561750445922052,
+      "reset_ratio": 1.0054836349730794,
+      "classification": "qualified"
+    },
+    {
+      "time_s": 0.0016482560570570434,
+      "rising": true,
+      "logic_V": 1.4549172705272004,
+      "actuator_V": 0.889645831996624,
+      "reset_ratio": 1.0043936049748798,
+      "classification": "low_rail_not_qualified"
+    }
+  ],
+  "Q_edges": [
+    {
+      "time_s": 0.0001888124279138466,
+      "rising": true,
+      "logic_V": 0.08441975119347987,
+      "actuator_V": 1.0249672073254141,
+      "classification": "low_rail_not_qualified"
+    },
+    {
+      "time_s": 0.0002717347957606185,
+      "rising": false,
+      "logic_V": 0.3158483781289799,
+      "actuator_V": 1.143646387420527,
+      "classification": "low_rail_not_qualified"
+    },
+    {
+      "time_s": 0.0005958471905176834,
+      "rising": true,
+      "logic_V": 1.6456746664093846,
+      "actuator_V": 1.0758656622193314,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.0007047386980094318,
+      "rising": false,
+      "logic_V": 1.6651936693302603,
+      "actuator_V": 1.1505103402829542,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.0008012540268099484,
+      "rising": true,
+      "logic_V": 1.6813536578367905,
+      "actuator_V": 1.1793183731252947,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.0008891132110905635,
+      "rising": false,
+      "logic_V": 1.6935990324056713,
+      "actuator_V": 1.1964737336225406,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.0009705830792933722,
+      "rising": true,
+      "logic_V": 1.704365791757407,
+      "actuator_V": 1.208345853849951,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.00104762236,
+      "rising": false,
+      "logic_V": 1.70824279,
+      "actuator_V": 1.2132904,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.00112407431,
+      "rising": true,
+      "logic_V": 1.70839184,
+      "actuator_V": 1.21506893,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.001200522871656419,
+      "rising": false,
+      "logic_V": 1.70841363837866,
+      "actuator_V": 1.2166020649692568,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.00127697653,
+      "rising": true,
+      "logic_V": 1.70851244,
+      "actuator_V": 1.21775485,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.00135342636,
+      "rising": false,
+      "logic_V": 1.70820901,
+      "actuator_V": 1.21879034,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.001429881,
+      "rising": true,
+      "logic_V": 1.70850565,
+      "actuator_V": 1.21954643,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.00150636409,
+      "rising": false,
+      "logic_V": 1.70569875,
+      "actuator_V": 1.21510682,
+      "classification": "qualified_clock_response"
+    },
+    {
+      "time_s": 0.0016482549,
+      "rising": true,
+      "logic_V": 1.45713238,
+      "actuator_V": 0.889644934,
+      "classification": "low_rail_not_qualified"
+    }
+  ],
+  "qualified_clock_rising_count": 12,
+  "qualified_clock_each_has_one_Q_transition": true,
+  "unmatched_qualified_Q_count": 0
+}

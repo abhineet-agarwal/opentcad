@@ -1,0 +1,17 @@
+{
+  "tests": {
+    "passed": 2,
+    "seconds": 0.77,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "native_process_count": 1,
+  "controller_transients": 0,
+  "native_DC_and_AC_current_partials_agree": true,
+  "input_matrix_identity_measured": true,
+  "resistor_sign_oracle_pass": true,
+  "tiny_correction_error_floor_explicit": true,
+  "postprocessing_fix": "NumPy boolean scalar serialization; saved-only --audit-only used, no native rerun. Original executed runner preserved.",
+  "scope": "Isolated branch current/Jacobian agreement only; reduced coupled reproducer recommended, no simulator-defect/coupled-startup claim",
+  "review_acceptance": "Reviewed and accepted as isolated native DC/AC source-law and derivative evidence at audited biases; coupled transient and end-to-end actuation remain unvalidated."
+}

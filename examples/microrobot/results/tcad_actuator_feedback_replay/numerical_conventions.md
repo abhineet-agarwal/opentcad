@@ -1,0 +1,9 @@
+# Numerical conventions documented before transient
+
+Installed ngspice44.2, same hsa initialization. The saved no-analysis option query reports CHGTOL1e-14 C, TRTOL7, VNTOL1e-6 V, GMIN1e-12. No A devices occur in this reduced bench. These unmodified defaults are expected here; options_effective.txt after the sole transient will confirm applied settings. The pre-analysis option listing shows old current settings, not queued .options; it must not be mistaken for the requested Gear2/reltol1e-6/abstol1e-15 settings.
+
+The official [manual44](https://ngspice.sourceforge.io/docs/ngspice-44-manual.pdf), sections11.1.2/11.1.4 and13.5.55, distinguishes convergence, charge and truncation controls. ABSTOL1e-15 is not a bound on every saved transient current or KCL discrepancy. Charge integration, step control and numerical conditioning also matter, without uniquely explaining earlier pA residuals. No tolerance is changed.
+
+I(Vprobe) is positive from the probe's first node to its second. It is a voltage-source branch current; SAVECURRENTS device vectors are not used. That option's possible one-step-delay warning therefore does not establish the cause here. Output uses native adaptive samples,17 digits and no INTERP.
+
+Post-run confirmation from the second option block in ngspice.log: GEAR, MaxOrder2, RELTOL1e-6, ABSTOL1e-15, CHGTOL1e-14 C, TRTOL7, VNTOL1e-6 V, GMIN1e-12, Sparse1.3. No A-device reduction or tolerance change occurred. The option command printed to process stdout despite requested file redirection; the evidence option files are exact block extracts from that saved log. Original local redirection files were empty. DELMIN is reported2.5e-19 s; the abort log gives timestep3.125e-20 s. These values are documentation, not a derived bound or causal explanation of current residuals.

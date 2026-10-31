@@ -1,0 +1,20 @@
+{
+  "scope": "One stable nonlinear adsorption-expression held-input diagnostic.",
+  "source_deck_sha256": "8479caf73f917236d263c0822ea3245fbb785305bfb3b63102b4eda149f87291",
+  "law": "Bads_stable metal adsnode I={qmax/(4*width*tau)*(v(metal,adsnode)-offset+2*width*ads_c((v(metal,solution)-offset)/(2*width)))}",
+  "correction_function": ".func ads_c(z) {abs(z)<1e-3 ? -z*z*z*(1/3-z*z*(2/15-z*z*17/315)) : tanh(z)-z}",
+  "actual_offset_V": 0,
+  "crossover": 0.001,
+  "approximation": "Degree7 correction inside; tanh(z)-z outside, with explicit Taylor remainder and floating audit bounds",
+  "unchanged": "Every other circuit, model, probe, storage, source, held input, tolerance and timing line",
+  "duration_s": 0.00025,
+  "max_step_s": 2.5e-08,
+  "energy_limit": "Normalized capacitor energy is not chemical energy; behavioral branch work is signed, not resistor heat",
+  "source_dependency_sha256": {
+    "examples/microrobot/tcad_stable_adsorption.py": "9313e26e98f4c5e7600ff51f3d540f14928f6a28aefb17b3c57d6ed421f5c8b4",
+    "tests/integration/test_tcad_stable_adsorption.py": "111a9eada32f89671a2e144cf10fd8f190fe574c1763ed18a1e541f66a00ab5c",
+    "examples/microrobot/tcad_charge_adsorption.py": "c898a52bf3f4912a4aa0ab6b8a046a141b35865e62ca0c7157e57ae9f600cdc7",
+    "examples/microrobot/tcad_passive_adsorption.py": "7c86555be9e7fc54dfb946f482908f74571279de427c9264f7a477cdfd1ba576",
+    "examples/microrobot/tcad_controller.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4"
+  }
+}

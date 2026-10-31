@@ -1,0 +1,110 @@
+{
+  "early0to0p4ms": {
+    "electrode_midpoint_peak_V": [
+      0.23497893160000002,
+      0.2348711678
+    ],
+    "logic_max_V": 0.948169168,
+    "actuator_max_V": 1.17768553,
+    "driver_ready_max_V": 0.392443834,
+    "reset_max_V": 0.173083363,
+    "phase_max_V": [
+      0.0762745947,
+      1.11466768e-06
+    ]
+  },
+  "v(ready)_logicbelow1V_ratio_range": [
+    -2.058964612785149e-05,
+    0.4250879070800904
+  ],
+  "v(ready)_highsample_time_range_s": null,
+  "v(driver_ready)_logicbelow1V_ratio_range": [
+    -2.0208823270224888e-05,
+    0.8170814917571362
+  ],
+  "v(driver_ready)_highsample_time_range_s": [
+    0.000125975,
+    0.000169598808
+  ],
+  "native_Q_before_first_clock": {
+    "first_clock_s": 0.00059572472,
+    "Q_abs_peak_V": 2.26938861e-05,
+    "Q_to_logic_peak": 1.4761944593032402e-05
+  },
+  "driver90_to_native90_interval": {
+    "start_s": 0.0005249066582091186,
+    "stop_s": 0.0005330017259632364,
+    "ea": {
+      "metal_range_V": [
+        -0.00976330168,
+        1.0283668022807397
+      ],
+      "midpoint_error_peak_V": 0.527404953273902,
+      "eta_range_V": [
+        -0.005174199000000046,
+        0.0006283692142176546
+      ],
+      "Cdl_net_charge_pC": 0.11010059211040778,
+      "adsorption_net_charge_pC": -0.0009495255790858969,
+      "faradaic_net_charge_pC": -2.393066864829594e-06,
+      "sampled_component_absolute_charge_sum_pC": 0.3550719166329949
+    },
+    "eb": {
+      "metal_range_V": [
+        -0.000232504898,
+        0.00136819026
+      ],
+      "midpoint_error_peak_V": 0.49974493652881224,
+      "eta_range_V": [
+        -0.010674415499200906,
+        -0.0021236428431166063
+      ],
+      "Cdl_net_charge_pC": -0.34203090624337196,
+      "adsorption_net_charge_pC": -0.001999771430535313,
+      "faradaic_net_charge_pC": -4.981862736819024e-06,
+      "sampled_component_absolute_charge_sum_pC": 0.3440357425764851
+    }
+  },
+  "early_details": {
+    "ea": {
+      "peak_mid_error_time_s": 0.000167519354,
+      "logic_V": 0.048888817,
+      "actuator_V": 0.583033965,
+      "mid_V": 0.253548174,
+      "metal_V": 0.0185692424,
+      "driver_ready_V": 0.318768565,
+      "reset_V": 0.161963134,
+      "eta_range_V": [
+        -0.006223377999999988,
+        6.322000000003047e-06
+      ]
+    },
+    "eb": {
+      "peak_mid_error_time_s": 0.000167519354,
+      "logic_V": 0.048888817,
+      "actuator_V": 0.583033965,
+      "mid_V": 0.253548174,
+      "metal_V": 0.0186770062,
+      "driver_ready_V": 0.318768565,
+      "reset_V": 0.161963134,
+      "eta_range_V": [
+        -0.006221908000000012,
+        6.334999999968449e-06
+      ]
+    }
+  },
+  "early_driver_high_conditions": {
+    "logic_range_V": [
+      0.00722754012,
+      0.051941875
+    ],
+    "actuator_range_V": [
+      0.100061053,
+      0.628624304
+    ],
+    "reset_range_V": [
+      0.0323052304,
+      0.173083363
+    ]
+  }
+}

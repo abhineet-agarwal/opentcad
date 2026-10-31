@@ -1,0 +1,9 @@
+{
+  "scope": "Exploratory direct driver-ready wiring/ordering control; no startup acceptance",
+  "actual_stop_s": 0.0008,
+  "rows": 20727,
+  "wall_s": 87.12252516599256,
+  "netlist_sha256": "4c945f09aff879494950d0b74c219e81d91e1f9b555755b25f9fc410e91c16a2",
+  "physical_change": "Four-FET actuator buffer loads native reset; only both driver ready pins move to its output; real driver gates replace ideal gate-load proxy",
+  "energy_method": "offline adaptive branch powers; separate Vdriverbuffer actuator feed; no auxiliary energy states"
+}

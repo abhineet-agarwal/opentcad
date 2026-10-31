@@ -1,0 +1,25 @@
+{
+  "change": "Formatting only after completed 254-test full suite; no numerical execution or fit regeneration",
+  "module": "examples/microrobot/reynolds_fit.py",
+  "command": [
+    ".venv/bin/ruff",
+    "format",
+    "examples/microrobot/reynolds_fit.py"
+  ],
+  "formatter_output": "1 file reformatted",
+  "before_code_sha256": "bb0c5b14a36d45dfb027aba498dd8373cc33a69f203166e87fb037bbfec568c2",
+  "after_code_sha256": "3db7013d6d2c8bba1eb995fd865077e537b8b79394b1d9441925a804ec0afa7d",
+  "fit_report_original_executed_code_sha256": "bb0c5b14a36d45dfb027aba498dd8373cc33a69f203166e87fb037bbfec568c2",
+  "before_matches_fit_report_executed_hash": true,
+  "ast_method": "ast.dump(ast.parse(source_bytes), include_attributes=False), SHA256 of UTF-8 encoded dump",
+  "before_ast_sha256": "0e0b515c37e8453269bdbfbc48ba356b011f6b552d1a887604fc3fbc52836f4f",
+  "after_ast_sha256": "0e0b515c37e8453269bdbfbc48ba356b011f6b552d1a887604fc3fbc52836f4f",
+  "ast_equal": true,
+  "accepted_artifact_sha256_unchanged": {
+    "fit_report.json": "9511f02cb56ff38e9e513ed0af7832919802f98b8cfb2f239793a446f92ba6ca",
+    "pv_candidates_and_residuals.png": "015031d217d67243968e0cddfe74f27bb749e39400c2d7274a76ab3c834c7ae3",
+    "execution_checks.json": "a99c0041da57de78c42693afafc5c8d6247f32475eafd3363f0ef6e991939b4a",
+    "README.md": "639757a413900f4951ba114667b3cb8190bd155bb8a8959c5e8841deb53b5a7b"
+  },
+  "provenance_note": "Original fit_report.json executed-code hash retained. The accepted fit report, plots and other prior artifacts are unchanged. Formatting alters source bytes only; no fit rerun, numerical change, report rewrite or wording change occurred."
+}

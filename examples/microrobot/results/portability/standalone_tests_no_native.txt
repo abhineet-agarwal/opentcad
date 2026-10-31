@@ -1,0 +1,21 @@
+============================= test session starts ==============================
+platform darwin -- Python 3.12.11, pytest-9.0.3, pluggy-1.7.0
+rootdir: /private/tmp/opentcad-standalone-py312
+configfile: pytest.ini
+testpaths: tests
+plugins: platformdirs-4.13.6
+collected 24 items
+
+tests/device/test_compact_pv.py ...s                                     [ 16%]
+tests/device/test_optical.py ..........                                  [ 58%]
+tests/integration/test_electrode_spice.py ss                             [ 66%]
+tests/integration/test_layout_edge_audit.py ..                           [ 75%]
+tests/integration/test_microrobot.py .....                               [ 95%]
+tests/integration/test_phase_generator.py s                              [100%]
+
+=========================== short test summary info ============================
+SKIPPED [1] tests/device/test_compact_pv.py:51: optional ngspice executable
+SKIPPED [1] tests/integration/test_electrode_spice.py:15: optional ngspice
+SKIPPED [1] tests/integration/test_electrode_spice.py:42: optional ngspice
+SKIPPED [1] tests/integration/test_phase_generator.py:10: optional Icarus Verilog tools
+======================== 20 passed, 4 skipped in 2.49s =========================

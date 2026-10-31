@@ -1,0 +1,50 @@
+* Current simulation options *
+******************************
+
+Temperatures:
+temp = 300.000000
+tnom = 300.150000
+
+Integration method summary:
+Integration Method = GEAR
+MaxOrder = 2
+xmu = 0.5
+indverbosity = 2
+epsmin = 1e-28
+
+Matrix solver:
+Sparse 1.3
+
+Tolerances (absolute):
+abstol      (current) = 1e-15
+chgtol      (charge)  = 1e-14
+vntol       (voltage) = 1e-06
+pivtol      (pivot)   = 1e-13
+
+Tolerances (relative):
+reltol      (current) = 1e-06
+pivrel      (pivot)   = 0.001
+
+Iteration limits:
+itl1 (DC iterations) = 100
+itl2 (DC transfer curve iterations) = 50
+itl4 (transient iterations) = 10
+gminsteps = 1
+srcsteps = 1
+
+Truncation error correction:
+trtol = 7.000000
+
+Conductances:
+gmin     (devices)  = 1e-12
+diaggmin (stepping) = 0
+gshunt = 0
+cshunt = -1
+delmin = 2.5e-19
+
+Default parameters for MOS devices
+Default M: 1.000000
+Default L: 0.000100
+Default W: 0.000100
+Default AD: 0.000000
+Default AS: 0.000000

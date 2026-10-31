@@ -1,0 +1,13 @@
+{
+  "README.md": "dc693b99558e707e7e2fe9de078bae0a3db6cce5fe270ef9da4ca2a1de224393",
+  "configuration.json": "c6be82874d83edd2866feb426211bc592e7bc286a42a02c39158feb2c5e39cff",
+  "deck.diff": "ed0bdba75daf58c499ae6e669850640b1e85d36494e5810a494f44a08f257a1e",
+  "execution.json": "5fac3b6df6974b12688415a39e62ff938a4820ed7188ff41c39e4d6921f4e36b",
+  "execution_counts.json": "90fa499c535726263716922604f2864464bb7c2abaa0bdb12a9124d7e7f79f5d",
+  "linear_bads.spice": "8479caf73f917236d263c0822ea3245fbb785305bfb3b63102b4eda149f87291",
+  "metrics.json": "9ba71930f23fadbb9e04cb7809f2b199e47148098b56c4e51e4b6bd6e0f36d13",
+  "ngspice.log": "7ade1a23f0a20140cb31b89c4139c7536b16e89ecdbe4740349e3ac22ba51916",
+  "runner_as_executed.py": "b64cc5c7e09a40b381622d39bac87c3bfa0e324ef09562e92fad405c4b8477a8",
+  "status.json": "2cb9e8905507dd8df320cdd797adcd4e9127eb3d272ca07a8485b4ca8c92599b",
+  "verification.json": "83cf158fb96c16906c22e0cafa7572836571498ee6bfab73c38dacac71077426"
+}

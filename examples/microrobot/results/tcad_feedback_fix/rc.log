@@ -1,0 +1,238 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * opentcad microrobot interface experiment
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+******************************
+* Current simulation options *
+******************************
+
+Temperatures:
+temp = 300.150000
+tnom = 300.150000
+
+Integration method summary:
+Integration Method = TRAPEZOIDAL
+MaxOrder = 2
+xmu = 0.5
+indverbosity = 2
+epsmin = 1e-28
+
+Matrix solver:
+Sparse 1.3
+
+Tolerances (absolute):
+abstol      (current) = 1e-12
+chgtol      (charge)  = 1e-14
+vntol       (voltage) = 1e-06
+pivtol      (pivot)   = 1e-13
+
+Tolerances (relative):
+reltol      (current) = 0.001
+pivrel      (pivot)   = 0.001
+
+Iteration limits:
+itl1 (DC iterations) = 100
+itl2 (DC transfer curve iterations) = 50
+itl4 (transient iterations) = 10
+gminsteps = 0
+srcsteps = 0
+
+Truncation error correction:
+trtol = 7.000000
+
+Conductances:
+gmin     (devices)  = 1e-12
+diaggmin (stepping) = 0
+gshunt = 0
+cshunt = 0
+delmin = 0
+
+Default parameters for MOS devices
+Default M: 1.000000
+Default L: 0.000100
+Default W: 0.000100
+Default AD: 0.000000
+Default AS: 0.000000
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+rc_logic                          -5.70036e-21
+rc_light                                     0
+rc_celllo                          1.57864e-15
+rc_mid                             1.57864e-15
+rc_cellhi                          4.05005e-15
+rc_act_raw                         4.05005e-15
+rc_act                             4.05005e-15
+rc_pa                                        0
+rc_pb                                        0
+rc_drivers_logic                  -5.70036e-21
+rc_drivers_act                     4.05005e-15
+rc_drivers_mid                     1.57864e-15
+xda_rc.phase_b                      -1.184e-21
+xda_rc.phase_local_b               1.06351e-15
+xda_rc.phase_local                 1.06185e-15
+xda_rc.p_gate                      2.35746e-15
+rc_driver_ready                              0
+xda_rc.xhigh.series                3.94081e-16
+xda_rc.low_b                       1.61504e-14
+xda_rc.xlow.series                -5.97915e-14
+xda_rc.n_gate                      1.39479e-15
+xda_rc.off                          1.0627e-15
+rc_ea_driver                       1.56639e-15
+xda_rc.xsnub.a                     1.57864e-15
+xda_rc.xsnub.b1                    1.57864e-15
+xdb_rc.phase_b                      -1.184e-21
+xdb_rc.phase_local_b               1.06351e-15
+xdb_rc.phase_local                 1.06185e-15
+xdb_rc.p_gate                       2.3578e-15
+xdb_rc.xhigh.series                3.93311e-16
+xdb_rc.low_b                       1.61505e-14
+xdb_rc.xlow.series                -5.97918e-14
+xdb_rc.n_gate                      1.39189e-15
+xdb_rc.off                          1.0627e-15
+rc_eb_driver                        1.5664e-15
+xdb_rc.xsnub.a                     1.57864e-15
+xdb_rc.xsnub.b1                    1.57864e-15
+rc_a                               1.56639e-15
+rc_b                                1.5664e-15
+rc_r                               1.57864e-15
+rc_sa                              1.57659e-15
+rc_xa                              1.56639e-15
+rc_sb                              1.57659e-15
+rc_xb                               1.5664e-15
+rc_sr                               1.5766e-15
+rc_xr                              1.57864e-15
+rc_bulk                             1.5766e-15
+vp_rc_r#branch                     2.03866e-27
+vp_rc_b#branch                    -1.01882e-27
+vp_rc_a#branch                    -1.01984e-27
+vdriversmid_rc#branch             -1.94025e-27
+vdriversact_rc#branch             -2.72419e-28
+vdriverslogic_rc#branch           -9.03293e-33
+vact_rc#branch                    -2.72419e-28
+vpvhi_rc#branch                   -2.72419e-28
+vpvlo_rc#branch                    -1.7401e-28
+vlight_rc#branch                             0
+v.xlogic_rc.vrail#branch           9.03293e-33
+
+ Reference value :  0.00000e+00
+ Reference value :  2.29394e-05
+ Reference value :  3.24379e-05
+ Reference value :  3.59281e-05
+ Reference value :  3.94996e-05
+ Reference value :  4.27166e-05
+ Reference value :  4.61880e-05
+ Reference value :  4.95368e-05
+ Reference value :  5.31802e-05
+ Reference value :  5.68788e-05
+ Reference value :  6.06605e-05
+ Reference value :  6.52469e-05
+ Reference value :  6.78424e-05
+ Reference value :  7.24781e-05
+ Reference value :  7.68354e-05
+ Reference value :  8.14457e-05
+ Reference value :  8.38016e-05
+ Reference value :  8.78697e-05
+ Reference value :  9.19790e-05
+ Reference value :  9.58506e-05
+ Reference value :  1.00367e-04
+ Reference value :  1.06045e-04
+ Reference value :  1.09791e-04
+ Reference value :  1.14320e-04
+ Reference value :  1.18516e-04
+ Reference value :  1.22969e-04
+ Reference value :  1.28315e-04
+ Reference value :  1.34087e-04
+ Reference value :  1.39194e-04
+ Reference value :  1.43303e-04
+ Reference value :  1.48009e-04
+ Reference value :  1.51591e-04
+ Reference value :  1.56285e-04
+ Reference value :  1.61539e-04
+ Reference value :  1.65792e-04
+ Reference value :  1.69546e-04
+ Reference value :  1.73369e-04
+ Reference value :  1.78627e-04
+ Reference value :  1.82481e-04
+ Reference value :  1.85875e-04
+ Reference value :  1.89776e-04
+ Reference value :  1.93233e-04
+ Reference value :  1.98705e-04
+ Reference value :  2.02387e-04
+ Reference value :  2.06449e-04
+ Reference value :  2.08694e-04
+ Reference value :  2.12669e-04
+ Reference value :  2.16599e-04
+ Reference value :  2.19960e-04
+ Reference value :  2.23868e-04
+ Reference value :  2.28063e-04
+ Reference value :  2.32144e-04
+ Reference value :  2.35281e-04
+ Reference value :  2.38734e-04
+ Reference value :  2.41883e-04
+ Reference value :  2.45380e-04
+ Reference value :  2.49229e-04
+No. of Data Rows : 80147
+******************************
+* Current simulation options *
+******************************
+
+Temperatures:
+temp = 300.000000
+tnom = 300.150000
+
+Integration method summary:
+Integration Method = GEAR
+MaxOrder = 2
+xmu = 0.5
+indverbosity = 2
+epsmin = 1e-28
+
+Matrix solver:
+Sparse 1.3
+
+Tolerances (absolute):
+abstol      (current) = 1e-15
+chgtol      (charge)  = 1e-14
+vntol       (voltage) = 1e-06
+pivtol      (pivot)   = 1e-13
+
+Tolerances (relative):
+reltol      (current) = 1e-06
+pivrel      (pivot)   = 0.001
+
+Iteration limits:
+itl1 (DC iterations) = 100
+itl2 (DC transfer curve iterations) = 50
+itl4 (transient iterations) = 10
+gminsteps = 1
+srcsteps = 1
+
+Truncation error correction:
+trtol = 7.000000
+
+Conductances:
+gmin     (devices)  = 1e-12
+diaggmin (stepping) = 0
+gshunt = 0
+cshunt = -1
+delmin = 2.5e-19
+
+Default parameters for MOS devices
+Default M: 1.000000
+Default L: 0.000100
+Default W: 0.000100
+Default AD: 0.000000
+Default AS: 0.000000
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+

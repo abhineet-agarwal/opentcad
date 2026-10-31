@@ -1,0 +1,49 @@
+{
+  "focused_test_passed": 1,
+  "test_seconds": 0.78,
+  "ruff": "All checks passed",
+  "initial_runs": 2,
+  "approved_CHGTOL_controls": 1,
+  "matching_RC_control_skipped": true,
+  "probes_preserved": true,
+  "retained_names_unchanged": true,
+  "deletion_only_initial_decks": true,
+  "single_option_control_diff_verified": true,
+  "effective_options": {
+    "rc": {
+      "method": "GEAR",
+      "maxord": 2,
+      "reltol": 1e-06,
+      "abstol_A": 1e-15,
+      "chgtol_C": 1e-14,
+      "trtol": 7,
+      "vntol_V": 1e-06,
+      "provenance": "Second native option block, extracted from retained log"
+    },
+    "stable": {
+      "method": "GEAR",
+      "maxord": 2,
+      "reltol": 1e-06,
+      "abstol_A": 1e-15,
+      "chgtol_C": 1e-14,
+      "trtol": 7,
+      "vntol_V": 1e-06,
+      "provenance": "Second native option block, extracted from retained log"
+    },
+    "stable_chgtol20": {
+      "method": "GEAR",
+      "maxord": 2,
+      "reltol": 1e-06,
+      "abstol_A": 1e-15,
+      "chgtol_C": 1e-20,
+      "trtol": 7,
+      "vntol_V": 1e-06,
+      "provenance": "Second native option block, extracted from retained log"
+    }
+  },
+  "comparison_limits_relaxed": false,
+  "input_waveform_changed": false,
+  "offline_knot_audit_only_after_control": true,
+  "new_native_runs_after_control": 0,
+  "scope": "No accepted fix; completions and current-precision limitations separated"
+}

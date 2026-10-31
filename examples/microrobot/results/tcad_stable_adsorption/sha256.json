@@ -1,0 +1,14 @@
+{
+  "README.md": "544e6f7839de7dbfae999346d4d90a16e5bdb68838618b97fc7c481a165f9f02",
+  "configuration.json": "57d7fe07f022eb4c5856cce8a54d40762025b612ee68b69b8c83b01a0a2c9a86",
+  "deck.diff": "d0b8fa93b090802ccffd0085de1df53c722e53296107dbb9c8f00117d1468c5f",
+  "execution.json": "ee28ad3ada1a579148d400874a867c93d51e3887779d2400b4f5407901c1cf14",
+  "execution_counts.json": "90fa499c535726263716922604f2864464bb7c2abaa0bdb12a9124d7e7f79f5d",
+  "metrics.json": "b5d068afe84ba51f83c00837be0285e425d4bd2a08425ac66002715df14d5801",
+  "ngspice.log": "2a09a5003be7ee1fe153e2cc951665344ad9aedaf238e126f7f8abeb43568d4e",
+  "offline_checks.json": "30ab493402c3484f98494baa058a2f1888f1e7ddf1d89e57cdd1edd9e13204c3",
+  "runner_as_executed.py": "9313e26e98f4c5e7600ff51f3d540f14928f6a28aefb17b3c57d6ed421f5c8b4",
+  "stable_adsorption.spice": "0d44de1af9dc2f32509abb28ce3f8acb07202d53a615247d7fb22a042db31243",
+  "status.json": "220e5c1998fbdf93e1c492d3d02d24ce4690f5a6dd37d2e2cc1c6e7cf321b298",
+  "verification.json": "7846518ba737a365256486509fac839db3a0f2fb69ad0d4f6d2a794608fbc6d2"
+}

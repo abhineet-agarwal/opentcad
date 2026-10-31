@@ -1,0 +1,17 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * isolated adsorption source current and native ac jacobian audit
+
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+ngspice-44.2 done

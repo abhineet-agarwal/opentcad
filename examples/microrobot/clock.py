@@ -19,10 +19,50 @@ from opentcad.device.compact import SingleDiodePV
 HERE = Path(__file__).parent
 
 
+def _actual_stop(data):
+    if data is None or not np.size(data):
+        return None
+    value = data[-1, 0] if data.ndim == 2 else data[0] if data.ndim == 1 else np.nan
+    return float(value) if np.isfinite(value) else None
+
+
+def _clock_data_error(data, expected_columns, stop_s):
+    """Only wrdata rounding (1e-8 relative/1ps) may separate final/requested time."""
+    if data.ndim != 2 or len(data) < 2 or data.shape[1] != expected_columns:
+        return f'invalid transient shape; expected at least 2 rows and {expected_columns} columns'
+    if not np.isfinite(data).all():
+        return 'nonfinite transient data'
+    t = data[:, 0]
+    if t[0] < 0 or not np.isclose(t[0], 0., rtol=0., atol=1e-12):
+        return 'transient does not start at zero'
+    if np.any(np.diff(t) < 0):
+        return 'transient time decreases'
+    if not np.isclose(t[-1], stop_s, rtol=1e-8, atol=1e-12):
+        return f'transient stop {t[-1]:.12g} s does not match requested {stop_s:.12g} s'
+    return None
+
+
+def _clock_failure(dest, reason, corner, stop_s, data=None):
+    actual = _actual_stop(data)
+    if (data is None or data.ndim != 2) and (dest/'clock.dat').is_file():
+        try:
+            times = np.loadtxt(dest/'clock.dat', skiprows=1, usecols=0, ndmin=1)
+            actual = float(times[-1]) if len(times) and np.isfinite(times[-1]) else None
+        except (ValueError, OSError):
+            actual = None
+    info = {'passed': False, 'failure': reason, 'corner': corner,
+            'stop_s': stop_s, 'requested_stop_s': stop_s, 'actual_stop_s': actual,
+            'requested_stop_reached': bool(actual is not None and
+                np.isclose(actual, stop_s, rtol=1e-8, atol=1e-12)),
+            'scope': 'Rejected clock experiment; no new metrics or preview emitted'}
+    (dest/'failure.json').write_text(json.dumps(info, indent=2)+'\n')
+    return info, None
+
+
 def clock_case(destination, *, corner="tt", voltage_V=1.8, temperature_C=26.85,
                ramp_s=100e-6, stop_s=0.004, timestep_s=50e-9, pv_model=None,
                output_load_F=0.0, pv_storage_F=2e-12, load_standard_cell=True,
-               circuit_path=None, relative_tolerance=1e-4):
+               circuit_path=None, relative_tolerance=1e-4, measure_bias_current=True):
     """Simulate cold startup without initial-condition/UIC or electrical kick.
 
     The source starts at zero, then ramps; intentional 10/12 fF asymmetry is
@@ -31,7 +71,10 @@ def clock_case(destination, *, corner="tt", voltage_V=1.8, temperature_C=26.85,
     scaling from the measured large cell. PV capacitance is not inferred;
     a chosen 2 pF storage capacitor is external to this clock macro. A real
     SKY130 DFF plus feedback inverter loads the clock by default; its supply
-    current is measured separately from the analog clock.
+    current is measured separately from the analog clock. Set
+    measure_bias_current=False for a supplied physical macro without internal
+    Vbias; its separate bias power is unavailable, not zero. This option does
+    not edit the supplied circuit. Whole-clock/receiver currents remain measured.
     """
     if corner not in {"tt", "ss", "ff", "sf", "fs"}:
         raise ValueError("Unknown process corner")
@@ -77,9 +120,8 @@ def clock_case(destination, *, corner="tt", voltage_V=1.8, temperature_C=26.85,
             if match is None:
                 raise ValueError(f"Installed standard-cell library lacks {name}")
             selected.append(match.group())
-        imported = ("* Unmodified cells imported from the installed SKY130 HD library.\n"
-                    "* Copyright SkyWater PDK Authors; Apache-2.0; see source PDK.\n"
-                    + "\n".join(selected) + "\n")
+        first_cell = re.search(r"(?m)^\.subckt\b", cells)
+        imported = cells[:first_cell.start()]+"\n".join(selected)+"\n"
         (dest / "receiver_cells.spice").write_text(imported)
         source_cell_hash = hashlib.sha256(imported.encode()).hexdigest()
         digital += ('.include "receiver_cells.spice"\n'
@@ -87,6 +129,7 @@ def clock_case(destination, *, corner="tt", voltage_V=1.8, temperature_C=26.85,
                     "Xfeedback div2 0 0 digital_supply digital_supply feedback sky130_fd_sc_hd__inv_1\n")
     else:
         digital += "Runused digital_supply 0 1e20\nRprobe div2 0 1e20\n"
+    bias_vector = " i(v.xclock.vbias)" if measure_bias_current else ""
     deck = (f"* Our low-power clock candidate; {supply_kind}\n"
             f'.lib "{library}" {corner}\n.temp {temperature_C:.12g}\n'
             + circuit + "\n" + supply
@@ -96,26 +139,55 @@ def clock_case(destination, *, corner="tt", voltage_V=1.8, temperature_C=26.85,
             + f".options method=gear maxord=2 reltol={relative_tolerance:.12g} abstol=1e-15\n"
             + ".control\nset wr_vecnames\nset wr_singlescale\n"
             + f"tran {timestep_s:.12g} {stop_s:.12g} 0 {timestep_s:.12g}\n"
-            + "wrdata clock.dat v(vdd) v(clk) v(bn) v(bp) i(Vsense) i(Vlogic) v(div2) i(v.xclock.vbias)\n"
+            + "wrdata clock.dat v(vdd) v(clk) v(bn) v(bp) i(Vsense) i(Vlogic) v(div2)"+bias_vector+"\n"
             + "quit\n.endc\n.end\n")
     (dest / "clock.spice").write_text(deck)
     try:
         result = subprocess.run([executable, "-b", "clock.spice"], cwd=dest,
                                 capture_output=True, text=True, timeout=180)
     except subprocess.TimeoutExpired as exc:
-        (dest / "ngspice.log").write_text(str(exc))
-        return {"passed": False, "failure": "simulation timeout", "corner": corner}, None
-    (dest / "ngspice.log").write_text(result.stdout + result.stderr)
-    if result.returncode or not (dest / "clock.dat").is_file():
-        return {"passed": False, "failure": "simulator error", "corner": corner}, None
-    data = np.loadtxt(dest / "clock.dat", skiprows=1)
-    preview_step = max(1, len(data)//1200)
-    np.savetxt(dest / "waveform.csv", data[::preview_step], delimiter=",", fmt="%.9e",
-        header="time_s,supply_V,clock_V,bias_n_V,bias_p_V,analog_current_A,"
-        "first_ff_current_A,divide2_V,reference_current_A", comments="")
-    t, vdd, clk, bn, bp, analog_current, digital_current, div2, bias_current = data.T
-    current = analog_current + digital_current
+        output = exc.stdout or ''
+        error = exc.stderr or ''
+        if isinstance(output, bytes):
+            output = output.decode(errors='replace')
+        if isinstance(error, bytes):
+            error = error.decode(errors='replace')
+        (dest / "ngspice.log").write_text(str(exc)+'\n'+output+error)
+        return _clock_failure(dest, 'simulation timeout', corner, stop_s)
+    log = result.stdout + result.stderr
+    (dest / "ngspice.log").write_text(log)
+    data = None
+    load_error = None
+    if (dest/'clock.dat').is_file():
+        try:
+            data = np.loadtxt(dest/'clock.dat', skiprows=1)
+        except (ValueError, OSError) as exc:
+            load_error = str(exc)
+    if result.returncode:
+        return _clock_failure(dest, 'simulator error', corner, stop_s, data)
+    if any(marker in log.lower() for marker in
+           ['simulation(s) aborted', 'doanalyses:', 'timestep too small']):
+        return _clock_failure(dest, 'simulator aborted transient; see ngspice.log',
+                              corner, stop_s, data)
+    if data is None:
+        return _clock_failure(dest, 'missing or malformed clock.dat'+
+                              (': '+load_error if load_error else ''), corner, stop_s)
+    invalid = _clock_data_error(data, 9 if measure_bias_current else 8, stop_s)
+    if invalid:
+        return _clock_failure(dest, invalid, corner, stop_s, data)
+    t, vdd, clk, bn, bp, analog_current, digital_current, div2 = data[:, :8].T
+    bias_current = data[:, 8] if measure_bias_current else None
     select = t > max(0.6 * stop_s, ramp_s * 1.2)
+    if np.count_nonzero(select) < 2 or np.ptp(t[select]) <= 0:
+        return _clock_failure(dest, 'insufficient steady-window samples', corner, stop_s, data)
+    preview_step = max(1, len(data)//1200)
+    preview_columns = ('time_s,supply_V,clock_V,bias_n_V,bias_p_V,analog_current_A,'
+                       'first_ff_current_A,divide2_V')
+    if measure_bias_current:
+        preview_columns += ',reference_current_A'
+    np.savetxt(dest/'waveform.csv.gz', data[::preview_step], delimiter=',', fmt='%.9e',
+               header=preview_columns, comments='')
+    current = analog_current + digital_current
     rail = float(np.mean(vdd[select]))
     threshold = vdd / 2
     crossings = np.flatnonzero((clk[:-1] < threshold[:-1]) & (clk[1:] >= threshold[1:]))
@@ -138,14 +210,20 @@ def clock_case(destination, *, corner="tt", voltage_V=1.8, temperature_C=26.85,
     info = {"passed": passed, "corner": corner, "voltage_V": voltage_V,
             "passed_meaning": "sustained clock, full output swing and first DFF divide-by-two; not a PV power-budget pass",
             "temperature_C": temperature_C, "ramp_s": ramp_s, "stop_s": stop_s,
+            "requested_stop_s": stop_s, "actual_stop_s": float(t[-1]),
+            "simulation_completed": True, "measure_bias_current": bool(measure_bias_current),
             "max_timestep_s": timestep_s, "relative_tolerance": relative_tolerance,
             "output_load_F": output_load_F,
             "supply": supply_kind, "steady_supply_V": rail, "frequency_Hz": frequency,
             "mean_power_W": power,
             "analog_clock_power_W": float(np.trapezoid((vdd*analog_current)[select],
                                                         t[select]) / np.ptp(t[select])),
-            "bias_reference_power_W": float(np.trapezoid((vdd*bias_current)[select],
-                                                          t[select]) / np.ptp(t[select])),
+            "bias_reference_power_W": (float(np.trapezoid((vdd*bias_current)[select],
+                                                          t[select]) / np.ptp(t[select]))
+                                       if measure_bias_current else None),
+            "bias_reference_power_available": bool(measure_bias_current),
+            "bias_reference_measurement": ('internal Vbias current' if measure_bias_current
+                                           else 'unavailable: internal bias measurement not requested'),
             "first_divider_stage_power_W": float(np.trapezoid((vdd*digital_current)[select],
                                                                t[select]) / np.ptp(t[select])),
             "mean_current_A": float(np.trapezoid(current[select], t[select]) / np.ptp(t[select])),
@@ -163,7 +241,9 @@ def clock_case(destination, *, corner="tt", voltage_V=1.8, temperature_C=26.85,
             "startup": "zero supply operating point, then ramp; no UIC or seeded node voltage",
             "waveform_csv": "Decimated for plots only; metrics use the full transient",
             "limitations": ["Supply/temperature dependent bias, not a PTAT reference",
-                "PDK MIM timing/bias capacitors; routing parasitics not extracted",
+                ("PDK MIM timing/bias capacitors; canonical schematic routing is not extracted"
+                 if circuit_path is None else
+                 "Extraction coverage follows supplied-netlist provenance; this bench does not extract or infer coverage from its filename"),
                 "No statistical mismatch; remaining divider and drivers not in this bench"]}
     if not passed:
         info["failure"] = "clock swing, power or first-DFF divide-by-two check failed"
@@ -227,7 +307,7 @@ def run_clock_matrix(destination, model: SingleDiodePV):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=HERE / "results/clock_final")
+    parser.add_argument("--output", type=Path, default=HERE / "local_runs/clock_final")
     args = parser.parse_args()
     fit = json.loads((HERE / "results/published/pv_fit.json").read_text())
     run_clock_matrix(args.output, SingleDiodePV(**fit["fitted_terminal_model"]))

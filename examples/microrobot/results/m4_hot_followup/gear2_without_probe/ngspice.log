@@ -1,0 +1,168 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * opentcad microrobot interface experiment
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Reducing trtol to 1 for xspice 'A' devices
+Doing analysis at TEMP = 85.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+light                                        0
+lp1                               -1.7644e-126
+lp2                              -3.52881e-126
+logic_raw                        -5.29321e-126
+celllo                            -3.21214e-16
+mid                               -3.21214e-16
+cellhi                            -2.51201e-16
+act_raw                           -2.51201e-16
+logic                            -5.29321e-126
+act                               -2.51201e-16
+clock_supply                     -5.29321e-126
+xclock.ref_vdd                   -5.29321e-126
+bn                               -9.68106e-127
+xclock.b2                        -2.42481e-126
+bp                               -8.25558e-127
+xclock.xcbiasp.a                             0
+xclock.xcbiasp.b1                            0
+xclock.xcbiasn.a                             0
+xclock.xcbiasn.b1                            0
+xclock.x1.ps                     -4.98411e-126
+xclock.a                          -4.0081e-125
+xclock.raw                        -4.0081e-125
+xclock.x1.ns                      4.46947e-125
+xclock.x2.ps                     -4.98411e-126
+xclock.b                          -4.0081e-125
+xclock.x2.ns                      4.46947e-125
+xclock.x3.ps                     -4.98411e-126
+xclock.c                          -4.0081e-125
+xclock.x3.ns                      4.46947e-125
+xclock.x4.ps                     -4.98411e-126
+xclock.d                          -4.0081e-125
+xclock.x4.ns                      4.46947e-125
+xclock.x5.ps                     -4.98411e-126
+xclock.x5.ns                      4.46947e-125
+xclock.xc1.a                                 0
+xclock.xc1.b1                                0
+xclock.xc2.a                                 0
+xclock.xc2.b1                                0
+xclock.xc3.a                                 0
+xclock.xc3.b1                                0
+xclock.xc4.a                                 0
+xclock.xc4.b1                                0
+xclock.xc5.a                                 0
+xclock.xc5.b1                                0
+xclock.buffered                  -8.25558e-127
+clk                              -3.53341e-127
+digital_supply                   -5.29321e-126
+feedback                         -4.54344e-126
+q0                               -4.54344e-126
+reset_n                          -1.06867e-127
+reset_supply                     -5.29321e-126
+reset_act_supply                  -2.51201e-16
+xready.input_b                     1.44091e-19
+ready                              6.21849e-19
+proxy_supply                     -5.29321e-126
+flop_load                         6.42528e-127
+xcproxy1.a                                   0
+xcproxy1.b1                                  0
+xcproxy2.a                                   0
+xcproxy2.b1                                  0
+monitor_supply                    -2.51201e-16
+xmonitor.ref                       1.30005e-18
+xmonitor.fbs                      -2.53227e-18
+xmonitor.tail                     -4.22019e-17
+xmonitor.diode                    -3.82602e-17
+xmonitor.sense                     -4.5164e-17
+xmonitor.xcref.a                             0
+xmonitor.xcref.b1                            0
+xmonitor.xcsense.a                           0
+xmonitor.xcsense.b1                          0
+clock_n                                      1
+reset_ok_n                       -1.06867e-126
+pan                                          0
+pbn                                          0
+pa_source                                    0
+pb_source                                    0
+pa_buffer                                    0
+pb_buffer                                    0
+pa                                           0
+pb                                           0
+xda.phase_b                      -2.23384e-126
+xda.phase_local_b                  3.31609e-18
+xda.phase_local                    3.31623e-18
+xda.p_gate                        -4.81287e-17
+driver_ready                      -2.18321e-18
+xda.xhigh.series                  -1.21367e-17
+xda.low_b                         -4.81287e-17
+xda.xlow.series                   -1.21367e-17
+xda.n_gate                        -9.75139e-19
+xda.off                           -1.42153e-18
+ea                                 3.57031e-16
+xda.xsnub.a                       -3.21214e-16
+xda.xsnub.b1                      -3.21214e-16
+xdb.phase_b                      -2.23384e-126
+xdb.phase_local_b                  3.31609e-18
+xdb.phase_local                    3.31623e-18
+xdb.p_gate                        -4.81289e-17
+xdb.xhigh.series                  -1.21366e-17
+xdb.low_b                          -4.8129e-17
+xdb.xlow.series                   -1.21366e-17
+xdb.n_gate                        -9.75139e-19
+xdb.off                            -1.4214e-18
+eb                                -3.54526e-16
+xdb.xsnub.a                       -3.21214e-16
+xdb.xsnub.b1                      -3.21214e-16
+sa                                -7.85912e-16
+ta                                         0.5
+sb                                -7.80468e-16
+tb                                         0.5
+sr                                -7.80434e-16
+tr                                         0.5
+bulk                              -7.80894e-16
+xdriverbuffer.nand_b              -2.12882e-17
+xdriverbuffer.series              -6.04488e-18
+bpb#branch                                   0
+bpa#branch                                   0
+breset_norm#branch                           0
+bclock_norm#branch                           0
+vpb#branch                                   0
+vpa#branch                                   0
+vmonitor#branch                   -9.72657e-28
+vproxy#branch                    -6.27355e-138
+vresetact#branch                  -2.23938e-28
+vresetlogic#branch                 -5.499e-138
+vdigital#branch                  -1.18781e-136
+v.xclock.vbias#branch            -1.51628e-137
+vclock#branch                     1.39179e-136
+vact#branch                       -5.32176e-29
+vlogic#branch                     1.76483e-138
+vpvhi#branch                      -5.32176e-29
+vpvlo#branch                       3.54399e-28
+vlight#branch                                0
+a.xphases.aout#branch_1_0                    0
+a.xphases.aout#branch_1_1                    0
+
+ Reference value :  0.00000e+00
+ Reference value :  3.93800e-05
+ Reference value :  7.83800e-05
+ Reference value :  8.12850e-05
+ Reference value :  8.12885e-05
+ Reference value :  8.12994e-05
+No. of Data Rows : 1778
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+doAnalyses: TRAN:  Timestep too small; time = 8.12994e-05, timestep = 6.25e-20: trouble with node "vmonitor#branch"
+
+
+tran simulation(s) aborted

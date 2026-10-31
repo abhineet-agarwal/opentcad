@@ -1,0 +1,24 @@
+{
+  "tests": {
+    "passed": 1,
+    "seconds": 1.29,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "bounded_transformation_verified": true,
+  "DD_sources_unchanged": true,
+  "clock_unchanged": true,
+  "counts": {
+    "transients": 1,
+    "fine": 0,
+    "rescue": 0,
+    "DC": 0,
+    "DD": 0,
+    "layout": 0
+  },
+  "resistor_losses_separately_reported": true,
+  "removed_zero_port_energies_labeled_analytical": true,
+  "raw_exported": false,
+  "scope": "Incomplete startup prefix; neither changed abort time nor trouble equation identifies a unique cause",
+  "review_acceptance": "Reviewed and accepted as failed passive-equivalent startup diagnostic evidence; full startup and end-to-end operation remain unvalidated."
+}

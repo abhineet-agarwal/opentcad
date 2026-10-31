@@ -1,0 +1,229 @@
+--- supervisor_control
++++ logic_isolation
+@@ -1266,120 +1266,10 @@
+ C374 bias_n.n8 vss 8.87454f
+ C375 bias_n.t8 vss 3.23226f
+ .ends
+-* Our SKY130 actuator interface; not an extracted Reynolds schematic.
+-* Pins: phase (logic domain), ready (actuator domain), electrode, logic supply,
+-* actuator upper supply, actuator midpoint/Pt metal, common lower supply.
+-* 1.8 V primitive dimensions in um. Body connections are explicit.
+-.subckt microrobot_driver phase ready electrode vlogic vact vmid vss
+-* Complementary logic input and static cross-coupled level converter.
+-Xip phase_b phase vlogic vlogic sky130_fd_pr__pfet_01v8 w=0.84 l=1
+-Xin phase_b phase vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+-Xlsn phase_local_b phase vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+-Xlsnb phase_local phase_b vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+-Xlsp phase_local_b phase_local vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=4
+-Xlspb phase_local phase_local_b vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=4
+-* Actuator-domain logic: p_gate=!(ready & phase), n_gate=ready & !phase.
+-Xhigh ready phase_local p_gate vact vss micro_nand2
+-Xlow ready phase_local_b low_b vact vss micro_nand2
+-Xlowinv low_b n_gate vact vss micro_inv
+-Xoff ready off vact vss micro_inv
+-Xdrivep electrode p_gate vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+-Xdriven electrode n_gate vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+-* A real transmission gate clamps the electrode to the Pt midpoint in reset.
+-* Long-channel LVT clamp retains conduction at the ~0.6 V midpoint.
+-* Standard-Vt clamps failed the 20 ms discharge limit in SS/FS.
+-Xclampn electrode off vmid vss sky130_fd_pr__nfet_01v8_lvt w=0.42 l=8
+-Xclampp electrode ready vmid vact sky130_fd_pr__pfet_01v8_lvt w=0.84 l=8
+-* Explicit ~103 fF PDK MIM suppresses electrode gate-charge feedthrough.
+-* This is our design component, not inferred electrode/PV capacitance.
+-Xsnub electrode vmid sky130_fd_pr__cap_mim_m3_1 w=7 l=7
+-.ends microrobot_driver
+-
+ .subckt micro_inv a y vdd vss
+ Xp y a vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+ Xn y a vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+ .ends micro_inv
+-
+-.subckt micro_nand2 a b y vdd vss
+-Xp1 y a vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+-Xp2 y b vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+-Xn1 y a series vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+-Xn2 series b vss vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+-.ends micro_nand2
+-
+-* Uncalibrated reduced electrode model; SI units.
+-* eta = metal minus local solution voltage; unknown absolute Ag/AgCl offset.
+-* theta is a dimensionless coverage encoded as a numerical voltage (1 V = 1).
+-* Cdl, adsorption charge and Faradaic leakage are separate terminal currents.
+-.subckt micro_electrode metal solution theta params: cdl=40p qmax=260p tau=20m rf=10g width=0.08 offset=0
+-Cdouble metal solution {cdl}
+-Rfaradaic metal solution {rf}
+-* Numerical state normalization; not a physical capacitor/power contribution.
+-Cstate theta 0 1n
+-Bstate theta 0 I={1n/tau*(v(theta)-1/(1+exp(-(v(metal,solution)-offset)/width)))}
+-Bads metal solution I={qmax/tau*(1/(1+exp(-(v(metal,solution)-offset)/width))-v(theta))}
+-.ends micro_electrode
+-
+-* DEVELOPMENT revision 2: stronger reference sink/feedback and reference filtering.
+-* Thresholds track actuator voltage; this is not a precision reference or signoff.
+-* Actuator-powered comparator. bn is the existing clock's NMOS bias output.
+-* Reference tracks vact; this is not a compensated voltage reference.
+-.subckt microrobot_brownout bn ready vact vss
+-Xrt ref ref vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=8
+-Xrb ref ref vss vss sky130_fd_pr__nfet_01v8 w=8 l=8
+-Xfb ref bn fbs vss sky130_fd_pr__nfet_01v8 w=3.36 l=8
+-Xfb_en fbs ready vss vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+-Xtail tail bn vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=8
+-Xref diode ref tail vss sky130_fd_pr__nfet_01v8 w=2 l=2
+-Xsense sense bn tail vss sky130_fd_pr__nfet_01v8 w=2 l=2
+-Xpm1 diode diode vact vact sky130_fd_pr__pfet_01v8 w=1 l=4
+-Xpm2 sense diode vact vact sky130_fd_pr__pfet_01v8 w=1 l=4
+-Xkeeper sense sense vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=8
+-Xp ready sense vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+-Xn ready sense vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+-Xcref ref vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+-Xcsense sense vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+-.ends microrobot_brownout
+-
+-* DEVELOPMENT candidate: nonregenerative reset level conversion.
+-* All dimensions in um. Standard SKY130 1.8V devices; no added storage.
+-* IMPORTANT extra sixth port bias_p must connect to the existing clock bp.
+-* Existing 5-port ready converters are not pin-compatible with this candidate.
+-* Keep original actuator-domain ready driving the driver clamps separately.
+-*
+-* ready low -> input_b high -> reset_n pulled low by Xsink.
+-* ready high -> input_b low -> bias-limited Xpullup raises reset_n to Vlogic.
+-* There is no cross-coupled feedback latch and no ideal threshold source.
+-* Xpullup W/L is .42 times the clock's 1/8 PMOS reference device.
+-* Rough nominal estimate: ~2nA reset-low current, ~3.5nW at1.8V.
+-* Estimate assumes settled TT clock bias; it is not a startup/corner bound.
+-* During reset-low the pullup current is a real static logic-rail load.
+-* The actuator inverter power must be measured at the actuator port separately.
+-* Startup depends on VACT inverter validity and the shared clock bias; this
+-* candidate does not establish deterministic POR from arbitrary dark states.
+-.subckt microrobot_ready_levelshift ready reset_n vact vlogic vss bias_p
+-Xip input_b ready vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+-Xin input_b ready vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+-Xpullup reset_n bias_p vlogic vlogic sky130_fd_pr__pfet_01v8 w=0.42 l=8
+-Xsink reset_n input_b vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+-.ends microrobot_ready_levelshift
+-
+-* DEVELOPMENT variant: only final output pulldown uses existing LVT NFET.
+-* DEVELOPMENT candidate: actuator-domain driver-ready AND qualification.
+-* Inputs: native current-limited reset_n AND original monitor ready.
+-* NAND2 PFETs .42/1 um each; series NFETs .42/1 um each.
+-* Output inverter PFET .84/1 and NFET .42/1 um.
+-* Native-reset input gate area matches the preceding two-inverter receiver.
+-* Original-ready gate loading is added; this is not a guaranteed cold-start POR.
+-.subckt microrobot_ready_driver_qualified_lvt reset_raw monitor_ready driver_ready vact vss
+-Xpa nand_b reset_raw vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=1
+-Xpb nand_b monitor_ready vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=1
+-Xna nand_b reset_raw series vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+-Xnb series monitor_ready vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+-Xop driver_ready nand_b vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+-Xon driver_ready nand_b vss vss sky130_fd_pr__nfet_01v8_lvt w=0.42 l=1
+-.ends microrobot_ready_driver_qualified_lvt
+-
+ * Copyright 2020 The SkyWater PDK Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+@@ -1431,99 +1321,35 @@
+ X0 VGND A Y VNB sky130_fd_pr__nfet_01v8 w=650000u l=150000u
+ X1 VPWR A Y VPB sky130_fd_pr__pfet_01v8_hvt w=1e+06u l=150000u
+ .ends
+-.subckt microrobot_event_phases clock_n reset_ok_n phase_a_n phase_b_n
+-Ainput [clock_n reset_ok_n] [clock reset_ok] event_adc
+-Arst reset_ok reset event_inv
+-.model event_adc adc_bridge(in_low=0.5 in_high=0.5)
+-.model event_inv d_inverter(rise_delay=1n fall_delay=1n)
+-.model event_ff d_dff(ic=0 clk_delay=1n reset_delay=1n rise_delay=1n fall_delay=1n)
+-.model event_xor d_xor(rise_delay=1n fall_delay=1n)
+-.model event_and d_and(rise_delay=1n fall_delay=1n)
+-.model event_dac dac_bridge(out_low=0 out_high=1 t_rise=1u t_fall=1u)
+-Aff0 n0 clock NULL reset q0 n0 event_ff
+-Aff1 n1 n0 NULL reset q1 n1 event_ff
+-Axor [q1 q0] phase_b event_xor
+-Apa [n1 reset_ok] phase_a_valid event_and
+-Apb [phase_b reset_ok] phase_b_valid event_and
+-Aout [phase_a_valid phase_b_valid] [phase_a_n phase_b_n] event_dac
+-.ends microrobot_event_phases
+ 
+-* New design: 4 logic + 2 lower + 2 upper cells, each 1080 um2 = 8640 um2.
+-* Common CMOS lower rail 0; physical Pt midpoint mid. No empirical PV fit.
++* Logic-only isolation; same 4x1080 um2 TCAD source, no actuator network.
+ Vlight light 0 PWL(0 0 1u 0 101u 1000)
+ Bpvlogic 0 logic_raw I={1080*(pwl(v(logic_raw,0)/4,0,-0,0.025000000000000001,-5.1031397811909158e-18,0.050000000000000003,-1.6900886162475216e-17,0.075000000000000011,-4.5544351773723475e-17,0.10000000000000001,-1.1706894591230417e-16,0.125,-2.9905618250101119e-16,0.15000000000000002,-7.6734017987466285e-16,0.17500000000000002,-1.9811143841814144e-15,0.20000000000000001,-5.1413199188098177e-15,0.22500000000000001,-1.339248219197384e-14,0.25,-3.4973150376715681e-14,0.27500000000000002,-9.147661302376481e-14,0.30000000000000004,-2.395109599907038e-13,0.32500000000000001,-6.2749260021912781e-13,0.35000000000000003,-1.6445520176143913e-12,0.375,-4.3109100739383552e-12,0.40000000000000002,-1.1301168443375023e-11,0.42500000000000004,-2.9626190973570329e-11,0.45000000000000001,-7.7660228884154431e-11,0.47500000000000003,-2.0354713172770298e-10,0.5,-5.3338403005281748e-10,0.52500000000000002,-1.3972186876001106e-09,0.55000000000000004,-3.6577646074621611e-09,0.57500000000000007,-9.5634616726067801e-09,0.60000000000000009,-2.4934425046235657e-08,0.625,-6.4594783222970078e-08,0.65000000000000002,-1.6493085582319065e-07,0.67500000000000004,-4.0868130472980025e-07,0.70000000000000007,-9.6116247988053517e-07)+(v(light)/1000)*pwl(v(logic_raw,0)/4,0,1.3549730611554419e-10,0.025000000000000001,1.3530083740007976e-10,0.050000000000000003,1.3510067269867956e-10,0.075000000000000011,1.3489660604312171e-10,0.10000000000000001,1.3468840825548359e-10,0.125,1.3447582330367215e-10,0.15000000000000002,1.3425856378492235e-10,0.17500000000000002,1.3403630585283119e-10,0.20000000000000001,1.3380868292412021e-10,0.22500000000000001,1.3357527812743415e-10,0.25,1.3333561450239847e-10,0.27500000000000002,1.3308914246389753e-10,0.30000000000000004,1.3283522208410721e-10,0.32500000000000001,1.3257309692922724e-10,0.35000000000000003,1.3230185109608407e-10,0.375,1.3202033046964549e-10,0.40000000000000002,1.3172698169543378e-10,0.42500000000000004,1.3141949265403456e-10,0.45000000000000001,1.310939383324102e-10,0.47500000000000003,1.3074267257959103e-10,0.5,1.30349005494306e-10,0.52500000000000002,1.2987360928719349e-10,0.55000000000000004,1.292197028599079e-10,0.57500000000000007,1.2814464613602281e-10,0.60000000000000009,1.2604226983527328e-10,0.625,1.2145042997884143e-10,0.65000000000000002,1.111646447815761e-10,0.67500000000000004,8.9506181583909814e-11,0.70000000000000007,4.9789836233574323e-11))}
+-Bpvlo 0 celllo I={1080*(pwl(v(celllo,0)/2,0,-0,0.025000000000000001,-5.1031397811909158e-18,0.050000000000000003,-1.6900886162475216e-17,0.075000000000000011,-4.5544351773723475e-17,0.10000000000000001,-1.1706894591230417e-16,0.125,-2.9905618250101119e-16,0.15000000000000002,-7.6734017987466285e-16,0.17500000000000002,-1.9811143841814144e-15,0.20000000000000001,-5.1413199188098177e-15,0.22500000000000001,-1.339248219197384e-14,0.25,-3.4973150376715681e-14,0.27500000000000002,-9.147661302376481e-14,0.30000000000000004,-2.395109599907038e-13,0.32500000000000001,-6.2749260021912781e-13,0.35000000000000003,-1.6445520176143913e-12,0.375,-4.3109100739383552e-12,0.40000000000000002,-1.1301168443375023e-11,0.42500000000000004,-2.9626190973570329e-11,0.45000000000000001,-7.7660228884154431e-11,0.47500000000000003,-2.0354713172770298e-10,0.5,-5.3338403005281748e-10,0.52500000000000002,-1.3972186876001106e-09,0.55000000000000004,-3.6577646074621611e-09,0.57500000000000007,-9.5634616726067801e-09,0.60000000000000009,-2.4934425046235657e-08,0.625,-6.4594783222970078e-08,0.65000000000000002,-1.6493085582319065e-07,0.67500000000000004,-4.0868130472980025e-07,0.70000000000000007,-9.6116247988053517e-07)+(v(light)/1000)*pwl(v(celllo,0)/2,0,1.3549730611554419e-10,0.025000000000000001,1.3530083740007976e-10,0.050000000000000003,1.3510067269867956e-10,0.075000000000000011,1.3489660604312171e-10,0.10000000000000001,1.3468840825548359e-10,0.125,1.3447582330367215e-10,0.15000000000000002,1.3425856378492235e-10,0.17500000000000002,1.3403630585283119e-10,0.20000000000000001,1.3380868292412021e-10,0.22500000000000001,1.3357527812743415e-10,0.25,1.3333561450239847e-10,0.27500000000000002,1.3308914246389753e-10,0.30000000000000004,1.3283522208410721e-10,0.32500000000000001,1.3257309692922724e-10,0.35000000000000003,1.3230185109608407e-10,0.375,1.3202033046964549e-10,0.40000000000000002,1.3172698169543378e-10,0.42500000000000004,1.3141949265403456e-10,0.45000000000000001,1.310939383324102e-10,0.47500000000000003,1.3074267257959103e-10,0.5,1.30349005494306e-10,0.52500000000000002,1.2987360928719349e-10,0.55000000000000004,1.292197028599079e-10,0.57500000000000007,1.2814464613602281e-10,0.60000000000000009,1.2604226983527328e-10,0.625,1.2145042997884143e-10,0.65000000000000002,1.111646447815761e-10,0.67500000000000004,8.9506181583909814e-11,0.70000000000000007,4.9789836233574323e-11))}
+-Bpvhi mid cellhi I={1080*(pwl(v(cellhi,mid)/2,0,-0,0.025000000000000001,-5.1031397811909158e-18,0.050000000000000003,-1.6900886162475216e-17,0.075000000000000011,-4.5544351773723475e-17,0.10000000000000001,-1.1706894591230417e-16,0.125,-2.9905618250101119e-16,0.15000000000000002,-7.6734017987466285e-16,0.17500000000000002,-1.9811143841814144e-15,0.20000000000000001,-5.1413199188098177e-15,0.22500000000000001,-1.339248219197384e-14,0.25,-3.4973150376715681e-14,0.27500000000000002,-9.147661302376481e-14,0.30000000000000004,-2.395109599907038e-13,0.32500000000000001,-6.2749260021912781e-13,0.35000000000000003,-1.6445520176143913e-12,0.375,-4.3109100739383552e-12,0.40000000000000002,-1.1301168443375023e-11,0.42500000000000004,-2.9626190973570329e-11,0.45000000000000001,-7.7660228884154431e-11,0.47500000000000003,-2.0354713172770298e-10,0.5,-5.3338403005281748e-10,0.52500000000000002,-1.3972186876001106e-09,0.55000000000000004,-3.6577646074621611e-09,0.57500000000000007,-9.5634616726067801e-09,0.60000000000000009,-2.4934425046235657e-08,0.625,-6.4594783222970078e-08,0.65000000000000002,-1.6493085582319065e-07,0.67500000000000004,-4.0868130472980025e-07,0.70000000000000007,-9.6116247988053517e-07)+(v(light)/1000)*pwl(v(cellhi,mid)/2,0,1.3549730611554419e-10,0.025000000000000001,1.3530083740007976e-10,0.050000000000000003,1.3510067269867956e-10,0.075000000000000011,1.3489660604312171e-10,0.10000000000000001,1.3468840825548359e-10,0.125,1.3447582330367215e-10,0.15000000000000002,1.3425856378492235e-10,0.17500000000000002,1.3403630585283119e-10,0.20000000000000001,1.3380868292412021e-10,0.22500000000000001,1.3357527812743415e-10,0.25,1.3333561450239847e-10,0.27500000000000002,1.3308914246389753e-10,0.30000000000000004,1.3283522208410721e-10,0.32500000000000001,1.3257309692922724e-10,0.35000000000000003,1.3230185109608407e-10,0.375,1.3202033046964549e-10,0.40000000000000002,1.3172698169543378e-10,0.42500000000000004,1.3141949265403456e-10,0.45000000000000001,1.310939383324102e-10,0.47500000000000003,1.3074267257959103e-10,0.5,1.30349005494306e-10,0.52500000000000002,1.2987360928719349e-10,0.55000000000000004,1.292197028599079e-10,0.57500000000000007,1.2814464613602281e-10,0.60000000000000009,1.2604226983527328e-10,0.625,1.2145042997884143e-10,0.65000000000000002,1.111646447815761e-10,0.67500000000000004,8.9506181583909814e-11,0.70000000000000007,4.9789836233574323e-11))}
+ Clogic logic_raw 0 2p
+ Vlogic logic_raw logic 0
+-Vpvlo celllo mid 0
+-Vpvhi cellhi act_raw 0
+-Vact act_raw act 0
+-Cstorelo mid 0 1p
+-Cstorehi act_raw mid 1p
+ Vclock logic clock_supply 0
+ Xclock clk clock_supply 0 bn bp microrobot_clock
+ Coutput clk 0 2f
+ Vdigital logic digital_supply 0
+ Xff clk feedback reset_n 0 0 digital_supply digital_supply q0 sky130_fd_sc_hd__dfrtp_1
+ Xfeedback q0 0 0 digital_supply digital_supply feedback sky130_fd_sc_hd__inv_1
+-* Measured switched-capacitor digital power proxy, not extracted RTL power.
+ Vproxy logic proxy_supply 0
+ Xproxy clk flop_load proxy_supply 0 micro_inv
+ Xcproxy1 flop_load 0 sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+ Xcproxy2 flop_load 0 sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+-* Native first DFF plus TWO functional bits: real-time /8 experiment.
+-Bclock_norm clock_n 0 V={1-v(q0)/max(v(logic),0.1)}
+-Breset_norm reset_ok_n 0 V={v(reset_n)/max(v(logic),0.1)}
+-Xphases clock_n reset_ok_n pan pbn microrobot_event_phases
+-* Functional CMOS output bridges: conductances move charge from measured rails.
+-* DAC outputs pan/pbn control conductance only; they deliver no phase energy.
+-Vphase logic phase_supply 0
+-Bpahi phase_supply pa I={(v(phase_supply)-v(pa))*min(max(v(pan),0),1)/10000}
+-Bpalo pa 0 I={v(pa)*(1-min(max(v(pan),0),1))/10000}
+-Bpbhi phase_supply pb I={(v(phase_supply)-v(pb))*min(max(v(pbn),0),1)/10000}
+-Bpblo pb 0 I={v(pb)*(1-min(max(v(pbn),0),1))/10000}
+-Vdriverslogic logic drivers_logic 0
+-Vdriversact act drivers_act 0
+-Vdriversmid mid drivers_mid 0
+-Xda pa driver_ready ea_driver drivers_logic drivers_act drivers_mid 0 microrobot_driver
+-Xdb pb driver_ready eb_driver drivers_logic drivers_act drivers_mid 0 microrobot_driver
+-Vea ea_driver ea 0
+-Veb eb_driver eb 0
+-Vreturn mid er 0
+-Xea ea sa ta micro_electrode
+-Xeb eb sb tb micro_electrode
+-Xreturn er sr tr micro_electrode cdl=400p qmax=2600p rf=1g
+-Rsa sa bulk 10meg
+-Rsb sb bulk 10meg
+-Rsr sr bulk 1meg
+-
+-* PROVISIONAL functional supervisor. Global hysteresis state, initially OFF.
+-* Logic ON/OFF=1.60/1.45 V; actuator span ON/OFF=1.50/1.40 V.
+-* The minimum normalized qualification gives both-ON restart after either-OFF.
+-* Numerical state circuit is isolated from all physical power ports.
+-* Supervisor physical quiescent power is uncharacterized, NOT known zero.
+-Bsupervisor_input supervisor_input 0 V={time<200u ? -1 : min((v(logic)-1.45)/0.15,(v(act)-1.40)/0.10)}
+-Vsupervisor_numeric_reference supervisor_numeric_reference 0 1
+-Ssupervisor supervisor_numeric_reference supervisor_state supervisor_input 0 supervisor_hysteresis
+-Rsupervisor_numeric_state supervisor_state 0 1g
+-.model supervisor_hysteresis SW(Ron=1 Roff=1e30 Vt=0.5 Vh=0.5)
+-* Independent real power ports for reset and driver-ready gate charging.
++* Existing rail-powered 10k reset bridge, held low by signal-only zero control.
++Vreset_control supervisor_state 0 0
+ Vsupervisor_reset logic supervisor_reset_supply 0
+ Bsupervisor_reset_hi supervisor_reset_supply reset_n I={(v(supervisor_reset_supply)-v(reset_n))*v(supervisor_state)/10000}
+ Bsupervisor_reset_lo reset_n 0 I={v(reset_n)*(1-v(supervisor_state))/10000}
+-Vsupervisor_driver act supervisor_driver_supply 0
+-Bsupervisor_driver_hi supervisor_driver_supply driver_ready I={(v(supervisor_driver_supply)-v(driver_ready))*v(supervisor_state)/10000}
+-Bsupervisor_driver_lo driver_ready 0 I={v(driver_ready)*(1-v(supervisor_state))/10000}
+-
+ .options method=gear maxord=2 reltol=1e-6 abstol=1e-15
+ .control
+ set wr_vecnames
+ set wr_singlescale
+ set numdgt=17
+-save v(supervisor_input) v(supervisor_state) i(Vsupervisor_reset) i(Vsupervisor_driver) v(light) v(logic_raw) v(logic) v(act_raw) v(act) v(mid) v(celllo) v(cellhi) v(clk) v(q0) v(bn) v(bp) v(reset_n) v(driver_ready) v(pan) v(pbn) v(pa) v(pb) v(ea_driver) v(eb_driver) v(ea) v(eb) v(er) v(sa) v(sb) v(sr) v(bulk) v(ta) v(tb) v(tr) i(Vlogic) i(Vact) i(Vpvlo) i(Vpvhi) i(Vclock) i(Vdigital) i(Vproxy) i(Vphase) i(Vdriverslogic) i(Vdriversact) i(Vdriversmid) i(Vea) i(Veb) i(Vreturn)
+-tran 2.4999999999999999e-08 0.008 0 2.4999999999999999e-08
+-wrdata controller.dat v(supervisor_input) v(supervisor_state) i(Vsupervisor_reset) i(Vsupervisor_driver) v(light) v(logic_raw) v(logic) v(act_raw) v(act) v(mid) v(celllo) v(cellhi) v(clk) v(q0) v(bn) v(bp) v(reset_n) v(driver_ready) v(pan) v(pbn) v(pa) v(pb) v(ea_driver) v(eb_driver) v(ea) v(eb) v(er) v(sa) v(sb) v(sr) v(bulk) v(ta) v(tb) v(tr) i(Vlogic) i(Vact) i(Vpvlo) i(Vpvhi) i(Vclock) i(Vdigital) i(Vproxy) i(Vphase) i(Vdriverslogic) i(Vdriversact) i(Vdriversmid) i(Vea) i(Veb) i(Vreturn)
++save v(light) v(logic_raw) v(logic) v(clk) v(q0) v(reset_n) v(bn) v(bp) v(supervisor_state) i(Vlogic) i(Vclock) i(Vdigital) i(Vproxy) i(Vsupervisor_reset)
++tran 25n 0.00025000000000000001 0 25n
++wrdata controller.dat v(light) v(logic_raw) v(logic) v(clk) v(q0) v(reset_n) v(bn) v(bp) v(supervisor_state) i(Vlogic) i(Vclock) i(Vdigital) i(Vproxy) i(Vsupervisor_reset)
+ quit
+ .endc
+ .end

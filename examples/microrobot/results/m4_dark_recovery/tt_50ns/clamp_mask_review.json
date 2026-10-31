@@ -1,0 +1,65 @@
+{
+  "definition": "Piecewise-linear threshold intersections; logic>=1V,act>=.5V; nativeR<=.1logic,driverready<=.1act. Engineering masks,not nativeVIH",
+  "actual_stop_s": 0.00300089994,
+  "masks": {
+    "native_low": {
+      "intervals_s": [
+        [
+          0.00040831092861578187,
+          0.000513908236905269
+        ],
+        [
+          0.0005163882638805626,
+          0.0005238719938294425
+        ]
+      ],
+      "total_duration_s": 0.00011308103823836713,
+      "fall1p5to1p6ms_overlap_s": 0.0,
+      "observed_dark1p6_to_stop_overlap_s": 0.0
+    },
+    "actual_driver_low": {
+      "intervals_s": [
+        [
+          0.00040831092861578187,
+          0.000513908236905269
+        ],
+        [
+          0.000513908236905269,
+          0.0005163882638805626
+        ],
+        [
+          0.0005163882638805626,
+          0.0005238719938294425
+        ],
+        [
+          0.0005238719938294425,
+          0.0005274637384859539
+        ]
+      ],
+      "total_duration_s": 0.00011915280987017198,
+      "fall1p5to1p6ms_overlap_s": 0.0,
+      "observed_dark1p6_to_stop_overlap_s": 0.0
+    },
+    "both_low": {
+      "intervals_s": [
+        [
+          0.00040831092861578187,
+          0.000513908236905269
+        ],
+        [
+          0.0005163882638805626,
+          0.0005238719938294425
+        ]
+      ],
+      "total_duration_s": 0.00011308103823836713,
+      "fall1p5to1p6ms_overlap_s": 0.0,
+      "observed_dark1p6_to_stop_overlap_s": 0.0
+    },
+    "native_low_driver_not_low": {
+      "intervals_s": [],
+      "total_duration_s": 0,
+      "fall1p5to1p6ms_overlap_s": 0,
+      "observed_dark1p6_to_stop_overlap_s": 0
+    }
+  }
+}

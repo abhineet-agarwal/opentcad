@@ -1,0 +1,213 @@
+{
+  "scope": "Exploratory LVT-pulldown AND-qualified driver-ready control; relative thresholds diagnostic, not acceptance",
+  "rows": 20491,
+  "actual_stop_s": 0.0008,
+  "requested_stop_s": 0.0008,
+  "complete": true,
+  "finite": true,
+  "crossing_method": "Linear interpolation of normalized instantaneous-domain signal; logic>=1V and time>=0.4ms for activation ordering",
+  "native_reset_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.000513908205424716,
+        "rising": true,
+        "logic_V": 1.560821455603068,
+        "actuator_V": 1.1915901303899048,
+        "native_reset_V": 0.1560820092544783
+      },
+      {
+        "time_s": 0.0005163882484298097,
+        "rising": false,
+        "logic_V": 1.5433444794662097,
+        "actuator_V": 1.1862068822516463,
+        "native_reset_V": 0.15433449610236818
+      },
+      {
+        "time_s": 0.0005238719601962174,
+        "rising": true,
+        "logic_V": 1.5300930821634269,
+        "actuator_V": 1.1897818505090496,
+        "native_reset_V": 0.1530094685436119
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.000529492398326028,
+        "rising": true,
+        "logic_V": 1.5537011607234423,
+        "actuator_V": 1.050763909755267,
+        "native_reset_V": 0.776850751553125
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.0005346993335593837,
+        "rising": true,
+        "logic_V": 1.5776378433636284,
+        "actuator_V": 1.0350814316755304,
+        "native_reset_V": 1.4198742904105843
+      }
+    ]
+  },
+  "driver_ready_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.0005274637114119833,
+        "rising": true,
+        "logic_V": 1.544513612936247,
+        "actuator_V": 1.1828261054024576,
+        "native_reset_V": 0.5752369133555699
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.0005275238397521964,
+        "rising": true,
+        "logic_V": 1.5447727924966945,
+        "actuator_V": 1.171343980643981,
+        "native_reset_V": 0.5721295196139418
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.0005275787602382952,
+        "rising": true,
+        "logic_V": 1.5449909218894107,
+        "actuator_V": 1.045509658645936,
+        "native_reset_V": 0.5340649931185345
+      }
+    ]
+  },
+  "phase_A_crossings": {
+    "0.1": [
+      {
+        "time_s": 0.0005296325134791101,
+        "rising": true,
+        "logic_V": 1.5548262931664176,
+        "actuator_V": 1.0499851906115942,
+        "native_reset_V": 0.7947319132111541
+      }
+    ],
+    "0.5": [
+      {
+        "time_s": 0.0005300325153761151,
+        "rising": true,
+        "logic_V": 1.553306931959386,
+        "actuator_V": 1.0110859980447584,
+        "native_reset_V": 0.8408035461834646
+      }
+    ],
+    "0.9": [
+      {
+        "time_s": 0.0005304325159194103,
+        "rising": true,
+        "logic_V": 1.5556286981094058,
+        "actuator_V": 0.9634584903340044,
+        "native_reset_V": 0.883871849034348
+      }
+    ]
+  },
+  "phase_B_crossings": {
+    "0.1": [],
+    "0.5": [],
+    "0.9": []
+  },
+  "native_reset_first_rising_0.1_s": 0.000513908205424716,
+  "native_reset_first_rising_0.5_s": 0.000529492398326028,
+  "native_reset_first_rising_0.9_s": 0.0005346993335593837,
+  "driver_ready_first_rising_0.1_s": 0.0005274637114119833,
+  "driver_ready_first_rising_0.5_s": 0.0005275238397521964,
+  "driver_ready_first_rising_0.9_s": 0.0005275787602382952,
+  "phase_A_first_rising_0.1_s": 0.0005296325134791101,
+  "phase_A_first_rising_0.5_s": 0.0005300325153761151,
+  "phase_A_first_rising_0.9_s": 0.0005304325159194103,
+  "driver10_minus_native10_s": 1.3555505987267332e-05,
+  "driver50_minus_native50_s": -1.9685585738315895e-06,
+  "driver90_minus_native90_s": -7.12057332108852e-06,
+  "driver90_minus_phaseA10_s": -2.0537532408148977e-06,
+  "native_definite_low": {
+    "definition": "diagnostic rail floors logic>=1V, actuator>=0.5V; relative thresholds10/90%",
+    "samples": 2775,
+    "time_range_s": [
+      0.000408327719,
+      0.000523847533
+    ],
+    "electrode_midpoint_error_peak_V": [
+      2.5268000000022717e-05,
+      2.5268000000022717e-05
+    ]
+  },
+  "driver_ready_definite_low": {
+    "definition": "diagnostic rail floors logic>=1V, actuator>=0.5V; relative thresholds10/90%",
+    "samples": 3003,
+    "time_range_s": [
+      0.000408327719,
+      0.000527460485
+    ],
+    "electrode_midpoint_error_peak_V": [
+      0.0021526530000000044,
+      0.0021526530000000044
+    ]
+  },
+  "native_uncertain": {
+    "definition": "diagnostic rail floors logic>=1V, actuator>=0.5V; relative thresholds10/90%",
+    "samples": 1345,
+    "time_range_s": [
+      0.00051392205,
+      0.000534674657
+    ],
+    "electrode_midpoint_error_peak_V": [
+      0.526599963,
+      0.49780108558999997
+    ]
+  },
+  "actuator_min": {
+    "V": 0.953424528,
+    "time_s": 0.000530681361,
+    "logic_V": 1.55700103,
+    "native_reset_V": 0.913598822,
+    "driver_ready_V": 0.95354657,
+    "mid_V": 0.441774305,
+    "ea_V": 0.912290821,
+    "eb_V": 0.00137547486
+  },
+  "logic_range_after_0p5ms_V": [
+    1.51478352,
+    1.79180051
+  ],
+  "reset_min_V": -0.0220179417,
+  "driver_ready_range_V": [
+    -0.000331315174,
+    1.18493556
+  ],
+  "source_energy_nJ": {
+    "logic": 0.008638011282952024,
+    "actuator": 0.021375626892822883,
+    "clock": 0.008173485910145113,
+    "firstff": 0.00018880323253589066,
+    "proxy": 0.00017800079551172953,
+    "resetlogic": 6.482717315421892e-05,
+    "monitor": 0.007781646452516083,
+    "phase": 1.302675820379096e-05,
+    "resetact": 5.313871671371487e-05
+  },
+  "driver_buffer_actuator_energy_nJ": 9.353740612474451e-05,
+  "driver_buffer_peak_supply_current_A": 6.59573242e-07,
+  "end_V": {
+    "v(logic)": 1.73225359,
+    "v(act)": 1.1760857,
+    "v(ready)": 1.1757273,
+    "v(reset_n)": 1.73437685,
+    "v(driver_ready)": 1.1760815,
+    "v(pa)": 1.73225544,
+    "v(pb)": -1.76755083e-06,
+    "v(ea)": 1.17367054,
+    "v(eb)": 0.000616171886,
+    "v(clk)": -3.50277651e-06,
+    "v(q0)": -6.50642902e-08
+  },
+  "Q_half_logic_crossings_s": [
+    0.00059584826,
+    0.000704741255
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "tests": {
+    "passed": 2,
+    "seconds": 1.37,
+    "simulator_calls": 0
+  },
+  "ruff": "All checks passed",
+  "counts": {
+    "ngspice_processes": 1,
+    "transients": 1,
+    "model_copies": 2,
+    "fine": 0,
+    "rescue": 0,
+    "DD": 0,
+    "layout": 0
+  },
+  "both_copies_complete_finite": true,
+  "eta_coverage_comparisons_pass": true,
+  "all_current_comparisons_pass": false,
+  "input_knot_duplicates": 0,
+  "stimulus_exported": false,
+  "raw_exported": false,
+  "limits_changed_after_execution": false,
+  "scope": "External-source replay completion with unresolved transient-current precision; no unique coupled cause or end-to-end actuation acceptance",
+  "review_acceptance": "Reviewed and accepted as completed isolated replay evidence with failed current-agreement gates; end-to-end actuation remains unvalidated."
+}

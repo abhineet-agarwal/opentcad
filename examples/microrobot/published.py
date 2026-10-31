@@ -80,7 +80,7 @@ def terminal_table(pair: SingleDiodePV):
 
 def plot_clock_validation(summary, clock_directory, destination):
     folder = Path(clock_directory)
-    preview = folder / "pv_startup/waveform.csv"
+    preview = folder / "pv_startup/waveform.csv.gz"
     if not preview.is_file():
         raise FileNotFoundError("Clock waveform preview missing; rerun the SPICE characterization")
     data = np.loadtxt(preview, delimiter=",", skiprows=1)
@@ -118,12 +118,12 @@ def plot_clock_validation(summary, clock_directory, destination):
     plt.close(fig)
 
 
-def run(destination=HERE / "results/published_system", *, with_spice=False):
+def run(destination=HERE / "local_runs/published_system", *, with_spice=False):
     dest = Path(destination)
     dest.mkdir(parents=True, exist_ok=True)
-    pv_dest = HERE / "results/published"
+    pv_dest = dest / "pv_fit"
     pair, fit = fit_digitized(HERE / "data/s2e_digitized.csv", pv_dest)
-    clock_dest = HERE / "results/clock_final"
+    clock_dest = dest / "clock" if with_spice else HERE / "results/clock_final"
     if with_spice:
         from .clock import run_clock_matrix
         summary, _ = run_clock_matrix(clock_dest, pair)
@@ -212,7 +212,7 @@ def run(destination=HERE / "results/published_system", *, with_spice=False):
                   "storage": "Chosen 2 pF logic and 1 pF per actuator rail; junction capacitance not measured",
                   "startup": "Direct clock SPICE is authoritative; reduced model subthreshold startup load is approximate"}}
     (dest / "report.json").write_text(json.dumps(report, indent=2) + "\n")
-    np.savetxt(dest / "waveforms.csv", np.column_stack([nominal[k][::5] for k in (
+    np.savetxt(dest / "waveforms.csv.gz", np.column_stack([nominal[k][::5] for k in (
         "time_s", "logic_V", "positive_V", "negative_magnitude_V", "drive_A_V", "drive_B_V",
         "eta_A_V", "eta_B_V", "electrolyte_bulk_V", "curvature_A_m_inv", "curvature_B_m_inv")]),
         delimiter=",", header="time_s,logic_V,positive_V,negative_magnitude_V,drive_A_V,drive_B_V,"
@@ -250,7 +250,7 @@ def run(destination=HERE / "results/published_system", *, with_spice=False):
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=HERE / "results/published_system")
+    parser.add_argument("--output", type=Path, default=HERE / "local_runs/published_system")
     parser.add_argument("--spice", action="store_true")
     args = parser.parse_args()
     run(args.output, with_spice=args.spice)

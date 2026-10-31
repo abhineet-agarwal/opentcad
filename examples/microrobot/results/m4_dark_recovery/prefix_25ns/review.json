@@ -1,0 +1,210 @@
+{
+  "status": "Completed distinctpowerdownprefix; notfull dark/recovery qualification",
+  "requested_stop_s": 0.0022,
+  "actual_stop_s": 0.0022,
+  "rows": 103842,
+  "finite": true,
+  "recovery_observed": false,
+  "planned_end_dark_reached": false,
+  "qualified_native_edges": {
+    "rising_count": 12,
+    "each_has_one_Q": true,
+    "unmatched_qualified_Q_count": 0
+  },
+  "limits": {
+    "electrode_outside_rails_V": {
+      "ea": 0.00990457053,
+      "eb": 0.000262377421
+    },
+    "limit_V": 0.1,
+    "reset_low_clamp": {
+      "native_reset_low": {
+        "samples": 4966,
+        "peak_midpoint_error_V": {
+          "ea": 2.5268000000022717e-05,
+          "eb": 2.5268000000022717e-05
+        }
+      },
+      "actual_driver_low": {
+        "samples": 5282,
+        "peak_midpoint_error_V": {
+          "ea": 0.0022191179999999644,
+          "eb": 0.0022191179999999644
+        }
+      },
+      "both_definite_low": {
+        "samples": 4966,
+        "peak_midpoint_error_V": {
+          "ea": 2.5268000000022717e-05,
+          "eb": 2.5268000000022717e-05
+        }
+      }
+    },
+    "clamp_limit_V": 0.05,
+    "meaningful_rail_floors": "logic>=1V,actuator>=.5V; diagnosticfloors only",
+    "lowrail_activity": {
+      "logic_below1V": {
+        "samples": 16490,
+        "time_range_s": [
+          0.0,
+          0.000408307488
+        ],
+        "ranges_V": {
+          "v(logic)": [
+            -7.80557721e-17,
+            0.999978503
+          ],
+          "v(act)": [
+            -3.10580444e-15,
+            1.17935268
+          ],
+          "v(reset_n)": [
+            -4.15771378e-05,
+            0.214951169
+          ],
+          "v(driver_ready)": [
+            -1.87938102e-05,
+            0.279272202
+          ],
+          "v(clk)": [
+            -1.77953144e-15,
+            0.999969079
+          ],
+          "v(q0)": [
+            -2.2947569e-05,
+            0.161364088
+          ],
+          "v(pa)": [
+            -8.59131481e-07,
+            0.0582724071
+          ],
+          "v(pb)": [
+            -8.13425245e-07,
+            1.11513661e-06
+          ]
+        }
+      },
+      "logic1to1p6V": {
+        "samples": 31026,
+        "time_range_s": [
+          0.000408332488,
+          0.0022
+        ],
+        "ranges_V": {
+          "v(logic)": [
+            1.00013486,
+            1.59997384
+          ],
+          "v(act)": [
+            0.761534977,
+            1.19419404
+          ],
+          "v(reset_n)": [
+            -0.0220181273,
+            1.60001956
+          ],
+          "v(driver_ready)": [
+            -0.000328839657,
+            1.06890568
+          ],
+          "v(clk)": [
+            -4.11077985e-05,
+            1.57600594
+          ],
+          "v(q0)": [
+            -0.0490689335,
+            1.45532125
+          ],
+          "v(pa)": [
+            -0.000264530164,
+            1.59997399
+          ],
+          "v(pb)": [
+            -0.000710100346,
+            6.12455397e-07
+          ]
+        }
+      },
+      "dark_observed": {
+        "samples": 24503,
+        "time_range_s": [
+          0.0016,
+          0.0022
+        ],
+        "ranges_V": {
+          "v(logic)": [
+            1.2395837,
+            1.60774636
+          ],
+          "v(act)": [
+            0.761534977,
+            0.960597759
+          ],
+          "v(reset_n)": [
+            1.2395515,
+            1.60759968
+          ],
+          "v(driver_ready)": [
+            0.761564928,
+            0.960686014
+          ],
+          "v(clk)": [
+            -4.11077985e-05,
+            1.44854603
+          ],
+          "v(q0)": [
+            -0.0490689335,
+            1.45532125
+          ],
+          "v(pa)": [
+            1.23958372,
+            1.60774653
+          ],
+          "v(pb)": [
+            -0.000710100346,
+            -1.0494221e-08
+          ]
+        }
+      }
+    }
+  },
+  "event_phase": {
+    "reset_input_crossings": [
+      {
+        "time_s": 0.00013218337491705779,
+        "rising": true,
+        "logic_V": 0.011095844750321292,
+        "actuator_V": 0.1536890267253737
+      },
+      {
+        "time_s": 0.0001737405012980402,
+        "rising": false,
+        "logic_V": 0.058269325256289015,
+        "actuator_V": 0.7444041293529355
+      },
+      {
+        "time_s": 0.0005294920889079456,
+        "rising": true,
+        "logic_V": 1.553699387979821,
+        "actuator_V": 1.0507592583447267
+      }
+    ],
+    "functional_guard_s": 2e-06,
+    "definition": "After normalizedreset<.5 plus2ussettling; allguardexclusions retained in raw traces",
+    "dark_reset_low_observed": false,
+    "dark_clear_evaluable_samples": 0,
+    "phase_peak_during_clear": {
+      "v(pan)": null,
+      "v(pbn)": null
+    },
+    "last_normalized_reset": 0.999974022,
+    "last_phase_states": {
+      "pan": 1.0,
+      "pbn": 0.0
+    },
+    "restart_observation": "NOTREACHED:prefix stops2.2ms before plannedrelight bydesign"
+  },
+  "dark_retention_observation": "Atlastsavedstate native reset/driverenable andphaseA remainhigh atlogicbelow1.6V; no completedbrownout/recovery qualification",
+  "complete": true,
+  "purpose": "Reproduce preabortlow-rail reset/driverretention; original4.5msfailure andskipped25ns remainunchanged"
+}

@@ -1,0 +1,97 @@
+{
+  "rc": {
+    "Cads_charge_max_abs_C": [
+      1.1676328216803089e-16,
+      1.1676328189741403e-16,
+      2.335253546786875e-16
+    ],
+    "Cads_charge_excursion_C": [
+      1.1808220290454585e-16,
+      1.18082202633929e-16,
+      2.3616330755565904e-16
+    ],
+    "Cdl_charge_max_abs_C": [
+      7.410909028937595e-16,
+      7.410909028937595e-16,
+      1.4821813883791891e-15
+    ],
+    "Cdl_charge_excursion_C": [
+      8.722106753733527e-16,
+      8.722106753733527e-16,
+      1.7444211324546545e-15
+    ],
+    "accepted_dt_min_s": 1.2911329991260878e-14,
+    "accepted_dt_max_s": 1.3330022535742623e-08,
+    "last_accepted_time_s": 0.00024999999999999995,
+    "nearest_logic_PWL_knot_s": 0.00025,
+    "distance_to_nearest_knot_s": -5.421010862427522e-20,
+    "terminal_current_scales": [
+      {
+        "peak_A": 4.777460020657406e-10,
+        "minimum_above_declared_1pA_floor_A": 1.0000323675075292e-12,
+        "5percentile_above_floor_A": 1.0332481842498832e-12
+      },
+      {
+        "peak_A": 4.777460020670321e-10,
+        "minimum_above_declared_1pA_floor_A": 1.0000326483991305e-12,
+        "5percentile_above_floor_A": 1.0332481695956835e-12
+      },
+      {
+        "peak_A": 9.554919048067848e-10,
+        "minimum_above_declared_1pA_floor_A": 1.0000265595072248e-12,
+        "5percentile_above_floor_A": 1.7714622942659427e-12
+      }
+    ],
+    "current_floor_definition": "Only |I|>=1pA treated as active; lower samples are not a precision claim"
+  },
+  "stable": {
+    "Cads_charge_max_abs_C": [
+      2.3211550848056818e-17,
+      2.321155111867368e-17,
+      4.642613044003596e-17
+    ],
+    "Cads_charge_excursion_C": [
+      2.453048267986313e-17,
+      2.4530482860274375e-17,
+      4.906408827831665e-17
+    ],
+    "Cdl_charge_max_abs_C": [
+      7.410891745029957e-16,
+      7.410891744630276e-16,
+      1.4821774617868045e-15
+    ],
+    "Cdl_charge_excursion_C": [
+      8.722089288815126e-16,
+      8.722089287926948e-16,
+      1.7444172010216975e-15
+    ],
+    "accepted_dt_min_s": 9.765624994859806e-13,
+    "accepted_dt_max_s": 1.3296831679822276e-08,
+    "last_accepted_time_s": 6.0406096197408286e-05,
+    "nearest_logic_PWL_knot_s": 6.040609697865829e-05,
+    "distance_to_nearest_knot_s": -7.812500036545426e-13,
+    "terminal_current_scales": [
+      {
+        "peak_A": 4.77745465403592e-10,
+        "minimum_above_declared_1pA_floor_A": 1.000430693349084e-12,
+        "5percentile_above_floor_A": 1.7709454915658749e-12
+      },
+      {
+        "peak_A": 4.777454652759955e-10,
+        "minimum_above_declared_1pA_floor_A": 1.0004279177905573e-12,
+        "5percentile_above_floor_A": 1.7709466612789909e-12
+      },
+      {
+        "peak_A": 9.55490814026778e-10,
+        "minimum_above_declared_1pA_floor_A": 1.0018800515576427e-12,
+        "5percentile_above_floor_A": 3.1481356703989846e-12
+      }
+    ],
+    "current_floor_definition": "Only |I|>=1pA treated as active; lower samples are not a precision claim"
+  },
+  "candidate": {
+    "CHGTOL_C": 1e-20,
+    "1pA_times_25ns_C": 2.5e-20,
+    "interpretation": "Charge-scale rationale only, not a direct saved-current error bound; all probes/physics/other tolerances unchanged"
+  }
+}

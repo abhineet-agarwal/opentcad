@@ -1,0 +1,104 @@
+[
+  {
+    "circuit": "starved_clock.spice",
+    "sha256": "dc606bcaa35616e6412c2b8d8c63e17175f6b53d6baad820a222b66b74dc29de",
+    "status": "Preserved nominal clock; previously qualified clock/first-DFF benches. Full controller not qualified.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "actuator_driver.spice",
+    "sha256": "dea3d0636501f19becdbe2d998decf202fef3aa19cf7879d22f9897dfbd52973",
+    "status": "Preserved driver with standalone preliminary corner checks; actual gates retained in coupled experiments.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "electrochemical.spice",
+    "sha256": "9df4c5ef9c56e9ce4c421a51be3d538eebba26b619301916c1b04f782fe7c2d3",
+    "status": "Reduced interface model; not calibrated device data.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "bias_reference.spice",
+    "sha256": "27cba31a6adca8fb38f7cd84695e9fbc333846794ef520a36926f8cbd131f4e1",
+    "status": "Existing physically verified bias macro only; no new M4 layout.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "brownout_candidate.spice",
+    "sha256": "970935d893921034f75ca26ae52e7cbd1550e5e87ef480de0302cc98412cfba2",
+    "status": "Original corner-rejected monitor; not complete POR.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "brownout_v2.spice",
+    "sha256": "c18bfb0076482bad658205bdc2ba1286eeaaac41e212586056e4029bdb91fbd1",
+    "status": "Legacy coupled default monitor; startup investigated, no complete POR corner gate.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "brownout_v3.spice",
+    "sha256": "dcd62f9046933d316dd07f69f3eccccc769da5f1cecc12c2595ce5a4b50220ba",
+    "status": "Exploratory keeper revision; no complete POR acceptance.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "ready_levelshift.spice",
+    "sha256": "a06d7402634eeb7222b40443df5eefabef5e8f11efd6364bb5ed984082d44929",
+    "status": "Legacy cross-coupled converter; nominal startup loading failure.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "ready_levelshift_weak.spice",
+    "sha256": "903a142def1534cc95ab58522243850146429140a90ac87c834938dbae2d8c8d",
+    "status": "PMOS L16 model-eligible, but release at 1.289 V and \u22120.411 V undershoot fail provisional gate.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "ready_levelshift_buffered.spice",
+    "sha256": "9fa52232431905d10ca5b320738842f4b79a52d4e9f03389629abf9b4d9ef6d7",
+    "status": "Actuator prebuffer plus original latch; rejected low-rail release/negative reset excursion.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "ready_levelshift_current_limited.spice",
+    "sha256": "836a0183fc713e59b59bb610e752b5e8ddd489bbc09b79effabbb7e7b275001d",
+    "status": "Six-port bp-connected nonregenerative converter; short nominal 50/25 ns numerical reference passes. Original monitor-ready still controls drivers in that reference.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "ready_levelshift_qualified.spice",
+    "sha256": "92a4d00a24f6316e3dea6cd5f1484b985dab0b6386c216439efd285aba052eaf",
+    "status": "**Unexecuted, superseded design sketch.** Starved first stage does not bound ordinary second-stage crowbar.",
+    "unexecuted_design": true
+  },
+  {
+    "circuit": "ready_levelshift_schmitt.spice",
+    "sha256": "f619da17b492d6d69cc5760712bfd58dd337e83db8a3b5053ff57bc230a71a73",
+    "status": "Isolated receiver has 0.451 V hysteresis and fast edges, but 99 pJ rising-ramp energy; rejected for this supply budget. No coupled run.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "ready_driver_buffer.spice",
+    "sha256": "8a6f8e698186c78b39bf7cfdd17b008e517bc5e171c392e4f946bf25e8cb59bb",
+    "status": "Direct actuator inverter pair; low energy but early cold-start clamp release. Rejected policy.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "ready_driver_qualified.spice",
+    "sha256": "0d71369f573b67b1dd52bc7828235e48396387afce09c62b5d7b094c0aee55f5",
+    "status": "AND(native reset, monitor-ready), standard-Vt output; cold-start metal error remains about 235 mV.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "ready_driver_qualified_lvt.spice",
+    "sha256": "7604cb233934b9733029d0d40b49d2501d0ff57b320b379a88868cf009d9b5c5",
+    "status": "Same AND with final LVT output pulldown; TT 2 ms / 50 ns and 25 ns scoped numerical/clamp gates pass; 85 \u00b0C startup remains unresolved after an early numerical abort. Full controller remains unaccepted.",
+    "unexecuted_design": false
+  },
+  {
+    "circuit": "starved_clock_slow.spice",
+    "sha256": "3f7e930eec05ccd530aa4a78d522986ffcfa602b3a8f782ff2ac2033cee1fd0a",
+    "status": "Real changed clock design, not time acceleration. Enlarged timing plates total 2100 \u00b5m\u00b2; finite-PV native-divider gate fails.",
+    "unexecuted_design": false
+  }
+]

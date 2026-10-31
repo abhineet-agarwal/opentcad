@@ -1,0 +1,229 @@
+
+Note: Compatibility modes selected: hs a
+
+
+Circuit: * opentcad microrobot interface experiment
+
+option SCALE: Scale is set to 1e-06 for instance and model parameters
+Reducing trtol to 1 for xspice 'A' devices
+Doing analysis at TEMP = 26.850000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+light                                        0
+lp1                                5.38178e-20
+lp2                                1.07636e-19
+logic_raw                          1.61453e-19
+celllo                            -4.99754e-20
+mid                               -4.99754e-20
+cellhi                            -1.26015e-19
+act_raw                           -1.26015e-19
+logic                              1.61453e-19
+act                               -1.26015e-19
+clock_supply                       1.61453e-19
+xclock.ref_vdd                     1.61453e-19
+bn                                -2.34804e-19
+xclock.b2                          -7.2772e-20
+bp                                 5.19966e-19
+xclock.xcbiasp.a                             0
+xclock.xcbiasp.b1                            0
+xclock.xcbiasn.a                             0
+xclock.xcbiasn.b1                            0
+xclock.x1.ps                       2.00876e-19
+xclock.a                          -1.35939e-22
+xclock.raw                        -4.50025e-19
+xclock.x1.ns                      -6.93441e-20
+xclock.x2.ps                       2.01097e-19
+xclock.b                           7.81558e-19
+xclock.x2.ns                      -6.50018e-19
+xclock.x3.ps                       2.01905e-19
+xclock.c                           9.23152e-20
+xclock.x3.ns                       5.97654e-20
+xclock.x4.ps                       2.01106e-19
+xclock.d                           1.32288e-19
+xclock.x4.ns                       3.84507e-20
+xclock.x5.ps                       2.01492e-19
+xclock.x5.ns                        2.4817e-19
+xclock.xc1.a                                 0
+xclock.xc1.b1                                0
+xclock.xc2.a                                 0
+xclock.xc2.b1                                0
+xclock.xc3.a                                 0
+xclock.xc3.b1                                0
+xclock.xc4.a                                 0
+xclock.xc4.b1                                0
+xclock.xc5.a                                 0
+xclock.xc5.b1                                0
+xclock.buffered                    5.45606e-20
+clk                                8.39832e-19
+digital_supply                     1.61453e-19
+feedback                           2.67019e-19
+q0                                 -2.7073e-21
+reset_n                            3.83159e-20
+reset_supply                       1.61453e-19
+reset_act_supply                  -1.26015e-19
+xready.input_b                     -2.3239e-20
+ready                              -2.3239e-20
+proxy_supply                       1.61453e-19
+flop_load                          7.59956e-21
+xcproxy1.a                                   0
+xcproxy1.b1                                  0
+xcproxy2.a                                   0
+xcproxy2.b1                                  0
+monitor_supply                    -1.26015e-19
+xmonitor.ref                      -8.54126e-19
+xmonitor.fbs                       1.66453e-19
+xmonitor.tail                      7.00316e-19
+xmonitor.diode                    -5.85043e-19
+xmonitor.sense                    -4.29821e-19
+xmonitor.xcref.a                             0
+xmonitor.xcref.b1                            0
+xmonitor.xcsense.a                           0
+xmonitor.xcsense.b1                          0
+clock_n                                      1
+reset_ok_n                         3.83159e-19
+pan                                          0
+pbn                                          0
+pa_source                                    0
+pb_source                                    0
+pa_buffer                                    0
+pb_buffer                                    0
+pa                                           0
+pb                                           0
+xda.phase_b                        1.65343e-20
+xda.phase_local_b                 -2.32396e-20
+xda.phase_local                   -2.32518e-20
+xda.p_gate                        -1.14429e-19
+driver_ready                       -2.3239e-20
+xda.xhigh.series                   5.59831e-20
+xda.low_b                         -1.14392e-19
+xda.xlow.series                    5.59352e-20
+xda.n_gate                         -2.3239e-20
+xda.off                            -2.3239e-20
+ea                                -4.95245e-20
+xda.xsnub.a                       -4.99754e-20
+xda.xsnub.b1                      -4.99754e-20
+xdb.phase_b                        1.65343e-20
+xdb.phase_local_b                 -2.32396e-20
+xdb.phase_local                   -2.32518e-20
+xdb.p_gate                        -1.14413e-19
+xdb.xhigh.series                   5.59461e-20
+xdb.low_b                         -1.14393e-19
+xdb.xlow.series                    5.59378e-20
+xdb.n_gate                         -2.3239e-20
+xdb.off                            -2.3239e-20
+eb                                -4.95245e-20
+xdb.xsnub.a                       -4.99754e-20
+xdb.xsnub.b1                      -4.99754e-20
+sa                                -4.98999e-20
+ta                                         0.5
+sb                                -4.98999e-20
+tb                                         0.5
+sr                                -4.99004e-20
+tr                                         0.5
+bulk                              -4.99003e-20
+driverbuffer_supply               -1.26015e-19
+xdriverbuffer.ib                  -2.32385e-20
+bpb#branch                                   0
+bpa#branch                                   0
+breset_norm#branch                           0
+bclock_norm#branch                           0
+vdriverbuffer#branch              -1.79958e-31
+vpb#branch                                   0
+vpa#branch                                   0
+vmonitor#branch                    1.59526e-30
+vproxy#branch                     -1.72027e-31
+vresetact#branch                   -8.9948e-32
+vresetlogic#branch                 4.43352e-31
+vdigital#branch                    5.10553e-31
+v.xclock.vbias#branch             -1.12855e-31
+vclock#branch                     -8.49338e-31
+vact#branch                        7.59292e-32
+vlogic#branch                     -5.37418e-32
+vpvhi#branch                       7.59292e-32
+vpvlo#branch                       4.99029e-32
+vlight#branch                                0
+a.xphases.aout#branch_1_0                    0
+a.xphases.aout#branch_1_1                    0
+
+ Reference value :  0.00000e+00
+ Reference value :  1.82300e-05
+ Reference value :  3.68800e-05
+ Reference value :  5.52800e-05
+ Reference value :  7.28300e-05
+ Reference value :  8.79800e-05
+ Reference value :  1.03825e-04
+ Reference value :  1.20275e-04
+ Reference value :  1.38210e-04
+ Reference value :  1.55110e-04
+ Reference value :  1.67234e-04
+ Reference value :  1.82699e-04
+ Reference value :  1.92201e-04
+ Reference value :  2.09111e-04
+ Reference value :  2.23811e-04
+ Reference value :  2.41711e-04
+ Reference value :  2.61011e-04
+ Reference value :  2.78961e-04
+ Reference value :  2.96711e-04
+ Reference value :  3.15511e-04
+ Reference value :  3.31508e-04
+ Reference value :  3.46327e-04
+ Reference value :  3.59712e-04
+ Reference value :  3.68754e-04
+ Reference value :  3.85904e-04
+ Reference value :  4.04754e-04
+ Reference value :  4.23054e-04
+ Reference value :  4.41904e-04
+ Reference value :  4.59954e-04
+ Reference value :  4.76554e-04
+ Reference value :  4.96204e-04
+ Reference value :  5.11086e-04
+ Reference value :  5.15010e-04
+ Reference value :  5.16634e-04
+ Reference value :  5.16646e-04
+ Reference value :  5.17902e-04
+ Reference value :  5.24733e-04
+ Reference value :  5.24878e-04
+ Reference value :  5.27652e-04
+ Reference value :  5.27991e-04
+ Reference value :  5.28086e-04
+ Reference value :  5.28540e-04
+ Reference value :  5.38140e-04
+ Reference value :  5.53359e-04
+ Reference value :  5.66384e-04
+ Reference value :  5.78990e-04
+ Reference value :  5.95479e-04
+ Reference value :  5.95724e-04
+ Reference value :  5.95724e-04
+ Reference value :  5.95748e-04
+ Reference value :  6.09611e-04
+ Reference value :  6.21773e-04
+ Reference value :  6.33117e-04
+ Reference value :  6.52203e-04
+ Reference value :  6.56073e-04
+ Reference value :  6.56075e-04
+ Reference value :  6.57007e-04
+ Reference value :  6.72855e-04
+ Reference value :  6.85046e-04
+ Reference value :  6.99410e-04
+ Reference value :  7.04635e-04
+ Reference value :  7.04638e-04
+ Reference value :  7.04642e-04
+ Reference value :  7.08797e-04
+ Reference value :  7.24710e-04
+ Reference value :  7.36155e-04
+ Reference value :  7.52737e-04
+ Reference value :  7.57718e-04
+ Reference value :  7.57722e-04
+ Reference value :  7.60229e-04
+ Reference value :  7.74835e-04
+ Reference value :  7.86523e-04
+No. of Data Rows : 20727
+ngspice-44.2 done
+Warning: m=xx on .subckt line will override multiplier m hierarchy!
+

@@ -1,0 +1,12 @@
+{
+  "status": "REJECTED incomplete numerical control; no rescue cascade",
+  "requested_stop_s": 0.0008,
+  "actual_stop_s": 8.12994395e-05,
+  "rows": 1778,
+  "finite": true,
+  "failure": "TRAN timestep too small6.25e-20s; node vmonitor#branch; dynamicgminstepping completed",
+  "netlist_sha256": "a9ae0c47b8147aae2af52d1e11c99ca48af4544ee4e6dcab1cbd00e694344454",
+  "physical_failure_not_established": true,
+  "powered_clamp_or_leakage_acceptance_available": false,
+  "stopped_before_optical_ramp": true
+}

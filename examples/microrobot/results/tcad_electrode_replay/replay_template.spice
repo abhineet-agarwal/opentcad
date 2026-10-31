@@ -1,0 +1,47 @@
+* Isolated full electrode/solution networks with externally powered replay
+.temp 26.85
+.func ads_c(z) {abs(z)<1e-3 ? -z*z*z*(1/3-z*z*(2/15-z*z*17/315)) : tanh(z)-z}
+.include "../metal_history.spice"
+.subckt electrode_rc metal solution adsnode params: cdl=40p qmax=260p tau=20m rf=10g width=0.08 offset=0
+Cdouble metal solution {cdl}
+Rfaradaic metal solution {rf}
+Rads metal adsnode {tau*4*width/qmax}
+Cads adsnode solution {qmax/(4*width)}
+.ends electrode_rc
+Xstim_rc rc_srca rc_srcb rc_srcr metal_history
+Vp_rc_a rc_srca rc_a 0
+Xe_rc_a rc_a rc_sa rc_xa electrode_rc
+Rs_rc_a rc_sa rc_bulk 10meg
+Vp_rc_b rc_srcb rc_b 0
+Xe_rc_b rc_b rc_sb rc_xb electrode_rc
+Rs_rc_b rc_sb rc_bulk 10meg
+Vp_rc_r rc_srcr rc_r 0
+Xe_rc_r rc_r rc_sr rc_xr electrode_rc cdl=400p qmax=2600p rf=1g
+Rs_rc_r rc_sr rc_bulk 1meg
+.subckt electrode_stable metal solution adsnode params: cdl=40p qmax=260p tau=20m rf=10g width=0.08 offset=0
+Cdouble metal solution {cdl}
+Rfaradaic metal solution {rf}
+Bads_stable metal adsnode I={qmax/(4*width*tau)*(v(metal,adsnode)-offset+2*width*ads_c((v(metal,solution)-offset)/(2*width)))}
+Cads adsnode solution {qmax/(4*width)}
+.ends electrode_stable
+Xstim_stable stable_srca stable_srcb stable_srcr metal_history
+Vp_stable_a stable_srca stable_a 0
+Xe_stable_a stable_a stable_sa stable_xa electrode_stable
+Rs_stable_a stable_sa stable_bulk 10meg
+Vp_stable_b stable_srcb stable_b 0
+Xe_stable_b stable_b stable_sb stable_xb electrode_stable
+Rs_stable_b stable_sb stable_bulk 10meg
+Vp_stable_r stable_srcr stable_r 0
+Xe_stable_r stable_r stable_sr stable_xr electrode_stable cdl=400p qmax=2600p rf=1g
+Rs_stable_r stable_sr stable_bulk 1meg
+.options method=gear maxord=2 reltol=1e-6 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+set numdgt=17
+save v(rc_a) v(rc_b) v(rc_r) v(rc_sa) v(rc_sb) v(rc_sr) v(rc_xa) v(rc_xb) v(rc_xr) v(rc_bulk) i(Vp_rc_a) i(Vp_rc_b) i(Vp_rc_r) v(stable_a) v(stable_b) v(stable_r) v(stable_sa) v(stable_sb) v(stable_sr) v(stable_xa) v(stable_xb) v(stable_xr) v(stable_bulk) i(Vp_stable_a) i(Vp_stable_b) i(Vp_stable_r)
+tran 25n .00025 0 25n
+wrdata replay.dat v(rc_a) v(rc_b) v(rc_r) v(rc_sa) v(rc_sb) v(rc_sr) v(rc_xa) v(rc_xb) v(rc_xr) v(rc_bulk) i(Vp_rc_a) i(Vp_rc_b) i(Vp_rc_r) v(stable_a) v(stable_b) v(stable_r) v(stable_sa) v(stable_sb) v(stable_sr) v(stable_xa) v(stable_xb) v(stable_xr) v(stable_bulk) i(Vp_stable_a) i(Vp_stable_b) i(Vp_stable_r)
+quit
+.endc
+.end

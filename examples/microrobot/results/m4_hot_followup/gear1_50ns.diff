@@ -1,0 +1,7 @@
+--- original_hot_Gear2
++++ hot_Gear1_50ns
+@@ -275,3 +275,3 @@
+ Xdriverbuffer reset_n ready driver_ready driverbuffer_supply 0 microrobot_ready_driver_qualified_lvt
+-.options method=gear maxord=2 reltol=1e-6 abstol=1e-15
++.options method=gear maxord=1 reltol=1e-6 abstol=1e-15
+ .control

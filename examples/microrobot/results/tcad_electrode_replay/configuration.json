@@ -1,0 +1,34 @@
+{
+  "scope": "One isolated two-model electrode replay of frozen adaptive metal histories.",
+  "benchmark_raw_sha256": "60c5bebe6f26885cc3bd4eb7d15f45f3d8dd220260415f37ebe367bc3c80d2f5",
+  "benchmark_local_path": "/Users/abhineet/Documents/opentcad_final/examples/microrobot/local_runs/tcad_passive_adsorption/controller.dat",
+  "stimulus_local_path": "/Users/abhineet/Documents/opentcad_final/examples/microrobot/local_runs/tcad_electrode_replay/metal_history.spice",
+  "stimulus_points_each": 14298,
+  "duplicate_times_removed": 0,
+  "duplicate_policy": "Remove identical duplicates only; reject conflicting same-time values rather than moving/smoothing events",
+  "maximum_input_gap_s": 2.500000000001416e-08,
+  "interpolation_limit": "Exact original knots, linear between them; no bound on unknown original between-sample waveform or edge-derivative error",
+  "comparison_thresholds": {
+    "benchmark_eta_abs_V": 1e-06,
+    "benchmark_coverage_abs": 1e-08,
+    "benchmark_current_abs_A": 5e-12,
+    "benchmark_relative_peak": 0.02,
+    "model_eta_abs_V": 1e-07,
+    "model_coverage_abs": 1e-09,
+    "model_current_abs_A": 1e-12,
+    "model_relative_peak": 0.001
+  },
+  "source_scope": "Independent external ideal voltage sources supply measured signed work, not finite PV or driver power",
+  "initialization": "Default operating point; no UIC/seed/IC",
+  "duration_s": 0.00025,
+  "max_step_s": 2.5e-08,
+  "source_dependency_sha256": {
+    "examples/microrobot/tcad_electrode_replay.py": "35c113e677a1aa7140155dad8d25c12134195d0016725ff87ec284c569b47234",
+    "tests/integration/test_tcad_electrode_replay.py": "fd8a8a74ff41e7b8dee6b7331f6aa1d51c7d58809d3a73e7ab3d85524efcc019",
+    "examples/microrobot/tcad_controller.py": "ab8852f14fe0feb78d0fa25ad518afeb5d61a611f07cea7e5e2df92ea8482cd4"
+  },
+  "electrode_model_source_hashes": {
+    "examples/microrobot/results/tcad_passive_adsorption/passive_adsorption.spice": "b7e4e306190e3884791fcfc2e7b19a45f2f20f07ce10864f0857a79ee861dbd7",
+    "examples/microrobot/results/tcad_stable_adsorption/stable_adsorption.spice": "0d44de1af9dc2f32509abb28ce3f8acb07202d53a615247d7fb22a042db31243"
+  }
+}

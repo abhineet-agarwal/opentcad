@@ -1,0 +1,197 @@
+{
+  "scope": "Completed powerdownprefix repetition only; original4.5msfailureunchanged",
+  "requested_stop_s": 0.0022,
+  "actual_stop_s": 0.0022,
+  "rows": 103842,
+  "state_at2p0ms": {
+    "v(logic)": 1.2759372011999999,
+    "v(act)": 0.8179398344059999,
+    "v(mid)": 0.410140857536,
+    "v(ready)": 0.817909487436,
+    "v(reset_n)": 1.27586504918,
+    "v(driver_ready)": 0.8179524546079999,
+    "v(ea)": 0.81963914586,
+    "v(eb)": -3.671228912719999e-05,
+    "v(sa)": 0.40280950473399996,
+    "v(sb)": 0.417624322116,
+    "v(sr)": 0.41016027053599996,
+    "v(bulk)": 0.410169710536,
+    "v(q0)": 1.2759371912,
+    "v(clk)": 1.2759372011999999,
+    "v(pan)": 1.0,
+    "v(pbn)": 0.0,
+    "v(ta)": 0.532726916554,
+    "v(tb)": 0.467179709446,
+    "v(tr)": 0.500025162,
+    "eta_A": 0.416829641126,
+    "eta_B": -0.4176610344051272,
+    "eta_return": -1.941299999996815e-05
+  },
+  "state_at2p2ms": {
+    "v(logic)": 1.2395837,
+    "v(act)": 0.761534977,
+    "v(mid)": 0.382021014,
+    "v(ready)": 0.761604741,
+    "v(reset_n)": 1.2395515,
+    "v(driver_ready)": 0.761564928,
+    "v(ea)": 0.763329382,
+    "v(eb)": -2.10215288e-05,
+    "v(sa)": 0.37899365,
+    "v(sb)": 0.385116685,
+    "v(sr)": 0.382038123,
+    "v(bulk)": 0.382040964,
+    "v(q0)": 1.23958369,
+    "v(clk)": 1.23958372,
+    "v(pan)": 1.0,
+    "v(pbn)": 0.0,
+    "v(ta)": 0.537309597,
+    "v(tb)": 0.462597287,
+    "v(tr)": 0.500024337,
+    "eta_A": 0.384335732,
+    "eta_B": -0.38513770652880003,
+    "eta_return": -1.710900000001514e-05
+  },
+  "first_descending_logic1p6V_after1p5ms_s": 0.00160330069707634,
+  "state_at_first_descending1p6V": {
+    "v(logic)": 1.6,
+    "v(act)": 0.9333645830687601,
+    "v(mid)": 0.46715488733459665,
+    "v(ready)": 0.9336668243302653,
+    "v(reset_n)": 1.6000452573253925,
+    "v(driver_ready)": 0.9334330241353546,
+    "v(ea)": 0.934866141674066,
+    "v(eb)": -0.00010784796108337848,
+    "v(sa)": 0.43755461336220897,
+    "v(sb)": 0.4982846888354088,
+    "v(sr)": 0.46715896002977797,
+    "v(bulk)": 0.46728574193719546,
+    "v(q0)": -3.994374169306984e-09,
+    "v(clk)": -1.908704045500812e-07,
+    "v(pan)": 1.0,
+    "v(pbn)": 0.0,
+    "v(ta)": 0.5234374550346508,
+    "v(tb)": 0.47646808796534923,
+    "v(tr)": 0.500026734,
+    "eta_A": 0.49731152831185704,
+    "eta_B": -0.49839253679649215,
+    "eta_return": -4.072695181323027e-06
+  },
+  "all_qualified_rail_crossings": [
+    {
+      "time_s": 0.0005386469510866228,
+      "rising": true,
+      "logic_V": 1.6,
+      "actuator_V": 1.0689814140885416
+    },
+    {
+      "time_s": 0.00160330069707634,
+      "rising": false,
+      "logic_V": 1.6,
+      "actuator_V": 0.9333645830687601
+    }
+  ],
+  "qualified_clock_rising_count": 12,
+  "qualified_clock_each_has_one_Q_transition": true,
+  "unmatched_qualified_Q_count": 0,
+  "full_signed_port_energy_nJ": {
+    "logic": 0.04179052646866497,
+    "actuator": 0.07042656371527459,
+    "clock": 0.03998249648865209,
+    "firstff": 0.0009644463238199025,
+    "proxy": 0.0007492213302479982,
+    "resetlogic": 6.131041093467058e-05,
+    "monitor": 0.04005134435971501,
+    "phase": 8.015186801227519e-06,
+    "resetact": 5.4695137665432524e-05,
+    "driverbuffer": 8.819540316795084e-05
+  },
+  "observed_no_reset_intervals_logic_below1p6V": [
+    [
+      0.00160330069707634,
+      0.0022
+    ]
+  ],
+  "observed_no_reset_duration_s": 0.0005966993029236601,
+  "fall_dark_extrema": {
+    "v(ready)": {
+      "absolute_V": [
+        0.761604741,
+        1.21735965
+      ],
+      "relative_to_domain": [
+        0.9978221043498532,
+        1.000516115451487
+      ]
+    },
+    "v(reset_n)": {
+      "absolute_V": [
+        1.2395515,
+        1.82270435
+      ],
+      "relative_to_domain": [
+        0.9996428871699693,
+        1.0170823328035874
+      ]
+    },
+    "v(driver_ready)": {
+      "absolute_V": [
+        0.761564928,
+        1.21937132
+      ],
+      "relative_to_domain": [
+        0.9999746717280662,
+        1.0000920303301484
+      ]
+    }
+  },
+  "fall_dark_crossings": {
+    "monitor_ready_crossings": {
+      "0.1": [],
+      "0.5": [],
+      "0.9": []
+    },
+    "reset_crossings": {
+      "0.1": [],
+      "0.5": [],
+      "0.9": []
+    },
+    "driver_ready_crossings": {
+      "0.1": [],
+      "0.5": [],
+      "0.9": []
+    }
+  },
+  "dark_Q_edges": [
+    {
+      "time_s": 0.0016482549,
+      "rising": true,
+      "logic_V": 1.45713238,
+      "actuator_V": 0.889644934,
+      "classification": "low_rail_not_qualified"
+    }
+  ],
+  "dark_clock_edges": [
+    {
+      "time_s": 0.0016482560570570434,
+      "rising": true,
+      "logic_V": 1.4549172705272004,
+      "actuator_V": 0.889645831996624,
+      "reset_ratio": 1.0043936049748798,
+      "classification": "low_rail_not_qualified"
+    }
+  ],
+  "dark_event_ranges": {
+    "v(pan)": [
+      1.0,
+      1.0
+    ],
+    "v(pbn)": [
+      0.0,
+      0.0
+    ],
+    "v(reset_ok_n)": [
+      0.999908767,
+      1.00518561
+    ]
+  }
+}

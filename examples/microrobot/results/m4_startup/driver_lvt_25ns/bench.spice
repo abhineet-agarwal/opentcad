@@ -1,0 +1,285 @@
+* OpenTCAD microrobot interface experiment
+.lib /usr/local/share/pdk/sky130A/libs.tech/ngspice/sky130.lib.spice tt
+.temp 26.85
+* Functional open-PDK candidate, not a reproduction of Reynolds' PTAT clock.
+* Diode-stack bias is supply/temperature dependent. No compensated reference.
+* All W/L in um under the installed SKY130 model scale.
+.subckt microrobot_clock clk vdd vss bias_n bias_p
+* A passive diode-connected stack has a nonzero DC path at illumination.
+Vbias vdd ref_vdd 0
+Xb1 bias_n bias_n vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xb2 b2 b2 bias_n vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xb3 ref_vdd ref_vdd b2 vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xmirror bias_p bias_n vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xpdiode bias_p bias_p ref_vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=8
+Xcbiasp bias_p vss sky130_fd_pr__cap_mim_m3_1 w=7 l=7
+Xcbiasn bias_n vss sky130_fd_pr__cap_mim_m3_1 w=7 l=7
+X1 raw a vdd vss bias_p bias_n micro_starved_inv
+X2 a b vdd vss bias_p bias_n micro_starved_inv
+X3 b c vdd vss bias_p bias_n micro_starved_inv
+X4 c d vdd vss bias_p bias_n micro_starved_inv
+X5 d raw vdd vss bias_p bias_n micro_starved_inv
+Xc1 a vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xc2 b vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xc3 c vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xc4 d vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+* Deliberate timing-capacitor asymmetry for nominal startup.
+Xc5 raw vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2.5
+* Long-channel receiver first, then a smaller faster receiver. Their supply
+* current is included; a slow raw ring must not drive digital gates for free.
+Xbp1 buffered raw vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=8
+Xbn1 buffered raw vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+Xbp2 clk buffered vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=1
+Xbn2 clk buffered vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=1
+.ends microrobot_clock
+
+.subckt micro_starved_inv a y vdd vss bp bn
+Xps ps bp vdd vdd sky130_fd_pr__pfet_01v8 w=1 l=8
+Xpi y a ps vdd sky130_fd_pr__pfet_01v8 w=1 l=0.5
+Xni y a ns vss sky130_fd_pr__nfet_01v8 w=0.5 l=0.5
+Xns ns bn vss vss sky130_fd_pr__nfet_01v8 w=0.5 l=8
+.ends micro_starved_inv
+
+* Our SKY130 actuator interface; not an extracted Reynolds schematic.
+* Pins: phase (logic domain), ready (actuator domain), electrode, logic supply,
+* actuator upper supply, actuator midpoint/Pt metal, common lower supply.
+* 1.8 V primitive dimensions in um. Body connections are explicit.
+.subckt microrobot_driver phase ready electrode vlogic vact vmid vss
+* Complementary logic input and static cross-coupled level converter.
+Xip phase_b phase vlogic vlogic sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xin phase_b phase vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xlsn phase_local_b phase vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xlsnb phase_local phase_b vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xlsp phase_local_b phase_local vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=4
+Xlspb phase_local phase_local_b vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=4
+* Actuator-domain logic: p_gate=!(ready & phase), n_gate=ready & !phase.
+Xhigh ready phase_local p_gate vact vss micro_nand2
+Xlow ready phase_local_b low_b vact vss micro_nand2
+Xlowinv low_b n_gate vact vss micro_inv
+Xoff ready off vact vss micro_inv
+Xdrivep electrode p_gate vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xdriven electrode n_gate vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+* A real transmission gate clamps the electrode to the Pt midpoint in reset.
+* Long-channel LVT clamp retains conduction at the ~0.6 V midpoint.
+* Standard-Vt clamps failed the 20 ms discharge limit in SS/FS.
+Xclampn electrode off vmid vss sky130_fd_pr__nfet_01v8_lvt w=0.42 l=8
+Xclampp electrode ready vmid vact sky130_fd_pr__pfet_01v8_lvt w=0.84 l=8
+* Explicit ~103 fF PDK MIM suppresses electrode gate-charge feedthrough.
+* This is our design component, not inferred electrode/PV capacitance.
+Xsnub electrode vmid sky130_fd_pr__cap_mim_m3_1 w=7 l=7
+.ends microrobot_driver
+
+.subckt micro_inv a y vdd vss
+Xp y a vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xn y a vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+.ends micro_inv
+
+.subckt micro_nand2 a b y vdd vss
+Xp1 y a vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xp2 y b vdd vdd sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xn1 y a series vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+Xn2 series b vss vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+.ends micro_nand2
+
+* Uncalibrated reduced electrode model; SI units.
+* eta = metal minus local solution voltage; unknown absolute Ag/AgCl offset.
+* theta is a dimensionless coverage encoded as a numerical voltage (1 V = 1).
+* Cdl, adsorption charge and Faradaic leakage are separate terminal currents.
+.subckt micro_electrode metal solution theta params: cdl=40p qmax=260p tau=20m rf=10g width=0.08 offset=0
+Cdouble metal solution {cdl}
+Rfaradaic metal solution {rf}
+* Numerical state normalization; not a physical capacitor/power contribution.
+Cstate theta 0 1n
+Bstate theta 0 I={1n/tau*(v(theta)-1/(1+exp(-(v(metal,solution)-offset)/width)))}
+Bads metal solution I={qmax/tau*(1/(1+exp(-(v(metal,solution)-offset)/width))-v(theta))}
+.ends micro_electrode
+
+* DEVELOPMENT revision 2: stronger reference sink/feedback and reference filtering.
+* Thresholds track actuator voltage; this is not a precision reference or signoff.
+* Actuator-powered comparator. bn is the existing clock's NMOS bias output.
+* Reference tracks vact; this is not a compensated voltage reference.
+.subckt microrobot_brownout bn ready vact vss
+Xrt ref ref vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=8
+Xrb ref ref vss vss sky130_fd_pr__nfet_01v8 w=8 l=8
+Xfb ref bn fbs vss sky130_fd_pr__nfet_01v8 w=3.36 l=8
+Xfb_en fbs ready vss vss sky130_fd_pr__nfet_01v8 w=0.84 l=1
+Xtail tail bn vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=8
+Xref diode ref tail vss sky130_fd_pr__nfet_01v8 w=2 l=2
+Xsense sense bn tail vss sky130_fd_pr__nfet_01v8 w=2 l=2
+Xpm1 diode diode vact vact sky130_fd_pr__pfet_01v8 w=1 l=4
+Xpm2 sense diode vact vact sky130_fd_pr__pfet_01v8 w=1 l=4
+Xkeeper sense sense vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=8
+Xp ready sense vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xn ready sense vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xcref ref vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xcsense sense vss sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+.ends microrobot_brownout
+
+* DEVELOPMENT candidate: nonregenerative reset level conversion.
+* All dimensions in um. Standard SKY130 1.8V devices; no added storage.
+* IMPORTANT extra sixth port bias_p must connect to the existing clock bp.
+* Existing 5-port ready converters are not pin-compatible with this candidate.
+* Keep original actuator-domain ready driving the driver clamps separately.
+*
+* ready low -> input_b high -> reset_n pulled low by Xsink.
+* ready high -> input_b low -> bias-limited Xpullup raises reset_n to Vlogic.
+* There is no cross-coupled feedback latch and no ideal threshold source.
+* Xpullup W/L is .42 times the clock's 1/8 PMOS reference device.
+* Rough nominal estimate: ~2nA reset-low current, ~3.5nW at1.8V.
+* Estimate assumes settled TT clock bias; it is not a startup/corner bound.
+* During reset-low the pullup current is a real static logic-rail load.
+* The actuator inverter power must be measured at the actuator port separately.
+* Startup depends on VACT inverter validity and the shared clock bias; this
+* candidate does not establish deterministic POR from arbitrary dark states.
+.subckt microrobot_ready_levelshift ready reset_n vact vlogic vss bias_p
+Xip input_b ready vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xin input_b ready vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xpullup reset_n bias_p vlogic vlogic sky130_fd_pr__pfet_01v8 w=0.42 l=8
+Xsink reset_n input_b vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+.ends microrobot_ready_levelshift
+
+* Unmodified SKY130 HD cells; Copyright SkyWater PDK Authors, Apache-2.0.
+.subckt sky130_fd_sc_hd__dfrtp_1 CLK D RESET_B VGND VNB VPB VPWR Q
+X0 a_1270_413# a_1283_21# VPWR VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X1 VPWR a_543_47# a_761_289# VPB sky130_fd_pr__pfet_01v8_hvt w=840000u l=150000u
+X2 VGND a_543_47# a_761_289# VNB sky130_fd_pr__nfet_01v8 w=640000u l=150000u
+X3 VGND D a_448_47# VNB sky130_fd_pr__nfet_01v8 w=420000u l=150000u
+X4 a_1108_47# a_193_47# a_1270_413# VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X5 VGND a_1283_21# Q VNB sky130_fd_pr__nfet_01v8 w=650000u l=150000u
+X6 a_1217_47# a_1283_21# VGND VNB sky130_fd_pr__nfet_01v8 w=420000u l=150000u
+X7 a_448_47# a_27_47# a_543_47# VNB sky130_fd_pr__special_nfet_01v8 w=360000u l=150000u
+X8 a_448_47# a_193_47# a_543_47# VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X9 a_543_47# a_193_47# a_639_47# VNB sky130_fd_pr__special_nfet_01v8 w=360000u l=150000u
+X10 a_1108_47# a_27_47# a_1217_47# VNB sky130_fd_pr__special_nfet_01v8 w=360000u l=150000u
+X11 a_1462_47# a_1108_47# a_1283_21# VNB sky130_fd_pr__nfet_01v8 w=420000u l=150000u
+X12 a_543_47# a_27_47# a_651_413# VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X13 a_805_47# RESET_B VGND VNB sky130_fd_pr__nfet_01v8 w=420000u l=150000u
+X14 a_761_289# a_193_47# a_1108_47# VNB sky130_fd_pr__special_nfet_01v8 w=360000u l=150000u
+X15 VPWR RESET_B a_651_413# VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X16 VGND a_27_47# a_193_47# VNB sky130_fd_pr__nfet_01v8 w=420000u l=150000u
+X17 a_27_47# CLK VGND VNB sky130_fd_pr__nfet_01v8 w=420000u l=150000u
+X18 a_27_47# CLK VPWR VPB sky130_fd_pr__pfet_01v8_hvt w=640000u l=150000u
+X19 VPWR a_1283_21# Q VPB sky130_fd_pr__pfet_01v8_hvt w=1e+06u l=150000u
+X20 VPWR a_27_47# a_193_47# VPB sky130_fd_pr__pfet_01v8_hvt w=640000u l=150000u
+X21 a_1283_21# a_1108_47# VPWR VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X22 VGND RESET_B a_1462_47# VNB sky130_fd_pr__nfet_01v8 w=420000u l=150000u
+X23 VPWR D a_448_47# VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X24 a_651_413# a_761_289# VPWR VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X25 a_761_289# a_27_47# a_1108_47# VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X26 VPWR RESET_B a_1283_21# VPB sky130_fd_pr__pfet_01v8_hvt w=420000u l=150000u
+X27 a_639_47# a_761_289# a_805_47# VNB sky130_fd_pr__nfet_01v8 w=420000u l=150000u
+.ends
+.subckt sky130_fd_sc_hd__inv_1 A VGND VNB VPB VPWR Y
+X0 VGND A Y VNB sky130_fd_pr__nfet_01v8 w=650000u l=150000u
+X1 VPWR A Y VPB sky130_fd_pr__pfet_01v8_hvt w=1e+06u l=150000u
+.ends
+.subckt microrobot_event_phases clock_n reset_ok_n phase_a_n phase_b_n
+Ainput [clock_n reset_ok_n] [clock reset_ok] event_adc
+Arst reset_ok reset event_inv
+.model event_adc adc_bridge(in_low=0.5 in_high=0.5)
+.model event_inv d_inverter(rise_delay=1n fall_delay=1n)
+.model event_ff d_dff(ic=0 clk_delay=1n reset_delay=1n rise_delay=1n fall_delay=1n)
+.model event_xor d_xor(rise_delay=1n fall_delay=1n)
+.model event_and d_and(rise_delay=1n fall_delay=1n)
+.model event_dac dac_bridge(out_low=0 out_high=1 t_rise=1u t_fall=1u)
+Aff0 n0 clock NULL reset q0 n0 event_ff
+Aff1 n1 n0 NULL reset q1 n1 event_ff
+Aff2 n2 n1 NULL reset q2 n2 event_ff
+Aff3 n3 n2 NULL reset q3 n3 event_ff
+Aff4 n4 n3 NULL reset q4 n4 event_ff
+Aff5 n5 n4 NULL reset q5 n5 event_ff
+Aff6 n6 n5 NULL reset q6 n6 event_ff
+Aff7 n7 n6 NULL reset q7 n7 event_ff
+Aff8 n8 n7 NULL reset q8 n8 event_ff
+Aff9 n9 n8 NULL reset q9 n9 event_ff
+Aff10 n10 n9 NULL reset q10 n10 event_ff
+Aff11 n11 n10 NULL reset q11 n11 event_ff
+Axor [q11 q10] phase_b event_xor
+Apa [n11 reset_ok] phase_a_valid event_and
+Apb [phase_b reset_ok] phase_b_valid event_and
+Aout [phase_a_valid phase_b_valid] [phase_a_n phase_b_n] event_dac
+.ends microrobot_event_phases
+
+* PV temperature fixed to fit; no optical/PV temperature calibration.
+.model pv D(IS=1.05859880341e-16 N=1.14470885396 TNOM=26.85 EG=0 XTI=0)
+.model pvlogic D(IS=2.9405522317e-17 N=1.14470885396 TNOM=26.85 EG=0 XTI=0)
+Vlight light 0 PWL(0 0 100u 0 1m 1000)
+Bph1 0 lp1 I={4.0350658074e-08*v(light)/1000}
+Bph2 lp1 lp2 I={4.0350658074e-08*v(light)/1000}
+Bph3 lp2 logic_raw I={4.0350658074e-08*v(light)/1000}
+Dlp1 lp1 0 pvlogic TEMP=26.85
+Dlp2 lp2 lp1 pvlogic TEMP=26.85
+Dlp3 logic_raw lp2 pvlogic TEMP=26.85
+Clogic logic_raw 0 2p
+Bphlo 0 celllo I={1.45262369066e-07*v(light)/1000}
+Dlo celllo 0 pv TEMP=26.85
+Vpvlo celllo mid 0
+Bphhi mid cellhi I={1.45262369066e-07*v(light)/1000}
+Dhi cellhi mid pv TEMP=26.85
+Vpvhi cellhi act_raw 0
+Cstorelo mid 0 1p
+Cstorehi act_raw mid 1p
+Vlogic logic_raw logic 0
+Vact act_raw act 0
+Vclock logic clock_supply 0
+Xclock clk clock_supply 0 bn bp microrobot_clock
+Vdigital logic digital_supply 0
+Xff clk feedback reset_n 0 0 digital_supply digital_supply q0 sky130_fd_sc_hd__dfrtp_1
+Xfeedback q0 0 0 digital_supply digital_supply feedback sky130_fd_sc_hd__inv_1
+Vresetlogic logic reset_supply 0
+Vresetact act reset_act_supply 0
+Xready ready reset_n reset_act_supply reset_supply 0 bp microrobot_ready_levelshift
+* Separate switched-capacitance proxy for remaining digital energy.
+* Two PDK 2x2 um MIMs (~19 fF total); no claim of RTL power extraction.
+Vproxy logic proxy_supply 0
+Xproxy clk flop_load proxy_supply 0 micro_inv
+Xcproxy1 flop_load 0 sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Xcproxy2 flop_load 0 sky130_fd_pr__cap_mim_m3_1 w=2 l=2
+Vmonitor act monitor_supply 0
+Xmonitor bn ready monitor_supply 0 microrobot_brownout
+Bclock_norm clock_n 0 V={1-v(q0)/max(v(logic),0.1)}
+Breset_norm reset_ok_n 0 V={v(reset_n)/max(v(logic),0.1)}
+Xphases clock_n reset_ok_n pan pbn microrobot_event_phases
+Bpa pa_source 0 V={v(pan)*v(logic)}
+Bpb pb_source 0 V={v(pbn)*v(logic)}
+Vpa pa_source pa_buffer 0
+Vpb pb_source pb_buffer 0
+Rpa pa_buffer pa 10k
+Rpb pb_buffer pb 10k
+Xda pa driver_ready ea logic act mid 0 microrobot_driver
+Xdb pb driver_ready eb logic act mid 0 microrobot_driver
+Xea ea sa ta micro_electrode
+Xeb eb sb tb micro_electrode
+Xreturn mid sr tr micro_electrode cdl=400p qmax=2600p rf=1g
+Rsa sa bulk 10meg
+Rsb sb bulk 10meg
+Rsr sr bulk 1meg
+* Signed source energy is integrated offline from adaptive currents.
+* DEVELOPMENT variant: only final output pulldown uses existing LVT NFET.
+* DEVELOPMENT candidate: actuator-domain driver-ready AND qualification.
+* Inputs: native current-limited reset_n AND original monitor ready.
+* NAND2 PFETs .42/1 um each; series NFETs .42/1 um each.
+* Output inverter PFET .84/1 and NFET .42/1 um.
+* Native-reset input gate area matches the preceding two-inverter receiver.
+* Original-ready gate loading is added; this is not a guaranteed cold-start POR.
+.subckt microrobot_ready_driver_qualified_lvt reset_raw monitor_ready driver_ready vact vss
+Xpa nand_b reset_raw vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=1
+Xpb nand_b monitor_ready vact vact sky130_fd_pr__pfet_01v8 w=0.42 l=1
+Xna nand_b reset_raw series vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xnb series monitor_ready vss vss sky130_fd_pr__nfet_01v8 w=0.42 l=1
+Xop driver_ready nand_b vact vact sky130_fd_pr__pfet_01v8 w=0.84 l=1
+Xon driver_ready nand_b vss vss sky130_fd_pr__nfet_01v8_lvt w=0.42 l=1
+.ends microrobot_ready_driver_qualified_lvt
+
+Vdriverbuffer act driverbuffer_supply 0
+Xdriverbuffer reset_n ready driver_ready driverbuffer_supply 0 microrobot_ready_driver_qualified_lvt
+.options method=gear maxord=2 reltol=1e-6 abstol=1e-15
+.control
+set wr_vecnames
+set wr_singlescale
+save i(Vdriverbuffer) v(driver_ready) v(xdriverbuffer.nand_b) v(xdriverbuffer.series) @m.xdriverbuffer.xon.msky130_fd_pr__nfet_01v8_lvt[id] i(Vpvlo) i(Vpvhi) i(Vclock) i(Vproxy) i(Vmonitor) i(Vpa) i(Vpb) v(pa_source) v(pb_source) i(Vresetlogic) i(Vresetact) i(Vdigital) i(Vlogic) v(bp) v(xready.input_b) v(light) v(logic) v(act) v(mid) v(ready) v(reset_n) v(pa) v(pb) v(ea) v(eb) v(sa) v(sb) v(ta) v(tb) v(clk) v(q0) v(bn)
+tran 1e-06 0.002 0 2.5e-08
+wrdata controller.dat i(Vdriverbuffer) v(driver_ready) v(xdriverbuffer.nand_b) v(xdriverbuffer.series) @m.xdriverbuffer.xon.msky130_fd_pr__nfet_01v8_lvt[id] i(Vpvlo) i(Vpvhi) i(Vclock) i(Vproxy) i(Vmonitor) i(Vpa) i(Vpb) v(pa_source) v(pb_source) i(Vresetlogic) i(Vresetact) i(Vdigital) i(Vlogic) v(bp) v(xready.input_b) v(light) v(logic) v(act) v(mid) v(ready) v(reset_n) v(pa) v(pb) v(ea) v(eb) v(sa) v(sb) v(ta) v(tb) v(clk) v(q0) v(bn)
+quit
+.endc
+.end
