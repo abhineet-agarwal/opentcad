@@ -75,6 +75,20 @@ velocity_saturation:
   beta_e: 2.0
   beta_h: 1.0
 
+# Impact-ionisation (avalanche generation). Chynoweth form:
+#   alpha(|E|) = a * exp(-b / |E|)   [pairs/cm per unit distance]
+# van Overstraeten-de Man coefficients (single-regime fit good for the
+# 1e5-5e5 V/cm range where Si junctions break down). Ref:
+# van Overstraeten & de Man, Solid-State Electron. 13, 583 (1970).
+# Only MVP intrinsic generation is wired; piecewise high/low field
+# coefficients and the full field-dependent Jacobian are documented
+# follow-ups in KNOWN_ISSUES.
+avalanche:
+  a_n_per_cm: 7.03e5     # [1/cm]  electron pre-exponent
+  b_n_V_per_cm: 1.231e6  # [V/cm]  electron critical field
+  a_p_per_cm: 1.582e6    # [1/cm]  hole pre-exponent
+  b_p_V_per_cm: 2.036e6  # [V/cm]  hole critical field
+
 calibration:
   status: literature_values
   calibrated_against: null

@@ -85,6 +85,15 @@ class VelocitySaturation(BaseModel):
     beta_h: float = 1.0
 
 
+class Avalanche(BaseModel):
+    """Impact-ionisation Chynoweth coefficients, Si defaults are the
+    van Overstraeten-de Man single-regime fit."""
+    a_n_per_cm: float = 7.03e5
+    b_n_V_per_cm: float = 1.231e6
+    a_p_per_cm: float = 1.582e6
+    b_p_V_per_cm: float = 2.036e6
+
+
 class MaterialParams(BaseModel):
     """Validated material parameter set for one material."""
     material: str
@@ -95,6 +104,7 @@ class MaterialParams(BaseModel):
     mobility_klaassen: MobilityKlaassen = MobilityKlaassen()
     recombination: Recombination = Recombination()
     velocity_saturation: VelocitySaturation = VelocitySaturation()
+    avalanche: Avalanche = Avalanche()
     raw: dict = {}   # full YAML dict for advanced access
 
 
@@ -171,6 +181,14 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
         beta_h=vs_raw.get("beta_h", 1.0),
     )
 
+    av_raw = raw.get("avalanche", {})
+    av = Avalanche(
+        a_n_per_cm=av_raw.get("a_n_per_cm", 7.03e5),
+        b_n_V_per_cm=av_raw.get("b_n_V_per_cm", 1.231e6),
+        a_p_per_cm=av_raw.get("a_p_per_cm", 1.582e6),
+        b_p_V_per_cm=av_raw.get("b_p_V_per_cm", 2.036e6),
+    )
+
     return MaterialParams(
         material=raw.get("material", symbol),
         symbol=raw.get("symbol", symbol),
@@ -180,5 +198,6 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
         mobility_klaassen=klaassen,
         recombination=rec,
         velocity_saturation=vs,
+        avalanche=av,
         raw=raw,
     )
