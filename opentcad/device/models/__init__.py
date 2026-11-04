@@ -2,9 +2,9 @@
 from .mobility import ConstantMobility, Klaassen, Canali, Lombardi
 from .recombination import SRH, Auger, Radiative, Avalanche
 from .bgn import NoBGN, Slotboom
-from .statistics import Boltzmann, FermiDirac
+from .statistics import Boltzmann, FermiDirac, JoyceDixon
 
 __all__ = ["ConstantMobility", "Klaassen", "Canali", "Lombardi",
            "SRH", "Auger", "Radiative", "Avalanche",
            "NoBGN", "Slotboom",
-           "Boltzmann", "FermiDirac"]
+           "Boltzmann", "FermiDirac", "JoyceDixon"]
