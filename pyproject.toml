@@ -56,6 +56,7 @@ dev = [
 ]
 gui = [
     "streamlit>=1.30",
+    "plotly>=5.20",
 ]
 # Level-set topography (deposit / etch / oxidize). Kept optional: the
 # current ViennaLS wheels ship a GPL v3 license; doping and device

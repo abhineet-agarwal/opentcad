@@ -12,9 +12,11 @@ structure:
   layers:
     - {name: p_body, thickness_um: 0.5, material: Si, doping_Na: 1e17}
     - {name: oxide, thickness_um: 0.005, material: SiO2}
-  regions:            # Si windows through the oxide for the S/D contacts
-    - {name: source_window, x_um: [0.0, 0.5], y_um: [0.4, 0.505], material: Si}
-    - {name: drain_window, x_um: [1.5, 2.0], y_um: [0.4, 0.505], material: Si}
+  regions:            # Si windows through the oxide for the S/D contacts.
+                      # A region replaces the doping beneath it, so the
+                      # windows repeat the body's Na.
+    - {name: source_window, x_um: [0.0, 0.5], y_um: [0.4, 0.505], material: Si, doping_Na: 1e17}
+    - {name: drain_window, x_um: [1.5, 2.0], y_um: [0.4, 0.505], material: Si, doping_Na: 1e17}
   contacts:
     - {name: source, x_um: [0.0, 0.5], layer: oxide, surface: top}
     - {name: drain, x_um: [1.5, 2.0], layer: oxide, surface: top}
