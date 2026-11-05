@@ -11,7 +11,7 @@ mature open libraries:
 | ------------------- | -------------------------------------- |
 | Meshing             | [Gmsh](https://gmsh.info)              |
 | Topography          | [ViennaLS](https://viennatools.github.io/) (level sets) |
-| Diffusion (planned) | [FiPy](https://www.ctcms.nist.gov/fipy/) |
+| Implant / diffusion | NumPy / SciPy kernels ([FiPy](https://www.ctcms.nist.gov/fipy/) planned) |
 | Device solver       | [DEVSIM](https://devsim.org)           |
 | Visualization       | [PyVista](https://pyvista.org)         |
 
@@ -41,22 +41,25 @@ A [standalone notebook export](examples/microrobot/SETUP.md) includes the requir
 project source and separates new run outputs from archived evidence; Python 3.12
 portability checks and optional-tool skips are recorded explicitly.
 
-Phases 0 and 1 are complete: process topography (deposit, etch,
+Phases 0, 1 and 2a are complete. Process topography (deposit, etch,
 oxidation) and device simulation both work end-to-end and are joined
-by a single `MeshField` data contract. The current release is
-suitable for research, teaching, and prototyping. See
-[PHASES.md](PHASES.md) for the full roadmap.
+by a single `MeshField` data contract. Phase 2 (doping) is partial:
+implant and anneal kernels run inside `run_recipe` and drive a working
+NMOS, but the full Pearson-IV shape, OED/TED and the SKY130 Vth exit
+check are still open. The current release is suitable for research,
+teaching, and prototyping. See [PHASES.md](PHASES.md) for the full
+roadmap.
 
 | Phase | Scope                                        | Status         |
 | ----- | -------------------------------------------- | -------------- |
 | 0     | Geometry DSL + DEVSIM device simulation      | **Complete**   |
 | 1     | Topography (ViennaLS): deposit + etch + Deal-Grove oxidation | **Complete** |
-| 2     | Implant (Pearson IV) + Fair diffusion + anneal | **Partial**  |
+| 2     | Implant (Gaussian on Pearson moments) + intrinsic / Fair anneal + `run_recipe` | **Partial** |
 | 2a    | Transient DC + small-signal AC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair anneal, physical Qf | **Complete** |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned        |
 
-**Executed test count (2026-11-05)**: 333 passing (82 device +
-251 geometry/materials/process/bridge/io). The Phase 2a additions —
+**Executed test count (2026-11-05)**: 333 passing (integration 133,
+process 95, device 82, geometry 12, materials 6, bridge 5). The Phase 2a additions —
 transient DC sweeps, small-signal AC (`ac_sweep` via DEVSIM circuit
 nodes, gated MOS HF-CV path), Avalanche impact ionization, Joyce-Dixon
 statistics past the Blakemore ceiling, Lombardi with vector-gradient
@@ -81,9 +84,8 @@ environment and remaining limitations are recorded in
   (SRH + Auger + Radiative), bandgap narrowing (Slotboom), and
   Fermi–Dirac statistics (Blakemore).
 - Analysis: `iv_sweep`, `cv_sweep` (quasi-static / low-frequency),
-  `transient_sweep` (BDF1/BDF2/TR step response), `ac_sweep`
-  (small-signal Y(f) on a MOS gate — HF CV + G/C spectra),
-  MOS-cap regime probes, NMOS Id–Vgs.
+  MOS-cap regime probes, NMOS Id–Vgs. (`transient_sweep` and
+  `ac_sweep` arrived in Phase 2a — see below.)
 - YAML-based material parameter database with `pydantic` validation.
 
 Phase 0 exit criteria (all met):
@@ -140,62 +142,85 @@ ViennaLS's copy, segfaulting on any real op. The ViennaPS process-model
 catalog (SF6O2Etching, MultiParticleProcess, …) plugs in when a fixed
 wheel ships — the Recipe / mesh-bridge boundaries won't move.
 
-### Doping — implant and anneal (Phase 2)
+### Doping — implant and anneal (Phase 2, partial)
 
-- `Recipe.implant(species, dose, energy, …)` fills `Nd`/`Na` from a
-  dual-Pearson-IV range + straggle parameterization fit for B, P, As,
-  BF₂ at 10–200 keV. Handles tilt and screen oxides; multi-step
-  implants accumulate.
-- `Recipe.anneal(T, t, …)` with two models:
-  * **Intrinsic** — analytic Gaussian spread using a per-species
-    Arrhenius `D_i(T)` (default; fast; valid when the active peak is
-    below `n_i(T)`).
-  * **Fair (`apply_anneal_fair`)** — concentration-coupled
-    D_eff = D_i + D⁻·(n/n_i) + D⁻⁻·(n/n_i)², integrated via an FTCS
-    sub-stepper with harmonic-mean face diffusivities and Von-Neumann
-    stability-driven step budgeting. Reproduces the S/D-level
-    phosphorus peak-flattening the intrinsic model cannot.
-- Smooth bridge from process-side profiles onto the device `MeshField`
-  via `opentcad.bridge`, with no manual re-interpolation on the user
-  side.
+- `Recipe.implant(species, energy_keV, dose_cm2, window_x_um=…)` adds
+  a vertical Gaussian centred on the projected range R_p with
+  straggle ΔR_p, both log-interpolated from per-species YAML tables
+  for B, P and As in Si over 10–200 keV. The tables already carry the
+  Pearson-IV skewness γ and kurtosis β, but the full Pearson-IV shape
+  is not evaluated yet. A mask window gets an erf lateral blur
+  (σ_lat ≈ 0.7·ΔR_p). Dose is conserved, and repeated implants
+  accumulate. `tilt_deg` is accepted but ignored (it raises a warning).
+  BF₂ and screen oxides are not supported.
+- `Recipe.anneal(temperature_C, time_s, …)` dispatches to the
+  **intrinsic** model, an analytic Gaussian spread with a per-species
+  Arrhenius D_i(T). It is exact while the profile stays below n_i(T).
+- `apply_anneal_fair(mf, T, t, …)` is the **Fair** concentration-
+  coupled model, called directly (not yet through `Recipe.anneal`).
+  It uses D_eff = D_i + D⁻·(n/n_i) + D⁻⁻·(n/n_i)² for donors (D⁺, D⁺⁺
+  in p/n_i for acceptors), stepped with explicit Euler on a Cartesian
+  grid. It has harmonic-mean face diffusivities, no-flux walls and an
+  adaptive sub-step sized by the stability limit. At an S/D-level
+  phosphorus peak it gives the concentration-enhanced flattening that
+  the intrinsic model misses. OED and TED are not modelled.
+- `run_recipe(structure, recipe)` plays topography steps through
+  ViennaLS, meshes the result, and then applies implant/anneal steps
+  directly onto the device `MeshField`. The `opentcad.bridge` RBF +
+  nearest-neighbour interpolator, which preserves junction depth to
+  within 5 % in its tests, exists for moving doping between meshes. It
+  is not yet wired into `run_recipe`.
 
 See [`examples/06_nmos_implanted.py`](examples/06_nmos_implanted.py)
-for a full implant-plus-anneal flow driving a working NMOS; see
+for a recipe-to-Id–Vgs NMOS flow (As implants plus anneal, with no
+hand-painted doping), and
 [`examples/09_fair_anneal_profile.py`](examples/09_fair_anneal_profile.py)
-for the Fair vs intrinsic comparison plot.
+for the Fair vs intrinsic comparison.
 
-### Phase 2a: device physics upgrades
+### Phase 2a: device physics upgrades (complete)
 
-Finished in Phase 2a — all with tests and physical validation.
+Each item has dedicated tests under `tests/device/` or
+`tests/process/`. The approximations listed are deliberate and are
+documented in the source.
 
-- **Avalanche impact ionization** — van Overstraeten–de Man α(E) with
-  low/high-field regimes and a thermal Arrhenius pre-factor; feeds the
-  recombination source via `|J_n|/|J_p|` so Vbd breakdown sweeps now
-  bend over physically.
-- **Joyce–Dixon Fermi–Dirac statistics** — degenerate-regime n(E_F)
-  inverse past the Blakemore ceiling (n ≫ 3.7·N_c); keeps the
-  statistics-aware Vbi offset consistent at ohmic contacts.
-- **Lombardi surface mobility** — element-based E_normal via
-  `vector_gradient`, configurable axis (`y`, `x`, `magnitude`);
-  recovers the textbook 20–40 % channel-mobility degradation that the
-  edge-only approximation under-reports.
-- **Fair concentration-coupled anneal** — see Phase 2 feature list.
-- **Qf as a physical interface surface charge** — Gaussian-smeared
-  volumetric charge placed at the interface y-coordinate inside the
-  semiconductor region; complements the compact `flat_band_shift_V`
-  for cases where Qf is spatially non-uniform or the geometry is
-  non-planar.
-- **`transient_sweep`** — BDF1/BDF2/TR step-response with
-  `transient_dc` initialization and `charge_error` convergence
-  tolerance exposed. Captures the junction-storage transit delay.
-- **`ac_sweep`** — small-signal admittance Y(f) on a MOS gate via
-  DEVSIM circuit nodes. Captures the HF–LF CV split in inversion that
-  the quasi-static `cv_sweep` cannot. Metal-on-insulator terminals
-  only (declared in `ac_terminals=[...]` at solver construction —
-  DEVSIM gates `add_circuit_node` after the first analysis).
+- **Avalanche impact ionization** (`Avalanche`): van Overstraeten–de
+  Man (Chynoweth-form) α_n, α_p(|E|), with nodal |E| from
+  `vector_gradient`. The carrier current uses a saturation-velocity
+  proxy |J| ≈ q·v_sat·n rather than the drift-diffusion |J_n|/|J_p|.
+  Sweeps do show a breakdown knee, but Vbd comes out roughly 2–3×
+  too high for Si at N = 1e17. That is fine for qualitative breakdown
+  but not for calibrated Vbd.
+- **Joyce–Dixon statistics** (`JoyceDixon`): an explicit series for
+  the inverse Fermi–Dirac integral that replaces the Blakemore form in
+  the ohmic-contact potential offsets, which fail above ~3.7·N_c. It
+  is accurate to better than 1 % for n ≤ ~3e20 cm⁻³ in Si. Bulk
+  carrier densities still use the Blakemore forward expression.
+- **Lombardi interface-normal field**: `Lombardi(e_normal_axis="y")`
+  (the default) takes |∂ψ/∂y| from `vector_gradient` as E_⊥ for planar
+  Si/SiO₂ interfaces. `"x"` suits vertical sidewalls, and
+  `"magnitude"` keeps the old isotropic |E|. The axis is set per
+  region. Curved interfaces would need a per-element projection, which
+  is not done yet.
+- **Fair concentration-coupled anneal** (`apply_anneal_fair`): see
+  the Phase 2 list above.
+- **Physical Q_f**: `DeviceSolver(..., interface_Qf_C_per_cm2={"SI":
+  (Qf, y_interface_um)})` places a fixed sheet charge as a
+  Gaussian-smeared volumetric charge inside the semiconductor, with
+  σ set by `interface_Qf_width_um` (default 5 nm). It complements the
+  compact gate `flat_band_shift_V`. Tests check that the induced
+  surface-potential shift has the right sign and is linear in Q_f.
+- **`transient_sweep`**: BDF1/BDF2/TR time stepping with a
+  `transient_dc` initialisation, plus `charge_error` exposed as a
+  convergence knob. Carrier-storage charge is included; external
+  circuit parasitics are not.
+- **`ac_sweep`**: small-signal admittance Y(f) = G + jωC on a
+  metal-on-insulator gate, via a DEVSIM circuit voltage source. It
+  gives HF CV, which the quasi-static `cv_sweep` cannot. Terminals
+  must be declared at construction with `ac_terminals=[...]`, because
+  DEVSIM forbids new circuit nodes after the first solve. AC on
+  ohmic/Schottky terminals raises `NotImplementedError`.
 
-Each item is covered by dedicated tests in `tests/device/` (see the
-Phase 2a demos section below for worked examples).
+Worked examples are in the Phase 2a demos section below.
 
 ---
 
@@ -215,8 +240,10 @@ Every layer communicates through a single data object — the **`MeshField`**
    │  add_substrate / add_layer / add_region /    │    │  .deposit(material, t)       │
    │  add_contact                                 │    │  .etch(depth, model=...,     │
    │                                              │    │        window_x_um=...)      │
+   │                                              │    │  .oxidize(T, t, ambient)     │
+   │                                              │    │  .implant(...) .anneal(...)  │
    └────────────────────┬─────────────────────────┘    └────────────┬─────────────────┘
-                        │ .to_meshfield()                           │ simulate(struct, recipe)
+                        │ .to_meshfield()                           │ run_recipe(struct, recipe)
                         │                                           ▼
                         │                             ┌───────────────────────────────┐
                         │                             │  ViennaLS multi-LS advection  │
@@ -227,7 +254,7 @@ Every layer communicates through a single data object — the **`MeshField`**
    ┌──────────────────────────────────────────────────────────────────────────────────┐
    │  MeshField  ─  pyvista UnstructuredGrid                                          │
    │   cells:  material_id                                                            │
-   │   nodes:  Nd, Na                                                                 │
+   │   nodes:  Nd, Na   ← run_recipe applies implant + anneal steps here              │
    │   tags :  ContactTag, ProcessStep                                                │
    └────────────────────────────────────────────┬─────────────────────────────────────┘
                                                 │
@@ -236,7 +263,7 @@ Every layer communicates through a single data object — the **`MeshField`**
                               │  opentcad.device.DeviceSolver          │
                               │  DEVSIM · Poisson + DD                 │
                               │  Klaassen · Canali · Lombardi · SRH …  │
-                              │  iv_sweep · cv_sweep · equilibrium     │
+                              │  iv · cv · transient · ac sweeps       │
                               └────────────────────┬───────────────────┘
                                                    │
                                                    ▼
@@ -503,9 +530,10 @@ across dry+wet ambients at 1000–1100 °C.
 Short, self-contained scripts that exercise the Phase 2a additions:
 
 - [`examples/09_fair_anneal_profile.py`](examples/09_fair_anneal_profile.py)
-  — Fair concentration-coupled anneal vs intrinsic Gaussian on an
-  implanted phosphorus profile. Shows the classic high-concentration
-  flattening the intrinsic model cannot produce, plus a D_eff(n/n_i)
+  — Fair concentration-coupled anneal vs intrinsic Gaussian on a
+  1e20 cm⁻³ Gaussian phosphorus profile, which stands in for an
+  as-implanted peak. It shows the concentration-enhanced flattening
+  that the intrinsic model cannot produce, plus a D_eff(n/n_i)
   reference plot.
 - [`examples/10_pn_transient.py`](examples/10_pn_transient.py) — p-n
   diode anode driven 0.1 → 0.7 V over 10 ns through
@@ -614,10 +642,11 @@ Available today:
 | Mobility | `ConstantMobility` | default; YAML `mobility_constant` values |
 | Mobility | `Klaassen` | unified low-field bulk mobility (1992) with clustering + carrier-carrier scattering |
 | Mobility | `Canali` | high-field velocity saturation; wraps any base model (composes with `Klaassen`) |
-| Mobility | `Lombardi` | surface mobility at Si/SiO₂ interfaces; wraps any base model; Matthiessen composition of bulk + acoustic-phonon + surface-roughness |
+| Mobility | `Lombardi` | surface mobility at Si/SiO₂ interfaces; wraps any base model; Matthiessen composition of bulk + acoustic-phonon + surface-roughness; `e_normal_axis="y"` (default) / `"x"` / `"magnitude"` selects the E_⊥ component |
 | Recombination | `SRH` | default; mid-gap trap |
 | Recombination | `Auger` | Dziewior-Schmid; dominates over SRH for n,p > ~10¹⁸ cm⁻³ |
 | Recombination | `Radiative` | negligible in Si; central for GaAs/GaN |
+| Recombination | `Avalanche` | impact-ionization *generation*, added to `recombination=[...]`; van Overstraeten–de Man α(E) with a v_sat·n current proxy, so Vbd is qualitative (~2–3× high) |
 | BGN | `NoBGN` | default; disables bandgap narrowing |
 | BGN | `Slotboom` | doping-dependent Eg narrowing; raises n_i_eff in n+/p+ regions |
 | Contact BC | `contact_type="ohmic"` | default; charge-neutral semiconductor contact |
@@ -625,6 +654,8 @@ Available today:
 | Contact BC | `flat_band_shift_V` | metal-on-insulator Vfb offset; packs Qf, midgap Dit, and phi_MS in one number |
 | Statistics | `Boltzmann` | default; classical Maxwell-Boltzmann |
 | Statistics | `FermiDirac` | Blakemore approximation; captures degeneracy at heavy doping (n → N_c) |
+| Statistics | `JoyceDixon` | Joyce–Dixon inverse for the contact potential offsets past the Blakemore ceiling (~3.7·N_c); bulk densities stay Blakemore |
+| Fixed charge | `interface_Qf_C_per_cm2` (solver kwarg) | physically-located Q_f as a Gaussian-smeared volumetric charge at a given interface y |
 
 The full CMOS mobility stack — bulk doping-dep + high-field saturation +
 surface degradation — composes in a single expression:
@@ -657,17 +688,19 @@ the relevant base in `opentcad/device/physics.py`.
 ```
 opentcad/
 ├── geometry/      Structure DSL, Gmsh meshing, MeshField data format
-├── process/
-│   └── topography/ Recipe DSL, ViennaLS simulator, level-set → mesh bridge
-├── device/        DEVSIM wrapper, physics models, contact BCs
+├── process/       run_recipe (topography + doping, end to end)
+│   ├── topography/ Recipe DSL, ViennaLS simulator, level-set → mesh bridge
+│   └── doping/    Implant (Gaussian on Pearson moments), intrinsic + Fair anneal, YAML tables
+├── device/        DEVSIM wrapper, physics models, contact BCs, IV/CV/transient/AC
 ├── materials/     YAML parameter database + loader
-├── bridge/        Process → device field interpolation (Phase 2)
+├── bridge/        RBF + nearest-neighbour doping-field interpolator (not yet used by run_recipe)
 ├── io/            VTK / GDS file I/O
-└── viz/           Plotting helpers
+├── viz/           Plotting helpers
+└── gui/           Optional Streamlit front end
 
-examples/          Runnable tutorial scripts + generated PNG plots
-tests/             Pytest suite — 78 tests
-                   (markers: slow, requires_devsim, requires_viennaps)
+examples/          Runnable tutorial scripts (01–11) + generated PNG plots
+tests/             Pytest suite — 333 tests
+                   (markers: slow, requires_devsim, requires_viennaps, integration)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
 
@@ -676,9 +709,10 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite (78 tests, ~20 s)
+pytest tests/ -v                         # full suite (333 tests, ~4–5 min)
 pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
-pytest tests/process/ -v                 # topography (requires viennals)
+pytest tests/process/ -v                 # topography (requires viennals) + doping
+pytest tests/device/ -v                  # DEVSIM device physics, transient, AC
 pytest -m "not slow" -v                  # skip slow tests
 pytest -m requires_devsim -v             # only DEVSIM-backed tests
 ```
@@ -702,18 +736,34 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
   thermal oxidation with a per-column moving boundary, and a
   level-set → `MeshField` bridge that drops straight into the device
   solver. LOCOS + gate-oxide-within-5 % exit criteria met.
+- **Phase 2a (device physics upgrades)**: Avalanche (van
+  Overstraeten–de Man), Joyce–Dixon contact offsets past the
+  Blakemore ceiling, Lombardi with an interface-normal E_⊥ via
+  `vector_gradient`, physically-located Q_f (Gaussian-smeared
+  volumetric), Fair concentration-coupled anneal, `transient_sweep`
+  (BDF1/BDF2/TR) and `ac_sweep` (small-signal Y(f) on MOS gates). All
+  are tested, with worked examples 09, 10 and 11.
+
+**In progress**
+
+- **Phase 2 (doping), partial**. Done: Gaussian implant on Pearson
+  moments for B/P/As (10–200 keV) with an erf mask edge, the intrinsic
+  anneal through `Recipe.anneal`, the standalone Fair anneal, and
+  `run_recipe` (topography → mesh → doping → `DeviceSolver`),
+  demonstrated by an implanted NMOS (example 06). Open: the full
+  Pearson-IV shape (γ, β), tilt, BF₂ and screen oxides, Fair through
+  `Recipe.anneal`, OED/TED, wiring the bridge interpolator into the
+  pipeline, and the exit check (Vth within 20 % of SKY130).
 
 **Next**
 
-- **Phase 2** — Implant (Pearson IV, B/P/As/BF₂) + FiPy diffusion
-  driven by a `Recipe.implant / anneal` extension, with a process →
-  device field translator that fills `Nd` / `Na` on the meshed device
-  from the process-side profile. Exit: full NMOS process flow with
-  Vth within 20 % of SKY130.
-- **Phase 3** — Quantitative calibration vs. SKY130 / IHP SG13G2
-  PDKs: scipy-driven fit of the existing physics knobs against target
-  metrics (Vth, Ion, SS).
-- **Phase 4** — NEGF backend via NanoTCAD ViDES, GDS import, Sphinx
+- **Phase 3**: quantitative calibration against the SKY130 / IHP
+  SG13G2 PDKs. This means a scipy-driven fit of the existing physics
+  knobs, now including the Phase 2a models, against target metrics
+  (Vth, Ion, SS). The models in the Phase 3 milestone list (Klaassen,
+  Canali, Lombardi, SRH, Auger, Slotboom BGN) already exist; the
+  calibration infrastructure does not.
+- **Phase 4**: NEGF backend via NanoTCAD ViDES, GDS import, Sphinx
   docs, community notebooks.
 
 **Backlog / follow-ups noted in code**
@@ -725,15 +775,17 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
   (currently an exponential heuristic feathering length).
 - Per-material selectivity in etch rates for multi-material stacks
   (currently one global rate).
-- Small-signal AC on ohmic/Schottky terminals (`ac_sweep` currently
-  requires a metal-on-insulator terminal — ohmic/Schottky needs the
-  Electron/HoleContinuity fluxes also routed into the circuit node).
-
-Phase 2a closed out the Lombardi element-based E_normal gap, the
-physically-located Q_f (as a Gaussian-smeared volumetric charge), the
-Joyce–Dixon Fermi–Dirac inverse past the Blakemore ceiling, and the
-small-signal AC half of the transient-plus-AC path (gated MOS terminals
-via `ac_sweep`).
+- Avalanche: replace the v_sat·n current proxy with the real
+  drift-diffusion |J_n|/|J_p|, which needs edge/element-aware models,
+  to get calibrated Vbd.
+- Lombardi: a per-element interface-normal projection for curved
+  interfaces (bird's beak, angled sidewalls).
+- Joyce–Dixon: a true F₁/₂ forward expression for bulk densities
+  (currently Blakemore).
+- Small-signal AC on ohmic/Schottky terminals. `ac_sweep` needs a
+  metal-on-insulator terminal today, because ohmic/Schottky contacts
+  would also need their Electron/HoleContinuity fluxes routed into
+  the circuit node.
 
 ---
 
@@ -758,4 +810,4 @@ PyVista MIT); each retains its own license.
 ## Citation
 
 If you use OpenTCAD in academic work, please cite the upstream tools
-(DEVSIM, Gmsh, ViennaLS, FiPy) in addition to this repository.
+(DEVSIM, Gmsh, ViennaLS) in addition to this repository.
