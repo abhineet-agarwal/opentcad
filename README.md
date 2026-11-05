@@ -140,6 +140,63 @@ ViennaLS's copy, segfaulting on any real op. The ViennaPS process-model
 catalog (SF6O2Etching, MultiParticleProcess, …) plugs in when a fixed
 wheel ships — the Recipe / mesh-bridge boundaries won't move.
 
+### Doping — implant and anneal (Phase 2)
+
+- `Recipe.implant(species, dose, energy, …)` fills `Nd`/`Na` from a
+  dual-Pearson-IV range + straggle parameterization fit for B, P, As,
+  BF₂ at 10–200 keV. Handles tilt and screen oxides; multi-step
+  implants accumulate.
+- `Recipe.anneal(T, t, …)` with two models:
+  * **Intrinsic** — analytic Gaussian spread using a per-species
+    Arrhenius `D_i(T)` (default; fast; valid when the active peak is
+    below `n_i(T)`).
+  * **Fair (`apply_anneal_fair`)** — concentration-coupled
+    D_eff = D_i + D⁻·(n/n_i) + D⁻⁻·(n/n_i)², integrated via an FTCS
+    sub-stepper with harmonic-mean face diffusivities and Von-Neumann
+    stability-driven step budgeting. Reproduces the S/D-level
+    phosphorus peak-flattening the intrinsic model cannot.
+- Smooth bridge from process-side profiles onto the device `MeshField`
+  via `opentcad.bridge`, with no manual re-interpolation on the user
+  side.
+
+See [`examples/06_nmos_implanted.py`](examples/06_nmos_implanted.py)
+for a full implant-plus-anneal flow driving a working NMOS; see
+[`examples/09_fair_anneal_profile.py`](examples/09_fair_anneal_profile.py)
+for the Fair vs intrinsic comparison plot.
+
+### Phase 2a: device physics upgrades
+
+Finished in Phase 2a — all with tests and physical validation.
+
+- **Avalanche impact ionization** — van Overstraeten–de Man α(E) with
+  low/high-field regimes and a thermal Arrhenius pre-factor; feeds the
+  recombination source via `|J_n|/|J_p|` so Vbd breakdown sweeps now
+  bend over physically.
+- **Joyce–Dixon Fermi–Dirac statistics** — degenerate-regime n(E_F)
+  inverse past the Blakemore ceiling (n ≫ 3.7·N_c); keeps the
+  statistics-aware Vbi offset consistent at ohmic contacts.
+- **Lombardi surface mobility** — element-based E_normal via
+  `vector_gradient`, configurable axis (`y`, `x`, `magnitude`);
+  recovers the textbook 20–40 % channel-mobility degradation that the
+  edge-only approximation under-reports.
+- **Fair concentration-coupled anneal** — see Phase 2 feature list.
+- **Qf as a physical interface surface charge** — Gaussian-smeared
+  volumetric charge placed at the interface y-coordinate inside the
+  semiconductor region; complements the compact `flat_band_shift_V`
+  for cases where Qf is spatially non-uniform or the geometry is
+  non-planar.
+- **`transient_sweep`** — BDF1/BDF2/TR step-response with
+  `transient_dc` initialization and `charge_error` convergence
+  tolerance exposed. Captures the junction-storage transit delay.
+- **`ac_sweep`** — small-signal admittance Y(f) on a MOS gate via
+  DEVSIM circuit nodes. Captures the HF–LF CV split in inversion that
+  the quasi-static `cv_sweep` cannot. Metal-on-insulator terminals
+  only (declared in `ac_terminals=[...]` at solver construction —
+  DEVSIM gates `add_circuit_node` after the first analysis).
+
+Each item is covered by dedicated tests in `tests/device/` (see the
+Phase 2a demos section below for worked examples).
+
 ---
 
 ## Architecture
