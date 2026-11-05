@@ -153,4 +153,6 @@ Sphinx docs, tutorial notebooks, NEGF extension (NanoTCAD ViDES), GDS import.
 GDS import, Sphinx docs, a plugin system, a CLI and packaging are planned
 earlier, as a tooling track right after Phase 2 (see the README roadmap).
 Tooling progress: plugin system ✓ (opentcad.plugins, docs/plugins.md);
-ViennaLS made an optional extra, so doping and device work without it.
+ViennaLS made an optional extra, so doping and device work without it;
+simulation files + `opentcad check | run` CLI ✓ (opentcad.io.deck,
+docs/simulation_files.md). Next: parameter sweeps, promptable GUI.

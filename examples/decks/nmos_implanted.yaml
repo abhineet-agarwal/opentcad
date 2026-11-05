@@ -1,0 +1,36 @@
+# The implanted NMOS of examples/06_nmos_implanted.py as a simulation file:
+# scaffold + S/D arsenic implants + anneal, then Id-Vgs at Vds = 50 mV.
+# The implant and anneal values are the example's illustrative stand-ins,
+# not a real process.
+#
+# Run:  opentcad run examples/decks/nmos_implanted.yaml
+version: 1
+name: nmos_implanted
+description: 1 µm NMOS, 5 nm oxide, Na = 1e17 body, As S/D implants + anneal.
+structure:
+  width_um: 2.0
+  layers:
+    - {name: p_body, thickness_um: 0.5, material: Si, doping_Na: 1e17}
+    - {name: oxide, thickness_um: 0.005, material: SiO2}
+  regions:            # Si windows through the oxide for the S/D contacts
+    - {name: source_window, x_um: [0.0, 0.5], y_um: [0.4, 0.505], material: Si}
+    - {name: drain_window, x_um: [1.5, 2.0], y_um: [0.4, 0.505], material: Si}
+  contacts:
+    - {name: source, x_um: [0.0, 0.5], layer: oxide, surface: top}
+    - {name: drain, x_um: [1.5, 2.0], layer: oxide, surface: top}
+    - {name: gate, x_um: [0.5, 1.5], layer: oxide, surface: top}
+    - {name: body, x_um: [0.0, 2.0], layer: p_body, surface: bottom}
+recipe:
+  - {step: implant, species: As, energy_keV: 30, dose_cm2: 1e15, window_x_um: [0.0, 0.5]}
+  - {step: implant, species: As, energy_keV: 30, dose_cm2: 1e15, window_x_um: [1.5, 2.0]}
+  - {step: implant, species: As, energy_keV: 100, dose_cm2: 1e15, window_x_um: [0.0, 0.5]}
+  - {step: implant, species: As, energy_keV: 100, dose_cm2: 1e15, window_x_um: [1.5, 2.0]}
+  - {step: anneal, temperature_C: 1000, time_s: 1800}
+mesh: {size_um: 0.03}
+device:
+  temperature_K: 300
+  physics: {mobility: constant, recombination: [srh]}
+analyses:
+  - {name: idvg, type: iv, anode_contact: gate, cathode_contact: source,
+     v_start: 0.0, v_end: 1.5, v_step: 0.1,
+     hold_contacts: {drain: 0.05}, measure_contact: drain}

@@ -40,6 +40,22 @@ out = run_recipe(structure, recipe)
 recipe order within their stage, but every topography step runs before every
 doping step, because doping is applied to the final mesh.
 
+In [simulation files](simulation_files.md) a step is written by name,
+`{step: uniform_acceptor, conc_cm3: 1e16}`. The name defaults to the class
+name in snake_case; pass `name=` to `register_step` to choose another. Only
+dataclass steps can be read from and written to files; their fields are
+converted using the type hints (numbers, text, materials, tuples).
+
+## Physics models
+
+`register_model(category, name, cls)` makes a model class usable by name in
+simulation files. The categories are `mobility`, `recombination`, `bgn` and
+`statistics`. The class's constructor arguments become its options, and each
+must be stored on the instance under the same name so the model can be
+written back out. An option called `base` is read as a nested model of the
+same category:
+`{model: lombardi, base: klaassen}`.
+
 ## Device analyses
 
 An analysis is a function `fn(solver, **kwargs)`. Run it with

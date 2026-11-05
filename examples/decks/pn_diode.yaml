@@ -1,0 +1,20 @@
+# A 1 µm silicon p-n junction: forward I-V sweep.
+# Run:  opentcad run examples/decks/pn_diode.yaml
+version: 1
+name: pn_diode
+description: Abrupt 1e17/1e17 silicon p-n junction, forward bias to 0.6 V.
+structure:
+  width_um: 1.0
+  layers:
+    - {name: p_body, thickness_um: 0.5, material: Si, doping_Na: 1e17}
+    - {name: n_well, thickness_um: 0.5, material: Si, doping_Nd: 1e17}
+  contacts:
+    - {name: anode, x_um: [0, 1], layer: p_body, surface: bottom}
+    - {name: cathode, x_um: [0, 1], layer: n_well, surface: top}
+mesh: {size_um: 0.05}
+device:
+  temperature_K: 300
+  physics: {mobility: klaassen, recombination: [srh]}
+analyses:
+  - {name: forward, type: iv, anode_contact: anode, cathode_contact: cathode,
+     v_start: 0.0, v_end: 0.6, v_step: 0.1}

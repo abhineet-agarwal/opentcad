@@ -39,6 +39,9 @@ dependencies = [
     "click>=8.1",
 ]
 
+[project.scripts]
+opentcad = "opentcad.cli:main"
+
 [project.urls]
 Homepage   = "https://github.com/abhineet-agarwal/opentcad"
 Repository = "https://github.com/abhineet-agarwal/opentcad"

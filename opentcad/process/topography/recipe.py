@@ -210,6 +210,9 @@ class Anneal:
         if self.model not in ANNEAL_MODELS:
             raise ValueError(
                 f"Anneal model must be one of {ANNEAL_MODELS}; got {self.model!r}")
+        from opentcad.process.doping.pearson_iv import canonicalize_species
+        canonicalize_species(self.species_Nd)
+        canonicalize_species(self.species_Na)
 
 
 @dataclass(frozen=True)
@@ -256,6 +259,13 @@ class Implant:
             raise ValueError(
                 f"Implant profile must be one of {IMPLANT_PROFILES}; "
                 f"got {self.profile!r}")
+        # Fail when the recipe is built, not mid-run: the species needs an
+        # implant table, and the (mass-scaled, for BF2) energy must lie in it.
+        from opentcad.process.doping.pearson_iv import (
+            moments_for, resolve_implant_species)
+        _, dopant, dopant_energy = resolve_implant_species(self.species,
+                                                           self.energy_keV)
+        moments_for(dopant, dopant_energy)
 
 
 Step = Union[Deposit, Etch, Oxidize, Implant, Anneal]

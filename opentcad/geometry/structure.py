@@ -121,6 +121,21 @@ class Structure:
         return self
 
     @property
+    def layers(self) -> tuple[LayerSpec, ...]:
+        """Layers bottom-first (the first is the substrate). Read-only view."""
+        return tuple(self._layers)
+
+    @property
+    def regions(self) -> tuple[RegionSpec, ...]:
+        """Region overrides in the order applied. Read-only view."""
+        return tuple(self._regions)
+
+    @property
+    def contacts(self) -> tuple[ContactSpec, ...]:
+        """Contacts in definition order. Read-only view."""
+        return tuple(self._contacts)
+
+    @property
     def total_height_um(self) -> float:
         return sum(l.thickness_um for l in self._layers)
 

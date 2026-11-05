@@ -7,6 +7,8 @@ are reachable by name through ``DeviceSolver.run``:
     "transient"  → DeviceSolver.transient_sweep
     "ac"         → DeviceSolver.ac_sweep
 
+The unbound methods are registered as-is, so ``fn(solver, **kwargs)``
+works and their signatures can be checked before a run.
 ``opentcad.plugins`` calls ``register()`` the first time a registry is
 consulted.
 """
@@ -15,24 +17,9 @@ from __future__ import annotations
 from opentcad.plugins import register_analysis
 
 
-def _iv(solver, **kwargs):
-    return solver.iv_sweep(**kwargs)
-
-
-def _cv(solver, **kwargs):
-    return solver.cv_sweep(**kwargs)
-
-
-def _transient(solver, **kwargs):
-    return solver.transient_sweep(**kwargs)
-
-
-def _ac(solver, **kwargs):
-    return solver.ac_sweep(**kwargs)
-
-
 def register() -> None:
-    register_analysis("iv", _iv)
-    register_analysis("cv", _cv)
-    register_analysis("transient", _transient)
-    register_analysis("ac", _ac)
+    from .solver import DeviceSolver
+    register_analysis("iv", DeviceSolver.iv_sweep)
+    register_analysis("cv", DeviceSolver.cv_sweep)
+    register_analysis("transient", DeviceSolver.transient_sweep)
+    register_analysis("ac", DeviceSolver.ac_sweep)

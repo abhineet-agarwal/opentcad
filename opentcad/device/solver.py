@@ -680,6 +680,14 @@ class DeviceSolver:
             raise RuntimeError("Call solve_equilibrium() before solve_dc()")
         self._solve_dc()
 
+    def close(self) -> None:
+        """Delete this solver's DEVSIM device (DEVSIM keeps devices in
+        global state; every ds.solve acts on all live devices). The solver
+        can't be used afterwards."""
+        if self._initialized and self._device_name in self._ds.get_device_list():
+            self._ds.delete_device(device=self._device_name)
+        self._initialized = False
+
     def run(self, analysis: str, **kwargs):
         """Run a registered analysis by name and return its result.
 

@@ -10,6 +10,9 @@ Four things can be added without editing OpenTCAD itself:
   object. Add instances with ``Recipe.add(step)``.
 * **Device analyses** — ``register_analysis("name", fn)``; run with
   ``DeviceSolver.run("name", **kwargs)``, which calls ``fn(solver, **kwargs)``.
+* **Physics models** — ``register_model("mobility", "name", cls)`` (also
+  ``recombination``, ``bgn``, ``statistics``) so simulation files can name
+  them.
 * **Data folders** — ``register_data_dir("materials", path)`` adds material
   YAMLs; ``register_data_dir("dopants", path)`` adds implant
   (``<Sym>_in_Si.yaml``) and diffusion (``<Sym>_diffusion.yaml``) tables.
@@ -36,6 +39,7 @@ ENTRY_POINT_GROUP = "opentcad.plugins"
 DISABLE_ENV_VAR = "OPENTCAD_DISABLE_PLUGINS"
 STAGES = ("topography", "doping")
 DATA_KINDS = ("materials", "dopants")
+MODEL_CATEGORIES = ("mobility", "recombination", "bgn", "statistics")
 
 _BUILTIN_DATA_DIRS = {
     "materials": Path(__file__).parent / "materials" / "params",
@@ -51,10 +55,12 @@ class StepHandler:
     apply: Callable
     describe: Optional[Callable] = None
     source: str = "opentcad"
+    name: str = ""              # the step's name in simulation files
 
 
 _steps: dict[type, StepHandler] = {}
 _analyses: dict[str, tuple[Callable, str]] = {}
+_models: dict[str, dict[str, tuple[type, str]]] = {c: {} for c in MODEL_CATEGORIES}
 _data_dirs: dict[str, list[tuple[Path, str]]] = {k: [] for k in DATA_KINDS}
 _plugin_status: dict[str, str] = {}
 _builtins_loaded = False
@@ -86,10 +92,11 @@ def _register_builtins() -> None:
     global _current_source
     _current_source = "opentcad"
     try:
-        from opentcad.device import builtin_analyses
+        from opentcad.device import builtin_analyses, builtin_models
         from opentcad.process import builtin_steps
         builtin_steps.register()
         builtin_analyses.register()
+        builtin_models.register()
     finally:
         _current_source = "user"
 
@@ -130,8 +137,19 @@ def plugin_status() -> dict[str, str]:
 # =============================================================================
 # Process steps
 # =============================================================================
+def _snake(name: str) -> str:
+    out = []
+    for i, ch in enumerate(name):
+        if ch.isupper() and i and (not name[i - 1].isupper()
+                                   or (i + 1 < len(name) and name[i + 1].islower())):
+            out.append("_")
+        out.append(ch.lower())
+    return "".join(out)
+
+
 def register_step(step_type: type, *, stage: str, apply: Callable,
                   describe: Optional[Callable] = None,
+                  name: Optional[str] = None,
                   replace: bool = False) -> None:
     """Register how a recipe-step class runs.
 
@@ -141,6 +159,9 @@ def register_step(step_type: type, *, stage: str, apply: Callable,
             or ``"doping"`` (``apply(meshfield, step)``, after meshing).
         apply: the handler.
         describe: optional ``describe(step) -> str`` for ``Recipe.summary``.
+        name: the step's name in simulation files; defaults to the class
+            name in snake_case (``UniformAcceptor`` → ``uniform_acceptor``).
+            Files can only carry dataclass steps.
         replace: allow re-registering a class that already has a handler.
     """
     _ensure_builtins()      # so a clash with a built-in is caught here
@@ -154,8 +175,23 @@ def register_step(step_type: type, *, stage: str, apply: Callable,
         raise ValueError(
             f"step {step_type.__name__} is already registered "
             f"(by {_steps[step_type].source}); pass replace=True to override")
+    step_name = name or _snake(step_type.__name__)
+    for other in _steps.values():
+        if other.name == step_name and other.step_type is not step_type:
+            raise ValueError(f"step name {step_name!r} is already used by "
+                             f"{other.step_type.__name__}")
     _steps[step_type] = StepHandler(step_type, stage, apply, describe,
-                                    _current_source)
+                                    _current_source, step_name)
+
+
+def step_class(name: str) -> type:
+    """The step class registered under ``name`` (as used in files)."""
+    _ensure_loaded()
+    for h in _steps.values():
+        if h.name == name:
+            return h.step_type
+    raise KeyError(f"Unknown step {name!r}; available: "
+                   f"{sorted(h.name for h in _steps.values())}")
 
 
 def step_handler(step) -> StepHandler:
@@ -209,6 +245,57 @@ def available_analyses() -> list[str]:
 
 
 # =============================================================================
+# Physics models (named, for simulation files)
+# =============================================================================
+def register_model(category: str, name: str, cls: type, *,
+                   replace: bool = False) -> None:
+    """Register a physics-model class under ``name`` so simulation files
+    can refer to it. ``category`` is one of MODEL_CATEGORIES. The class's
+    constructor arguments become the model's options in the file; each
+    must be stored on the instance under the same name."""
+    _ensure_builtins()
+    if category not in MODEL_CATEGORIES:
+        raise ValueError(f"category must be one of {MODEL_CATEGORIES}, "
+                         f"got {category!r}")
+    if not isinstance(cls, type):
+        raise TypeError(f"model must be a class, got {cls!r}")
+    if not isinstance(name, str) or not name:
+        raise ValueError("model name must be a non-empty string")
+    table = _models[category]
+    if name in table and not replace:
+        raise ValueError(f"{category} model {name!r} is already registered "
+                         f"(by {table[name][1]}); pass replace=True")
+    table[name] = (cls, _current_source)
+
+
+def get_model(category: str, name: str) -> type:
+    _ensure_loaded()
+    if category not in MODEL_CATEGORIES:
+        raise ValueError(f"category must be one of {MODEL_CATEGORIES}, "
+                         f"got {category!r}")
+    try:
+        return _models[category][name][0]
+    except KeyError:
+        raise KeyError(f"Unknown {category} model {name!r}; available: "
+                       f"{sorted(_models[category])}") from None
+
+
+def model_name(category: str, model) -> str:
+    """The registered name of a model instance's class (exact class match)."""
+    _ensure_loaded()
+    for name, (cls, _) in _models[category].items():
+        if type(model) is cls:
+            return name
+    raise KeyError(f"{type(model).__name__} is not a registered "
+                   f"{category} model")
+
+
+def available_models(category: str) -> list[str]:
+    _ensure_loaded()
+    return sorted(_models[category])
+
+
+# =============================================================================
 # Data folders
 # =============================================================================
 def register_data_dir(kind: str, path) -> None:
@@ -251,6 +338,8 @@ def _reset_for_tests() -> None:
     global _builtins_loaded, _entry_points_loaded
     _steps.clear()
     _analyses.clear()
+    for table in _models.values():
+        table.clear()
     for v in _data_dirs.values():
         v.clear()
     _plugin_status.clear()

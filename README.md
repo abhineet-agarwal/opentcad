@@ -60,8 +60,8 @@ roadmap.
 | 2a    | Transient DC + small-signal AC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair anneal, physical Qf | **Complete** |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned (SKY130 targets extracted) |
 
-**Executed test count (2026-11-06)**: 420 passing (process 148,
-integration 133, device 92, plugins 14, validation 7, geometry 15,
+**Executed test count (2026-11-06)**: 433 passing (process 148,
+integration 133, device 92, plugins 14, io 13, validation 7, geometry 15,
 materials 6, bridge 5). The Phase 2a additions —
 transient DC sweeps, small-signal AC (`ac_sweep` via DEVSIM circuit
 nodes, gated MOS HF-CV path), Avalanche impact ionization, Joyce-Dixon
@@ -731,6 +731,23 @@ Adding new physics is one new file under
 [`opentcad/device/models/`](opentcad/device/models/) that subclasses
 the relevant base in `opentcad/device/physics.py`.
 
+### Simulation files and the `opentcad` command
+
+A whole run — structure, recipe, mesh, device physics and analyses — can
+be written as one YAML or JSON file and run from the command line:
+
+```bash
+opentcad check examples/decks/nmos_implanted.yaml   # every problem, with its location
+opentcad run   examples/decks/nmos_implanted.yaml   # results → nmos_implanted.results.json
+```
+
+Steps, models and analyses are referred to by name (plugin ones too).
+Unknown keys, unknown species and out-of-table implant energies are
+reported before anything runs. From Python, use
+`opentcad.io.load_deck / run_deck / save_deck`. See
+[`docs/simulation_files.md`](docs/simulation_files.md) and the examples in
+[`examples/decks/`](examples/decks/).
+
 ### Extending OpenTCAD (plugins)
 
 New process steps, device analyses, dopant tables and material files can
@@ -757,7 +774,8 @@ a silent override, and a plugin that fails to load produces a warning. Set
 
 ```
 opentcad/
-├── plugins.py     Registries for process steps, analyses and data folders; entry-point discovery
+├── plugins.py     Registries for process steps, analyses, physics models and data folders
+├── cli.py         `opentcad check | run | plugins`
 ├── geometry/      Structure DSL, Gmsh meshing, MeshField data format
 ├── process/       run_recipe (topography + doping, end to end)
 │   ├── topography/ Recipe DSL, ViennaLS simulator, level-set → mesh bridge
@@ -766,14 +784,15 @@ opentcad/
 │                  Vth extraction (extract.py)
 ├── materials/     YAML parameter database + loader
 ├── bridge/        RBF + nearest-neighbour doping-field interpolator (not yet used by run_recipe)
-├── io/            Empty placeholder (MeshField.save writes .vtu; GDS import is planned)
+├── io/            Simulation files (deck.py); MeshField.save writes .vtu; GDS import is planned
 ├── viz/           Empty placeholder (GUI plots live in gui/plots.py)
 └── gui/           Optional Streamlit front end
 
 validation/sky130/ Phase 2 exit check against SkyWater's nfet_01v8 model card
-docs/              Plugin guide, optical generation, compact PV notes
-examples/          Runnable tutorial scripts (01–11) + generated PNG plots
-tests/             Pytest suite — 420 tests
+docs/              Simulation files, plugin guide, optical generation, compact PV notes
+examples/          Runnable tutorial scripts (01–11) + generated PNG plots;
+                   examples/decks/ has simulation files
+tests/             Pytest suite — 433 tests
                    (markers: slow, requires_devsim, requires_viennaps, integration)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
@@ -783,7 +802,7 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite (420 tests, ~8 min)
+pytest tests/ -v                         # full suite (433 tests, ~8 min)
 pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
 pytest tests/process/ -v                 # topography (requires viennals) + doping
 pytest tests/device/ -v                  # DEVSIM device physics, transient, AC
@@ -830,12 +849,15 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
 
 **Next**
 
-- **Tooling**: the plugin system is in place (`opentcad.plugins`:
-  process steps, device analyses, dopant and material tables, entry-point
-  discovery; [`docs/plugins.md`](docs/plugins.md)). Still to come: a file
-  format for structures and recipes, a CLI with parameter sweeps, a
-  promptable GUI built on that file format, GDS import, Sphinx docs and
-  a PyPI release.
+- **Tooling**:
+  - Done: the plugin system (`opentcad.plugins`: process steps, device
+    analyses, physics models, dopant and material tables, entry-point
+    discovery; [`docs/plugins.md`](docs/plugins.md)). Simulation files
+    with `opentcad check | run`
+    ([`docs/simulation_files.md`](docs/simulation_files.md)).
+  - Still to come: parameter sweeps over simulation files, a promptable
+    GUI that writes simulation files, GDS import, Sphinx docs and a PyPI
+    release.
 - **Phase 3**: quantitative calibration against the SKY130 / IHP
   SG13G2 PDKs: a scipy-driven fit of the existing physics knobs against
   target metrics (Vth, Ion, SS). The models in the Phase 3 milestone
