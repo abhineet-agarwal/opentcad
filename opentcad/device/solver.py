@@ -46,11 +46,47 @@ class DeviceSolver:
     def __init__(self, meshfield: MeshField,
                  material_params: dict[str, MaterialParams],
                  temperature_K: float = T_K_DEFAULT,
-                 physics: PhysicsConfig | None = None):
+                 physics: PhysicsConfig | None = None,
+                 interface_Qf_C_per_cm2: dict | None = None,
+                 interface_Qf_width_um: float = 0.005):
+        """Create a DEVSIM drift-diffusion solver for a MeshField.
+
+        Args:
+            meshfield: 2D triangle MeshField.
+            material_params: Material display name -> MaterialParams.
+            temperature_K: Lattice temperature [K].
+            physics: Composable PhysicsConfig (mobility, recombination,
+                BGN, statistics). Defaults to Boltzmann + Klaassen + SRH.
+            interface_Qf_C_per_cm2: Optional dict keyed by
+                semiconductor REGION name (e.g. ``"SI"``) giving a
+                ``(Qf [C/cm²], y_interface [µm])`` tuple that installs
+                a fixed sheet charge as a Gaussian-smeared volumetric
+                charge in that region. The sheet sits at
+                ``y_interface_um`` with the σ configured below. This
+                is the PHYSICAL Qf path — complements the compact
+                ``flat_band_shift_V`` applied at a gate contact. Signs:
+                positive Qf means net-positive ions at the interface,
+                which shifts Vfb NEGATIVE (easier to invert for n-MOS).
+                Example: ``{"SI": (1e-8, 0.5)}`` installs a sheet of
+                1e-8 C/cm² at y = 0.5 µm. Omit or set empty/None to
+                disable.
+            interface_Qf_width_um: Smearing width σ [um] of the
+                Gaussian used to represent the sheet charge as a
+                volumetric density. Default 5 nm matches the typical
+                mesh resolution; the integrated charge equals Qf
+                regardless of σ as long as σ is resolvable by the
+                mesh. Narrower σ places all the charge on the
+                immediate interface plane; wider σ smears it a few
+                nm into the Si side — a realistic physical model for
+                process-induced Qf whose actual location sits a few
+                lattice spacings from the strict interface anyway.
+        """
         self.mf = meshfield
         self.mat_params = material_params
         self.T = float(temperature_K)
         self.physics = physics if physics is not None else PhysicsConfig()
+        self.interface_Qf = dict(interface_Qf_C_per_cm2 or {})
+        self.interface_Qf_width_um = float(interface_Qf_width_um)
         base = meshfield.metadata.get("structure_name", "device")
         # DEVSIM keeps global mesh/device state — disambiguate per instance.
         DeviceSolver._instance_counter += 1
@@ -572,10 +608,77 @@ class DeviceSolver:
                 self.physics.statistics.attach(
                     self._ds, self._device_name, region, params, self.T)
                 self._build_potential_only(region, params)
+        self._install_interface_Qf()
         for contact in self._contact_regions:
             self._build_contact_potential_equation(contact)
         for if_name, r0, r1 in self._interfaces:
             self._build_interface_continuity(if_name, "Potential")
+
+    def _install_interface_Qf(self) -> None:
+        """For each semiconductor region in ``self.interface_Qf``, augment
+        PotentialNodeCharge with a Gaussian-smeared sheet charge sitting
+        at the interface y-coordinate. The Gaussian is normalised so its
+        integral over y is exactly ``Qf`` [C/cm²] — adding a sheet
+        rather than a smear of equivalent average density.
+        """
+        if not self.interface_Qf:
+            return
+        ds = self._ds
+        um_to_cm = 1e-4
+        sigma_cm = float(self.interface_Qf_width_um) * um_to_cm
+        # Gaussian normalisation so ∫ Qf·g(y) dy = Qf exactly:
+        #   g(y) = exp(-(y-y0)²/(2σ²)) / (σ·√(2π))
+        norm = 1.0 / (sigma_cm * (2.0 * np.pi) ** 0.5)
+
+        for region, spec in self.interface_Qf.items():
+            if region not in self._region_materials:
+                raise KeyError(
+                    f"interface_Qf_C_per_cm2 names region {region!r} which "
+                    f"doesn't exist; known: {list(self._region_materials)}")
+            if self._region_is_insulator.get(region, False):
+                raise ValueError(
+                    f"interface_Qf for region {region!r} refuses an "
+                    f"insulator region — Qf installs as charge in the "
+                    f"semiconductor side of the interface.")
+            if not (isinstance(spec, (tuple, list)) and len(spec) == 2):
+                raise ValueError(
+                    f"interface_Qf[{region!r}] must be a "
+                    f"(Qf_C_per_cm2, y_interface_um) tuple; got {spec!r}")
+            qf_val = float(spec[0])
+            y_if_cm = float(spec[1]) * um_to_cm
+
+            # DEVSIM's `y` node model is in cm (we convert on mesh load).
+            # Register Qf parameters and the Gaussian-smeared charge.
+            ds.set_parameter(device=self._device_name, region=region,
+                             name="Qf_sheet", value=qf_val)
+            ds.set_parameter(device=self._device_name, region=region,
+                             name="Qf_sigma_cm", value=sigma_cm)
+            ds.set_parameter(device=self._device_name, region=region,
+                             name="Qf_y_if_cm", value=y_if_cm)
+            ds.set_parameter(device=self._device_name, region=region,
+                             name="Qf_gaussian_norm", value=norm)
+            ds.node_model(
+                device=self._device_name, region=region,
+                name="InterfaceQfSmear",
+                equation=("Qf_sheet * Qf_gaussian_norm * "
+                          "exp(-((y - Qf_y_if_cm)*(y - Qf_y_if_cm)) / "
+                          "(2*Qf_sigma_cm*Qf_sigma_cm))"))
+            # PotentialNodeCharge has already been registered by
+            # _build_potential_only. Replace it with the augmented form
+            # (DEVSIM warns but accepts the replacement).
+            ds.node_model(
+                device=self._device_name, region=region,
+                name="PotentialNodeCharge",
+                equation=("-ElectronCharge*(Holes - Electrons + NetDoping)"
+                          " - InterfaceQfSmear"))
+            # Carrier-derivative entries don't change — they are the same
+            # as the base PotentialNodeCharge (Qf doesn't depend on n or p).
+            # Same for PotentialIntrinsicNodeCharge used during the
+            # equilibrium-only solve: include the Qf there too.
+            ds.node_model(
+                device=self._device_name, region=region,
+                name="PotentialIntrinsicNodeCharge",
+                equation="-ElectronCharge*IntrinsicCharge - InterfaceQfSmear")
 
     def _attach_mobility_models(self) -> None:
         """Register the configured mobility model on every semiconductor
