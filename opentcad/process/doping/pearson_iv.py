@@ -1,8 +1,12 @@
 """
 opentcad.process.doping.pearson_iv — Implant moment tables + Pearson profile.
 
-Loads the per-species YAML tables under `data/` and returns the four
-moments (Rp, ΔRp, γ, β) for a given (species, energy). Log-interpolates
+Loads the per-species ``<Sym>_in_Si.yaml`` tables — the built-in ones
+under `data/`, plus any folder added with
+``opentcad.plugins.register_data_dir("dopants", ...)`` — and returns the
+four moments (Rp, ΔRp, γ, β) for a given (species, energy). The tables
+define the species: each file's ``species`` and ``symbol`` are the
+accepted names. Log-interpolates
 in energy — implant range vs energy follows a nuclear-stopping-power law
 that is very close to a power law across the ranges we tabulate, so
 log-linear is accurate to well under 5 % between tabulated points.
@@ -35,19 +39,51 @@ import yaml
 from opentcad.geometry.formats import Material
 
 
-_DATA_DIR = Path(__file__).parent / "data"
+@dataclass(frozen=True)
+class _SpeciesIndex:
+    aliases: Dict[str, str]          # lowercase alias → canonical name
+    files: Dict[str, Path]           # canonical name → implant table
+    symbols: Dict[str, str]          # canonical name → element symbol
 
 
-# Species names OpenTCAD recognises. Uses lowercase full name as canonical.
-# Add symbol aliases as we ship more species.
-_ALIASES = {
-    "boron":      "boron",
-    "b":          "boron",
-    "phosphorus": "phosphorus",
-    "p":          "phosphorus",
-    "arsenic":    "arsenic",
-    "as":         "arsenic",
-}
+@lru_cache(maxsize=16)
+def _build_species_index(dirs: Tuple[Path, ...]) -> _SpeciesIndex:
+    """Index every ``*_in_Si.yaml`` implant table across ``dirs``.
+
+    Species are defined by the tables themselves: each file's ``species``
+    (canonical, lowercase) and ``symbol`` become the accepted names. A
+    species or alias defined twice is an error, never a silent override.
+    """
+    aliases: Dict[str, str] = {}
+    files: Dict[str, Path] = {}
+    symbols: Dict[str, str] = {}
+    for d in dirs:
+        for path in sorted(d.glob("*_in_Si.yaml")):
+            table = _read_yaml(path)
+            name = str(table["species"]).strip().lower()
+            symbol = str(table["symbol"]).strip()
+            if name in files:
+                raise ValueError(f"implant species {name!r} is defined in both "
+                                 f"{files[name]} and {path}")
+            files[name] = path
+            symbols[name] = symbol
+            for alias in (name, symbol.lower()):
+                if aliases.get(alias, name) != name:
+                    raise ValueError(f"species alias {alias!r} names both "
+                                     f"{aliases[alias]!r} and {name!r}")
+                aliases[alias] = name
+    return _SpeciesIndex(aliases, files, symbols)
+
+
+def _species_index() -> _SpeciesIndex:
+    from opentcad.plugins import data_dirs
+    return _build_species_index(data_dirs("dopants"))
+
+
+@lru_cache(maxsize=None)
+def _read_yaml(path: Path) -> Dict:
+    with path.open("r") as fh:
+        return yaml.safe_load(fh)
 
 
 @dataclass(frozen=True)
@@ -63,38 +99,35 @@ class PearsonMoments:
     dopant_kind: str      # 'donor' | 'acceptor'
 
 
-@lru_cache(maxsize=None)
 def _load_species(canonical_name: str) -> Dict:
-    """Read a species YAML once, cache forever."""
-    path = _DATA_DIR / f"{_symbol_for(canonical_name)}_in_Si.yaml"
-    if not path.exists():
+    """The implant table for a canonical species name."""
+    index = _species_index()
+    if canonical_name not in index.files:
         raise FileNotFoundError(
-            f"No implant table for species {canonical_name!r}: "
-            f"looked at {path}. Ship a YAML there to add one.")
-    with path.open("r") as fh:
-        return yaml.safe_load(fh)
-
-
-_SYMBOLS = {"boron": "B", "phosphorus": "P", "arsenic": "As"}
+            f"No implant table for species {canonical_name!r}. Add a "
+            f"<Sym>_in_Si.yaml to a dopants data folder "
+            f"(opentcad.plugins.register_data_dir).")
+    return _read_yaml(index.files[canonical_name])
 
 
 def _symbol_for(canonical_name: str) -> str:
-    return _SYMBOLS[canonical_name]
+    return _species_index().symbols[canonical_name]
 
 
 def canonicalize_species(name: str) -> str:
     """Normalize a species name to the canonical lowercase form. Raises
-    ValueError with a clear message if we don't ship data for it."""
+    ValueError with a clear message if no implant table defines it."""
     key = name.strip().lower()
-    if key not in _ALIASES:
+    aliases = _species_index().aliases
+    if key not in aliases:
         raise ValueError(
             f"Unknown implant species {name!r}. Known: "
-            f"{sorted(set(_ALIASES.values()))}")
-    return _ALIASES[key]
+            f"{sorted(set(aliases.values()))}")
+    return aliases[key]
 
 
 def available_species() -> List[str]:
-    return sorted(set(_ALIASES.values()))
+    return sorted(set(_species_index().aliases.values()))
 
 
 def dopant_kind(species: str) -> str:

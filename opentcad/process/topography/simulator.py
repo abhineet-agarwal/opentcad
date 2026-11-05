@@ -47,7 +47,7 @@ from .oxidation import (
     oxide_thickness,
     temperature_celsius_to_kelvin,
 )
-from .recipe import Anneal, Deposit, Etch, Implant, Oxidize, Recipe
+from .recipe import Deposit, Etch, Oxidize, Recipe
 
 
 @dataclass
@@ -566,21 +566,15 @@ def simulate(structure, recipe: Recipe, grid_delta_um: float = 0.01
         recipe: opentcad Recipe — ordered process steps.
         grid_delta_um: level-set grid spacing.
     """
+    from opentcad.plugins import step_handler
+
     state = initial_state_from_structure(structure, grid_delta_um)
     for step in recipe:
-        if isinstance(step, Deposit):
-            _apply_deposit(state, step)
-        elif isinstance(step, Etch):
-            _apply_etch(state, step)
-        elif isinstance(step, Oxidize):
-            _apply_oxidize(state, step)
-        elif isinstance(step, (Implant, Anneal)):
-            # Doping — a MeshField concern, not a level-set concern.
-            # Carried through to the doping dispatcher after meshing;
-            # ignored by the topography simulator.
-            continue
-        else:
-            raise TypeError(f"Unknown recipe step type: {type(step).__name__}")
+        handler = step_handler(step)   # TypeError for unregistered steps
+        # Doping-stage steps are a MeshField concern, not a level-set one:
+        # the doping dispatcher runs them after meshing.
+        if handler.stage == "topography":
+            handler.apply(state, step)
     return state
 
 

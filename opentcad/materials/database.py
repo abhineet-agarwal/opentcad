@@ -114,7 +114,11 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
     Args:
         symbol: Material symbol, e.g. "Si", "SiO2", "GaN".
         process: Optional process variant, e.g. "hackerfab". If given, loads
-                 from params/{process}/{symbol}.yaml with fallback to params/{symbol}.yaml.
+                 {process}/{symbol}.yaml with fallback to {symbol}.yaml.
+
+    Files are looked up in the built-in params/ folder and in any folder
+    added with ``opentcad.plugins.register_data_dir("materials", path)``.
+    A file present in two folders raises ValueError.
 
     Returns:
         MaterialParams pydantic object.
@@ -122,23 +126,25 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
     Raises:
         FileNotFoundError: If no YAML file found for the given symbol.
     """
-    candidates = []
-    if process:
-        candidates.append(PARAMS_DIR / process / f"{symbol}.yaml")
-    candidates.append(PARAMS_DIR / f"{symbol}.yaml")
+    from opentcad.plugins import data_dirs, find_data_file
 
+    # Built-in params/ first, then folders added with
+    # opentcad.plugins.register_data_dir("materials", ...). A file name
+    # provided by two folders is an error rather than a silent override.
     yaml_path = None
-    for p in candidates:
-        if p.exists():
-            yaml_path = p
-            break
+    if process:
+        yaml_path = find_data_file("materials", f"{process}/{symbol}.yaml")
+    if yaml_path is None:
+        yaml_path = find_data_file("materials", f"{symbol}.yaml")
 
     if yaml_path is None:
-        available = [f.stem for f in PARAMS_DIR.glob("*.yaml")]
+        dirs = data_dirs("materials")
+        available = sorted({f.stem for d in dirs for f in d.glob("*.yaml")})
         raise FileNotFoundError(
-            f"No parameter file found for '{symbol}'. "
+            f"No parameter file found for '{symbol}'"
+            f"{f' (process {process!r})' if process else ''}. "
             f"Available: {available}. "
-            f"Searched: {[str(c) for c in candidates]}"
+            f"Searched: {[str(d) for d in dirs]}"
         )
 
     raw = yaml.safe_load(yaml_path.read_text())

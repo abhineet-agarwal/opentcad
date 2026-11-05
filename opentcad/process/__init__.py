@@ -20,16 +20,18 @@ closes the process → device loop end-to-end.
 """
 from __future__ import annotations
 
+import importlib
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 
 from opentcad.geometry.formats import MeshField
+from opentcad.plugins import step_handler
 
 from .doping import DopingRecipeResult, apply_doping_recipe
-from .topography import (
-    Recipe, TopographyState, simulate, topography_to_meshfield,
-)
-from .topography.recipe import Anneal, Implant
+from .topography import Recipe
+
+if TYPE_CHECKING:
+    from .topography.simulator import TopographyState
 
 
 @dataclass
@@ -46,9 +48,9 @@ class RecipeRunResult:
 
 
 def _recipe_has_topography_steps(recipe: Recipe) -> bool:
-    """A recipe is topography-free if every step is a doping step
-    (Implant or Anneal)."""
-    return any(not isinstance(step, (Implant, Anneal)) for step in recipe)
+    """A recipe is topography-free if every step is a doping-stage step
+    (built-in Implant / Anneal, or a plugin step registered as doping)."""
+    return any(step_handler(step).stage == "topography" for step in recipe)
 
 
 def run_recipe(structure,
@@ -83,6 +85,7 @@ def run_recipe(structure,
     # directly — faster, and keeps hand-drawn devices identical to
     # their pre-Recipe form.
     if _recipe_has_topography_steps(recipe):
+        from .topography import simulate, topography_to_meshfield
         topo = simulate(structure, recipe, grid_delta_um=grid_delta_um)
         mf = topography_to_meshfield(topo, mesh_size_um=mesh_size_um)
     else:
@@ -95,6 +98,16 @@ def run_recipe(structure,
     return RecipeRunResult(meshfield=mf,
                             topography_state=topo,
                             doping_result=dop)
+
+
+_LAZY = {"simulate", "topography_to_meshfield", "TopographyState"}
+
+
+def __getattr__(name: str):
+    # ViennaLS-backed names load on first use (see opentcad.process.topography).
+    if name in _LAZY:
+        return getattr(importlib.import_module(".topography", __name__), name)
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 __all__ = [

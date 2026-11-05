@@ -30,12 +30,9 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field as _field
-from functools import lru_cache
-from pathlib import Path
 from typing import Optional
 
 import numpy as np
-import yaml
 
 from opentcad.geometry.formats import Material, MeshField
 
@@ -43,20 +40,26 @@ from .pearson_iv import canonicalize_species, dopant_kind
 
 
 _K_BOLTZMANN_EV_PER_K = 8.617333262e-5
-_DATA_DIR = Path(__file__).parent / "data"
 _UM_TO_CM = 1e-4
 
 
-@lru_cache(maxsize=None)
 def _load_diffusion_yaml(canonical: str) -> dict:
-    """Read the per-species diffusion YAML, cache forever."""
-    sym = {"boron": "B", "phosphorus": "P", "arsenic": "As"}[canonical]
-    path = _DATA_DIR / f"{sym}_diffusion.yaml"
-    if not path.exists():
+    """The ``<Sym>_diffusion.yaml`` table for a canonical species, from
+    the dopants data folders (built-in first, then registered ones)."""
+    from opentcad.plugins import find_data_file
+    from .pearson_iv import _read_yaml, _symbol_for
+    name = f"{_symbol_for(canonical)}_diffusion.yaml"
+    path = find_data_file("dopants", name)
+    if path is None:
         raise FileNotFoundError(
-            f"No diffusion table for {canonical!r}: looked at {path}")
-    with path.open("r") as fh:
-        return yaml.safe_load(fh)
+            f"No diffusion table for {canonical!r}: add {name} to a dopants "
+            f"data folder (opentcad.plugins.register_data_dir).")
+    table = _read_yaml(path)
+    declared = str(table.get("species", canonical)).strip().lower()
+    if declared != canonical:
+        raise ValueError(f"{path} declares species {declared!r}, "
+                         f"expected {canonical!r}")
+    return table
 
 
 def diffusivity_intrinsic(species: str, T_K: float,

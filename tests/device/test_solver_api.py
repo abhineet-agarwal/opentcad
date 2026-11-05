@@ -47,3 +47,17 @@ def test_diode_forward_bias_increases(simple_mf):
     I_arr = np.array(I)
     # Current should increase with voltage in forward bias
     assert np.all(np.diff(I_arr) >= 0), "Forward bias current not monotonically increasing"
+
+
+@pytest.mark.requires_devsim
+def test_analyses_chain_on_one_solver(simple_mf):
+    # A second sweep starts from the first one's last operating point;
+    # re-running the Poisson-only equilibrium from there does not
+    # converge, so the solver ramps the biases back to 0 V instead.
+    solver = DeviceSolver(simple_mf, {"Silicon": load_material("Si")})
+    v1, i1 = solver.iv_sweep("anode", "cathode", 0.0, 0.4, 0.1)
+    v2, i2 = solver.iv_sweep("anode", "cathode", 0.0, 0.4, 0.1)
+    assert v1 == v2
+    assert i2 == pytest.approx(i1, rel=1e-6, abs=1e-15)
+    vr, ir = solver.iv_sweep("anode", "cathode", 0.0, -0.4, -0.1)
+    assert abs(ir[-1]) < abs(i1[-1])          # reverse bias after forward

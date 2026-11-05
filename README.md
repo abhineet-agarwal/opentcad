@@ -60,9 +60,9 @@ roadmap.
 | 2a    | Transient DC + small-signal AC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair anneal, physical Qf | **Complete** |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned (SKY130 targets extracted) |
 
-**Executed test count (2026-11-06)**: 404 passing (process 147,
-integration 133, device 91, validation 7, geometry 15, materials 6,
-bridge 5). The Phase 2a additions —
+**Executed test count (2026-11-06)**: 420 passing (process 148,
+integration 133, device 92, plugins 14, validation 7, geometry 15,
+materials 6, bridge 5). The Phase 2a additions —
 transient DC sweeps, small-signal AC (`ac_sweep` via DEVSIM circuit
 nodes, gated MOS HF-CV path), Avalanche impact ionization, Joyce-Dixon
 statistics past the Blakemore ceiling, Lombardi with vector-gradient
@@ -329,7 +329,13 @@ cd opentcad
 python -m venv .venv
 source .venv/bin/activate
 pip install -e ".[dev]"
+pip install -e ".[topography]"   # ViennaLS, for deposit / etch / oxidize steps
 ```
+
+ViennaLS is optional. Without it, structures, doping-only recipes,
+implants, anneals and the device solver all work, and only topography
+steps raise an error asking for it. Its current wheels ship a GPL v3
+license, which is why it isn't a required dependency.
 
 Verify the installation:
 
@@ -725,12 +731,33 @@ Adding new physics is one new file under
 [`opentcad/device/models/`](opentcad/device/models/) that subclasses
 the relevant base in `opentcad/device/physics.py`.
 
+### Extending OpenTCAD (plugins)
+
+New process steps, device analyses, dopant tables and material files can
+be added from outside the core through `opentcad.plugins`. The built-ins
+are registered the same way.
+
+```python
+from opentcad.plugins import register_step, register_analysis, register_data_dir
+
+register_step(MyStep, stage="doping", apply=my_apply)      # Recipe().add(MyStep(...))
+register_analysis("my_sweep", my_sweep)                    # solver.run("my_sweep", ...)
+register_data_dir("dopants", "tables/")                    # e.g. Sb_in_Si.yaml → implant("Sb", ...)
+```
+
+An installed package can declare an `opentcad.plugins` entry point, and
+OpenTCAD loads it automatically. A name defined twice is an error, never
+a silent override, and a plugin that fails to load produces a warning. Set
+`OPENTCAD_DISABLE_PLUGINS=1` to run with the core alone. See
+[`docs/plugins.md`](docs/plugins.md).
+
 ---
 
 ## Project layout
 
 ```
 opentcad/
+├── plugins.py     Registries for process steps, analyses and data folders; entry-point discovery
 ├── geometry/      Structure DSL, Gmsh meshing, MeshField data format
 ├── process/       run_recipe (topography + doping, end to end)
 │   ├── topography/ Recipe DSL, ViennaLS simulator, level-set → mesh bridge
@@ -744,8 +771,9 @@ opentcad/
 └── gui/           Optional Streamlit front end
 
 validation/sky130/ Phase 2 exit check against SkyWater's nfet_01v8 model card
+docs/              Plugin guide, optical generation, compact PV notes
 examples/          Runnable tutorial scripts (01–11) + generated PNG plots
-tests/             Pytest suite — 404 tests
+tests/             Pytest suite — 420 tests
                    (markers: slow, requires_devsim, requires_viennaps, integration)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
@@ -755,7 +783,7 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite (404 tests, ~8 min)
+pytest tests/ -v                         # full suite (420 tests, ~8 min)
 pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
 pytest tests/process/ -v                 # topography (requires viennals) + doping
 pytest tests/device/ -v                  # DEVSIM device physics, transient, AC
@@ -802,8 +830,9 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
 
 **Next**
 
-- **Tooling**: a plugin system (process steps, device analyses,
-  material and implant tables registered from outside the core), a file
+- **Tooling**: the plugin system is in place (`opentcad.plugins`:
+  process steps, device analyses, dopant and material tables, entry-point
+  discovery; [`docs/plugins.md`](docs/plugins.md)). Still to come: a file
   format for structures and recipes, a CLI with parameter sweeps, a
   promptable GUI built on that file format, GDS import, Sphinx docs and
   a PyPI release.

@@ -107,6 +107,8 @@ class DeviceSolver:
         self._device_name = f"{base}_{suffix}"
         self._mesh_name = f"{base}_{suffix}_mesh"
         self._initialized = False
+        self._equilibrated_once = False
+        self._contact_bias: dict[str, float] = {}      # last bias set per contact [V]
         self._contact_regions: dict[str, str] = {}     # contact name -> region name
         self._region_materials: dict[str, Material] = {}   # region name -> Material
         self._region_is_insulator: dict[str, bool] = {}    # region name -> insulator?
@@ -198,10 +200,30 @@ class DeviceSolver:
         # is far below any current magnitude of physical interest.
         ds.solve(type="dc", absolute_error=1e10, relative_error=1e-7,
                  maximum_iterations=50)
-        # Mark so a later sweep chaining solve_equilibrium a second time
-        # — only ac_sweep uses this hint today — can short-circuit the
-        # staged Poisson→DD setup and just re-solve DC with fresh biases.
+        # Later analyses on this solver skip the staged Poisson→DD setup
+        # and just ramp the biases back to 0 V (_start_from_zero_bias).
         self._equilibrated_once = True
+
+    def _start_from_zero_bias(self) -> None:
+        """Bring every contact to 0 V before an analysis.
+
+        The first call runs the staged ``solve_equilibrium``. Later calls
+        ramp each biased contact back to 0 V in ≤ 50 mV steps from the
+        previous operating point, so analyses can be chained on one solver
+        (re-running the Poisson-only stage from a biased state does not
+        converge).
+        """
+        if not self._equilibrated_once:
+            self.solve_equilibrium()
+            return
+        biased = {c: v for c, v in self._contact_bias.items() if v != 0.0}
+        if not biased:
+            return
+        n = max(1, int(np.ceil(max(abs(v) for v in biased.values()) / 0.05)))
+        for k in range(n - 1, -1, -1):
+            for c, v in biased.items():
+                self._set_contact_voltage(c, v * k / n)
+            self._solve_dc()
 
     def cv_sweep(self, terminal: str, reference: str,
                  v_start: float, v_end: float, v_step: float
@@ -226,7 +248,7 @@ class DeviceSolver:
         """
         if not self._initialized:
             self.initialize()
-        self.solve_equilibrium()
+        self._start_from_zero_bias()
         self._set_contact_voltage(reference, 0.0)
 
         voltages = np.arange(v_start, v_end + v_step / 2, v_step)
@@ -301,7 +323,7 @@ class DeviceSolver:
         """
         if not self._initialized:
             self.initialize()
-        self.solve_equilibrium()
+        self._start_from_zero_bias()
         self._set_contact_voltage(cathode_contact, 0.0)
 
         # Ramp any pre-held contacts to their target bias smoothly so
@@ -414,7 +436,7 @@ class DeviceSolver:
         # t[0] biases via DC solve. Follow with one `transient_dc` to
         # initialise DEVSIM's time-data machinery; without this, the
         # first BDF1/2/TR step raises "missing time data".
-        self.solve_equilibrium()
+        self._start_from_zero_bias()
         for contact, vals in resolved.items():
             self._set_contact_voltage(contact, float(vals[0]))
         self._solve_dc()
@@ -530,18 +552,10 @@ class DeviceSolver:
                 f"circuit nodes once an analysis has run; recreate the "
                 f"solver with ac_terminals=['{terminal}', ...].")
 
-        # Reset every contact to 0 V so a second ac_sweep call on the
-        # same solver starts from thermal equilibrium, not the previous
-        # DC operating point. solve_equilibrium's full Poisson→DD
-        # staging only runs the first time — repeat calls just re-solve
-        # DC from the carrier densities already on the device.
-        for c in self._contact_regions:
-            self._set_contact_voltage(c, 0.0)
-        if not getattr(self, "_equilibrated_once", False):
-            self.solve_equilibrium()
-            self._equilibrated_once = True
-        else:
-            self._solve_dc()
+        # Start from 0 V on every contact, so a second ac_sweep (or any
+        # earlier analysis) on the same solver doesn't leak its operating
+        # point into this one.
+        self._start_from_zero_bias()
 
         # Ramp DC: reference to 0, terminal to dc_bias in 50 mV steps.
         self._set_contact_voltage(reference, 0.0)
@@ -647,6 +661,35 @@ class DeviceSolver:
         if contact not in self._contact_regions:
             raise KeyError(f"Unknown contact: {contact}")
         return self._get_contact_current(contact)
+
+    # ------------------------------------------------------------------
+    # Building blocks for analyses (built-in or plugin)
+    # ------------------------------------------------------------------
+    def set_contact_voltage(self, contact: str, voltage: float) -> None:
+        """Set a contact's bias [V]; it takes effect at the next
+        ``solve_dc()``. Requires ``solve_equilibrium()`` first."""
+        if not self._initialized:
+            raise RuntimeError("Call solve_equilibrium() before setting biases")
+        if contact not in self._contact_regions:
+            raise KeyError(f"Unknown contact: {contact}")
+        self._set_contact_voltage(contact, voltage)
+
+    def solve_dc(self) -> None:
+        """Newton DC solve at the current contact biases."""
+        if not self._initialized:
+            raise RuntimeError("Call solve_equilibrium() before solve_dc()")
+        self._solve_dc()
+
+    def run(self, analysis: str, **kwargs):
+        """Run a registered analysis by name and return its result.
+
+        Built-ins: ``"iv"``, ``"cv"``, ``"transient"`` and ``"ac"`` (the
+        ``*_sweep`` methods, same keyword arguments). Plugins add more with
+        ``opentcad.plugins.register_analysis``; ``run(name, **kw)`` calls
+        ``fn(self, **kw)``.
+        """
+        from opentcad.plugins import get_analysis
+        return get_analysis(analysis)(self, **kwargs)
 
     # ------------------------------------------------------------------
     # Mesh conversion
@@ -1393,6 +1436,7 @@ class DeviceSolver:
     # Solve helpers
     # ------------------------------------------------------------------
     def _set_contact_voltage(self, contact: str, voltage: float) -> None:
+        self._contact_bias[contact] = float(voltage)
         # AC-wired contacts are driven by a circuit voltage source
         # (DEVSIM's circuit_node binding replaces the parameter-driven
         # Dirichlet BC with a KCL at the circuit node). Change the DC

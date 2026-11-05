@@ -54,6 +54,12 @@ dev = [
 gui = [
     "streamlit>=1.30",
 ]
+# Level-set topography (deposit / etch / oxidize). Kept optional: the
+# current ViennaLS wheels ship a GPL v3 license; doping and device
+# simulation do not need it.
+topography = [
+    "ViennaLS>=5.8",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -152,3 +152,5 @@ Exit: NMOS Vth/Ion/SS within 10% of SKY130. All parameters cited.
 Sphinx docs, tutorial notebooks, NEGF extension (NanoTCAD ViDES), GDS import.
 GDS import, Sphinx docs, a plugin system, a CLI and packaging are planned
 earlier, as a tooling track right after Phase 2 (see the README roadmap).
+Tooling progress: plugin system ✓ (opentcad.plugins, docs/plugins.md);
+ViennaLS made an optional extra, so doping and device work without it.

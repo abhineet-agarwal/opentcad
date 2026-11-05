@@ -321,6 +321,15 @@ class Recipe:
                                   model=model))
         return self
 
+    def add(self, step) -> "Recipe":
+        """Append any registered step — the way to use plugin steps
+        (see ``opentcad.plugins.register_step``). Raises TypeError for a
+        step class with no registered handler."""
+        from opentcad.plugins import step_handler
+        step_handler(step)
+        self.steps.append(step)
+        return self
+
     def __len__(self) -> int:
         return len(self.steps)
 
@@ -328,54 +337,12 @@ class Recipe:
         return iter(self.steps)
 
     def summary(self) -> str:
+        from opentcad.plugins import step_handler
         lines = [f"Recipe {self.name!r}: {len(self.steps)} step(s)"]
         for i, step in enumerate(self.steps, 1):
-            if isinstance(step, Deposit):
-                lines.append(
-                    f"  {i}. deposit {step.thickness_um*1000:.1f} nm of "
-                    f"{step.material.name} ({step.model})")
-            elif isinstance(step, Etch):
-                bits = []
-                if step.window_x_um is not None:
-                    x0, x1 = step.window_x_um
-                    bits.append(f" window=[{x0:.3f}..{x1:.3f}] um")
-                if step.mask_material is not None:
-                    bits.append(f" mask={step.mask_material.name}")
-                if step.rates is not None:
-                    rate_bits = ", ".join(
-                        f"{m.name}:{r:g}" for m, r in step.rates.items())
-                    bits.append(f" rates=[{rate_bits}]")
-                lines.append(
-                    f"  {i}. etch {step.depth_um*1000:.1f} nm "
-                    f"({step.model}){''.join(bits)}")
-            elif isinstance(step, Oxidize):
-                bits = []
-                if step.window_x_um is not None:
-                    x0, x1 = step.window_x_um
-                    bits.append(f" window=[{x0:.3f}..{x1:.3f}] um")
-                if step.bird_beak_length_um > 0:
-                    bits.append(
-                        f" bird_beak={step.bird_beak_length_um*1000:.0f} nm")
-                lines.append(
-                    f"  {i}. oxidize @ {step.temperature_C:.0f}°C for "
-                    f"{step.time_s:.0f} s ({step.ambient}){''.join(bits)}")
-            elif isinstance(step, Implant):
-                bits = []
-                if step.window_x_um is not None:
-                    x0, x1 = step.window_x_um
-                    bits.append(f" window=[{x0:.3f}..{x1:.3f}] um")
-                if step.tilt_deg:
-                    bits.append(f" tilt={step.tilt_deg:+.1f}°")
-                if step.profile != "pearson":
-                    bits.append(f" profile={step.profile}")
-                lines.append(
-                    f"  {i}. implant {step.species} @ {step.energy_keV:g} keV, "
-                    f"dose {step.dose_cm2:.1e} cm⁻²{''.join(bits)}")
-            elif isinstance(step, Anneal):
-                lines.append(
-                    f"  {i}. anneal @ {step.temperature_C:.0f}°C for "
-                    f"{step.time_s:.0f} s ({step.model}; "
-                    f"untracked Nd:{step.species_Nd}, Na:{step.species_Na})")
-            else:
-                lines.append(f"  {i}. {step}")
+            try:
+                describe = step_handler(step).describe
+            except TypeError:          # unregistered: still printable
+                describe = None
+            lines.append(f"  {i}. {describe(step) if describe else repr(step)}")
         return "\n".join(lines)
