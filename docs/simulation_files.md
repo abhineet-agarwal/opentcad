@@ -8,6 +8,7 @@ command line runs, and what a front end such as the GUI produces.
 opentcad check examples/decks/nmos_implanted.yaml        # list every problem, or OK
 opentcad run   examples/decks/nmos_implanted.yaml        # → nmos_implanted.results.json
 opentcad run   deck.yaml -o out.json --vtu mesh.vtu      # also save the final MeshField
+opentcad sweep examples/decks/nmos_tox_sweep.yaml        # parameter sweep → table.csv
 opentcad plugins                                         # what steps/analyses/models exist
 ```
 
@@ -81,6 +82,59 @@ analyses:                                  # run in order on one solver
   signature, and contact names against the structure, before anything runs.
   `ac` terminals are wired automatically. Results go to the JSON under each
   analysis's `name`, with complex values written as `[re, im]`.
+
+## Parameter sweeps
+
+A sweep file names a base simulation file, the values to vary and the
+numbers to extract from each run:
+
+```yaml
+version: 1
+name: nmos_tox_sweep
+base: nmos_implanted.yaml            # relative to this file; or an inline mapping
+mode: zip                            # product (every combination, default) or zip
+vary:                                # path in the simulation file → values
+  structure.layers[1].thickness_um: [0.003, 0.005, 0.007]
+  structure.regions[0].y_um[1]: [0.503, 0.505, 0.507]
+  structure.regions[1].y_um[1]: [0.503, 0.505, 0.507]
+metrics:
+  - {name: vth_cc, analysis: idvg, metric: vth_constant_current, i_crit: 1.0e-3}
+  - {name: id_at_1p5V, analysis: idvg, metric: value_at, x: 1.5}
+```
+
+```bash
+opentcad check examples/decks/nmos_tox_sweep.yaml   # checks every point
+opentcad sweep examples/decks/nmos_tox_sweep.yaml   # → examples/decks/nmos_tox_sweep/
+opentcad sweep sweep.yaml -o out/ -j 4              # 4 points at a time
+```
+
+- **Paths** address the simulation file as `save_deck` writes it: dotted
+  keys, `[i]` for list items. A key that's absent, such as an implant's
+  default `tilt_deg`, can still be set and is then checked like any other
+  field.
+- **Checking:** every point is checked as a complete simulation file before
+  anything runs.
+- **Metrics:**
+  - `vth_max_gm` (option `vds`)
+  - `vth_constant_current` (option `i_crit`, in the analysis's current units)
+  - `value_at` (option `x`: |y| interpolated at x)
+  - `max_abs`
+
+  Plugins add more with `register_metric`. A metric that can't be computed
+  for a point (say, a gm that never peaks) is left empty, with the reason
+  in the `notes` column.
+- **Output folder:**
+  - `table.csv`: one row per point with the varied values, metrics,
+    status, time and notes.
+  - `sweep.json`: the same rows plus the definition.
+  - `points/point_NNN.yaml`: the exact simulation file of each point.
+  - `points/point_NNN.json`: each point's full results.
+
+  A failed point is recorded and the sweep continues. The exit status is 2
+  if any point failed.
+- **Parallel runs:** with `-j N` points run in separate processes, because
+  DEVSIM keeps global state. Those processes see entry-point plugins but not
+  ones registered at runtime in the parent.
 
 ## Checking
 

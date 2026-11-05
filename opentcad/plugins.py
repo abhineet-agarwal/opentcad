@@ -13,6 +13,8 @@ Four things can be added without editing OpenTCAD itself:
 * **Physics models** — ``register_model("mobility", "name", cls)`` (also
   ``recombination``, ``bgn``, ``statistics``) so simulation files can name
   them.
+* **Metrics** — ``register_metric("name", fn)``; sweeps call
+  ``fn(analysis_result, **options)`` to get one number per run.
 * **Data folders** — ``register_data_dir("materials", path)`` adds material
   YAMLs; ``register_data_dir("dopants", path)`` adds implant
   (``<Sym>_in_Si.yaml``) and diffusion (``<Sym>_diffusion.yaml``) tables.
@@ -61,6 +63,7 @@ class StepHandler:
 _steps: dict[type, StepHandler] = {}
 _analyses: dict[str, tuple[Callable, str]] = {}
 _models: dict[str, dict[str, tuple[type, str]]] = {c: {} for c in MODEL_CATEGORIES}
+_metrics: dict[str, tuple[Callable, str]] = {}
 _data_dirs: dict[str, list[tuple[Path, str]]] = {k: [] for k in DATA_KINDS}
 _plugin_status: dict[str, str] = {}
 _builtins_loaded = False
@@ -92,11 +95,12 @@ def _register_builtins() -> None:
     global _current_source
     _current_source = "opentcad"
     try:
-        from opentcad.device import builtin_analyses, builtin_models
+        from opentcad.device import builtin_analyses, builtin_metrics, builtin_models
         from opentcad.process import builtin_steps
         builtin_steps.register()
         builtin_analyses.register()
         builtin_models.register()
+        builtin_metrics.register()
     finally:
         _current_source = "user"
 
@@ -296,6 +300,37 @@ def available_models(category: str) -> list[str]:
 
 
 # =============================================================================
+# Metrics (numbers extracted from analysis results, for sweeps)
+# =============================================================================
+def register_metric(name: str, fn: Callable, *, replace: bool = False) -> None:
+    """Register ``fn(result, **options) -> float`` under ``name``. ``result``
+    is what the analysis returned (for ``iv``: ``(voltages, currents)``)."""
+    _ensure_builtins()
+    if not isinstance(name, str) or not name:
+        raise ValueError("metric name must be a non-empty string")
+    if not callable(fn):
+        raise TypeError("metric must be callable")
+    if name in _metrics and not replace:
+        raise ValueError(f"metric {name!r} is already registered (by "
+                         f"{_metrics[name][1]}); pass replace=True to override")
+    _metrics[name] = (fn, _current_source)
+
+
+def get_metric(name: str) -> Callable:
+    _ensure_loaded()
+    try:
+        return _metrics[name][0]
+    except KeyError:
+        raise KeyError(f"Unknown metric {name!r}; available: "
+                       f"{sorted(_metrics)}") from None
+
+
+def available_metrics() -> list[str]:
+    _ensure_loaded()
+    return sorted(_metrics)
+
+
+# =============================================================================
 # Data folders
 # =============================================================================
 def register_data_dir(kind: str, path) -> None:
@@ -340,6 +375,7 @@ def _reset_for_tests() -> None:
     _analyses.clear()
     for table in _models.values():
         table.clear()
+    _metrics.clear()
     for v in _data_dirs.values():
         v.clear()
     _plugin_status.clear()

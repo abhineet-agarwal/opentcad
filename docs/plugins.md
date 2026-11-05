@@ -85,6 +85,14 @@ Built-in analyses start by bringing every contact back to 0 V. The first
 analysis runs the equilibrium solve; later ones ramp the biases down from the
 previous operating point. So analyses can be chained on one solver.
 
+## Metrics
+
+A metric turns one analysis result into one number for a
+[sweep](simulation_files.md#parameter-sweeps) table:
+`register_metric("name", fn)`, where `fn(result, **options) -> float`.
+For `iv` and `cv`, `result` is `(x_values, y_values)`. The options in a
+sweep file are checked against `fn`'s signature.
+
 ## Data folders
 
 ```python

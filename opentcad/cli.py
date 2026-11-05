@@ -1,14 +1,16 @@
 """
 opentcad.cli — command-line interface.
 
-    opentcad check FILE                 check a simulation file, list every problem
+    opentcad check FILE                 check a simulation or sweep file, list every problem
     opentcad run FILE [-o OUT.json]     run it; write analysis results as JSON
                       [--vtu MESH.vtu]  also save the final MeshField
                       [--verbose]       show DEVSIM's solver output
+    opentcad sweep FILE [-o DIR] [-j N] run a sweep; table.csv + per-point results
     opentcad plugins                    list registered steps, analyses, models,
-                                        data folders and entry-point plugins
+                                        metrics, data folders and plugins
 
-Exit status: 0 success, 1 the file has problems, 2 the run failed.
+Exit status: 0 success, 1 the file has problems, 2 the run (or a sweep
+point) failed.
 """
 from __future__ import annotations
 
@@ -45,18 +47,60 @@ def _err(msg: str) -> None:
     print(msg, file=sys.stderr, flush=True)
 
 
+def _report(file, exc) -> int:
+    _err(f"{file}: {len(exc.problems)} problem(s)")
+    for path, msg in exc.problems:
+        _err(f"  {path}: {msg}" if path else f"  {msg}")
+    return 1
+
+
+def _is_sweep_file(path) -> bool:
+    import yaml
+
+    from opentcad.io.deck import _Loader
+    try:
+        data = yaml.load(Path(path).read_text(), Loader=_Loader)
+    except Exception:
+        return False
+    return isinstance(data, dict) and "vary" in data
+
+
 def _cmd_check(args) -> int:
     from opentcad.io.deck import DeckError, load_deck
+    from opentcad.io.sweep import load_sweep
     try:
+        if _is_sweep_file(args.file):
+            sweep = load_sweep(args.file)
+            print(f"{args.file}: OK — sweep {sweep.name}: {len(sweep.points)} "
+                  f"point(s) ({sweep.mode} of {len(sweep.vary)} parameter(s)), "
+                  f"{len(sweep.metrics)} metric(s)")
+            return 0
         deck = load_deck(args.file)
     except DeckError as exc:
-        _err(f"{args.file}: {len(exc.problems)} problem(s)")
-        for path, msg in exc.problems:
-            _err(f"  {path}: {msg}" if path else f"  {msg}")
-        return 1
+        return _report(args.file, exc)
     print(f"{args.file}: OK — {deck.name}: {len(deck.structure.layers)} layer(s), "
           f"{len(deck.recipe)} recipe step(s), {len(deck.analyses)} analysis/es")
     return 0
+
+
+def _cmd_sweep(args) -> int:
+    from opentcad.io.deck import DeckError
+    from opentcad.io.sweep import load_sweep, run_sweep
+    try:
+        sweep = load_sweep(args.file)
+    except DeckError as exc:
+        return _report(args.file, exc)
+    outdir = Path(args.out) if args.out else Path(args.file).with_suffix("")
+    t0 = time.time()
+    _err(f"sweep {sweep.name}: {len(sweep.points)} point(s), jobs={args.jobs} "
+         f"→ {outdir}")
+    with _quiet_stdout(not args.verbose):
+        result = run_sweep(sweep, outdir, jobs=args.jobs,
+                           log=lambda m: _err(f"[{time.time()-t0:6.1f} s] {m}"))
+    failed = [r for r in result.rows if r["status"] != "ok"]
+    _err(f"table → {outdir / 'table.csv'}  ({len(result.rows) - len(failed)} ok, "
+         f"{len(failed)} failed)")
+    return 2 if failed else 0
 
 
 def _cmd_run(args) -> int:
@@ -64,10 +108,7 @@ def _cmd_run(args) -> int:
     try:
         deck = load_deck(args.file)
     except DeckError as exc:
-        _err(f"{args.file}: {len(exc.problems)} problem(s)")
-        for path, msg in exc.problems:
-            _err(f"  {path}: {msg}" if path else f"  {msg}")
-        return 1
+        return _report(args.file, exc)
     out_path = Path(args.out) if args.out else Path(args.file).with_suffix(".results.json")
     t0 = time.time()
     try:
@@ -105,6 +146,8 @@ def _cmd_plugins(args) -> int:
     print("Physics models:")
     for cat in plugins.MODEL_CATEGORIES:
         print(f"  {cat:<14} {', '.join(plugins.available_models(cat))}")
+    print("Metrics:")
+    print(f"  {', '.join(plugins.available_metrics())}")
     print("Data folders:")
     for kind in plugins.DATA_KINDS:
         for d in plugins.data_dirs(kind):
@@ -130,6 +173,13 @@ def build_parser() -> argparse.ArgumentParser:
     r.add_argument("--verbose", action="store_true",
                    help="show solver output and full tracebacks")
     r.set_defaults(func=_cmd_run)
+    sw = sub.add_parser("sweep", help="run a parameter sweep file")
+    sw.add_argument("file")
+    sw.add_argument("-o", "--out", help="output folder (default: FILE without .yaml)")
+    sw.add_argument("-j", "--jobs", type=int, default=1,
+                    help="points to run in parallel (separate processes)")
+    sw.add_argument("--verbose", action="store_true", help="show solver output")
+    sw.set_defaults(func=_cmd_sweep)
     pl = sub.add_parser("plugins", help="list registered extensions")
     pl.set_defaults(func=_cmd_plugins)
     return p

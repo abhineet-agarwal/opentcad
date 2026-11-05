@@ -45,3 +45,7 @@ examples/microrobot/local_references/
 examples/microrobot/local_runs/
 examples/microrobot/results/**/*.dat
 examples/microrobot/results/**/.spiceinit
+
+# Output of `opentcad run` / `opentcad sweep` on the example files
+examples/decks/*.results.json
+examples/decks/*/

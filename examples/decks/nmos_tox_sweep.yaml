@@ -1,0 +1,19 @@
+# Gate-oxide thickness sweep on the implanted NMOS (nmos_implanted.yaml).
+# The S/D windows must reach the top of the oxide, so their upper y edge
+# moves with the oxide: three paths varied together (mode: zip).
+#
+# Run:  opentcad sweep examples/decks/nmos_tox_sweep.yaml
+#       → examples/decks/nmos_tox_sweep/table.csv
+version: 1
+name: nmos_tox_sweep
+description: Vth and on-current vs gate-oxide thickness (3, 5, 7 nm).
+base: nmos_implanted.yaml
+mode: zip
+vary:
+  structure.layers[1].thickness_um: [0.003, 0.005, 0.007]
+  structure.regions[0].y_um[1]: [0.503, 0.505, 0.507]
+  structure.regions[1].y_um[1]: [0.503, 0.505, 0.507]
+metrics:
+  # 100 nA·W/L per unit width for L = 1 µm: 1e-7 A/µm = 1e-3 A/cm.
+  - {name: vth_cc, analysis: idvg, metric: vth_constant_current, i_crit: 1.0e-3}
+  - {name: id_at_1p5V, analysis: idvg, metric: value_at, x: 1.5}

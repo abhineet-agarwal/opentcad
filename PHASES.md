@@ -143,8 +143,9 @@ Milestone 3.2 — Advanced DEVSIM physics (surface mobility, interface traps, BG
 Milestone 3.3 — Calibration infrastructure (scipy optimizer, SKY130 target metrics)  ◐
       Targets exist: validation/sky130/nfet_01v8_tt_reference.json has Vth,
       DIBL, SS and Ion for L = 0.15–20 µm from the tt model card, and
-      opentcad.device.extract gives the matching Vth extraction. The
-      optimizer is not started.
+      opentcad.device.extract gives the matching Vth extraction. Sweeps
+      over simulation files with named metrics (opentcad.io.sweep) give
+      the evaluation loop an optimizer needs. The optimizer is not started.
 
 Exit: NMOS Vth/Ion/SS within 10% of SKY130. All parameters cited.
 
@@ -155,4 +156,5 @@ earlier, as a tooling track right after Phase 2 (see the README roadmap).
 Tooling progress: plugin system ✓ (opentcad.plugins, docs/plugins.md);
 ViennaLS made an optional extra, so doping and device work without it;
 simulation files + `opentcad check | run` CLI ✓ (opentcad.io.deck,
-docs/simulation_files.md). Next: parameter sweeps, promptable GUI.
+docs/simulation_files.md); parameter sweeps with metrics ✓
+(`opentcad sweep`, opentcad.io.sweep). Next: promptable GUI.
