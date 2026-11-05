@@ -57,7 +57,8 @@ class DeviceSolver:
             material_params: Material display name -> MaterialParams.
             temperature_K: Lattice temperature [K].
             physics: Composable PhysicsConfig (mobility, recombination,
-                BGN, statistics). Defaults to Boltzmann + Klaassen + SRH.
+                BGN, statistics). Defaults to Boltzmann + constant
+                mobility + SRH, no BGN.
             interface_Qf_C_per_cm2: Optional dict keyed by
                 semiconductor REGION name (e.g. ``"SI"``) giving a
                 ``(Qf [C/cm²], y_interface [µm])`` tuple that installs

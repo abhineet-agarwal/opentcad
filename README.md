@@ -41,27 +41,28 @@ A [standalone notebook export](examples/microrobot/SETUP.md) includes the requir
 project source and separates new run outputs from archived evidence; Python 3.12
 portability checks and optional-tool skips are recorded explicitly.
 
-Phases 0, 1 and 2a are complete. Process topography (deposit, etch,
-oxidation) and device simulation both work end-to-end and are joined
-by a single `MeshField` data contract. Phase 2 (doping) has its
-physics in place inside `run_recipe` and drives a working implanted
-NMOS. That covers Pearson implant profiles, tilt, BF₂, per-species
-tracking, and intrinsic or Fair anneal. What remains is the exit check
-(Vth within 20 % of SKY130), which needs a SKY130 reference. OED/TED
-are deferred beyond Phase 2. The current release is suitable for
-research, teaching, and prototyping. See [PHASES.md](PHASES.md) for the
-full roadmap.
+Phases 0, 1, 2 and 2a are complete. Process topography (deposit, etch,
+oxidation), doping (Pearson implants with tilt and BF₂, per-species
+tracking, intrinsic or Fair anneal) and device simulation work
+end-to-end, joined by a single `MeshField` data contract. The Phase 2
+exit check passes: a 1 µm NMOS built from a recipe lands within 15 % of
+the Vth from SkyWater's SKY130 `nfet_01v8` model card
+([`validation/sky130/`](validation/sky130/README.md)). OED/TED are
+deferred beyond Phase 2. The current release is suitable for research,
+teaching, and prototyping. See [PHASES.md](PHASES.md) for the full
+roadmap.
 
 | Phase | Scope                                        | Status         |
 | ----- | -------------------------------------------- | -------------- |
 | 0     | Geometry DSL + DEVSIM device simulation      | **Complete**   |
 | 1     | Topography (ViennaLS): deposit + etch + Deal-Grove oxidation | **Complete** |
-| 2     | Pearson implant (tilt, BF₂) + per-species intrinsic / Fair anneal + `run_recipe` | **Partial** (SKY130 Vth exit check open) |
+| 2     | Pearson implant (tilt, BF₂) + per-species intrinsic / Fair anneal + `run_recipe`; SKY130 Vth check | **Complete** |
 | 2a    | Transient DC + small-signal AC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair anneal, physical Qf | **Complete** |
-| 3     | Materials calibration vs. SKY130 / IHP       | Planned        |
+| 3     | Materials calibration vs. SKY130 / IHP       | Planned (SKY130 targets extracted) |
 
-**Executed test count (2026-11-05)**: 388 passing (process 147,
-integration 133, device 82, geometry 15, materials 6, bridge 5). The Phase 2a additions —
+**Executed test count (2026-11-06)**: 404 passing (process 147,
+integration 133, device 91, validation 7, geometry 15, materials 6,
+bridge 5). The Phase 2a additions —
 transient DC sweeps, small-signal AC (`ac_sweep` via DEVSIM circuit
 nodes, gated MOS HF-CV path), Avalanche impact ionization, Joyce-Dixon
 statistics past the Blakemore ceiling, Lombardi with vector-gradient
@@ -150,7 +151,7 @@ process models (plasma etch, ion-beam etch, flux-based deposition) are
 on the backlog as an optional topography backend; the Recipe and
 mesh-bridge boundaries won't move.
 
-### Doping — implant and anneal (Phase 2; physics complete, exit check open)
+### Doping — implant and anneal (Phase 2)
 
 - **Implant:** `Recipe.implant(species, energy_keV, dose_cm2,
   window_x_um=…, tilt_deg=…, profile="pearson")`.
@@ -206,6 +207,17 @@ for a recipe-to-Id–Vgs NMOS flow (As implants plus anneal, with no
 hand-painted doping), and
 [`examples/09_fair_anneal_profile.py`](examples/09_fair_anneal_profile.py)
 for the Fair vs intrinsic comparison.
+
+Phase 2 exit criterion (met):
+
+- ✓ NMOS Vth within 20 % of SKY130. A 1 µm `nfet_01v8`-like device is
+  built from a recipe: SkyWater's published oxide, p-well and junction
+  depth, plus a stand-in boron threshold implant sized once by a 1-D
+  design formula. Its simulated Vth is 0.679 V by max-gm against 0.592 V
+  from the SKY130 tt model card (+14.8 %), and 0.588 V against 0.547 V
+  at 100 nA·W/L (+7.5 %). Both curves go through the same extraction
+  (`opentcad.device.extract`). Inputs, stand-ins, mesh refinement and
+  caveats are in [`validation/sky130/`](validation/sky130/README.md).
 
 ### Phase 2a: device physics upgrades (complete)
 
@@ -723,15 +735,17 @@ opentcad/
 ├── process/       run_recipe (topography + doping, end to end)
 │   ├── topography/ Recipe DSL, ViennaLS simulator, level-set → mesh bridge
 │   └── doping/    Pearson implant (tilt, BF₂), per-species intrinsic + Fair anneal, YAML tables
-├── device/        DEVSIM wrapper, physics models, contact BCs, IV/CV/transient/AC
+├── device/        DEVSIM wrapper, physics models, contact BCs, IV/CV/transient/AC,
+│                  Vth extraction (extract.py)
 ├── materials/     YAML parameter database + loader
 ├── bridge/        RBF + nearest-neighbour doping-field interpolator (not yet used by run_recipe)
-├── io/            VTK / GDS file I/O
-├── viz/           Plotting helpers
+├── io/            Empty placeholder (MeshField.save writes .vtu; GDS import is planned)
+├── viz/           Empty placeholder (GUI plots live in gui/plots.py)
 └── gui/           Optional Streamlit front end
 
+validation/sky130/ Phase 2 exit check against SkyWater's nfet_01v8 model card
 examples/          Runnable tutorial scripts (01–11) + generated PNG plots
-tests/             Pytest suite — 388 tests
+tests/             Pytest suite — 404 tests
                    (markers: slow, requires_devsim, requires_viennaps, integration)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
@@ -741,10 +755,11 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite (388 tests, ~4–5 min)
+pytest tests/ -v                         # full suite (404 tests, ~8 min)
 pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
 pytest tests/process/ -v                 # topography (requires viennals) + doping
 pytest tests/device/ -v                  # DEVSIM device physics, transient, AC
+pytest tests/validation/ -v              # SKY130 Vth check (end-to-end run ~6 min)
 pytest -m "not slow" -v                  # skip slow tests
 pytest -m requires_devsim -v             # only DEVSIM-backed tests
 ```
@@ -775,35 +790,32 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
   volumetric), Fair concentration-coupled anneal, `transient_sweep`
   (BDF1/BDF2/TR) and `ac_sweep` (small-signal Y(f) on MOS gates). All
   are tested, with worked examples 09, 10 and 11.
-
-**In progress**
-
-- **Phase 2 (doping): physics done, exit check open**.
-  - Done:
-    - Pearson implant profiles matched to all four moments for B, P and
-      As (10–200 keV), and BF₂.
-    - Tilt, beam-geometry mask edges, and per-column surfaces.
-    - Per-species `C_<species>` tracking.
-    - Intrinsic and Fair anneal, both selectable via `Recipe.anneal`.
-    - `run_recipe` (topography → mesh → doping → `DeviceSolver`), with
-      a junction depth that is converged under mesh refinement.
-    - An implanted NMOS demo (example 06).
-  - Open: the exit check (Vth within 20 % of SKY130). It needs a SKY130
-    `nfet_01v8` reference (target Vth, t_ox) and a stand-in implant
-    recipe, documented as a stand-in rather than SkyWater's actual
-    flow.
-  - Deferred beyond Phase 2: OED, TED and segregation.
+- **Phase 2 (doping)** — Pearson implant profiles matched to all four
+  moments for B, P and As (10–200 keV) and BF₂; tilt, beam-geometry
+  mask edges and per-column surfaces; per-species `C_<species>`
+  tracking; intrinsic and Fair anneal via `Recipe.anneal`; `run_recipe`
+  (topography → mesh → doping → `DeviceSolver`) with a junction depth
+  converged under mesh refinement; the implanted NMOS demo (example 06).
+  Exit check met: Vth within 15 % of SKY130 `nfet_01v8`
+  ([`validation/sky130/`](validation/sky130/README.md)). OED, TED and
+  segregation are deferred beyond Phase 2.
 
 **Next**
 
+- **Tooling**: a plugin system (process steps, device analyses,
+  material and implant tables registered from outside the core), a file
+  format for structures and recipes, a CLI with parameter sweeps, a
+  promptable GUI built on that file format, GDS import, Sphinx docs and
+  a PyPI release.
 - **Phase 3**: quantitative calibration against the SKY130 / IHP
-  SG13G2 PDKs. This means a scipy-driven fit of the existing physics
-  knobs, now including the Phase 2a models, against target metrics
-  (Vth, Ion, SS). The models in the Phase 3 milestone list (Klaassen,
-  Canali, Lombardi, SRH, Auger, Slotboom BGN) already exist; the
-  calibration infrastructure does not.
-- **Phase 4**: NEGF backend via NanoTCAD ViDES, GDS import, Sphinx
-  docs, community notebooks.
+  SG13G2 PDKs: a scipy-driven fit of the existing physics knobs against
+  target metrics (Vth, Ion, SS). The models in the Phase 3 milestone
+  list (Klaassen, Canali, Lombardi, SRH, Auger, Slotboom BGN) exist, and
+  SKY130 targets and Vth extraction are ready (`validation/sky130/`,
+  `opentcad.device.extract`). The optimizer does not exist yet. The first
+  item is surface mobility: with literature Lombardi coefficients the
+  simulated gm plateaus instead of peaking.
+- **Phase 4**: NEGF backend via NanoTCAD ViDES, community notebooks.
 
 **Backlog / follow-ups noted in code**
 

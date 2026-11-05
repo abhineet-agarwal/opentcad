@@ -1,0 +1,127 @@
+{
+  "device": "sky130_fd_pr__nfet_01v8",
+  "source": "SkyWater SKY130 BSIM4 model cards, evaluated with ngspice",
+  "pdk": {
+    "path": "/usr/local/share/pdk/sky130A",
+    "open_pdks_commit": "b01f6d281922e2185acf13fb855b338bb97ff460",
+    "sky130_fd_pr_commit": "1232782c1b9fab3aacda74d67ce7c92bf7da8105",
+    "corner": "tt",
+    "toxe_nm_from_model_card": 4.148
+  },
+  "simulator": "ngspice-44.2 : Circuit level simulation program",
+  "conditions": {
+    "W_um": 10.0,
+    "temperature_C": 26.85,
+    "Vds_lin_V": 0.05,
+    "Vds_sat_V": 1.8,
+    "Vbs_V": 0.0,
+    "Vgs_step_V": 0.002
+  },
+  "methods": {
+    "Vth_lin_ELR": "max-gm linear extrapolation at Vds_lin: Vg* - Id*/gm* - Vds/2",
+    "Vth_cc": "Vgs where Id = 100 nA * W/L (log-interpolated)",
+    "DIBL": "(Vth_lin_cc - Vth_sat_cc) / (Vds_sat - Vds_lin)",
+    "SS_min": "min dVgs/dlog10(Id) for 1e-13 A < Id < 100 nA*W/L at Vds_lin"
+  },
+  "results": [
+    {
+      "L_um": 0.15,
+      "Vth_lin_ELR_V": 0.7108,
+      "Vth_lin_cc_V": 0.6595,
+      "Vth_sat_cc_V": 0.573,
+      "DIBL_mV_per_V": 49.4,
+      "SS_min_mV_per_dec": 77.3,
+      "gm_max_lin_S": 0.0008826197499999938,
+      "Ion_sat_A_per_um": 0.0005123837550000001,
+      "Ioff_sat_A_per_um": 2.51596423e-13
+    },
+    {
+      "L_um": 0.18,
+      "Vth_lin_ELR_V": 0.7129,
+      "Vth_lin_cc_V": 0.6685,
+      "Vth_sat_cc_V": 0.6023,
+      "DIBL_mV_per_V": 37.9,
+      "SS_min_mV_per_dec": 88.3,
+      "gm_max_lin_S": 0.0007596407499999985,
+      "Ion_sat_A_per_um": 0.00043854836899999997,
+      "Ioff_sat_A_per_um": 4.6852102e-13
+    },
+    {
+      "L_um": 0.25,
+      "Vth_lin_ELR_V": 0.6793,
+      "Vth_lin_cc_V": 0.6348,
+      "Vth_sat_cc_V": 0.5865,
+      "DIBL_mV_per_V": 27.6,
+      "SS_min_mV_per_dec": 86.1,
+      "gm_max_lin_S": 0.0005431632499999992,
+      "Ion_sat_A_per_um": 0.00036234882300000004,
+      "Ioff_sat_A_per_um": 3.00803723e-13
+    },
+    {
+      "L_um": 0.5,
+      "Vth_lin_ELR_V": 0.6268,
+      "Vth_lin_cc_V": 0.5803,
+      "Vth_sat_cc_V": 0.5546,
+      "DIBL_mV_per_V": 14.7,
+      "SS_min_mV_per_dec": 85.9,
+      "gm_max_lin_S": 0.00027051800000000084,
+      "Ion_sat_A_per_um": 0.000233902711,
+      "Ioff_sat_A_per_um": 2.90797988e-13
+    },
+    {
+      "L_um": 1.0,
+      "Vth_lin_ELR_V": 0.5919,
+      "Vth_lin_cc_V": 0.5468,
+      "Vth_sat_cc_V": 0.529,
+      "DIBL_mV_per_V": 10.2,
+      "SS_min_mV_per_dec": 84.7,
+      "gm_max_lin_S": 0.00013679090000000022,
+      "Ion_sat_A_per_um": 0.000139602944,
+      "Ioff_sat_A_per_um": 2.70638402e-13
+    },
+    {
+      "L_um": 2.0,
+      "Vth_lin_ELR_V": 0.5697,
+      "Vth_lin_cc_V": 0.527,
+      "Vth_sat_cc_V": 0.5097,
+      "DIBL_mV_per_V": 9.9,
+      "SS_min_mV_per_dec": 85.6,
+      "gm_max_lin_S": 6.962294999999933e-05,
+      "Ion_sat_A_per_um": 7.70863247e-05,
+      "Ioff_sat_A_per_um": 2.6464289899999996e-13
+    },
+    {
+      "L_um": 4.0,
+      "Vth_lin_ELR_V": 0.5544,
+      "Vth_lin_cc_V": 0.5118,
+      "Vth_sat_cc_V": 0.4983,
+      "DIBL_mV_per_V": 7.7,
+      "SS_min_mV_per_dec": 85.0,
+      "gm_max_lin_S": 3.477796749999998e-05,
+      "Ion_sat_A_per_um": 4.00444165e-05,
+      "Ioff_sat_A_per_um": 2.3345068e-13
+    },
+    {
+      "L_um": 8.0,
+      "Vth_lin_ELR_V": 0.5454,
+      "Vth_lin_cc_V": 0.502,
+      "Vth_sat_cc_V": 0.4894,
+      "DIBL_mV_per_V": 7.2,
+      "SS_min_mV_per_dec": 84.9,
+      "gm_max_lin_S": 1.7372722500000022e-05,
+      "Ion_sat_A_per_um": 2.05115241e-05,
+      "Ioff_sat_A_per_um": 2.13644791e-13
+    },
+    {
+      "L_um": 20.0,
+      "Vth_lin_ELR_V": 0.5435,
+      "Vth_lin_cc_V": 0.4999,
+      "Vth_sat_cc_V": 0.4874,
+      "DIBL_mV_per_V": 7.2,
+      "SS_min_mV_per_dec": 85.1,
+      "gm_max_lin_S": 6.945917499999975e-06,
+      "Ion_sat_A_per_um": 8.37987632e-06,
+      "Ioff_sat_A_per_um": 1.9482670299999998e-13
+    }
+  ]
+}

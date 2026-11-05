@@ -19,8 +19,8 @@ is separate from conceptual TCAD device physics.
 
 The Phase 2 list below is a roadmap, not an exhaustive capability inventory.
 Pearson implant profiles, per-species tracking, and intrinsic and Fair
-anneal exist and have tests. The SKY130 Vth exit check and calibration are
-open. TED, OED and segregation are deferred beyond Phase 2.
+anneal exist and have tests, and the SKY130 Vth exit check passes. Calibration
+is open. TED, OED and segregation are deferred beyond Phase 2.
 
 ## Phase 0 — Skeleton and Device Simulation — COMPLETE
 Goal: p-n junction and MOSFET IV curves with hand-specified doping. No process sim.
@@ -60,7 +60,7 @@ Deferred to Phase 3+: angled directional etch, polygon walker for
 re-entrant profiles, proper 2D coupled O2 diffusion under the mask
 (current bird's-beak is a heuristic exponential feathering).
 
-## Phase 2 — Doping Simulation — PARTIAL (physics done; exit check open)
+## Phase 2 — Doping Simulation — COMPLETE
 Goal: Realistic implant+anneal profiles feeding device simulation.
 
 Milestone 2.1 — Implant parameter database (Pearson IV tables B/P/As/BF2 in Si)  ✓
@@ -97,9 +97,13 @@ Milestone 2.4 — Process→device mesh translator (THE CORE PIECE)  ✓
       between separate meshes.
 
 Exit: ✓ Full NMOS process flow simulated (examples/06_nmos_implanted.py);
-      ✗ Vth within 20% of SKY130 published value — not yet checked. Needs a
-        SKY130 nfet_01v8 reference (target Vth, t_ox) and a stand-in
-        implant recipe, documented as such.
+      ✓ Vth within 20% of SKY130 (validation/sky130/). At L = 1 µm the
+        max-gm Vth is 0.679 V against 0.592 V from SkyWater's nfet_01v8 tt
+        model card (+14.8 %); at 100 nA·W/L it is 0.588 V against 0.547 V
+        (+7.5 %). Oxide, p-well and junction depth are SkyWater's published
+        values. The threshold implant is a stand-in, sized once by a 1-D
+        design formula and then simulated untuned. Converged to < 10 mV
+        between 10 nm and 7 nm meshes.
 
 ## Phase 2a — Device physics paydown — COMPLETE
 Goal: close the device-side known issues that blocked process-coupled
@@ -130,13 +134,21 @@ Goal: Quantitative agreement with real fab data.
 
 Milestone 3.1 — Materials database (Klaassen, Lombardi, Canali, SRH, Auger)  ◐
       Models implemented with YAML parameters; values not yet fit to data.
+      First target from the Phase 2 check: with the literature Lombardi
+      coefficients, gm plateaus instead of peaking, and peak gm is ~25 %
+      below SKY130's (validation/sky130/README.md).
 Milestone 3.2 — Advanced DEVSIM physics (surface mobility, interface traps, BGN)  ◐
       Lombardi surface mobility and Slotboom BGN done; interface traps only
       as a compact mid-gap Dit term in flat_band_shift_V (no dynamic traps).
-Milestone 3.3 — Calibration infrastructure (scipy optimizer, SKY130 target metrics)
-      Not started.
+Milestone 3.3 — Calibration infrastructure (scipy optimizer, SKY130 target metrics)  ◐
+      Targets exist: validation/sky130/nfet_01v8_tt_reference.json has Vth,
+      DIBL, SS and Ion for L = 0.15–20 µm from the tt model card, and
+      opentcad.device.extract gives the matching Vth extraction. The
+      optimizer is not started.
 
 Exit: NMOS Vth/Ion/SS within 10% of SKY130. All parameters cited.
 
 ## Phase 4 — Community (Ongoing)
 Sphinx docs, tutorial notebooks, NEGF extension (NanoTCAD ViDES), GDS import.
+GDS import, Sphinx docs, a plugin system, a CLI and packaging are planned
+earlier, as a tooling track right after Phase 2 (see the README roadmap).
