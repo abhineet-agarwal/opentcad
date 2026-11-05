@@ -51,12 +51,17 @@ suitable for research, teaching, and prototyping. See
 | ----- | -------------------------------------------- | -------------- |
 | 0     | Geometry DSL + DEVSIM device simulation      | **Complete**   |
 | 1     | Topography (ViennaLS): deposit + etch + Deal-Grove oxidation | **Complete** |
-| 2     | Implant + diffusion (FiPy)                   | Planned        |
+| 2     | Implant (Pearson IV) + Fair diffusion + anneal | **Partial**  |
+| 2a    | Transient DC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair-coupled anneal | **Complete** |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned        |
 
-**Executed test count (2026-10-27)**: 170 passing, including optical,
-charge-conservation, compact-PV/SPICE and microrobot/RTL regressions. Full execution used
-ViennaLS 5.9.0; the environment and remaining limitations are recorded in
+**Executed test count (2026-11-05)**: 185 passing, including the Phase 2a
+additions — transient DC sweeps, Avalanche impact ionization,
+Joyce-Dixon statistics past the Blakemore ceiling, Lombardi with
+vector-gradient E-normal, concentration-coupled Fair anneal — plus the
+original optical, charge-conservation, compact-PV/SPICE and
+microrobot/RTL regressions. Full execution used ViennaLS 5.9.0; the
+environment and remaining limitations are recorded in
 [`examples/microrobot/README.md`](examples/microrobot/README.md).
 
 ### Device simulation (Phase 0)
