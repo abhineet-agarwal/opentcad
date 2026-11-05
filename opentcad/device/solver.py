@@ -897,8 +897,21 @@ class DeviceSolver:
             # Metal-on-insulator: Potential pinned to bias, minus a
             # flat-band shift that encodes fixed oxide charge Qf, midgap
             # Dit-driven Vfb offset, and phi_MS in one compact-model
-            # number. Follow-up: implement proper interface-Poisson
-            # surface-charge for a physically-located Qf.
+            # number.
+            #
+            # Why compact and not a physical interface surface charge?
+            # DEVSIM's `interface_equation` permits ONE type per variable
+            # per interface (verified: `type="fluxterm"` replaces the
+            # existing `type="continuous"` rather than augmenting it).
+            # A sheet charge Qf [C/cm²] at the Si/SiO2 interface wants
+            # BOTH: potential continuity (continuous) and a displacement
+            # jump of magnitude Qf (fluxterm source). The compact Vfb
+            # shift reproduces the same gate-threshold effect for a
+            # uniform oxide — exactly equivalent to Qf/Cox for the
+            # planar case. Follow-up for non-planar / spatially-varying
+            # Qf: install a thin volumetric charge at Si nodes touching
+            # the interface via get_interface_node_list + node_model
+            # augmentation of PotentialNodeCharge.
             tag = self._contact_tag(contact)
             vfb = 0.0 if tag is None else float(tag.flat_band_shift_V)
             vfb_name = f"{contact}_vfb"
