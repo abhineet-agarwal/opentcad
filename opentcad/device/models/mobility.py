@@ -259,14 +259,37 @@ class Lombardi(MobilityModel):
 
         Lombardi(base=Canali(base=Klaassen()))
 
-    Approximation: uses |EField| as the E_normal proxy. In our layered
-    Structure DSL, the Si/SiO2 interface is horizontal and the gate
-    field is primarily vertical, so |E| ≈ |E_y| under the channel. A
-    proper E_normal would require 2D element models — noted as follow-up.
+    E_normal selection via the ``e_normal_axis`` kwarg:
+      * ``"y"`` (default) — use ``|Potential_grady|`` via DEVSIM
+        ``vector_gradient``. This is the physical normal field for a
+        horizontal Si/SiO2 interface (the layered-DSL case), so it is
+        the right default for planar MOSFETs. Averaging node→edge
+        matches what ``Lb_NI`` already does.
+      * ``"x"`` — use ``|Potential_gradx|`` for vertical-sidewall
+        interfaces (FinFET fin side, trench MOS).
+      * ``"magnitude"`` — the earlier behavior: the edge ``EField``
+        magnitude, isotropic and independent of the interface
+        orientation. Use for comparison or for devices without a
+        well-defined interface normal.
+
+    Caveats:
+      * The axis toggle is global per region — a device whose Si/SiO2
+        interface genuinely changes orientation (curved birds-beak,
+        45-degree sidewalls) still needs a per-element projection, which
+        requires element-aware models and is documented as follow-up.
+      * ``Potential_grady`` depends on ``Potential`` only — its
+        derivative wrt ``Potential`` at each node is finite but
+        averaging to edges smooths out the step; Newton converges.
     """
 
-    def __init__(self, base: Optional[MobilityModel] = None):
+    def __init__(self, base: Optional[MobilityModel] = None,
+                 e_normal_axis: str = "y"):
         self.base = base if base is not None else ConstantMobility()
+        if e_normal_axis not in {"y", "x", "magnitude"}:
+            raise ValueError(
+                f"e_normal_axis must be 'y', 'x' or 'magnitude' "
+                f"(got {e_normal_axis!r})")
+        self.e_normal_axis = e_normal_axis
 
     @property
     def requires_carriers(self) -> bool:
@@ -300,14 +323,31 @@ class Lombardi(MobilityModel):
                               node_model="Lb_NI_node",
                               average_type="geometric")
 
-        # Smoothed |E| on the edge — same regularization as Canali so
-        # Newton's derivative through E=0 stays finite.
-        e_mag = "((EField*EField) + 1)^(0.5)"
-        # Prevent E_mag from being pathologically small in the mu_ac and
-        # mu_sr denominators. 1 V/cm floor is far below any real MOSFET
-        # inversion-layer field (typically 1e4 - 1e6 V/cm).
-        ds.edge_model(device=device, region=region, name="Lb_Emag",
-                      equation=f"max({e_mag}, 1)")
+        # E_normal source depends on the configured axis. 1 V/cm floor
+        # keeps mu_ac / mu_sr denominators away from zero; far below any
+        # real MOSFET inversion-layer field (1e4 - 1e6 V/cm typical).
+        if self.e_normal_axis == "magnitude":
+            # Isotropic back-compat path: use smoothed edge |EField|.
+            e_mag = "((EField*EField) + 1)^(0.5)"
+            ds.edge_model(device=device, region=region, name="Lb_Emag",
+                          equation=f"max({e_mag}, 1)")
+        else:
+            # Interface-normal path: use vector_gradient's y- or x-
+            # component, averaged node→edge via arithmetic edge_average.
+            ds.vector_gradient(device=device, region=region,
+                               node_model="Potential", calc_type="default")
+            comp = "Potential_grady" if self.e_normal_axis == "y" \
+                else "Potential_gradx"
+            ds.node_model(device=device, region=region,
+                          name="Lb_Enorm_node",
+                          equation=f"((({comp})*({comp})) + 1)^(0.5)")
+            ds.edge_average_model(
+                device=device, region=region,
+                edge_model="Lb_Emag_raw",
+                node_model="Lb_Enorm_node",
+                average_type="arithmetic")
+            ds.edge_model(device=device, region=region, name="Lb_Emag",
+                          equation="max(Lb_Emag_raw, 1)")
 
         # Acoustic-phonon-limited surface mobility (edge)
         for k in ("e", "h"):
