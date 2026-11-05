@@ -171,27 +171,34 @@ class Oxidize:
                 f"{self.bird_beak_length_um}")
 
 
+ANNEAL_MODELS = ("intrinsic", "fair")
+IMPLANT_PROFILES = ("pearson", "gaussian")
+
+
 @dataclass(frozen=True)
 class Anneal:
-    """Thermal anneal — Fickian diffusion of all dopant fields at the
-    given temperature for the given time.
+    """Thermal anneal — diffusion of every dopant field at the given
+    temperature for the given time.
 
-    Phase 2.3a implementation is intrinsic D only (no concentration-
-    dependent Fair term); see opentcad.process.doping.anneal for the
-    full set of caveats. The convolution kernel σ = √(2 D t) is applied
-    separately to Nd (using species_Nd's D) and to Na (species_Na's D).
+    Each implanted species (tracked ``C_<species>`` field) diffuses with
+    its own coefficients; doping that is only in Nd / Na uses
+    species_Nd / species_Na. See opentcad.process.doping.anneal.
 
     Args:
       temperature_C: anneal temperature in °C.
       time_s:        duration in seconds.
-      species_Nd:    donor species whose D parameterises the Nd field
-                     diffusion. Default "As" — modern CMOS n+ S/D.
-      species_Na:    acceptor species for the Na field. Default "B".
+      species_Nd:    species whose coefficients drive the untracked Nd
+                     remainder. Default "As".
+      species_Na:    same for the untracked Na remainder. Default "B".
+      model:         "intrinsic" (Gaussian convolution with D_i; exact
+                     below n_i) or "fair" (concentration-coupled Fair
+                     model; needed at S/D-level doping).
     """
     temperature_C: float
     time_s: float
     species_Nd: str = "As"
     species_Na: str = "B"
+    model: str = "intrinsic"
 
     def __post_init__(self):
         if self.time_s < 0:
@@ -200,6 +207,9 @@ class Anneal:
             raise ValueError(
                 f"Anneal temperature must be above absolute zero "
                 f"(got {self.temperature_C} °C)")
+        if self.model not in ANNEAL_MODELS:
+            raise ValueError(
+                f"Anneal model must be one of {ANNEAL_MODELS}; got {self.model!r}")
 
 
 @dataclass(frozen=True)
@@ -209,22 +219,25 @@ class Implant:
     topography state has been meshed.
 
     Args:
-        species: 'boron' / 'B' / 'phosphorus' / 'P' / 'arsenic' / 'As'
-            (case-insensitive).
-        energy_keV: implant energy in keV. Must fall inside the
-            tabulated Pearson-IV range for the species.
+        species: 'boron' / 'B' / 'phosphorus' / 'P' / 'arsenic' / 'As' /
+            'BF2' (case-insensitive).
+        energy_keV: ion energy in keV. The dopant energy (for BF₂,
+            ≈ 0.225 × this) must fall inside the tabulated range.
         dose_cm2: dose per unit area in cm⁻². Typical S/D is 1e14-1e16.
         window_x_um: (x0, x1) mask opening in µm, or None for a
             blanket implant. Mask edge is softened by the lateral
             straggle in the kernel.
-        tilt_deg: documented but not yet implemented (vertical
-            implant assumed; nonzero issues a warning).
+        tilt_deg: beam tilt from the wafer normal in the cross-section
+            plane, |tilt| < 89°. Positive leans toward +x with depth.
+        profile: "pearson" (all four tabulated moments, default) or
+            "gaussian" (Rp and ΔRp only).
     """
     species: str
     energy_keV: float
     dose_cm2: float
     window_x_um: Optional[Tuple[float, float]] = None
     tilt_deg: float = 0.0
+    profile: str = "pearson"
 
     def __post_init__(self):
         if self.energy_keV <= 0:
@@ -237,6 +250,12 @@ class Implant:
                 raise ValueError(
                     f"Implant window must be (x0, x1) with x1 > x0; "
                     f"got {self.window_x_um!r}")
+        if not abs(self.tilt_deg) < 89.0:
+            raise ValueError(f"Implant |tilt_deg| must be < 89°; got {self.tilt_deg}")
+        if self.profile not in IMPLANT_PROFILES:
+            raise ValueError(
+                f"Implant profile must be one of {IMPLANT_PROFILES}; "
+                f"got {self.profile!r}")
 
 
 Step = Union[Deposit, Etch, Oxidize, Implant, Anneal]
@@ -281,21 +300,25 @@ class Recipe:
 
     def implant(self, species: str, energy_keV: float, dose_cm2: float,
                 window_x_um: Optional[Tuple[float, float]] = None,
-                tilt_deg: float = 0.0) -> "Recipe":
+                tilt_deg: float = 0.0,
+                profile: str = "pearson") -> "Recipe":
         self.steps.append(Implant(species=species,
                                    energy_keV=energy_keV,
                                    dose_cm2=dose_cm2,
                                    window_x_um=window_x_um,
-                                   tilt_deg=tilt_deg))
+                                   tilt_deg=tilt_deg,
+                                   profile=profile))
         return self
 
     def anneal(self, temperature_C: float, time_s: float,
                species_Nd: str = "As",
-               species_Na: str = "B") -> "Recipe":
+               species_Na: str = "B",
+               model: str = "intrinsic") -> "Recipe":
         self.steps.append(Anneal(temperature_C=temperature_C,
                                   time_s=time_s,
                                   species_Nd=species_Nd,
-                                  species_Na=species_Na))
+                                  species_Na=species_Na,
+                                  model=model))
         return self
 
     def __len__(self) -> int:
@@ -343,14 +366,16 @@ class Recipe:
                     bits.append(f" window=[{x0:.3f}..{x1:.3f}] um")
                 if step.tilt_deg:
                     bits.append(f" tilt={step.tilt_deg:+.1f}°")
+                if step.profile != "pearson":
+                    bits.append(f" profile={step.profile}")
                 lines.append(
                     f"  {i}. implant {step.species} @ {step.energy_keV:g} keV, "
                     f"dose {step.dose_cm2:.1e} cm⁻²{''.join(bits)}")
             elif isinstance(step, Anneal):
                 lines.append(
                     f"  {i}. anneal @ {step.temperature_C:.0f}°C for "
-                    f"{step.time_s:.0f} s "
-                    f"(Nd:{step.species_Nd}, Na:{step.species_Na})")
+                    f"{step.time_s:.0f} s ({step.model}; "
+                    f"untracked Nd:{step.species_Nd}, Na:{step.species_Na})")
             else:
                 lines.append(f"  {i}. {step}")
         return "\n".join(lines)

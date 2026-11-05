@@ -8,9 +8,8 @@
 #
 # Fair's model for the full concentration-dependent diffusivity is
 #     D(n, p) = D_i + D_plus * (p / n_i)
-# — boron is an acceptor so hole-mediated diffusion dominates. Only the
-# intrinsic D_i part is used by Phase 2.3a; D_plus coefficients sit in
-# this YAML as placeholders for the Phase 2.3b upgrade.
+# — boron is an acceptor so hole-mediated diffusion dominates. D_i is
+# used by apply_anneal (intrinsic); apply_anneal_fair adds D_plus.
 
 species: boron
 symbol: B
@@ -21,7 +20,7 @@ intrinsic:
   D0_cm2s: 0.76        # pre-exponential  [cm² / s]
   Ea_eV:   3.46        # activation energy [eV]
 
-# Fair concentration-dependent coefficients — placeholders.
+# Fair concentration-dependent coefficients (used by apply_anneal_fair).
 # Boron: D = D_i + D_plus * (p / n_i)
 fair:
   D_plus:              # hole-mediated component

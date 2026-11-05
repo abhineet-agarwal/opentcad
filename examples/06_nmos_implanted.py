@@ -110,9 +110,10 @@ def main():
     print(f"  Implants fired: {out.doping_result.n_implants}")
     print(f"  Anneals fired:  {out.doping_result.n_anneals}")
     for a in out.doping_result.anneals:
-        print(f"    {a.temperature_C:.0f}°C · {a.time_s:.0f}s  →  "
-              f"σ(Nd)={a.sigma_Nd_um*1000:.1f}nm "
-              f"σ(Na)={a.sigma_Na_um*1000:.1f}nm")
+        spread = ", ".join(f"σ({s})={v*1000:.1f}nm"
+                           for s, v in a.species_sigma_um.items())
+        print(f"    {a.temperature_C:.0f}°C · {a.time_s:.0f}s ({a.model})  →  "
+              f"{spread}; p-body σ={a.sigma_Na_um*1000:.1f}nm")
 
     print(f"\n  Nd_max = {mf.Nd.max():.2e} cm⁻³   "
           f"Na_max = {mf.Na.max():.2e} cm⁻³")

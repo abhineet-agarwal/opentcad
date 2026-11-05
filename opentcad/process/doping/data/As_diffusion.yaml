@@ -18,7 +18,7 @@ intrinsic:
   D0_cm2s: 0.066       # [cm² / s]
   Ea_eV:   3.44        # [eV]
 
-# Fair concentration-dependent coefficients — placeholders.
+# Fair concentration-dependent coefficients (used by apply_anneal_fair).
 fair:
   D_minus:
     D0_cm2s: 12.0

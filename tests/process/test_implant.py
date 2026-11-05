@@ -5,9 +5,10 @@ Six groups of tests:
 
   1. Pearson-IV table lookup — species canonicalisation, interpolation,
      refusal to extrapolate.
-  2. Vertical profile — peak lands at Rp, Gaussian width matches dRp,
-     integrated profile per column equals the input dose (within mesh
-     discretisation).
+  2. Vertical profile — with profile="gaussian" the peak lands at Rp
+     with the Gaussian height; for either profile the integrated
+     profile per column equals the input dose (within mesh
+     discretisation). Pearson-shape tests live in test_pearson.py.
   3. Mask attenuation — far outside the window the added dopant is ≈ 0;
      inside the window it's ≈ full dose; the erf edge has the expected
      width σ_lat ≈ 0.7·dRp.
@@ -89,11 +90,12 @@ def _bare_si(width_um=2.0, body_um=0.5, mesh=0.01):
 
 
 def test_peak_concentration_lands_near_Rp():
-    """Vertical Gaussian is centred at Rp below the top surface. The
+    """Gaussian profile is centred at Rp below the top surface. The
     node of maximum Nd should sit within one grid cell of Rp."""
     mf = _bare_si(width_um=1.0, mesh=0.005)
     y_top = float(np.asarray(mf.grid.points)[:, 1].max())
-    r = apply_implant(mf, "P", energy_keV=60, dose_cm2=1e14)
+    r = apply_implant(mf, "P", energy_keV=60, dose_cm2=1e14,
+                      profile="gaussian")
     y_peak = float(mf.grid.points[int(np.argmax(mf.Nd)), 1])
     y_expected = y_top - r.moments.Rp_um
     assert abs(y_peak - y_expected) < 0.015   # 1-2 grid cells of slop
@@ -105,7 +107,8 @@ def test_peak_concentration_magnitude_matches_gaussian():
     sitting precisely at depth = Rp."""
     mf = _bare_si(width_um=1.0, mesh=0.005)
     dose = 1e14
-    r = apply_implant(mf, "P", energy_keV=60, dose_cm2=dose)
+    r = apply_implant(mf, "P", energy_keV=60, dose_cm2=dose,
+                      profile="gaussian")
     dRp_cm = r.moments.dRp_um * 1e-4
     expected = dose / (math.sqrt(2.0 * math.pi) * dRp_cm)
     got = float(mf.Nd.max())

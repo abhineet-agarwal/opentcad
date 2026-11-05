@@ -152,3 +152,44 @@ def test_fair_rejects_negative_time():
     mf = _mesh(); _install_gaussian(mf, 1e18)
     with pytest.raises(ValueError, match="time"):
         apply_anneal_fair(mf, 1000.0, -1.0, species_Nd="P")
+
+
+def test_ftcs_step_stable_at_limit_and_conserves_trapezoid_mass():
+    """At D·dt/dx² = 0.25 round-off noise must not grow (above it, the 2D
+    explicit scheme amplifies the checkerboard mode), and a blob touching
+    the wall keeps its trapezoid-weighted mass exactly."""
+    from opentcad.process.doping.anneal import _ftcs_step
+    rng = np.random.default_rng(0)
+    dx, D0 = 1e-6, 1e-13
+    C = 1e20 * (1.0 + 1e-12 * rng.standard_normal((40, 40)))
+    D = np.full_like(C, D0)
+    for _ in range(1000):
+        C = _ftcs_step(C, D, dx, 0.25 * dx * dx / D0)
+    assert np.ptp(C) / 1e20 < 1e-11
+
+    C = np.zeros((30, 30)); C[0:4, 8:12] = 1e20
+    D = np.full_like(C, D0)
+    w = np.ones_like(C)
+    w[0, :] *= 0.5; w[-1, :] *= 0.5; w[:, 0] *= 0.5; w[:, -1] *= 0.5
+    m0 = float((w * C).sum())
+    for _ in range(500):
+        C = _ftcs_step(C, D, dx, 0.2 * dx * dx / D0)
+    assert float((w * C).sum()) == pytest.approx(m0, rel=1e-12)
+    assert C.min() >= 0.0
+
+
+def test_fair_long_anneal_obeys_maximum_principle():
+    """Thousands of sub-steps at heavy doping: the profile may only
+    spread — never overshoot its initial peak or go non-finite."""
+    mf = _mesh(); _install_gaussian(mf, 1e21)
+    peak0 = float(mf.Nd.max())
+    res = apply_anneal_fair(mf, 1000.0, 30.0, species_Nd="P")
+    assert res.n_sub_steps > 200
+    assert np.all(np.isfinite(mf.Nd))
+    assert float(mf.Nd.max()) <= peak0 * (1 + 1e-9)
+
+
+def test_fair_rejects_factor_above_stability_limit():
+    mf = _mesh(); _install_gaussian(mf, 1e18)
+    with pytest.raises(ValueError, match="stability_factor"):
+        apply_anneal_fair(mf, 1000.0, 1.0, stability_factor=0.3)

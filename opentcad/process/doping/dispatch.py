@@ -12,20 +12,19 @@ written in.
 The order matters: an As implant at step 3 and a B implant at step 7
 should land in the order the Recipe specifies, so a later implant can
 counter-dope an earlier one in a window the user chose precisely.
-Topography steps are *not* interleaved with doping here — in Phase 2.1
-we defer every implant to after the mesh exists. That's fine for the
-NMOS flow (all topography is done before S/D implant) but doesn't
-model well implants or dopant transport through subsequent oxidation.
-Those are Phase 2.3+ concerns, documented in KNOWN_ISSUES.
+Topography steps are *not* interleaved with doping here — every implant
+runs after the mesh exists. That's fine for the NMOS flow (all
+topography is done before S/D implant) but doesn't model well implants
+followed by oxidation, or dopant transport through a later oxidation.
 """
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import List
+from typing import List, Union
 
 from opentcad.geometry.formats import MeshField
 
-from .anneal import AnnealResult, apply_anneal
+from .anneal import AnnealResult, FairAnnealResult, apply_anneal, apply_anneal_fair
 from .implant import ImplantResult, apply_implant
 from opentcad.process.topography.recipe import Anneal, Implant, Recipe
 
@@ -35,7 +34,7 @@ class DopingRecipeResult:
     """What apply_doping_recipe did, in order. Useful for the GUI's
     sidebar summary and for debugging a long multi-step recipe."""
     implants: List[ImplantResult] = field(default_factory=list)
-    anneals: List[AnnealResult] = field(default_factory=list)
+    anneals: List[Union[AnnealResult, FairAnnealResult]] = field(default_factory=list)
 
     @property
     def n_implants(self) -> int:
@@ -67,10 +66,12 @@ def apply_doping_recipe(mf: MeshField, recipe: Recipe) -> DopingRecipeResult:
                 dose_cm2=step.dose_cm2,
                 window_x_um=step.window_x_um,
                 tilt_deg=step.tilt_deg,
+                profile=step.profile,
             )
             out.implants.append(res)
         elif isinstance(step, Anneal):
-            res = apply_anneal(
+            kernel = apply_anneal_fair if step.model == "fair" else apply_anneal
+            res = kernel(
                 mf,
                 temperature_C=step.temperature_C,
                 time_s=step.time_s,

@@ -72,3 +72,35 @@ def test_summary_runs():
     mf = make_tetra()
     s = mf.summary()
     assert "Silicon" in s
+
+
+def test_species_fields_default_empty():
+    mf = make_tetra()
+    assert mf.species_names() == []
+    np.testing.assert_array_equal(mf.get_species("boron"), np.zeros(4))
+
+
+def test_species_fields_set_get_and_dont_touch_totals():
+    mf = make_tetra()
+    mf.Nd = np.full(4, 1e16)
+    mf.set_species("phosphorus", np.full(4, 2e15))
+    mf.set_species("arsenic", np.full(4, 3e15))
+    assert mf.species_names() == ["arsenic", "phosphorus"]
+    np.testing.assert_allclose(mf.get_species("arsenic"), 3e15)
+    # Species fields are bookkeeping only; Nd is owned by the caller.
+    np.testing.assert_allclose(mf.Nd, 1e16)
+    with pytest.raises(AssertionError):
+        mf.set_species("boron", np.array([-1.0, 0, 0, 0]))
+    with pytest.raises(AssertionError):
+        mf.set_species("boron", np.zeros(3))
+
+
+def test_species_fields_survive_save_load(tmp_path):
+    mf = make_tetra()
+    mf.set_species("boron", np.array([1e15, 2e15, 3e15, 4e15]))
+    p = tmp_path / "mesh"
+    mf.save(p)
+    mf2 = MeshField.load(p)
+    assert mf2.species_names() == ["boron"]
+    np.testing.assert_allclose(mf2.get_species("boron"), [1e15, 2e15, 3e15, 4e15])
+    assert "boron" in mf2.summary()

@@ -42,12 +42,21 @@ class ProcessStep:
     species: Optional[str] = None
     parameters: dict = field(default_factory=dict)
 
+#: point_data key prefix for per-species dopant concentrations [cm^-3].
+SPECIES_PREFIX = "C_"
+
+
 @dataclass
 class MeshField:
     """Central interchange object. Wraps pyvista UnstructuredGrid + semiconductor fields.
-    
+
     grid cell_data must have 'material_id' (int32, Material enum values).
     grid point_data may have 'Nd', 'Na' (float64, cm^-3).
+    grid point_data may also have per-species dopant fields 'C_<species>'
+    (float64, cm^-3, e.g. 'C_boron'). Nd / Na stay the totals the device
+    solver reads; process steps that track a species keep
+    Nd = untracked + sum(donor species) and likewise for Na. Doping set
+    directly through Nd / Na (e.g. by the Structure DSL) is "untracked".
     """
     grid: pv.UnstructuredGrid
     contacts: list[ContactTag] = field(default_factory=list)
@@ -101,6 +110,23 @@ class MeshField:
     @property
     def net_doping(self): return self.Nd - self.Na
 
+    def species_names(self) -> list[str]:
+        """Dopant species with a tracked 'C_<species>' field, sorted."""
+        n = len(SPECIES_PREFIX)
+        return sorted(k[n:] for k in self.grid.point_data.keys()
+                      if k.startswith(SPECIES_PREFIX))
+
+    def get_species(self, name: str) -> np.ndarray:
+        """Concentration of one tracked species [cm^-3]; zeros if untracked."""
+        return self.grid.point_data.get(SPECIES_PREFIX + name, np.zeros(self.n_points))
+
+    def set_species(self, name: str, values: np.ndarray):
+        """Write one species field. Does NOT touch Nd / Na — callers own that sum."""
+        values = np.asarray(values)
+        assert values.shape == (self.n_points,), f"Shape mismatch: {values.shape} vs ({self.n_points},)"
+        assert np.all(values >= 0), f"Concentration of {name} must be non-negative"
+        self.grid.point_data[SPECIES_PREFIX + name] = values.astype(np.float64)
+
     def get_contact(self, name: str) -> ContactTag:
         for c in self.contacts:
             if c.name == name: return c
@@ -151,6 +177,8 @@ class MeshField:
             lines.append(f"    {name}: {count} cells")
         if self.has_doping:
             lines.append(f"  Doping: Nd_max={self.Nd.max():.2e}, Na_max={self.Na.max():.2e} [cm^-3]")
+        for s in self.species_names():
+            lines.append(f"    {s}: max={self.get_species(s).max():.2e} [cm^-3]")
         if self.contacts:
             lines.append(f"  Contacts: {[c.name for c in self.contacts]}")
         return "\n".join(lines)

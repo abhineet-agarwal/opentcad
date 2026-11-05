@@ -43,23 +43,25 @@ portability checks and optional-tool skips are recorded explicitly.
 
 Phases 0, 1 and 2a are complete. Process topography (deposit, etch,
 oxidation) and device simulation both work end-to-end and are joined
-by a single `MeshField` data contract. Phase 2 (doping) is partial:
-implant and anneal kernels run inside `run_recipe` and drive a working
-NMOS, but the full Pearson-IV shape, OED/TED and the SKY130 Vth exit
-check are still open. The current release is suitable for research,
-teaching, and prototyping. See [PHASES.md](PHASES.md) for the full
-roadmap.
+by a single `MeshField` data contract. Phase 2 (doping) has its
+physics in place inside `run_recipe` and drives a working implanted
+NMOS. That covers Pearson implant profiles, tilt, BF₂, per-species
+tracking, and intrinsic or Fair anneal. What remains is the exit check
+(Vth within 20 % of SKY130), which needs a SKY130 reference. OED/TED
+are deferred beyond Phase 2. The current release is suitable for
+research, teaching, and prototyping. See [PHASES.md](PHASES.md) for the
+full roadmap.
 
 | Phase | Scope                                        | Status         |
 | ----- | -------------------------------------------- | -------------- |
 | 0     | Geometry DSL + DEVSIM device simulation      | **Complete**   |
 | 1     | Topography (ViennaLS): deposit + etch + Deal-Grove oxidation | **Complete** |
-| 2     | Implant (Gaussian on Pearson moments) + intrinsic / Fair anneal + `run_recipe` | **Partial** |
+| 2     | Pearson implant (tilt, BF₂) + per-species intrinsic / Fair anneal + `run_recipe` | **Partial** (SKY130 Vth exit check open) |
 | 2a    | Transient DC + small-signal AC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair anneal, physical Qf | **Complete** |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned        |
 
-**Executed test count (2026-11-05)**: 333 passing (integration 133,
-process 95, device 82, geometry 12, materials 6, bridge 5). The Phase 2a additions —
+**Executed test count (2026-11-05)**: 388 passing (process 147,
+integration 133, device 82, geometry 15, materials 6, bridge 5). The Phase 2a additions —
 transient DC sweeps, small-signal AC (`ac_sweep` via DEVSIM circuit
 nodes, gated MOS HF-CV path), Avalanche impact ionization, Joyce-Dixon
 statistics past the Blakemore ceiling, Lombardi with vector-gradient
@@ -142,34 +144,56 @@ ViennaLS's copy, segfaulting on any real op. The ViennaPS process-model
 catalog (SF6O2Etching, MultiParticleProcess, …) plugs in when a fixed
 wheel ships — the Recipe / mesh-bridge boundaries won't move.
 
-### Doping — implant and anneal (Phase 2, partial)
+### Doping — implant and anneal (Phase 2; physics complete, exit check open)
 
-- `Recipe.implant(species, energy_keV, dose_cm2, window_x_um=…)` adds
-  a vertical Gaussian centred on the projected range R_p with
-  straggle ΔR_p, both log-interpolated from per-species YAML tables
-  for B, P and As in Si over 10–200 keV. The tables already carry the
-  Pearson-IV skewness γ and kurtosis β, but the full Pearson-IV shape
-  is not evaluated yet. A mask window gets an erf lateral blur
-  (σ_lat ≈ 0.7·ΔR_p). Dose is conserved, and repeated implants
-  accumulate. `tilt_deg` is accepted but ignored (it raises a warning).
-  BF₂ and screen oxides are not supported.
-- `Recipe.anneal(temperature_C, time_s, …)` dispatches to the
-  **intrinsic** model, an analytic Gaussian spread with a per-species
-  Arrhenius D_i(T). It is exact while the profile stays below n_i(T).
-- `apply_anneal_fair(mf, T, t, …)` is the **Fair** concentration-
-  coupled model, called directly (not yet through `Recipe.anneal`).
-  It uses D_eff = D_i + D⁻·(n/n_i) + D⁻⁻·(n/n_i)² for donors (D⁺, D⁺⁺
-  in p/n_i for acceptors), stepped with explicit Euler on a Cartesian
-  grid. It has harmonic-mean face diffusivities, no-flux walls and an
-  adaptive sub-step sized by the stability limit. At an S/D-level
-  phosphorus peak it gives the concentration-enhanced flattening that
-  the intrinsic model misses. OED and TED are not modelled.
-- `run_recipe(structure, recipe)` plays topography steps through
-  ViennaLS, meshes the result, and then applies implant/anneal steps
-  directly onto the device `MeshField`. The `opentcad.bridge` RBF +
-  nearest-neighbour interpolator, which preserves junction depth to
-  within 5 % in its tests, exists for moving doping between meshes. It
-  is not yet wired into `run_recipe`.
+- **Implant:** `Recipe.implant(species, energy_keV, dose_cm2,
+  window_x_um=…, tilt_deg=…, profile="pearson")`.
+  - *Depth profile:* the Pearson curve matched to all four tabulated
+    moments (R_p, ΔR_p, γ, β), log-interpolated from per-species YAML
+    tables for B, P and As in Si over 10–200 keV. It solves the Pearson
+    equation directly, so every valid (γ, β) works. Several tabulated
+    rows are type I or VI rather than IV; boron above ~30 keV, for
+    example, is type I. `profile="gaussian"` keeps only R_p and ΔR_p.
+  - *Lateral straggle and mask edges:* Gaussian lateral straggle with
+    σ_lat = 0.7·ΔR_p. The concentration at each node is integrated over
+    the beam geometry, so mask windows get the erf edge blur and dose
+    per unit wafer area is conserved at any tilt.
+  - *Tilt:* |tilt| < 89° in the cross-section plane. Channeling is not
+    modelled, so tilt changes only the geometry.
+  - *Surface:* depth is measured from the local top of the meshed
+    stack, found column by column, so implants into trenches or LOCOS
+    land where they should.
+  - *BF₂:* treated as boron at the mass-scaled energy, E·11/49.
+  - *Screen oxide:* material above the Si is crossed with the Si range
+    tables, because no SiO₂ stopping data is shipped.
+- **Per-species tracking:** each implant writes a `C_<species>` field
+  on the `MeshField` (`C_boron`, `C_phosphorus`, `C_arsenic`). `Nd` and
+  `Na` stay the totals the device solver reads. Doping painted by the
+  `Structure` DSL is "untracked" and keeps the old single-species
+  behaviour (`species_Nd`/`species_Na`).
+- **Anneal:** `Recipe.anneal(temperature_C, time_s, model=…)`. Every
+  tracked species diffuses with its own coefficients, so P and As in
+  the same n+ region spread at their own rates.
+  - `model="intrinsic"` (default): an analytic Gaussian spread with the
+    Arrhenius D_i(T). It is exact while the profile stays below n_i(T).
+  - `model="fair"`: Fair concentration-coupled diffusion. It uses
+    D_eff = D_i + D⁻·(n/n_i) + D⁻⁻·(n/n_i)² for donors (D⁺, D⁺⁺ with
+    p/n_i for acceptors), where n and p are the total donor and
+    acceptor concentrations shared by all species. It steps explicitly
+    on a Cartesian grid, with harmonic-mean face diffusivities, a
+    no-flux wall on the boundary samples, and sub-steps held under the
+    2-D stability limit (factor ≤ 0.25). It also runs standalone as
+    `apply_anneal_fair`. At S/D-level doping it produces the
+    concentration-enhanced spreading that the intrinsic model misses.
+  - Both kernels conserve each species' dose.
+  - Not modelled: OED, TED and segregation (deferred beyond Phase 2).
+- **`run_recipe(structure, recipe)`:** plays topography steps through
+  ViennaLS, meshes the result, and then applies the implant/anneal
+  steps directly onto the device `MeshField`. A test checks that the
+  resulting junction depth agrees between 20 nm and 5 nm device meshes
+  to within 5 % (1.4 % intrinsic, 0.3 % Fair in practice). The
+  `opentcad.bridge` RBF + nearest-neighbour interpolator remains
+  available for moving doping between separate meshes.
 
 See [`examples/06_nmos_implanted.py`](examples/06_nmos_implanted.py)
 for a recipe-to-Id–Vgs NMOS flow (As implants plus anneal, with no
@@ -596,7 +620,9 @@ doping, contact, and provenance information stay together.
 
 ```python
 mf.material_ids        # ndarray[int], one per cell
-mf.Nd, mf.Na           # ndarray[float], cm^-3, per node
+mf.Nd, mf.Na           # ndarray[float], cm^-3, per node (totals the device solver reads)
+mf.species_names()     # e.g. ["arsenic", "boron"] — implanted species tracked as C_<species>
+mf.get_species("boron")  # ndarray[float], cm^-3, per node
 mf.get_contact("gate") # ContactTag
 mf.save("device.vtu")  # VTK + sidecar JSON metadata
 MeshField.load("device.vtu")
@@ -690,7 +716,7 @@ opentcad/
 ├── geometry/      Structure DSL, Gmsh meshing, MeshField data format
 ├── process/       run_recipe (topography + doping, end to end)
 │   ├── topography/ Recipe DSL, ViennaLS simulator, level-set → mesh bridge
-│   └── doping/    Implant (Gaussian on Pearson moments), intrinsic + Fair anneal, YAML tables
+│   └── doping/    Pearson implant (tilt, BF₂), per-species intrinsic + Fair anneal, YAML tables
 ├── device/        DEVSIM wrapper, physics models, contact BCs, IV/CV/transient/AC
 ├── materials/     YAML parameter database + loader
 ├── bridge/        RBF + nearest-neighbour doping-field interpolator (not yet used by run_recipe)
@@ -699,7 +725,7 @@ opentcad/
 └── gui/           Optional Streamlit front end
 
 examples/          Runnable tutorial scripts (01–11) + generated PNG plots
-tests/             Pytest suite — 333 tests
+tests/             Pytest suite — 388 tests
                    (markers: slow, requires_devsim, requires_viennaps, integration)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
@@ -709,7 +735,7 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite (333 tests, ~4–5 min)
+pytest tests/ -v                         # full suite (388 tests, ~4–5 min)
 pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
 pytest tests/process/ -v                 # topography (requires viennals) + doping
 pytest tests/device/ -v                  # DEVSIM device physics, transient, AC
@@ -746,14 +772,21 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
 
 **In progress**
 
-- **Phase 2 (doping), partial**. Done: Gaussian implant on Pearson
-  moments for B/P/As (10–200 keV) with an erf mask edge, the intrinsic
-  anneal through `Recipe.anneal`, the standalone Fair anneal, and
-  `run_recipe` (topography → mesh → doping → `DeviceSolver`),
-  demonstrated by an implanted NMOS (example 06). Open: the full
-  Pearson-IV shape (γ, β), tilt, BF₂ and screen oxides, Fair through
-  `Recipe.anneal`, OED/TED, wiring the bridge interpolator into the
-  pipeline, and the exit check (Vth within 20 % of SKY130).
+- **Phase 2 (doping): physics done, exit check open**.
+  - Done:
+    - Pearson implant profiles matched to all four moments for B, P and
+      As (10–200 keV), and BF₂.
+    - Tilt, beam-geometry mask edges, and per-column surfaces.
+    - Per-species `C_<species>` tracking.
+    - Intrinsic and Fair anneal, both selectable via `Recipe.anneal`.
+    - `run_recipe` (topography → mesh → doping → `DeviceSolver`), with
+      a junction depth that is converged under mesh refinement.
+    - An implanted NMOS demo (example 06).
+  - Open: the exit check (Vth within 20 % of SKY130). It needs a SKY130
+    `nfet_01v8` reference (target Vth, t_ox) and a stand-in implant
+    recipe, documented as a stand-in rather than SkyWater's actual
+    flow.
+  - Deferred beyond Phase 2: OED, TED and segregation.
 
 **Next**
 
@@ -786,6 +819,15 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
   metal-on-insulator terminal today, because ohmic/Schottky contacts
   would also need their Electron/HoleContinuity fluxes routed into
   the circuit node.
+- Doping physics left out of Phase 2:
+  - OED, which needs interstitial injection from the oxidation step.
+  - TED, which needs an implant-damage model.
+  - Dopant segregation at Si/SiO₂, which needs a cited segregation
+    coefficient per species.
+  - SiO₂ range tables for screen oxides (today the oxide is crossed
+    with Si stopping).
+  - Doping steps interleaved with later topography: implants run after
+    meshing, so a well implant followed by oxidation isn't modelled.
 
 ---
 

@@ -13,8 +13,9 @@
 #   beta         kurtosis (4th standardized moment; requires beta > gamma^2 + 1)
 #
 # Notes:
-#   - Boron in Si has NEGATIVE skew above ~50 keV — the peak sits shallower
-#     than a Gaussian would predict, with a long tail into the substrate.
+#   - In this table boron's skew turns NEGATIVE from ~100 keV. With depth as
+#     the variable, negative skew puts the peak deeper than Rp and the longer
+#     tail toward the surface (positive skew is the reverse).
 #   - Kurtosis ~2.6-3.2 covers the ion-implant regime (Gaussian = 3.0).
 #   - Below 5 keV, sputtering yield and surface effects dominate; those
 #     energies are out of the amorphous-Pearson regime and not listed.

@@ -69,7 +69,7 @@ def main():
 
     r_i = apply_anneal(mf_i, T_C, t_s, species_Nd="P")
     r_f = apply_anneal_fair(mf_f, T_C, t_s, species_Nd="P",
-                             species_Na="B", stability_factor=0.4)
+                             species_Na="B")
 
     print("\nResults:")
     print(f"  Intrinsic: sigma = {r_i.sigma_Nd_um:.4f} um, "

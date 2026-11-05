@@ -18,9 +18,9 @@ TCAD measurement calibration remain future work. Foundry circuit/layout verifica
 is separate from conceptual TCAD device physics.
 
 The Phase 2 list below is a roadmap, not an exhaustive capability inventory.
-Gaussian implant (on Pearson moments), intrinsic anneal and the Fair
-concentration-coupled anneal exist and have tests. The full Pearson-IV shape,
-TED/OED and calibration are incomplete.
+Pearson implant profiles, per-species tracking, and intrinsic and Fair
+anneal exist and have tests. The SKY130 Vth exit check and calibration are
+open. TED, OED and segregation are deferred beyond Phase 2.
 
 ## Phase 0 — Skeleton and Device Simulation — COMPLETE
 Goal: p-n junction and MOSFET IV curves with hand-specified doping. No process sim.
@@ -57,31 +57,46 @@ Deferred to Phase 3+: angled directional etch, polygon walker for
 re-entrant profiles, proper 2D coupled O2 diffusion under the mask
 (current bird's-beak is a heuristic exponential feathering).
 
-## Phase 2 — Doping Simulation — PARTIAL
+## Phase 2 — Doping Simulation — PARTIAL (physics done; exit check open)
 Goal: Realistic implant+anneal profiles feeding device simulation.
 
-Milestone 2.1 — Implant parameter database (Pearson IV tables B/P/As/BF2 in Si)  ◐
+Milestone 2.1 — Implant parameter database (Pearson IV tables B/P/As/BF2 in Si)  ✓
       B, P, As tables (Rp, ΔRp, γ, β) over 10-200 keV, log-interpolated in
-      energy, no extrapolation. BF2 not yet tabulated.
+      energy, no extrapolation. BF2 maps to B at E·11/49 (mass share), so
+      it needs no separate table. Co-implanted F is not modelled.
 Milestone 2.2 — Implant simulation (Pearson IV + 2D lateral straggle + screening)  ◐
-      Vertical Gaussian on (Rp, ΔRp) plus an erf lateral mask-edge blur
-      (σ_lat ≈ 0.7·ΔRp); dose-conserving, implants accumulate. Open: full
-      Pearson-IV shape from γ/β, tilt (accepted but ignored with a
-      warning), screen oxides, per-column surface lookup.
+      The depth profile is the Pearson curve matched to all four moments,
+      from the Pearson ODE. It covers types I/IV/VI, since several table
+      rows are not type IV. Gaussian lateral straggle (σ_lat ≈ 0.7·ΔRp)
+      with the concentration integrated over the beam geometry: mask-edge
+      blur, tilt |θ| < 89°, dose per wafer area conserved. Depth comes
+      from a per-column top-surface lookup (trenches, LOCOS). Implants
+      write C_<species> plus the Nd/Na totals. Open: screen oxides with
+      SiO₂ range data (today oxide is crossed with Si stopping); no
+      channeling.
 Milestone 2.3 — Diffusion solver (FiPy + Fair model + OED)  ◐
-      Intrinsic analytic Gaussian anneal (Recipe.anneal). Fair
-      concentration-coupled anneal (apply_anneal_fair): explicit Euler
-      on a Cartesian grid, harmonic-mean face D, stability-limited
-      sub-steps. Not FiPy-based. Open: Fair via Recipe.anneal, OED, TED,
-      segregation.
-Milestone 2.4 — Process→device mesh translator (THE CORE PIECE)  ◐
+      Per-species anneal, each species with its own coefficients, chosen
+      by Recipe.anneal(model=...):
+        * intrinsic — analytic Gaussian convolution.
+        * fair — explicit Euler on a Cartesian grid with harmonic-mean
+          face D, a no-flux wall on the boundary samples (exact dose
+          conservation), and sub-steps within the 2D stability limit
+          (factor ≤ 0.25). Species share n / p = total donors / acceptors.
+      Not FiPy-based. OED, TED and segregation are deferred beyond
+      Phase 2 (agreed 2026-11-05).
+Milestone 2.4 — Process→device mesh translator (THE CORE PIECE)  ✓
       run_recipe(structure, recipe) runs topography → mesh → doping and
-      hands a MeshField straight to DeviceSolver (examples/06). The RBF +
-      nearest-neighbour field interpolator in opentcad/bridge (junction
-      depth within 5% in tests) is not yet wired into run_recipe.
+      hands a MeshField straight to DeviceSolver (examples/06). Doping is
+      computed on the device mesh itself. Junction depth agrees within 5%
+      between 20 nm and 5 nm meshes for both anneal models
+      (tests/process/test_junction_refinement.py). The RBF + nearest-
+      neighbour interpolator in opentcad/bridge remains for moving doping
+      between separate meshes.
 
 Exit: ✓ Full NMOS process flow simulated (examples/06_nmos_implanted.py);
-      ✗ Vth within 20% of SKY130 published value — not yet checked.
+      ✗ Vth within 20% of SKY130 published value — not yet checked. Needs a
+        SKY130 nfet_01v8 reference (target Vth, t_ox) and a stand-in
+        implant recipe, documented as such.
 
 ## Phase 2a — Device physics paydown — COMPLETE
 Goal: close the device-side known issues that blocked process-coupled

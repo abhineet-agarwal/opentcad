@@ -1,25 +1,35 @@
 """
-opentcad.process.doping.pearson_iv — Pearson-IV moment lookup.
+opentcad.process.doping.pearson_iv — Implant moment tables + Pearson profile.
 
-Loads the per-species YAML tables under `data/` at import time and
-returns the four moments (Rp, ΔRp, γ, β) for a given (species, energy).
-Log-interpolates in energy — implant range vs energy follows a nuclear-
-stopping-power law that is very close to a power law across the ranges
-we tabulate, so log-linear is accurate to well under 5 % between
-tabulated points.
+Loads the per-species YAML tables under `data/` and returns the four
+moments (Rp, ΔRp, γ, β) for a given (species, energy). Log-interpolates
+in energy — implant range vs energy follows a nuclear-stopping-power law
+that is very close to a power law across the ranges we tabulate, so
+log-linear is accurate to well under 5 % between tabulated points.
 
-The evaluator itself (Pearson-IV analytic profile) is *not* here yet —
-the current implant kernel uses only Rp and ΔRp as a Gaussian
-approximation. γ and β are surfaced for a later upgrade; see the
-'implant is Gaussian' entry in KNOWN_ISSUES.md.
+`pearson_density` turns the four moments into the depth profile. It
+solves the Pearson differential equation
+
+    p'(y) / p(y) = -(a + y) / (b0 + b1·y + b2·y²),    y = depth - Rp
+
+whose coefficients are fixed by (ΔRp, γ, β). This is the general Pearson
+system, not only type IV: tabulated rows fall in types I, IV and VI
+(e.g. boron above ~30 keV has β < 3 + 1.5γ², which is type I), and each
+gets the unique Pearson curve with exactly those four moments. γ = 0,
+β = 3 reduces to the Gaussian.
+
+Molecular ions (BF₂) are mapped to their dopant atom at the atom's share
+of the beam energy — see `resolve_implant_species`.
 """
 from __future__ import annotations
 
+import math
 from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Tuple
 
+import numpy as np
 import yaml
 
 from opentcad.geometry.formats import Material
@@ -87,6 +97,34 @@ def available_species() -> List[str]:
     return sorted(set(_ALIASES.values()))
 
 
+def dopant_kind(species: str) -> str:
+    """'donor' or 'acceptor' for an atomic dopant species."""
+    return _load_species(canonicalize_species(species))["dopant_kind"]
+
+
+# Molecular ions: canonical name → (dopant atom, atom's share of the beam
+# energy). The molecule splits on impact and each atom carries energy in
+# proportion to its mass: BF₂ (49.0 u) puts 11.0/49.0 ≈ 0.225 of E on B.
+_MOLECULAR_IONS = {
+    "bf2": ("boron", 11.009 / (11.009 + 2 * 18.998)),
+}
+
+
+def resolve_implant_species(name: str, energy_keV: float) -> Tuple[str, str, float]:
+    """Map an implanted ion to (ion, dopant, dopant_energy_keV).
+
+    Atomic species pass through unchanged. A molecular ion such as BF₂
+    becomes its dopant atom at the mass-scaled energy. Co-implanted
+    fluorine (and its effect on diffusion) is not modelled.
+    """
+    key = name.strip().lower().replace("₂", "2")
+    if key in _MOLECULAR_IONS:
+        dopant, frac = _MOLECULAR_IONS[key]
+        return key, dopant, float(energy_keV) * frac
+    canonical = canonicalize_species(name)
+    return canonical, canonical, float(energy_keV)
+
+
 def moments_for(species: str, energy_keV: float,
                 target: Material = Material.SI) -> PearsonMoments:
     """Interpolate Pearson-IV moments for the given species and energy.
@@ -145,3 +183,73 @@ def moments_for(species: str, energy_keV: float,
         beta=_interp_lin("beta"),
         dopant_kind=table["dopant_kind"],
     )
+
+
+@lru_cache(maxsize=256)
+def _pearson_density_cached(Rp_um: float, dRp_um: float, gamma: float,
+                            beta: float, n_samples: int):
+    sigma = dRp_um
+    if not sigma > 0:
+        raise ValueError(f"dRp must be > 0 (got {dRp_um} µm)")
+    if not beta > gamma * gamma + 1.0:
+        raise ValueError(
+            f"No distribution has kurtosis β={beta} with skewness γ={gamma} "
+            f"(need β > γ² + 1).")
+    A = 10.0 * beta - 12.0 * gamma * gamma - 18.0
+    if not A > 0:
+        raise ValueError(
+            f"(γ={gamma}, β={beta}) lies outside the bell-shaped Pearson "
+            f"region (10β - 12γ² - 18 must be > 0).")
+    b0 = sigma * sigma * (4.0 * beta - 3.0 * gamma * gamma) / A
+    b1 = sigma * gamma * (beta + 3.0) / A
+    b2 = (2.0 * beta - 3.0 * gamma * gamma - 6.0) / A
+    a = b1
+    mode = -a
+
+    # Support: ±12σ, cut at any real root of b0 + b1·y + b2·y² (types I/VI).
+    lo, hi = -12.0 * sigma, 12.0 * sigma
+    if abs(b2) > 1e-12:
+        roots = np.roots([b2, b1, b0])
+    elif abs(b1) > 1e-12:
+        roots = np.array([-b0 / b1])
+    else:
+        roots = np.array([])
+    for r in roots:
+        if abs(r.imag) < 1e-12 * sigma:
+            r = float(r.real)
+            if r < mode:
+                lo = max(lo, r)
+            else:
+                hi = min(hi, r)
+    eps = 1e-9 * sigma
+    y = np.linspace(lo + eps, hi - eps, n_samples)
+    q = b0 + b1 * y + b2 * y * y
+    integrand = -(a + y) / q
+    # ln p by cumulative trapezoid, then normalise numerically.
+    lnp = np.concatenate(([0.0], np.cumsum(
+        0.5 * (integrand[1:] + integrand[:-1]) * np.diff(y))))
+    p = np.exp(lnp - lnp.max())
+    k = int(np.argmax(p))
+    if k in (0, len(p) - 1):
+        raise ValueError(
+            f"(γ={gamma}, β={beta}) gives a J-shaped Pearson curve; not an "
+            f"implant profile.")
+    p /= np.trapezoid(p, y)
+    depth = Rp_um + y
+    depth.flags.writeable = False
+    p.flags.writeable = False
+    return depth, p
+
+
+def pearson_density(moments: PearsonMoments, n_samples: int = 20001):
+    """Sample the Pearson-system depth density for *moments*.
+
+    Returns ``(depth_um, density_per_um)``: the curve has mean Rp,
+    standard deviation ΔRp, skewness γ and kurtosis β, and integrates to
+    1 over depth (including any part at negative depth — the caller
+    decides what happens above the surface). Arrays are read-only and
+    cached per moment set.
+    """
+    return _pearson_density_cached(float(moments.Rp_um), float(moments.dRp_um),
+                                   float(moments.gamma), float(moments.beta),
+                                   int(n_samples))
