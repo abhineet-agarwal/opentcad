@@ -441,6 +441,29 @@ across dry+wet ambients at 1000–1100 °C.
 
 ---
 
+## Phase 2a demos
+
+Short, self-contained scripts that exercise the Phase 2a additions:
+
+- [`examples/09_fair_anneal_profile.py`](examples/09_fair_anneal_profile.py)
+  — Fair concentration-coupled anneal vs intrinsic Gaussian on an
+  implanted phosphorus profile. Shows the classic high-concentration
+  flattening the intrinsic model cannot produce, plus a D_eff(n/n_i)
+  reference plot.
+- [`examples/10_pn_transient.py`](examples/10_pn_transient.py) — p-n
+  diode anode driven 0.1 → 0.7 V over 10 ns through
+  `DeviceSolver.transient_sweep` (BDF1). Records the ~10 decades of
+  current rise as the junction crosses the Shockley knee.
+- [`examples/11_mos_hfcv.py`](examples/11_mos_hfcv.py) — small-signal
+  high-frequency CV on a p-sub MOS cap via `DeviceSolver.ac_sweep` at
+  1 MHz. Reproduces the textbook three-regime shape (C_ox in
+  accumulation, falling through depletion, HF floor in inversion —
+  C_ox / C_min ≈ 4.6× for NA = 1e17 / t_ox = 10 nm).
+
+![MOS HF-CV](examples/11_mos_hfcv.png)
+
+---
+
 ## Concepts
 
 ### The `Structure` DSL
@@ -645,13 +668,15 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
   (currently an exponential heuristic feathering length).
 - Per-material selectivity in etch rates for multi-material stacks
   (currently one global rate).
-- Element-based E_normal for Lombardi surface mobility (currently
-  ~3 % degradation instead of the textbook 20–40 %).
-- Interface-Poisson Q_f as a physically-located surface charge, for CV
-  curves with interface E-field discontinuities.
-- Joyce–Dixon inverse for Fermi–Dirac statistics beyond the Blakemore
-  ceiling (n > 3.7 · N_c).
-- Small-signal AC via DEVSIM's circuit machinery for true HF-CV.
+- Small-signal AC on ohmic/Schottky terminals (`ac_sweep` currently
+  requires a metal-on-insulator terminal — ohmic/Schottky needs the
+  Electron/HoleContinuity fluxes also routed into the circuit node).
+
+Phase 2a closed out the Lombardi element-based E_normal gap, the
+physically-located Q_f (as a Gaussian-smeared volumetric charge), the
+Joyce–Dixon Fermi–Dirac inverse past the Blakemore ceiling, and the
+small-signal AC half of the transient-plus-AC path (gated MOS terminals
+via `ac_sweep`).
 
 ---
 
