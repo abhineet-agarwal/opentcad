@@ -48,7 +48,8 @@ class DeviceSolver:
                  temperature_K: float = T_K_DEFAULT,
                  physics: PhysicsConfig | None = None,
                  interface_Qf_C_per_cm2: dict | None = None,
-                 interface_Qf_width_um: float = 0.005):
+                 interface_Qf_width_um: float = 0.005,
+                 ac_terminals: list[str] | None = None):
         """Create a DEVSIM drift-diffusion solver for a MeshField.
 
         Args:
@@ -80,6 +81,16 @@ class DeviceSolver:
                 nm into the Si side — a realistic physical model for
                 process-induced Qf whose actual location sits a few
                 lattice spacings from the strict interface anyway.
+            ac_terminals: optional list of metal-on-insulator contact
+                names to pre-wire for small-signal AC analysis via
+                ``ac_sweep``. DEVSIM blocks new circuit nodes once any
+                DC solve has run, so AC terminals MUST be declared at
+                construction time. Each named contact gets a dedicated
+                circuit source whose DC value tracks the normal contact
+                bias API; ``ac_sweep`` only bumps its AC amplitude.
+                Ohmic/Schottky contacts are rejected here to keep the
+                contract honest — see ac_sweep's NotImplementedError
+                message for the follow-up.
         """
         self.mf = meshfield
         self.mat_params = material_params
@@ -87,6 +98,7 @@ class DeviceSolver:
         self.physics = physics if physics is not None else PhysicsConfig()
         self.interface_Qf = dict(interface_Qf_C_per_cm2 or {})
         self.interface_Qf_width_um = float(interface_Qf_width_um)
+        self.ac_terminals: list[str] = list(ac_terminals or [])
         base = meshfield.metadata.get("structure_name", "device")
         # DEVSIM keeps global mesh/device state — disambiguate per instance.
         DeviceSolver._instance_counter += 1
@@ -98,6 +110,9 @@ class DeviceSolver:
         self._region_materials: dict[str, Material] = {}   # region name -> Material
         self._region_is_insulator: dict[str, bool] = {}    # region name -> insulator?
         self._interfaces: list[tuple[str, str, str]] = []  # (if_name, r0, r1)
+        # AC wiring state (populated in initialize(), consumed by ac_sweep
+        # and _set_contact_voltage): contact → (circuit_node, src_name).
+        self._ac_wiring: dict[str, tuple[str, str]] = {}
 
     # ------------------------------------------------------------------
     # Public API
@@ -115,6 +130,12 @@ class DeviceSolver:
         self._ds = ds
         self._convert_meshfield()
         self._setup_equations()
+        # AC circuit nodes MUST be added before any DC solve runs —
+        # DEVSIM locks out add_circuit_node once an analysis has
+        # happened (process-global gate). Wire them here, after the
+        # equations are built but before solve_equilibrium.
+        for terminal in self.ac_terminals:
+            self._wire_ac_source_init(terminal)
         self._initialized = True
 
     def solve_equilibrium(self) -> None:
@@ -176,6 +197,10 @@ class DeviceSolver:
         # is far below any current magnitude of physical interest.
         ds.solve(type="dc", absolute_error=1e10, relative_error=1e-7,
                  maximum_iterations=50)
+        # Mark so a later sweep chaining solve_equilibrium a second time
+        # — only ac_sweep uses this hint today — can short-circuit the
+        # staged Poisson→DD setup and just re-solve DC with fresh biases.
+        self._equilibrated_once = True
 
     def cv_sweep(self, terminal: str, reference: str,
                  v_start: float, v_end: float, v_step: float
@@ -195,7 +220,8 @@ class DeviceSolver:
           on which we register PotentialEdgeFlux as the edge_charge_model.
         - The result is quasi-static (the DC-diff limit) — equivalent to
           measured LF CV. For HF CV where minority carriers can't follow,
-          a small-signal AC solve is a follow-up.
+          use ``ac_sweep`` (small-signal, requires declaring the gate in
+          ``ac_terminals=[...]`` at solver construction).
         """
         if not self._initialized:
             self.initialize()
@@ -419,6 +445,195 @@ class DeviceSolver:
                 currents[c].append(self._get_contact_current(c))
 
         return times.tolist(), currents
+
+    # ------------------------------------------------------------------
+    # Small-signal AC
+    # ------------------------------------------------------------------
+    def ac_sweep(self,
+                 terminal: str,
+                 reference: str,
+                 frequencies,
+                 *,
+                 dc_bias: float = 0.0,
+                 ) -> "tuple[list[float], list[complex]]":
+        """Small-signal AC analysis — complex admittance Y(f) at *terminal*.
+
+        ``terminal`` must have been named in ``ac_terminals=[...]`` at
+        ``DeviceSolver`` construction time — DEVSIM blocks adding circuit
+        nodes once any DC analysis has run (process-global gate), so the
+        AC scaffold is built in ``initialize``, before the first solve.
+
+        Procedure:
+          1. Equilibrium → ramp ``reference`` to 0 V and ``terminal`` to
+             ``dc_bias`` in ≤ 50 mV steps (``circuit_alter`` on the pre-
+             wired V source carries the DC through to the KCL).
+          2. For every frequency f: ``ds.solve(type="ac", frequency=f)``.
+             Read the real & imag branch currents of the V source from
+             circuit node ``V_<terminal>_src__<device>.I`` (DEVSIM
+             auto-creates the ``.I`` node for voltage sources).
+             Admittance:
+
+                Y(f) = -I_V1(f) / V_ac     with V_ac = 1 V
+
+             so ``Y_real = -V1.I_real`` and ``Y_imag = -V1.I_imag``.
+             Convert to capacitance / conductance by
+             ``C(f) = Im(Y(f)) / (2πf)`` and ``G(f) = Re(Y(f))``.
+
+        Returns:
+            ``(freqs, Y)`` where ``freqs`` is a ``list[float]`` and ``Y`` a
+            ``list[complex]`` in Siemens per cm of out-of-plane depth
+            (matching the 2-D integration convention used elsewhere).
+
+        Scope:
+            Supports metal-on-insulator (MOS gate) terminals — the
+            HF-CV case this method was built for. Ohmic/Schottky
+            semiconductor terminals need the Electron/HoleContinuity
+            flux also routed into the same circuit node; that
+            extension raises NotImplementedError explicitly.
+
+        Caveats:
+          * The acreal=1 V AC amplitude is the DEVSIM small-signal
+            convention — the returned Y(f) is independent of it.
+          * ``_set_contact_voltage`` on an AC-wired contact routes
+            through ``circuit_alter`` on the pre-wired source; any
+            subsequent iv_/cv_/transient sweep that drives this contact
+            still works, driven through the same path.
+        """
+        if not self._initialized:
+            self.initialize()
+
+        freqs = np.asarray(frequencies, dtype=float)
+        if freqs.ndim != 1 or len(freqs) < 1:
+            raise ValueError("frequencies must be a 1D array with ≥ 1 point")
+        if np.any(freqs <= 0):
+            raise ValueError("frequencies must all be > 0 Hz")
+
+        if terminal not in self._contact_regions:
+            raise KeyError(f"Unknown terminal contact: {terminal!r}")
+        if reference not in self._contact_regions:
+            raise KeyError(f"Unknown reference contact: {reference!r}")
+
+        region = self._contact_regions[terminal]
+        if not self._region_is_insulator.get(region, False):
+            raise NotImplementedError(
+                f"ac_sweep currently supports only metal-on-insulator "
+                f"(MOS gate) terminals; '{terminal}' sits on semiconductor "
+                f"region '{region}'. An ohmic/Schottky AC path requires "
+                f"routing the Electron/HoleContinuityEquation currents "
+                f"into the circuit node as well — follow-up work.")
+
+        if terminal not in self._ac_wiring:
+            raise RuntimeError(
+                f"'{terminal}' was not declared in ac_terminals at "
+                f"DeviceSolver construction. DEVSIM forbids adding "
+                f"circuit nodes once an analysis has run; recreate the "
+                f"solver with ac_terminals=['{terminal}', ...].")
+
+        # Reset every contact to 0 V so a second ac_sweep call on the
+        # same solver starts from thermal equilibrium, not the previous
+        # DC operating point. solve_equilibrium's full Poisson→DD
+        # staging only runs the first time — repeat calls just re-solve
+        # DC from the carrier densities already on the device.
+        for c in self._contact_regions:
+            self._set_contact_voltage(c, 0.0)
+        if not getattr(self, "_equilibrated_once", False):
+            self.solve_equilibrium()
+            self._equilibrated_once = True
+        else:
+            self._solve_dc()
+
+        # Ramp DC: reference to 0, terminal to dc_bias in 50 mV steps.
+        self._set_contact_voltage(reference, 0.0)
+        ramp_step = 0.05
+        if abs(dc_bias) > 1e-9:
+            pre = np.sign(dc_bias) * np.arange(
+                ramp_step, abs(dc_bias) + ramp_step / 2, ramp_step)
+            for v in pre:
+                self._set_contact_voltage(terminal, float(v))
+                self._solve_dc()
+        self._set_contact_voltage(terminal, float(dc_bias))
+        self._solve_dc()
+
+        ds = self._ds
+        _, src_name = self._ac_wiring[terminal]
+        src_i_node = f"{src_name}.I"
+
+        Y: list[complex] = []
+        for f in freqs:
+            ds.solve(type="ac", frequency=float(f))
+            i_re = ds.get_circuit_node_value(solution="ssac_real",
+                                             node=src_i_node)
+            i_im = ds.get_circuit_node_value(solution="ssac_imag",
+                                             node=src_i_node)
+            # V_ac = 1 V (acreal=1); current flowing INTO the source
+            # is V1.I, so current OUT to the device = -V1.I.
+            # Y = I_device / V_ac = -V1.I.
+            Y.append(complex(-i_re, -i_im))
+
+        return freqs.tolist(), Y
+
+    def _wire_ac_source_init(self, terminal: str) -> None:
+        """Pre-wire a circuit AC source at *terminal*. Called by
+        ``initialize`` BEFORE any solve. Adds a circuit node + a
+        ``V_<terminal>_src__<device>`` voltage source (acreal=1) and
+        rewrites the contact's PotentialEquation with ``circuit_node=``
+        so DEVSIM integrates the contact's displacement flux into the
+        new KCL.
+
+        After this runs, ``_set_contact_voltage`` on this contact routes
+        through ``ds.circuit_alter(name=src_name, value=V)`` instead of
+        setting the parameter — the KCL at the circuit node drives the
+        gate.
+        """
+        ds = self._ds
+        if terminal not in self._contact_regions:
+            raise KeyError(
+                f"ac_terminals entry {terminal!r} is not a contact on this "
+                f"device. Available: {sorted(self._contact_regions)}")
+        region = self._contact_regions[terminal]
+        if not self._region_is_insulator.get(region, False):
+            raise NotImplementedError(
+                f"ac_terminals entry '{terminal}' sits on semiconductor "
+                f"region '{region}'. AC on ohmic/Schottky contacts needs "
+                f"the continuity-equation currents routed into the circuit "
+                f"node as well — not yet wired.")
+
+        # Circuit nodes are DEVSIM-global: include the per-instance device
+        # suffix so concurrent solvers don't collide on the node name.
+        ckt_node = f"V_{terminal}__{self._device_name}"
+        src_name = f"V_{terminal}_src__{self._device_name}"
+
+        ds.add_circuit_node(name=ckt_node)
+        ds.circuit_element(name=src_name, n1=ckt_node, n2=0,
+                           value=0.0, acreal=1.0, acimag=0.0)
+
+        tag = self._contact_tag(terminal)
+        vfb = 0.0 if tag is None else float(tag.flat_band_shift_V)
+        vfb_name = f"{terminal}_vfb"
+        ds.set_parameter(device=self._device_name, region=region,
+                         name=vfb_name, value=vfb)
+
+        pot_name = f"{terminal}nodemodel_ac"
+        ds.contact_node_model(device=self._device_name, contact=terminal,
+                              name=pot_name,
+                              equation=f"Potential - {ckt_node} + {vfb_name}")
+        ds.contact_node_model(device=self._device_name, contact=terminal,
+                              name=f"{pot_name}:Potential", equation="1")
+        # DEVSIM needs the explicit Jacobian entry w.r.t. the circuit node
+        # — without it the AC coupling is zero and SSAC returns Y = 0.
+        ds.contact_node_model(device=self._device_name, contact=terminal,
+                              name=f"{pot_name}:{ckt_node}", equation="-1")
+        # edge_charge_model routes the integral of Permittivity*EField
+        # along contact edges — the displacement charge on the gate side
+        # of the oxide — into the circuit node as a charge term. Under
+        # AC this becomes jω·Q, the displacement current the source
+        # supplies. Without it, Y comes back identically 0.
+        ds.contact_equation(device=self._device_name, contact=terminal,
+                            name="PotentialEquation",
+                            circuit_node=ckt_node, node_model=pot_name,
+                            edge_charge_model="PotentialEdgeFlux")
+
+        self._ac_wiring[terminal] = (ckt_node, src_name)
 
     def contact_current_A_per_cm(self, contact: str) -> float:
         """Read conventional current entering a contact at the last DD solution.
@@ -1177,6 +1392,16 @@ class DeviceSolver:
     # Solve helpers
     # ------------------------------------------------------------------
     def _set_contact_voltage(self, contact: str, voltage: float) -> None:
+        # AC-wired contacts are driven by a circuit voltage source
+        # (DEVSIM's circuit_node binding replaces the parameter-driven
+        # Dirichlet BC with a KCL at the circuit node). Change the DC
+        # value via circuit_alter — the parameter `<contact>bias` is
+        # inert for these contacts.
+        if contact in self._ac_wiring:
+            _, src_name = self._ac_wiring[contact]
+            self._ds.circuit_alter(name=src_name, param="value",
+                                   value=float(voltage))
+            return
         region = self._contact_regions[contact]
         self._ds.set_parameter(device=self._device_name, region=region,
                                name=f"{contact}bias", value=float(voltage))
