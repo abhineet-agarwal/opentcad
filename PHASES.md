@@ -47,11 +47,14 @@ Exit: ✓ LOCOS isolation structure simulated (examples/05_locos.py);
       ✓ oxide thickness within 5% of analytic Deal-Grove across dry+wet
         ambients at 1000-1100°C (tests/process/test_oxidation.py).
 
-Backend note: shipping on ViennaLS directly instead of ViennaPS —
-the macOS ViennaPS 4.6 wheel statically links VTK and its duplicate
-vtkCocoa* classes segfault when both packages load. ViennaPS process
-models (SF6O2Etching, MultiParticleProcess, ...) plug in later when a
-fixed wheel arrives; the Recipe / mesh-bridge boundaries won't move.
+Backend note: shipping on ViennaLS directly instead of ViennaPS.
+On macOS, `import viennaps` loads ViennaLS itself, both wheels bundle
+their own VTK and OpenMP, and the duplicates segfault on the first real
+operation (re-tested 2026-11-06 with ViennaPS 4.6.1 and 4.7.0).
+TODO: ViennaPS as an optional topography backend (plasma etch, ion-beam
+etch, flux-based deposition). Routes: test the Linux wheels, build both
+from source on macOS against one shared VTK/OpenMP, report upstream.
+The Recipe / mesh-bridge boundaries won't move.
 
 Deferred to Phase 3+: angled directional etch, polygon walker for
 re-entrant profiles, proper 2D coupled O2 diffusion under the mask

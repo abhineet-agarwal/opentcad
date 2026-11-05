@@ -115,6 +115,10 @@ Phase 0 exit criteria (all met):
 - Multi-material stacks: a deep masked etch punches through a top
   layer and continues into the material beneath it, via ViennaLS
   multi-level-set advection. Enables hardmask patterning flows.
+- Per-material etch selectivity: `etch(..., rates={Material.SI3N4: 1.0,
+  Material.SIO2: 0.02})` etches each exposed material at its own
+  relative rate, e.g. a nitride etch that stops on oxide
+  (`tests/process/test_selectivity.py`).
 - **Deal–Grove thermal oxidation**: closed-form linear-parabolic law
   with Arrhenius fits for dry O₂ and wet H₂O on ⟨100⟩ Si. Per-column
   moving boundary — Si consumed downward by 0.44 · Δx, SiO₂ top up
@@ -138,11 +142,13 @@ two-material through-etch demo, and
 [`examples/05_locos.py`](examples/05_locos.py) for the LOCOS flow.
 
 **Backend note (macOS)**: OpenTCAD talks to ViennaLS directly rather
-than through ViennaPS, because the current ViennaPS macOS wheel
-statically links VTK and its duplicate `vtkCocoa*` classes collide with
-ViennaLS's copy, segfaulting on any real op. The ViennaPS process-model
-catalog (SF6O2Etching, MultiParticleProcess, …) plugs in when a fixed
-wheel ships — the Recipe / mesh-bridge boundaries won't move.
+than through ViennaPS, because the ViennaPS macOS wheels crash.
+`import viennaps` loads ViennaLS itself, both packages bundle their own
+VTK and OpenMP, and the duplicates segfault on the first real operation
+(re-tested 2026-11-06 with ViennaPS 4.6.1 and 4.7.0). ViennaPS's
+process models (plasma etch, ion-beam etch, flux-based deposition) are
+on the backlog as an optional topography backend; the Recipe and
+mesh-bridge boundaries won't move.
 
 ### Doping — implant and anneal (Phase 2; physics complete, exit check open)
 
@@ -806,8 +812,6 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
   (currently drops the overhang sliver at multi-valued x).
 - Full 2D coupled O₂ diffusion for the LOCOS bird's-beak profile
   (currently an exponential heuristic feathering length).
-- Per-material selectivity in etch rates for multi-material stacks
-  (currently one global rate).
 - Avalanche: replace the v_sat·n current proxy with the real
   drift-diffusion |J_n|/|J_p|, which needs edge/element-aware models,
   to get calibrated Vbd.
@@ -828,6 +832,12 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
     with Si stopping).
   - Doping steps interleaved with later topography: implants run after
     meshing, so a well implant followed by oxidation isn't modelled.
+- ViennaPS as an optional topography backend, adding physical plasma
+  etch, ion-beam etch and flux-based deposition next to the geometric
+  ViennaLS steps. Blocked on the macOS crash above. Routes to try:
+  check whether the Linux wheels work, build ViennaLS and ViennaPS from
+  source on macOS against one shared VTK and OpenMP, and report the
+  crash upstream.
 
 ---
 
@@ -845,9 +855,11 @@ citations), example notebooks, and DEVSIM physics models. Please:
 ## License
 
 Apache License 2.0 — see [LICENSE](LICENSE). OpenTCAD wraps several
-permissively-licensed open-source projects (Gmsh GPLv2 with linking
-exception, DEVSIM Apache 2.0, FiPy public domain, ViennaLS MIT,
-PyVista MIT); each retains its own license.
+open-source projects, each under its own license: Gmsh GPLv2 with
+linking exception, DEVSIM Apache 2.0, FiPy public domain, PyVista MIT,
+and ViennaLS, whose current wheels (5.8.3, 5.9.0) ship a GPL v3 license
+file. ViennaLS is not a declared dependency; only the topography
+module needs it.
 
 ## Citation
 
