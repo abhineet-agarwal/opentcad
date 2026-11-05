@@ -262,6 +262,128 @@ class DeviceSolver:
             currents.append(self._get_contact_current(measure))
         return voltages.tolist(), currents
 
+    def transient_sweep(self,
+                         bias_schedule,
+                         times,
+                         *,
+                         measure_contacts=None,
+                         integrator: str = "bdf1",
+                         charge_error: float = 0.5,
+                         ) -> "tuple[list[float], dict[str, list[float]]]":
+        """Transient DC sweep. Step through *times* applying *bias_schedule*.
+
+        Returns ``(times_list, {contact: current_history_A_per_cm})``.
+
+        Args:
+            bias_schedule: mapping ``{contact_name: f(t)}`` or
+                ``{contact_name: array-like}`` giving the contact voltage
+                at each sample time. Callables are evaluated at every
+                step; arrays must have the same length as ``times``.
+                Contacts not in the dict stay at their current bias.
+            times: 1D array of absolute time points (s). The first entry
+                is treated as the initial condition (no transient solve
+                taken; biases are applied + DC-resolved as a settled
+                starting state). Each subsequent entry drives one
+                transient solve with ``tdelta = t[i] - t[i-1]``.
+            measure_contacts: list of contacts whose currents to record;
+                defaults to every contact on the MeshField.
+            integrator: DEVSIM transient type — one of
+                ``"bdf1"`` (first-order implicit, default; damped),
+                ``"bdf2"`` (second-order, better accuracy, less damped),
+                ``"tr"``   (trapezoidal, second-order, undamped).
+            charge_error: tolerance on the relative difference between
+                BDF projected charge and the Newton-solved charge at
+                each step. **Convergence** knob, not accuracy — DEVSIM
+                refuses to label a step converged while this ratio is
+                above the threshold. Default 0.5 (50 %) survives
+                turn-on ramps where each dt adds a factor of e to the
+                current; tighten (0.05 or 0.01) for small-signal /
+                near-steady runs where Newton converges tightly from
+                the BDF projection.
+
+        Step-response example:
+            # Gate steps from 0 -> 1 V at t = 0, settle for 10 ns.
+            import numpy as np
+            times = np.linspace(0, 10e-9, 101)
+            V_gate = np.where(times > 0, 1.0, 0.0)
+            t, I = solver.transient_sweep({"gate": V_gate}, times,
+                                           measure_contacts=["drain"])
+
+        Caveats:
+          * The initial condition at ``times[0]`` is a DC solve at the
+            prescribed biases, not an arbitrary user-provided state.
+          * BDF1 adds numerical damping; BDF2/TR are preferred for
+            ringing-sensitive measurements. Try BDF2 first if a result
+            looks over-damped.
+          * Junction capacitance from carrier-storage is represented
+            (NCharge, PCharge time terms exist). External wiring
+            parasitics are not — add them via DEVSIM's circuit layer.
+        """
+        if not self._initialized:
+            self.initialize()
+
+        valid = {"bdf1", "bdf2", "tr"}
+        if integrator not in valid:
+            raise ValueError(
+                f"integrator must be one of {sorted(valid)} (got "
+                f"{integrator!r})")
+
+        times = np.asarray(times, dtype=float)
+        if times.ndim != 1 or len(times) < 2:
+            raise ValueError("times must be 1D with at least 2 points")
+        if np.any(np.diff(times) <= 0):
+            raise ValueError("times must be strictly increasing")
+
+        # Resolve the bias schedule — a dict of contact → array(len=N).
+        resolved: dict[str, np.ndarray] = {}
+        for contact, f in (bias_schedule or {}).items():
+            if callable(f):
+                vals = np.array([float(f(t)) for t in times], dtype=float)
+            else:
+                vals = np.asarray(f, dtype=float)
+                if vals.shape != times.shape:
+                    raise ValueError(
+                        f"bias_schedule[{contact!r}] has shape {vals.shape}, "
+                        f"expected {times.shape}")
+            resolved[contact] = vals
+
+        # Initial condition: equilibrium, then settle at the prescribed
+        # t[0] biases via DC solve. Follow with one `transient_dc` to
+        # initialise DEVSIM's time-data machinery; without this, the
+        # first BDF1/2/TR step raises "missing time data".
+        self.solve_equilibrium()
+        for contact, vals in resolved.items():
+            self._set_contact_voltage(contact, float(vals[0]))
+        self._solve_dc()
+        self._ds.solve(type="transient_dc", absolute_error=1e10,
+                       relative_error=1e-5, maximum_iterations=50)
+
+        measure = list(measure_contacts or
+                        [c.name for c in self.mf.contacts])
+        currents: dict[str, list[float]] = {c: [] for c in measure}
+        for c in measure:
+            currents[c].append(self._get_contact_current(c))
+
+        # Transient loop — BDF1/2/TR step at each tdelta.
+        # charge_error must be > 0 or DEVSIM reports "converged: False"
+        # regardless of equation residuals (default charge_error = 0
+        # means "the check never passes"). The 0.5 default survives
+        # exponential turn-on where current gains ~e per step; tighten
+        # for small-signal work.
+        tname = f"transient_{integrator}"
+        for i in range(1, len(times)):
+            dt = float(times[i] - times[i - 1])
+            for contact, vals in resolved.items():
+                self._set_contact_voltage(contact, float(vals[i]))
+            self._ds.solve(type=tname, absolute_error=1e10,
+                           relative_error=1e-5,
+                           charge_error=float(charge_error),
+                           maximum_iterations=50, tdelta=dt)
+            for c in measure:
+                currents[c].append(self._get_contact_current(c))
+
+        return times.tolist(), currents
+
     def contact_current_A_per_cm(self, contact: str) -> float:
         """Read conventional current entering a contact at the last DD solution.
 
