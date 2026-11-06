@@ -88,6 +88,36 @@ def cells_on_grid(mf: MeshField, x: np.ndarray, y: np.ndarray) -> np.ndarray:
     return np.asarray(tri.get_trifinder()(xx, yy), dtype=np.int64)
 
 
+def cell_gradient(mf: MeshField, values) -> np.ndarray:
+    """Gradient of nodal ``values`` on each triangle, (n_cells, 2), in
+    [value]/µm. Exact for the piecewise-linear field."""
+    v = np.asarray(values, dtype=float)
+    pts = points_um(mf)
+    t = triangles(mf)
+    p0, p1, p2 = pts[t[:, 0]], pts[t[:, 1]], pts[t[:, 2]]
+    d1, d2 = p1 - p0, p2 - p0
+    det = d1[:, 0] * d2[:, 1] - d1[:, 1] * d2[:, 0]
+    f1, f2 = v[t[:, 1]] - v[t[:, 0]], v[t[:, 2]] - v[t[:, 0]]
+    gx = (f1 * d2[:, 1] - f2 * d1[:, 1]) / det
+    gy = (f2 * d1[:, 0] - f1 * d2[:, 0]) / det
+    return np.column_stack([gx, gy])
+
+
+def electric_field_V_per_cm(mf: MeshField, potential=None) -> np.ndarray:
+    """|E| = |∇ψ| on each triangle [V/cm], from the ``Potential`` point
+    data of a solver snapshot (or ``potential`` given explicitly)."""
+    psi = mf.grid.point_data["Potential"] if potential is None else potential
+    g = cell_gradient(mf, psi)                    # V/µm
+    return np.hypot(g[:, 0], g[:, 1]) * 1e4
+
+
+def cell_values_on_grid(mf: MeshField, cell_values, x, y) -> np.ndarray:
+    """Per-cell values on a grid (NaN outside the mesh), shape (len(y), len(x))."""
+    cells = cells_on_grid(mf, x, y)
+    vals = np.asarray(cell_values, dtype=float)
+    return np.where(cells >= 0, vals[np.clip(cells, 0, None)], np.nan)
+
+
 def net_doping(mf: MeshField) -> np.ndarray:
     """Nd − Na [cm⁻³]: positive n-type, negative p-type."""
     return np.asarray(mf.Nd, dtype=float) - np.asarray(mf.Na, dtype=float)

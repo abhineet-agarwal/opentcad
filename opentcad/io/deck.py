@@ -802,7 +802,7 @@ def deck_from_dict(data: dict) -> Deck:
                     and isinstance(v, str) and struct and v not in contact_names:
                 probs.add(f"analyses[{i}].{k}", f"no contact named {v!r}; "
                                                 f"contacts: {sorted(contact_names)}")
-            if k in ("hold_contacts", "bias_schedule") and isinstance(v, dict) and struct:
+            if k in ("hold_contacts", "bias_schedule", "biases") and isinstance(v, dict) and struct:
                 for c in v:
                     if c not in contact_names:
                         probs.add(f"analyses[{i}].{k}.{c}", f"no contact named {c!r}")
@@ -873,7 +873,18 @@ class DeckResult:
 
     def analyses_to_dict(self) -> dict:
         """Analysis results as JSON-friendly values (complex → [re, im])."""
+        from opentcad.geometry.formats import MeshField
+
         def conv(v):
+            if isinstance(v, MeshField):          # a "fields" snapshot
+                units = v.metadata.get("solution_fields", {})
+                return {"meshfield": {
+                    "cells": int(v.n_cells), "nodes": int(v.n_points),
+                    "bias_V": dict(v.metadata.get("solution_bias_V", {})),
+                    "fields": {f: {"unit": u,
+                                   "min": float(v.grid.point_data[f].min()),
+                                   "max": float(v.grid.point_data[f].max())}
+                               for f, u in units.items()}}}
             if isinstance(v, complex):
                 return [v.real, v.imag]
             if isinstance(v, (list, tuple)):

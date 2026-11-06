@@ -52,7 +52,7 @@ def test_draft_review_run(fake_model):
     _button(at, "Run").click().run()
     assert not at.exception and not at.error
     assert [t.label for t in at.tabs] == ["Structure", "Doping", "Results"]
-    assert len(at.get("plotly_chart")) == 5
+    assert len(at.get("plotly_chart")) == 6        # + the inversion field map
 
 
 def test_editor_reports_problems():

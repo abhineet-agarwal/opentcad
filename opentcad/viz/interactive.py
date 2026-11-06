@@ -24,7 +24,7 @@ from opentcad.geometry.formats import MATERIAL_NAMES, Material, MeshField
 
 from . import fields as F
 from .palette import (CATEGORICAL, FONT, INK, diverging_colorscale, material_color,
-                      species_color)
+                      sequential_colorscale, species_color)
 
 
 def _go():
@@ -152,6 +152,95 @@ def doping_map(mf: MeshField, *, theme: str = "light", nx: int = 500,
                                showarrow=False,
                                font=dict(color=ink["secondary"], size=11))
     fig.update_layout(**_layout(theme, title))
+    fig.update_xaxes(title_text="x [µm]")
+    fig.update_yaxes(title_text="y [µm]")
+    _equal_aspect(fig, mf)
+    return fig
+
+
+FIELD_QUANTITIES = ("Potential", "Electrons", "Holes", "ElectricField")
+
+
+def field_map(mf: MeshField, quantity: str, *, theme: str = "light",
+              nx: int = 500, title: Optional[str] = None):
+    """A solution field from a solver snapshot (``DeviceSolver.snapshot`` or
+    the ``fields`` analysis):
+
+      * ``Potential`` — ψ [V], diverging around 0 (n-like +, p-like −), all regions
+      * ``Electrons`` / ``Holes`` — log10 density [cm⁻³], semiconductors only
+      * ``ElectricField`` — |E| [V/cm] per triangle, all regions
+
+    Material edges and the p-n junction are drawn on top."""
+    go = _go()
+    ink = INK[theme]
+    if quantity not in FIELD_QUANTITIES:
+        raise ValueError(f"quantity must be one of {FIELD_QUANTITIES}")
+    if quantity != "ElectricField" and quantity not in mf.grid.point_data:
+        raise ValueError(f"the MeshField has no {quantity!r} data; take a "
+                         f"solver snapshot first")
+    if quantity == "ElectricField" and "Potential" not in mf.grid.point_data:
+        raise ValueError("the MeshField has no 'Potential' data; take a "
+                         "solver snapshot first")
+    xmin, xmax, ymin, ymax = mf.bounds[:4]
+    if quantity == "Potential":
+        g = F.sample_on_grid(mf, mf.grid.point_data["Potential"], nx=nx)
+        x, y, z = g.x, g.y, g.z
+        zmax = float(np.nanmax(np.abs(z))) or 1.0
+        trace = dict(z=z, zmin=-zmax, zmax=zmax,
+                     colorscale=diverging_colorscale(theme),
+                     colorbar_title="ψ [V]",
+                     hovertemplate="ψ %{z:.3f} V<extra></extra>")
+        label = "Electrostatic potential"
+    elif quantity in ("Electrons", "Holes"):
+        vals = np.asarray(mf.grid.point_data[quantity], dtype=float)
+        logv = np.log10(np.clip(vals, 1.0, None))
+        g = F.sample_on_grid(mf, logv, nx=nx, materials=F.SEMICONDUCTORS)
+        x, y, z = g.x, g.y, g.z
+        hi = float(np.ceil(np.nanmax(z))) if np.isfinite(z).any() else 1.0
+        lo = max(0.0, hi - 16.0, float(np.floor(np.nanmin(z))))
+        ticks = list(range(int(lo), int(hi) + 1, 2 if hi - lo > 8 else 1))
+        trace = dict(z=z, zmin=lo, zmax=hi, colorscale=sequential_colorscale(theme),
+                     colorbar=dict(tickvals=ticks, ticktext=[_sup(k) for k in ticks]),
+                     colorbar_title=f"{quantity.lower()} [cm⁻³]",
+                     hovertemplate=f"{quantity.lower()} 10^%{{z:.2f}} cm⁻³<extra></extra>")
+        label = f"{quantity} density"
+    else:
+        # Log scale: the oxide field (MV/cm) would wash out the silicon on a
+        # linear one.
+        e = np.log10(np.clip(F.electric_field_V_per_cm(mf), 1.0, None))
+        ny = max(2, int(round(nx * (ymax - ymin) / max(xmax - xmin, 1e-12))))
+        x, y = np.linspace(xmin, xmax, nx), np.linspace(ymin, ymax, ny)
+        z = F.cell_values_on_grid(mf, e, x, y)
+        hi = float(np.ceil(np.nanmax(z))) if np.isfinite(z).any() else 1.0
+        lo = max(0.0, hi - 5.0)
+        ticks = list(range(int(lo), int(hi) + 1))
+        trace = dict(z=z, zmin=lo, zmax=hi, colorscale=sequential_colorscale(theme),
+                     colorbar=dict(tickvals=ticks, ticktext=[_sup(k) for k in ticks]),
+                     colorbar_title="|E| [V/cm]",
+                     hovertemplate="|E| 10^%{z:.2f} V/cm<extra></extra>")
+        label = "Electric field"
+    cb = trace.pop("colorbar", {})
+    cb_title = trace.pop("colorbar_title")
+    fig = go.Figure(go.Heatmap(
+        x=x, y=y, zsmooth=False,
+        colorbar=dict(title=dict(text=cb_title, font=dict(color=ink["secondary"], size=11)),
+                      thickness=12, outlinewidth=0,
+                      tickfont=dict(color=ink["muted"], size=10), **cb),
+        **trace))
+    ex, ey = _segments_xy(F.material_edges(mf))
+    fig.add_trace(go.Scatter(x=ex, y=ey, mode="lines", hoverinfo="skip",
+                             line=dict(color=ink["axis"], width=1), showlegend=False))
+    junction = F.zero_contour(mf, F.net_doping(mf))
+    if len(junction):
+        jx, jy = _segments_xy(junction)
+        fig.add_trace(go.Scatter(x=jx, y=jy, mode="lines", hoverinfo="skip",
+                                 line=dict(color=ink["primary"], width=1.5, dash="dot"),
+                                 name="p-n junction"))
+    bias = mf.metadata.get("solution_bias_V") or {}
+    nonzero = {c: v for c, v in bias.items() if v}
+    suffix = ("  (" + ", ".join(f"{c} {v:g} V" for c, v in nonzero.items()) + ")"
+              if nonzero else "  (all contacts 0 V)")
+    fig.update_layout(**_layout(theme, (title or label) + suffix))
     fig.update_xaxes(title_text="x [µm]")
     fig.update_yaxes(title_text="y [µm]")
     _equal_aspect(fig, mf)

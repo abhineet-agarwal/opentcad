@@ -186,6 +186,10 @@ def test_run_diode_deck_and_cli(tmp_path, capsys):
     payload = json.loads(out.read_text())
     assert payload["deck"] == "pn_diode"
     assert np.allclose(payload["analyses"]["forward"][1], i, rtol=1e-6)
+    # The `fields` snapshot: summarised in the JSON, saved in full as .vtu.
+    eq = payload["analyses"]["equilibrium"]["meshfield"]
+    assert eq["fields"]["Electrons"]["max"] == pytest.approx(1e17, rel=1e-2)
+    assert (tmp_path / "r.equilibrium.vtu").exists()
 
 
 def test_cli_check(tmp_path, capsys):

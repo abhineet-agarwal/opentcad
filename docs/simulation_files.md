@@ -82,6 +82,13 @@ analyses:                                  # run in order on one solver
   signature, and contact names against the structure, before anything runs.
   `ac` terminals are wired automatically. Results go to the JSON under each
   analysis's `name`, with complex values written as `[re, im]`.
+- **Field maps:** `{name: on, type: fields, biases: {gate: 1.5, drain: 0.05}}`
+  solves at those biases (unnamed contacts at 0 V, ramped from 0) and keeps
+  the potential, electron and hole densities on the mesh
+  (`DeviceSolver.field_snapshot`). The JSON gets a summary (each field's
+  range, the biases); `opentcad run` writes the full fields to
+  `<results>.<name>.vtu`; the GUI draws them as maps, with |E| computed from
+  the potential.
 
 ## Parameter sweeps
 

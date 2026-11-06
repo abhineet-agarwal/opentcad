@@ -44,7 +44,9 @@ streamlit run opentcad/gui/app.py      # then "assistant" in the sidebar
 4. **Edit** the YAML if needed. It's re-checked as you go, and you can
    download it or load your own.
 5. **Run.** You get the structure, a net-doping map with the p-n junction,
-   a doping profile at any x, and the analysis results.
+   a doping profile at any x, and the analysis results. A `fields`
+   analysis adds maps of the potential, electron and hole densities and
+   |E| at its bias.
 
 From Python:
 

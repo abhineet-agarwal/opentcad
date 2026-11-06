@@ -129,6 +129,12 @@ def _cmd_run(args) -> int:
     }
     out_path.write_text(json.dumps(payload, indent=2) + "\n")
     _err(f"results → {out_path}")
+    from opentcad.geometry.formats import MeshField
+    for name, res in result.analyses.items():
+        if isinstance(res, MeshField):            # "fields" snapshots
+            vtu = out_path.with_name(f"{out_path.name.split('.')[0]}.{name}.vtu")
+            res.save(vtu)
+            _err(f"fields {name} → {vtu}")
     if args.vtu:
         saved = mf.save(args.vtu)
         _err(f"mesh → {saved if saved else args.vtu}")

@@ -36,3 +36,4 @@ analyses:
   - {name: idvg, type: iv, anode_contact: gate, cathode_contact: source,
      v_start: 0.0, v_end: 1.5, v_step: 0.1,
      hold_contacts: {drain: 0.05}, measure_contact: drain}
+  - {name: inversion, type: fields, biases: {gate: 1.5, drain: 0.05}}   # potential, n, p maps

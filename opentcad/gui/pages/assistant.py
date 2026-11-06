@@ -249,6 +249,13 @@ if r:
                 c1, c2 = st.columns(2)
                 c1.plotly_chart(lin, width="stretch", theme=None)
                 c2.plotly_chart(log, width="stretch", theme=None)
+            elif atype == "fields" and out is not None:
+                labels = {"Potential": "Potential ψ", "Electrons": "Electrons n",
+                          "Holes": "Holes p", "ElectricField": "Electric field |E|"}
+                q = st.radio("Quantity", list(labels), format_func=labels.get,
+                             horizontal=True, key=f"field_{name}")
+                st.plotly_chart(figs.field_map(out, q, theme=t), width="stretch",
+                                theme=None)
             elif atype == "cv" and out is not None:
                 lin, _ = figs.iv_figures(out[0], out[1], theme=t,
                                          x_label="V [V]", y_label="C [F/cm²]")

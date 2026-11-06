@@ -680,6 +680,71 @@ class DeviceSolver:
             raise RuntimeError("Call solve_equilibrium() before solve_dc()")
         self._solve_dc()
 
+    #: Node solutions ``snapshot`` can copy out, and their units.
+    SOLUTION_FIELDS = {"Potential": "V", "Electrons": "cm^-3", "Holes": "cm^-3"}
+
+    def snapshot(self, fields=("Potential", "Electrons", "Holes")) -> MeshField:
+        """A copy of the MeshField carrying the current solution as point
+        data: ``Potential`` [V, relative to the intrinsic level, Fermi
+        level at 0 V], ``Electrons`` and ``Holes`` [cm⁻³]. Carrier
+        densities are 0 in insulators; on a semiconductor/insulator
+        interface node the semiconductor's value is used. The contact
+        biases go in ``metadata["solution_bias_V"]``."""
+        if not self._initialized:
+            raise RuntimeError("Solve the device before taking a snapshot")
+        unknown = [f for f in fields if f not in self.SOLUTION_FIELDS]
+        if unknown:
+            raise ValueError(f"unknown solution field(s) {unknown}; "
+                             f"available: {list(self.SOLUTION_FIELDS)}")
+        ds = self._ds
+        mf = self.mf
+        tree = cKDTree(np.asarray(mf.points, dtype=float)[:, :2])
+        out = {f: np.zeros(mf.n_points) for f in fields}
+        # Insulators first, so semiconductor values win on shared nodes.
+        regions = sorted(self._region_materials,
+                         key=lambda r: not self._region_is_insulator.get(r, False))
+        for region in regions:
+            insulator = self._region_is_insulator.get(region, False)
+            x = np.asarray(ds.get_node_model_values(
+                device=self._device_name, region=region, name="x"))
+            y = np.asarray(ds.get_node_model_values(
+                device=self._device_name, region=region, name="y"))
+            _, idx = tree.query(np.column_stack([x, y]) * 1e4)
+            for f in fields:
+                if insulator and f != "Potential":
+                    continue
+                out[f][idx] = np.asarray(ds.get_node_model_values(
+                    device=self._device_name, region=region, name=f))
+        grid = mf.grid.copy(deep=True)
+        for f, vals in out.items():
+            grid.point_data[f] = vals
+        meta = dict(mf.metadata)
+        meta["solution_bias_V"] = dict(self._contact_bias)
+        meta["solution_fields"] = {f: self.SOLUTION_FIELDS[f] for f in fields}
+        return MeshField(grid=grid, contacts=list(mf.contacts),
+                         process_history=list(mf.process_history), metadata=meta)
+
+    def field_snapshot(self, biases: dict[str, float] | None = None,
+                       fields=("Potential", "Electrons", "Holes")) -> MeshField:
+        """Solve at ``biases`` ({contact: V}; unnamed contacts at 0 V) and
+        return ``snapshot(fields)``. Biases are ramped from 0 V in ≤ 50 mV
+        steps. Registered as the ``fields`` analysis."""
+        biases = dict(biases or {})
+        names = {t.name for t in self.mf.contacts}
+        for c in biases:
+            if c not in names:
+                raise KeyError(f"Unknown contact: {c}; contacts: {sorted(names)}")
+        if not self._initialized:
+            self.initialize()
+        self._start_from_zero_bias()
+        if biases:
+            n = max(1, int(np.ceil(max(abs(v) for v in biases.values()) / 0.05)))
+            for k in range(1, n + 1):
+                for c, v in biases.items():
+                    self._set_contact_voltage(c, v * k / n)
+                self._solve_dc()
+        return self.snapshot(fields)
+
     def close(self) -> None:
         """Delete this solver's DEVSIM device (DEVSIM keeps devices in
         global state; every ds.solve acts on all live devices). The solver

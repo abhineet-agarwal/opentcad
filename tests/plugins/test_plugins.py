@@ -49,7 +49,7 @@ def test_builtins_registered_through_the_same_registry():
         "Deposit": "topography", "Etch": "topography", "Oxidize": "topography",
         "Implant": "doping", "Anneal": "doping"}
     assert all(h.source == "opentcad" for h in steps.values())
-    assert plugins.available_analyses() == ["ac", "cv", "iv", "transient"]
+    assert plugins.available_analyses() == ["ac", "cv", "fields", "iv", "transient"]
 
 
 def test_builtins_come_back_after_reset():

@@ -6,6 +6,7 @@ are reachable by name through ``DeviceSolver.run``:
     "cv"         → DeviceSolver.cv_sweep
     "transient"  → DeviceSolver.transient_sweep
     "ac"         → DeviceSolver.ac_sweep
+    "fields"     → DeviceSolver.field_snapshot (a MeshField with the solution)
 
 The unbound methods are registered as-is, so ``fn(solver, **kwargs)``
 works and their signatures can be checked before a run.
@@ -23,3 +24,4 @@ def register() -> None:
     register_analysis("cv", DeviceSolver.cv_sweep)
     register_analysis("transient", DeviceSolver.transient_sweep)
     register_analysis("ac", DeviceSolver.ac_sweep)
+    register_analysis("fields", DeviceSolver.field_snapshot)

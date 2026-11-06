@@ -135,3 +135,41 @@ def test_plotly_builders(mf):
         assert np.isnan(m.data[0].y[1])
     with pytest.raises(ValueError, match="does not cross"):
         I.doping_profile(mf, 5.0)
+
+
+# ---- solution fields ------------------------------------------------------------
+def _with_solution(mf):
+    snap = type(mf)(grid=mf.grid.copy(deep=True), contacts=list(mf.contacts),
+                    metadata={"solution_bias_V": {"gate": 1.0}})
+    p = F.points_um(snap)
+    snap.grid.point_data["Potential"] = 0.5 - 2.0 * p[:, 1]       # E_y = 2 V/µm
+    snap.grid.point_data["Electrons"] = 10.0 ** (5 + 10 * p[:, 1])
+    snap.grid.point_data["Holes"] = np.full(snap.n_points, 1e16)
+    return snap
+
+
+def test_cell_gradient_and_electric_field(mf):
+    g = F.cell_gradient(mf, _linear(mf))
+    assert np.allclose(g, [2.0, 3.0])
+    snap = _with_solution(mf)
+    e = F.electric_field_V_per_cm(snap)
+    assert np.allclose(e, 2.0e4)                                    # 2 V/µm
+    grid = F.cell_values_on_grid(mf, e, np.array([0.5, 3.0]), np.array([0.2]))
+    assert grid[0, 0] == pytest.approx(2e4) and np.isnan(grid[0, 1])
+
+
+def test_field_map_builder(mf):
+    pytest.importorskip("plotly")
+    from opentcad.viz import interactive as I
+    snap = _with_solution(mf)
+    for q in I.FIELD_QUANTITIES:
+        fig = I.field_map(snap, q, nx=120)
+        assert "gate 1 V" in fig.layout.title.text
+    pot = I.field_map(snap, "Potential", nx=120).data[0]
+    assert pot.zmin == -pot.zmax
+    e = I.field_map(snap, "ElectricField", nx=120).data[0]
+    assert np.nanmax(e.z) == pytest.approx(np.log10(2e4))          # log scale
+    with pytest.raises(ValueError, match="snapshot"):
+        I.field_map(mf, "Electrons")
+    with pytest.raises(ValueError, match="quantity"):
+        I.field_map(snap, "Temperature")

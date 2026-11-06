@@ -18,3 +18,4 @@ device:
 analyses:
   - {name: forward, type: iv, anode_contact: anode, cathode_contact: cathode,
      v_start: 0.0, v_end: 0.6, v_step: 0.1}
+  - {name: equilibrium, type: fields}       # potential, n, p at 0 V (→ .vtu with `opentcad run`)

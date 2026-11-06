@@ -60,8 +60,8 @@ roadmap.
 | 2a    | Transient DC + small-signal AC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair anneal, physical Qf | **Complete** |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned (SKY130 targets extracted) |
 
-**Executed test count (2026-11-06)**: 463 passing (process 148,
-integration 133, device 92, plugins 14, io 21, assist 12, viz 10, validation 7, geometry 15,
+**Executed test count (2026-11-06)**: 467 passing (process 148,
+integration 133, device 94, plugins 14, io 21, assist 12, viz 12, validation 7, geometry 15,
 materials 6, bridge 5), plus 2 GUI-page tests that run where Streamlit is installed. The Phase 2a additions —
 transient DC sweeps, small-signal AC (`ac_sweep` via DEVSIM circuit
 nodes, gated MOS HF-CV path), Avalanche impact ionization, Joyce-Dixon
@@ -365,7 +365,8 @@ drafts the simulation file, and OpenTCAD checks it and has the model
 repair any problems. You then see every value that wasn't in your request,
 plus every change from the starting file, before you run it. Results are
 interactive Plotly figures: the structure, a net-doping map with the p-n
-junction, doping profiles, and the analysis curves. See
+junction, doping profiles, the analysis curves, and maps of the potential,
+carrier densities and |E| at any bias (the `fields` analysis). See
 [`docs/assistant.md`](docs/assistant.md).
 
 ---
@@ -809,7 +810,7 @@ validation/sky130/ Phase 2 exit check against SkyWater's nfet_01v8 model card
 docs/              Simulation files, assistant, plugin guide, optical generation, compact PV notes
 examples/          Runnable tutorial scripts (01–11) + generated PNG plots;
                    examples/decks/ has simulation files
-tests/             Pytest suite — 463 tests (+2 GUI)
+tests/             Pytest suite — 467 tests (+2 GUI)
                    (markers: slow, requires_devsim, requires_viennaps, integration)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
@@ -819,7 +820,7 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite (463 tests, ~8 min)
+pytest tests/ -v                         # full suite (467 tests, ~8 min)
 pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
 pytest tests/process/ -v                 # topography (requires viennals) + doping
 pytest tests/device/ -v                  # DEVSIM device physics, transient, AC
@@ -875,9 +876,11 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
     A promptable GUI page that drafts simulation files with a local
     open-weights model, flags every value not in the request, and shows
     interactive Plotly results ([`docs/assistant.md`](docs/assistant.md)).
-  - Still to come: GDS import, Sphinx docs, a PyPI release, and maps of
-    solution fields (potential, carriers), which need the solver to hand
-    its node values back to the MeshField.
+    Solution-field maps: `DeviceSolver.snapshot` / the `fields` analysis
+    copy the potential and carrier densities back to the MeshField
+    (checked against pn-junction analytics); maps in the GUI, `.vtu` from
+    the CLI.
+  - Still to come: GDS import, Sphinx docs and a PyPI release.
 - **Phase 3**: quantitative calibration against the SKY130 / IHP
   SG13G2 PDKs: a scipy-driven fit of the existing physics knobs against
   target metrics (Vth, Ion, SS). The models in the Phase 3 milestone
