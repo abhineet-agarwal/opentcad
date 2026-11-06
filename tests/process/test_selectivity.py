@@ -22,7 +22,10 @@ import pytest
 
 from opentcad.geometry.formats import Material
 from opentcad.geometry.structure import Structure
-from opentcad.process.topography import (
+
+pytest.importorskip("viennals")      # every test here runs topography
+
+from opentcad.process.topography import (  # noqa: E402
     Recipe, extract_surface_polyline, simulate,
 )
 from opentcad.process.topography.recipe import Etch

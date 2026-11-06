@@ -143,6 +143,7 @@ def test_run_recipe_doping_only_uses_structure_meshfield_shortcut():
 
 def test_run_recipe_topography_only_populates_state_but_no_doping():
     """A topography-only recipe runs the level-set path; no implants."""
+    pytest.importorskip("viennals")
     struct = (Structure(width_um=1.0, name="rr")
               .add_substrate("si", 0.3, Material.SI))
     out = run_recipe(struct, Recipe().oxidize(1000, 600, "dry"),
@@ -160,6 +161,7 @@ def test_run_recipe_topography_only_populates_state_but_no_doping():
 def test_run_recipe_mixed_pipeline_closes_the_loop():
     """Full pipeline: topography step + implant chain. Verify both
     the TopographyState and the MeshField doping were produced."""
+    pytest.importorskip("viennals")
     struct = (Structure(width_um=1.0, name="rr")
               .add_substrate("p", 0.3, Material.SI, doping_Na=1e17)
               .add_region("sw", 0.0, 0.5, 0.2, 0.3, Material.SI))

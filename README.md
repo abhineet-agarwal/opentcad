@@ -810,7 +810,7 @@ opentcad/
 └── gui/           Optional Streamlit front end; pages/assistant.py is the promptable page
 
 validation/sky130/ Phase 2 exit check against SkyWater's nfet_01v8 model card
-docs/              Simulation files, assistant, plugin guide, optical generation, compact PV notes
+docs/              Simulation files, assistant, plugins, releasing, optical generation, compact PV notes
 examples/          Runnable tutorial scripts (01–11) + generated PNG plots;
                    examples/decks/ has simulation files
 tests/             Pytest suite — 473 tests (+2 GUI)
@@ -883,7 +883,11 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
     copy the potential and carrier densities back to the MeshField
     (checked against pn-junction analytics); maps in the GUI, `.vtu` from
     the CLI.
-  - Still to come: GDS import, Sphinx docs and a PyPI release.
+    Packaging: the wheel and sdist build, install cleanly without the
+    optional extras, and pass their tests; release steps are in
+    [`docs/releasing.md`](docs/releasing.md). Not yet published.
+  - Still to come: the first PyPI upload (a maintainer step), GDS import
+    and Sphinx docs.
 - **Phase 3**: quantitative calibration against the SKY130 / IHP
   SG13G2 PDKs: a scipy-driven fit of the existing physics knobs against
   target metrics (Vth, Ion, SS). The models in the Phase 3 milestone

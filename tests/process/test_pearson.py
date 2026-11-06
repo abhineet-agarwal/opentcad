@@ -17,6 +17,7 @@ import numpy as np
 import pytest
 import yaml
 
+import opentcad
 from opentcad.geometry.formats import Material
 from opentcad.geometry.structure import Structure
 from opentcad.process.doping import (
@@ -24,8 +25,8 @@ from opentcad.process.doping import (
     resolve_implant_species,
 )
 
-_DATA = (Path(__file__).resolve().parents[2]
-         / "opentcad" / "process" / "doping" / "data")
+# The tables shipped with the package (works for a checkout or an install).
+_DATA = Path(opentcad.__file__).resolve().parent / "process" / "doping" / "data"
 
 
 def _rows():

@@ -813,6 +813,15 @@ def deck_from_dict(data: dict) -> Deck:
                 grid_delta_um=grid_delta, device=device, analyses=analyses)
 
 
+def example_decks_dir() -> Path:
+    """The bundled example simulation files (also the assistant's
+    templates): inside the package when installed from a wheel,
+    ``examples/decks`` in a source checkout."""
+    here = Path(__file__).resolve()
+    packaged = here.parents[1] / "_examples" / "decks"
+    return packaged if packaged.is_dir() else here.parents[2] / "examples" / "decks"
+
+
 def load_deck(source) -> Deck:
     """Read and check a simulation file (``.yaml``/``.yml``/``.json`` path),
     or a dict already parsed. Raises DeckError listing every problem."""

@@ -13,13 +13,13 @@ import dataclasses
 import inspect
 import json
 import typing
-from pathlib import Path
 from typing import Any, Union
 
 from opentcad.geometry.formats import Material
-from opentcad.io.deck import CONTACT_TYPES, MATERIAL_SYMBOLS, SURFACES, load_deck
+from opentcad.io.deck import (CONTACT_TYPES, MATERIAL_SYMBOLS, SURFACES,
+                              example_decks_dir, load_deck)
 
-_EXAMPLES = Path(__file__).resolve().parents[2] / "examples" / "decks"
+_EXAMPLES = example_decks_dir()
 
 # Field values a step accepts, where the dataclass only says "str".
 _FIELD_ENUMS = {

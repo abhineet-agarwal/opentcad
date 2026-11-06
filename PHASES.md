@@ -160,5 +160,6 @@ docs/simulation_files.md); parameter sweeps with metrics ✓
 (`opentcad sweep`, opentcad.io.sweep); promptable GUI page with a local
 open-weights model (opentcad.assist, gui/pages/assistant.py,
 docs/assistant.md) and Plotly figures (opentcad.viz) ✓. Next: GDS
-import, Sphinx docs, PyPI release. Solution-field maps ✓
+import, Sphinx docs, the first PyPI upload. Packaging ready ✓ (clean
+wheel install passes its tests; docs/releasing.md). Solution-field maps ✓
 (DeviceSolver.snapshot, `fields` analysis).

@@ -4,11 +4,12 @@ build-backend = "hatchling.build"
 
 [project]
 name = "opentcad"
-version = "0.1.0-dev"
+version = "0.1.0.dev0"
 description = "Open-source TCAD framework for semiconductor process and device simulation"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE" }
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 authors = [
     { name = "Abhineet Agarwal", email = "iamabhineetagarwal@gmail.com" },
 ]
@@ -16,7 +17,6 @@ keywords = ["tcad", "semiconductor", "device-simulation", "process-simulation", 
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: POSIX :: Linux",
     "Operating System :: MacOS",
     "Programming Language :: Python :: 3",
@@ -30,13 +30,10 @@ dependencies = [
     "scipy>=1.11",
     "pyvista>=0.43",
     "pydantic>=2.0",
-    "fipy>=3.4",
     "gmsh>=4.11",
     "devsim>=2.6",
     "matplotlib>=3.7",
     "pyyaml>=6.0",
-    "rich>=13.0",
-    "click>=8.1",
 ]
 
 [project.scripts]
@@ -64,6 +61,32 @@ gui = [
 topography = [
     "ViennaLS>=5.8",
 ]
+
+[tool.hatch.build.targets.wheel]
+packages = ["opentcad"]
+
+# The example simulation files double as the assistant's templates, so the
+# wheel carries them inside the package (opentcad.io.deck.example_decks_dir).
+[tool.hatch.build.targets.wheel.force-include]
+"examples/decks/pn_diode.yaml" = "opentcad/_examples/decks/pn_diode.yaml"
+"examples/decks/nmos_implanted.yaml" = "opentcad/_examples/decks/nmos_implanted.yaml"
+"examples/decks/nmos_tox_sweep.yaml" = "opentcad/_examples/decks/nmos_tox_sweep.yaml"
+
+[tool.hatch.build.targets.sdist]
+include = [
+    "/opentcad/",
+    "/tests/",
+    "/examples/decks/*.yaml",
+    "/docs/",
+    "/validation/",
+    "/README.md",
+    "/PHASES.md",
+    "/LICENSE",
+    "/pyproject.toml",
+]
+# tests/integration exercises the microrobot application in examples/,
+# which is not part of the library package.
+exclude = ["**/__pycache__", "/tests/integration/"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

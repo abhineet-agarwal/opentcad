@@ -13,7 +13,6 @@ from __future__ import annotations
 import copy
 import hashlib
 import json
-from pathlib import Path
 
 import numpy as np
 import streamlit as st
@@ -21,12 +20,13 @@ import yaml
 
 from opentcad.assist import ChatClient, LLMError, draft_deck
 from opentcad.assist.client import DEFAULT_URL
-from opentcad.io.deck import DeckError, _Loader, deck_from_dict, dumps_deck, run_deck
+from opentcad.io.deck import (DeckError, _Loader, deck_from_dict, dumps_deck,
+                              example_decks_dir, run_deck)
 from opentcad.viz import interactive as figs
 
 st.set_page_config(page_title="OpenTCAD assistant", layout="wide")
 
-EXAMPLES = Path(__file__).resolve().parents[3] / "examples" / "decks"
+EXAMPLES = example_decks_dir()
 TEMPLATES = {"pn diode": "pn_diode.yaml", "NMOS (implanted)": "nmos_implanted.yaml"}
 
 ss = st.session_state

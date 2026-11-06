@@ -19,7 +19,7 @@ from opentcad.geometry.structure import Structure
 from opentcad.process.doping import (
     apply_implant, pearson_density, surface_height_function,
 )
-from opentcad.process.topography import Recipe, simulate, topography_to_meshfield
+from opentcad.process.topography import Recipe
 from opentcad.process.topography.recipe import Implant
 
 
@@ -108,7 +108,8 @@ def test_surface_function_flat_for_layer_stack():
 
 def test_implant_into_trench_lands_below_trench_floor():
     pytest.importorskip("viennals")
-    struct =Structure(width_um=1.0, name="trench").add_substrate("body", 0.5, Material.SI)
+    from opentcad.process.topography import simulate, topography_to_meshfield
+    struct = Structure(width_um=1.0, name="trench").add_substrate("body", 0.5, Material.SI)
     state = simulate(struct, Recipe("t").etch(0.1, model="directional",
                                               window_x_um=(0.35, 0.65)),
                      grid_delta_um=0.005)

@@ -37,7 +37,7 @@ from opentcad.process.doping import (
     canonicalize_species,
     moments_for,
 )
-from opentcad.process.topography import Recipe, simulate
+from opentcad.process.topography import Recipe
 
 
 # ---------------------------------------------------------------------------
@@ -270,6 +270,8 @@ def test_simulate_ignores_implant_step_cleanly():
     """simulate() handles the topography half of the recipe only;
     Implant steps pass through without error (doping dispatcher
     will pick them up in Unit B)."""
+    pytest.importorskip("viennals")
+    from opentcad.process.topography import simulate
     struct = Structure(width_um=1.0).add_substrate("s", 0.5, Material.SI)
     recipe = (Recipe("mixed")
               .oxidize(temperature_C=900, time_s=600)
