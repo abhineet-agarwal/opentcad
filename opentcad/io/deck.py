@@ -371,6 +371,27 @@ def _structure_from_dict(d, name, probs) -> Optional[Structure]:
         struct.add_contact(cname, x0, x1, layer, surface=surface,
                            contact_type=ctype, work_function_eV=wf,
                            flat_band_shift_V=vfb)
+
+    # Geometry must lie inside the device: 0 ≤ x ≤ width, 0 ≤ y ≤ stack top.
+    # (A region left above the top after a layer was thinned would otherwise
+    # be clipped silently.)
+    eps = 1e-9
+    top = struct.total_height_um
+    if struct.layers:
+        for i, r in enumerate(struct.regions):
+            p = f"{path}.regions[{i}]"
+            if r.x_start < -eps or r.x_end > struct.width_um + eps:
+                probs.add(f"{p}.x_um", f"[{r.x_start:g}, {r.x_end:g}] is outside "
+                                       f"the device (0 to width_um = {struct.width_um:g})")
+            if r.y_start < -eps or r.y_end > top + eps:
+                probs.add(f"{p}.y_um", f"[{r.y_start:g}, {r.y_end:g}] is outside "
+                                       f"the layer stack (0 to {top:g} µm, the sum "
+                                       f"of the layer thicknesses)")
+        for i, c in enumerate(struct.contacts):
+            if c.x_start < -eps or c.x_end > struct.width_um + eps:
+                probs.add(f"{path}.contacts[{i}].x_um",
+                          f"[{c.x_start:g}, {c.x_end:g}] is outside the device "
+                          f"(0 to width_um = {struct.width_um:g})")
     return struct
 
 

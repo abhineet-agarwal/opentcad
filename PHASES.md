@@ -157,4 +157,7 @@ Tooling progress: plugin system ✓ (opentcad.plugins, docs/plugins.md);
 ViennaLS made an optional extra, so doping and device work without it;
 simulation files + `opentcad check | run` CLI ✓ (opentcad.io.deck,
 docs/simulation_files.md); parameter sweeps with metrics ✓
-(`opentcad sweep`, opentcad.io.sweep). Next: promptable GUI.
+(`opentcad sweep`, opentcad.io.sweep); promptable GUI page with a local
+open-weights model (opentcad.assist, gui/pages/assistant.py,
+docs/assistant.md) and Plotly figures (opentcad.viz) ✓. Next: GDS
+import, Sphinx docs, PyPI release, solution-field maps.

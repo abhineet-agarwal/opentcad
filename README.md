@@ -60,9 +60,9 @@ roadmap.
 | 2a    | Transient DC + small-signal AC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair anneal, physical Qf | **Complete** |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned (SKY130 targets extracted) |
 
-**Executed test count (2026-11-06)**: 441 passing (process 148,
-integration 133, device 92, plugins 14, io 21, validation 7, geometry 15,
-materials 6, bridge 5). The Phase 2a additions —
+**Executed test count (2026-11-06)**: 463 passing (process 148,
+integration 133, device 92, plugins 14, io 21, assist 12, viz 10, validation 7, geometry 15,
+materials 6, bridge 5), plus 2 GUI-page tests that run where Streamlit is installed. The Phase 2a additions —
 transient DC sweeps, small-signal AC (`ac_sweep` via DEVSIM circuit
 nodes, gated MOS HF-CV path), Avalanche impact ionization, Joyce-Dixon
 statistics past the Blakemore ceiling, Lombardi with vector-gradient
@@ -357,6 +357,16 @@ streamlit run opentcad/gui/app.py
 Opens `http://localhost:8501`. Session state carries the built objects
 between sections; a sidebar "Reset entire pipeline" button clears
 everything.
+
+The **assistant** page (sidebar) is promptable. Describe a device, or a
+change to a template ("make the gate oxide 4 nm and sweep Vgs to 1.8 V").
+A model on your own machine (llama-server, Ollama, LM Studio or vLLM)
+drafts the simulation file, and OpenTCAD checks it and has the model
+repair any problems. You then see every value that wasn't in your request,
+plus every change from the starting file, before you run it. Results are
+interactive Plotly figures: the structure, a net-doping map with the p-n
+junction, doping profiles, and the analysis curves. See
+[`docs/assistant.md`](docs/assistant.md).
 
 ---
 
@@ -791,14 +801,15 @@ opentcad/
 ├── materials/     YAML parameter database + loader
 ├── bridge/        RBF + nearest-neighbour doping-field interpolator (not yet used by run_recipe)
 ├── io/            Simulation files (deck.py), parameter sweeps (sweep.py); GDS import is planned
-├── viz/           Empty placeholder (GUI plots live in gui/plots.py)
-└── gui/           Optional Streamlit front end
+├── viz/           Figure data on the mesh (fields.py), palette, Plotly figures (interactive.py)
+├── assist/        Drafting simulation files with a local open-weights model (optional)
+└── gui/           Optional Streamlit front end; pages/assistant.py is the promptable page
 
 validation/sky130/ Phase 2 exit check against SkyWater's nfet_01v8 model card
-docs/              Simulation files, plugin guide, optical generation, compact PV notes
+docs/              Simulation files, assistant, plugin guide, optical generation, compact PV notes
 examples/          Runnable tutorial scripts (01–11) + generated PNG plots;
                    examples/decks/ has simulation files
-tests/             Pytest suite — 441 tests
+tests/             Pytest suite — 463 tests (+2 GUI)
                    (markers: slow, requires_devsim, requires_viennaps, integration)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
@@ -808,7 +819,7 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite (441 tests, ~8 min)
+pytest tests/ -v                         # full suite (463 tests, ~8 min)
 pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
 pytest tests/process/ -v                 # topography (requires viennals) + doping
 pytest tests/device/ -v                  # DEVSIM device physics, transient, AC
@@ -861,8 +872,12 @@ See [PHASES.md](PHASES.md) for full milestone descriptions.
     discovery; [`docs/plugins.md`](docs/plugins.md)). Simulation files
     with `opentcad check | run`, and parameter sweeps with metrics
     (`opentcad sweep`; [`docs/simulation_files.md`](docs/simulation_files.md)).
-  - Still to come: a promptable GUI that writes simulation files, GDS
-    import, Sphinx docs and a PyPI release.
+    A promptable GUI page that drafts simulation files with a local
+    open-weights model, flags every value not in the request, and shows
+    interactive Plotly results ([`docs/assistant.md`](docs/assistant.md)).
+  - Still to come: GDS import, Sphinx docs, a PyPI release, and maps of
+    solution fields (potential, carriers), which need the solver to hand
+    its node values back to the MeshField.
 - **Phase 3**: quantitative calibration against the SKY130 / IHP
   SG13G2 PDKs: a scipy-driven fit of the existing physics knobs against
   target metrics (Vth, Ion, SS). The models in the Phase 3 milestone
