@@ -106,6 +106,26 @@ class MaterialParams(BaseModel):
     velocity_saturation: VelocitySaturation = VelocitySaturation()
     avalanche: Avalanche = Avalanche()
     raw: dict = {}   # full YAML dict for advanced access
+    #: Fields the file did not give, filled with the code defaults (the
+    #: silicon values), as dotted names: "mobility_klaassen" for a whole
+    #: missing block, "recombination.Et_eV" for one key. Physics models
+    #: check this so they never run on silicon numbers by accident.
+    defaulted: list[str] = []
+    source: str = ""  # the YAML file it came from
+
+
+class MaterialFileError(ValueError):
+    """A material file lacks fields every simulation needs."""
+
+
+#: Needed for every material.
+REQUIRED_ALL = ("permittivity_relative",)
+#: Needed for every semiconductor (insulators run Poisson only).
+REQUIRED_SEMICONDUCTOR = (
+    "bandgap.Eg_eV_300K", "electron_affinity_eV", "Nc_cm3_300K",
+    "Nv_cm3_300K", "ni_cm3_300K", "mobility_constant.electron_cm2_Vs",
+    "mobility_constant.hole_cm2_Vs", "recombination.tau_n_s",
+    "recombination.tau_p_s")
 
 
 def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
@@ -147,63 +167,82 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
             f"Searched: {[str(d) for d in dirs]}"
         )
 
-    raw = yaml.safe_load(yaml_path.read_text())
+    raw = yaml.safe_load(yaml_path.read_text()) or {}
+    return params_from_dict(raw, symbol, source=str(yaml_path))
 
-    # Parse into typed sub-objects
-    bs_raw = raw.get("bandgap", {})
+
+def _has(raw: dict, dotted: str) -> bool:
+    node = raw
+    for part in dotted.split("."):
+        if not isinstance(node, dict) or part not in node:
+            return False
+        node = node[part]
+    return True
+
+
+def params_from_dict(raw: dict, symbol: str = "", *, source: str = "") -> MaterialParams:
+    """Build MaterialParams from a parsed material file.
+
+    Fields every simulation needs (REQUIRED_ALL, plus REQUIRED_SEMICONDUCTOR
+    unless ``is_insulator: true``) must be present: a missing one raises
+    MaterialFileError instead of silently taking silicon's value. Optional
+    model blocks (Klaassen, velocity saturation, Auger/radiative, avalanche)
+    fall back to the code defaults, which are silicon's; every field filled
+    that way is listed in ``MaterialParams.defaulted`` so the models that
+    need it can refuse to run.
+    """
+    is_insulator = bool(raw.get("is_insulator", False))
+    required = REQUIRED_ALL + (() if is_insulator else REQUIRED_SEMICONDUCTOR)
+    missing = [k for k in required if not _has(raw, k)]
+    if missing:
+        where = f" ({source})" if source else ""
+        raise MaterialFileError(
+            f"material {raw.get('symbol', symbol)!r}{where} is missing "
+            f"required field(s) {missing}; give them in the file (OpenTCAD "
+            f"does not fill them with silicon's values)")
+
+    defaulted: list[str] = []
+
+    def block(name: str, model):
+        """The YAML block ``name`` as ``model``, recording what was filled."""
+        given = raw.get(name)
+        if not isinstance(given, dict):
+            defaulted.append(name)
+            return model()
+        known = {k: v for k, v in given.items() if k in model.model_fields}
+        defaulted.extend(f"{name}.{k}" for k in model.model_fields
+                         if k not in known and k != "uncertainty_percent")
+        return model(**known)
+
+    def top(key: str, default):
+        if key in raw:
+            return raw[key]
+        defaulted.append(key)
+        return default
+
+    bandgap = raw.get("bandgap") if isinstance(raw.get("bandgap"), dict) else {}
     band = BandStructure(
-        Eg_eV_300K=bs_raw.get("Eg_eV_300K", 1.124),
-        electron_affinity_eV=raw.get("electron_affinity_eV", 4.05),
-        Nc_cm3_300K=raw.get("Nc_cm3_300K", 2.86e19),
-        Nv_cm3_300K=raw.get("Nv_cm3_300K", 3.10e19),
-        ni_cm3_300K=raw.get("ni_cm3_300K", 9.65e9),
-        permittivity_relative=raw.get("permittivity_relative", 11.7),
+        Eg_eV_300K=bandgap.get("Eg_eV_300K", BandStructure().Eg_eV_300K),
+        electron_affinity_eV=top("electron_affinity_eV", 4.05),
+        Nc_cm3_300K=top("Nc_cm3_300K", 2.86e19),
+        Nv_cm3_300K=top("Nv_cm3_300K", 3.10e19),
+        ni_cm3_300K=top("ni_cm3_300K", 9.65e9),
+        permittivity_relative=raw["permittivity_relative"],
     )
-
-    mob_raw = raw.get("mobility_constant", {})
-    mob = MobilityConstant(
-        electron_cm2_Vs=mob_raw.get("electron_cm2_Vs", 1350.0),
-        hole_cm2_Vs=mob_raw.get("hole_cm2_Vs", 480.0),
-    )
-
-    # Klaassen block is optional; if missing the pydantic defaults apply.
-    klaassen_raw = raw.get("mobility_klaassen", {})
-    klaassen = MobilityKlaassen(**klaassen_raw)
-
-    rec_raw = raw.get("recombination", {})
-    rec = Recombination(
-        tau_n_s=rec_raw.get("tau_n_s", 1e-5),
-        tau_p_s=rec_raw.get("tau_p_s", 1e-5),
-        Et_eV=rec_raw.get("Et_eV", 0.0),
-        Cn_cm6_per_s=rec_raw.get("Cn_cm6_per_s", 2.8e-31),
-        Cp_cm6_per_s=rec_raw.get("Cp_cm6_per_s", 9.9e-32),
-    )
-
-    vs_raw = raw.get("velocity_saturation", {})
-    vs = VelocitySaturation(
-        vsat_e_cm_s=vs_raw.get("vsat_e_cm_s", 1.02e7),
-        vsat_h_cm_s=vs_raw.get("vsat_h_cm_s", 0.72e7),
-        beta_e=vs_raw.get("beta_e", 2.0),
-        beta_h=vs_raw.get("beta_h", 1.0),
-    )
-
-    av_raw = raw.get("avalanche", {})
-    av = Avalanche(
-        a_n_per_cm=av_raw.get("a_n_per_cm", 7.03e5),
-        b_n_V_per_cm=av_raw.get("b_n_V_per_cm", 1.231e6),
-        a_p_per_cm=av_raw.get("a_p_per_cm", 1.582e6),
-        b_p_V_per_cm=av_raw.get("b_p_V_per_cm", 2.036e6),
-    )
+    if "Eg_eV_300K" not in bandgap:
+        defaulted.append("bandgap.Eg_eV_300K")
 
     return MaterialParams(
         material=raw.get("material", symbol),
         symbol=raw.get("symbol", symbol),
-        is_insulator=bool(raw.get("is_insulator", False)),
+        is_insulator=is_insulator,
         band_structure=band,
-        mobility_constant=mob,
-        mobility_klaassen=klaassen,
-        recombination=rec,
-        velocity_saturation=vs,
-        avalanche=av,
+        mobility_constant=block("mobility_constant", MobilityConstant),
+        mobility_klaassen=block("mobility_klaassen", MobilityKlaassen),
+        recombination=block("recombination", Recombination),
+        velocity_saturation=block("velocity_saturation", VelocitySaturation),
+        avalanche=block("avalanche", Avalanche),
         raw=raw,
+        defaulted=defaulted,
+        source=source,
     )

@@ -73,6 +73,9 @@ class Auger(RecombinationModel):
 
     term_name = "UAuger"
 
+    def required_params(self) -> tuple[str, ...]:
+        return ("recombination.Cn_cm6_per_s", "recombination.Cp_cm6_per_s")
+
     def attach(self, ds, device, region, params, T_K, n_i_expr="n_i"):
         ds.set_parameter(device=device, region=region, name="Cn_Auger",
                          value=float(params.recombination.Cn_cm6_per_s))
@@ -93,6 +96,9 @@ class Radiative(RecombinationModel):
     gap GaAs/GaN (B ~ 1e-10)."""
 
     term_name = "URad"
+
+    def required_params(self) -> tuple[str, ...]:
+        return ("recombination.B_rad_cm3_per_s",)
 
     def attach(self, ds, device, region, params, T_K, n_i_expr="n_i"):
         ds.set_parameter(device=device, region=region, name="B_rad",
@@ -140,6 +146,9 @@ class Avalanche(RecombinationModel):
     """
 
     term_name = "UAvalanche"
+
+    def required_params(self) -> tuple[str, ...]:
+        return ("avalanche", "velocity_saturation")
 
     def attach(self, ds, device, region, params, T_K, n_i_expr="n_i"):
         av = params.avalanche

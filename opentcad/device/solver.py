@@ -922,9 +922,32 @@ class DeviceSolver:
     # ------------------------------------------------------------------
     # Equation setup
     # ------------------------------------------------------------------
+    def _check_material_params(self, region: str, params: MaterialParams) -> None:
+        """Refuse to run a model on parameters its material file didn't
+        give (the loader filled them with silicon's defaults)."""
+        models = [self.physics.mobility, *self.physics.recombination,
+                  self.physics.bgn, self.physics.statistics]
+        defaulted = getattr(params, "defaulted", []) or []
+        problems = []
+        for m in models:
+            for need in m.required_params():
+                if any(d == need or d.startswith(need + ".") or need.startswith(d + ".")
+                       for d in defaulted):
+                    problems.append(f"{type(m).__name__} needs {need}")
+        if problems:
+            where = f" ({params.source})" if getattr(params, "source", "") else ""
+            raise ValueError(
+                f"region {region}: the material file for {params.symbol}{where} "
+                f"doesn't give what the chosen models need — "
+                f"{'; '.join(problems)}. Without it they would run on "
+                f"silicon's default values. Add those fields to the file, or "
+                f"choose models that don't need them.")
+
     def _setup_equations(self) -> None:
         for region, mat in self._region_materials.items():
             params = self._params_for_region(mat)
+            if not self._region_is_insulator.get(region, False):
+                self._check_material_params(region, params)
             self._set_region_parameters(region, params)
             if self._region_is_insulator.get(region, False):
                 self._build_insulator_potential(region)

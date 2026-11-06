@@ -109,10 +109,20 @@ register_data_dir("materials", "my_materials/")  # <Symbol>.yaml, <process>/<Sym
   `<Sym>_diffusion.yaml` (with `intrinsic: {D0_cm2s, Ea_eV}`, plus `fair:`
   coefficients for the Fair model) makes it annealable.
 - **Materials:** YAMLs follow `opentcad/materials/params/Si.yaml`.
-  `load_material` currently fills missing fields with silicon defaults, so
-  give every field explicitly. A new material can only be used for a region
-  if the `Material` enum in `opentcad/geometry/formats.py` already has it;
-  adding enum members from a plugin is not supported yet.
+  - Every file needs `permittivity_relative`.
+  - A semiconductor (anything without `is_insulator: true`) also needs
+    the band structure (`bandgap.Eg_eV_300K`, `electron_affinity_eV`,
+    `Nc_cm3_300K`, `Nv_cm3_300K`, `ni_cm3_300K`), the constant mobilities
+    and the SRH lifetimes. A missing one is an error, never filled with
+    silicon's value.
+  - Model-specific blocks (`mobility_klaassen`, `velocity_saturation`,
+    the Auger/radiative coefficients, `avalanche`) may be left out. Then
+    the models that need them refuse to run on that material, telling you
+    what to add. (`MaterialParams.defaulted` lists what was left out;
+    model classes declare their needs with `required_params()`.)
+  - A new material can only be used for a region if the `Material` enum
+    in `opentcad/geometry/formats.py` already has it; adding enum members
+    from a plugin is not supported yet.
 - **Clashes:** a species, alias or file name defined in two folders raises
   an error. A plugin cannot silently replace built-in data.
 

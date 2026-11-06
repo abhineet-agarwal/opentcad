@@ -58,6 +58,9 @@ class Klaassen(MobilityModel):
 
     requires_carriers = True
 
+    def required_params(self) -> tuple[str, ...]:
+        return ("mobility_klaassen",)
+
     def attach(self, ds, device, region, params, T_K):
         self._set_parameters(ds, device, region, params, T_K)
         self._build_node_models(ds, device, region)
@@ -174,6 +177,9 @@ class Canali(MobilityModel):
         Canali(base=ConstantMobility()) — simple high-field
     """
 
+    def required_params(self) -> tuple[str, ...]:
+        return ("velocity_saturation",) + self.base.required_params()
+
     def __init__(self, base: Optional[MobilityModel] = None):
         self.base = base if base is not None else ConstantMobility()
 
@@ -281,6 +287,9 @@ class Lombardi(MobilityModel):
         derivative wrt ``Potential`` at each node is finite but
         averaging to edges smooths out the step; Newton converges.
     """
+
+    def required_params(self) -> tuple[str, ...]:
+        return self.base.required_params()   # own coefficients are built in (Darwish 1997)
 
     def __init__(self, base: Optional[MobilityModel] = None,
                  e_normal_axis: str = "y"):

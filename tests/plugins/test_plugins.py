@@ -217,7 +217,7 @@ def test_dopant_folder_cannot_redefine_a_builtin(tmp_path):
 
 def test_material_folder_adds_and_refuses_duplicates(tmp_path):
     from opentcad.materials.database import load_material
-    (tmp_path / "TestOx.yaml").write_text("permittivity_relative: 7.5\n")
+    (tmp_path / "TestOx.yaml").write_text("is_insulator: true\npermittivity_relative: 7.5\n")
     (tmp_path / "Si.yaml").write_text("permittivity_relative: 1.0\n")
     plugins.register_data_dir("materials", tmp_path)
     assert load_material("TestOx").band_structure.permittivity_relative == 7.5

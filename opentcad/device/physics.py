@@ -44,6 +44,14 @@ class MobilityModel(ABC):
     #: the current-density expressions.
     requires_carriers: bool = False
 
+    def required_params(self) -> tuple[str, ...]:
+        """Material-file fields this model needs beyond the required core
+        (block names like ``"mobility_klaassen"`` or keys like
+        ``"recombination.Cn_cm6_per_s"``). The solver refuses to run the
+        model on a material whose file left them to the silicon defaults
+        (``MaterialParams.defaulted``)."""
+        return ()
+
     @abstractmethod
     def attach(self, ds, device: str, region: str, params, T_K: float) -> None:
         ...
@@ -72,6 +80,14 @@ class RecombinationModel(ABC):
     formulas contain n_i^2 which must use the effective value.
     """
 
+    def required_params(self) -> tuple[str, ...]:
+        """Material-file fields this model needs beyond the required core
+        (block names like ``"mobility_klaassen"`` or keys like
+        ``"recombination.Cn_cm6_per_s"``). The solver refuses to run the
+        model on a material whose file left them to the silicon defaults
+        (``MaterialParams.defaulted``)."""
+        return ()
+
     @property
     @abstractmethod
     def term_name(self) -> str:
@@ -93,6 +109,14 @@ class BandgapNarrowingModel(ABC):
     returns the plain parameter name "n_i".
     """
 
+    def required_params(self) -> tuple[str, ...]:
+        """Material-file fields this model needs beyond the required core
+        (block names like ``"mobility_klaassen"`` or keys like
+        ``"recombination.Cn_cm6_per_s"``). The solver refuses to run the
+        model on a material whose file left them to the silicon defaults
+        (``MaterialParams.defaulted``)."""
+        return ()
+
     @abstractmethod
     def attach(self, ds, device: str, region: str, params, T_K: float) -> None:
         ...
@@ -111,6 +135,14 @@ class StatisticsModel(ABC):
     built-in potential offset. Boltzmann is a no-op identity; FermiDirac
     applies the Blakemore approximation.
     """
+
+    def required_params(self) -> tuple[str, ...]:
+        """Material-file fields this model needs beyond the required core
+        (block names like ``"mobility_klaassen"`` or keys like
+        ``"recombination.Cn_cm6_per_s"``). The solver refuses to run the
+        model on a material whose file left them to the silicon defaults
+        (``MaterialParams.defaulted``)."""
+        return ()
 
     def attach(self, ds, device: str, region: str, params, T_K: float) -> None:
         """Register any per-region parameters (Nc, Nv, ...) needed for

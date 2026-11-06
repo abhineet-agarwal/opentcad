@@ -60,9 +60,9 @@ roadmap.
 | 2a    | Transient DC + small-signal AC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair anneal, physical Qf | **Complete** |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned (SKY130 targets extracted) |
 
-**Executed test count (2026-11-06)**: 467 passing (process 148,
+**Executed test count (2026-11-06)**: 473 passing (process 148,
 integration 133, device 94, plugins 14, io 21, assist 12, viz 12, validation 7, geometry 15,
-materials 6, bridge 5), plus 2 GUI-page tests that run where Streamlit is installed. The Phase 2a additions —
+materials 12, bridge 5), plus 2 GUI-page tests that run where Streamlit is installed. The Phase 2a additions —
 transient DC sweeps, small-signal AC (`ac_sweep` via DEVSIM circuit
 nodes, gated MOS HF-CV path), Avalanche impact ionization, Joyce-Dixon
 statistics past the Blakemore ceiling, Lombardi with vector-gradient
@@ -670,7 +670,10 @@ Material parameters live as YAML files in
 specifies bandgap, effective densities of states, mobility, SRH
 lifetimes, and (for insulators) the `is_insulator: true` flag that puts
 the region in Poisson-only mode. Add a new material by dropping in a new
-YAML file.
+YAML file. Missing required fields are an error, never silently filled
+with silicon's values. Model-specific blocks (Klaassen, velocity
+saturation, Auger/radiative, avalanche) may be omitted; the models that
+need them then refuse to run on that material and say what to add.
 
 ```python
 from opentcad.materials.database import load_material
@@ -810,7 +813,7 @@ validation/sky130/ Phase 2 exit check against SkyWater's nfet_01v8 model card
 docs/              Simulation files, assistant, plugin guide, optical generation, compact PV notes
 examples/          Runnable tutorial scripts (01–11) + generated PNG plots;
                    examples/decks/ has simulation files
-tests/             Pytest suite — 467 tests (+2 GUI)
+tests/             Pytest suite — 473 tests (+2 GUI)
                    (markers: slow, requires_devsim, requires_viennaps, integration)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
@@ -820,7 +823,7 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite (467 tests, ~8 min)
+pytest tests/ -v                         # full suite (473 tests, ~8 min)
 pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
 pytest tests/process/ -v                 # topography (requires viennals) + doping
 pytest tests/device/ -v                  # DEVSIM device physics, transient, AC
