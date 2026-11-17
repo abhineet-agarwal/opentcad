@@ -101,3 +101,23 @@ def test_solver_refuses_models_on_defaulted_parameters(simple_si_meshfield):
     ok = DeviceSolver(simple_si_meshfield, {"Silicon": copy.deepcopy(params)},
                       physics=PhysicsConfig(mobility=ConstantMobility()))
     ok.solve_equilibrium()                   # constant mobility + SRH: all given
+
+
+def test_missing_process_variant_is_an_error(tmp_path, monkeypatch):
+    from opentcad import plugins
+    monkeypatch.setattr(plugins, "_iter_entry_points", lambda: [])
+    plugins._reset_for_tests()
+    try:
+        with pytest.raises(FileNotFoundError) as info:
+            load_material("Si", process="mylab")
+        assert "Variants that exist for Si: none" in str(info.value)
+        raw = _si_raw()
+        raw["recombination"]["tau_n_s"] = 3e-6
+        (tmp_path / "mylab").mkdir()
+        (tmp_path / "mylab" / "Si.yaml").write_text(_yaml.safe_dump(raw))
+        plugins.register_data_dir("materials", tmp_path)
+        assert load_material("Si", process="mylab").recombination.tau_n_s == 3e-6
+        with pytest.raises(FileNotFoundError, match=r"\['mylab'\]"):
+            load_material("Si", process="otherlab")
+    finally:
+        plugins._reset_for_tests()

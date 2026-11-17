@@ -133,8 +133,10 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
 
     Args:
         symbol: Material symbol, e.g. "Si", "SiO2", "GaN".
-        process: Optional process variant, e.g. "hackerfab". If given, loads
-                 {process}/{symbol}.yaml with fallback to {symbol}.yaml.
+        process: Optional process variant, e.g. "mylab". If given,
+                 ``{process}/{symbol}.yaml`` must exist: a missing variant is
+                 an error listing the variants that do exist, never a silent
+                 fallback to ``{symbol}.yaml``.
 
     Files are looked up in the built-in params/ folder and in any folder
     added with ``opentcad.plugins.register_data_dir("materials", path)``.
@@ -151,10 +153,17 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
     # Built-in params/ first, then folders added with
     # opentcad.plugins.register_data_dir("materials", ...). A file name
     # provided by two folders is an error rather than a silent override.
-    yaml_path = None
     if process:
         yaml_path = find_data_file("materials", f"{process}/{symbol}.yaml")
-    if yaml_path is None:
+        if yaml_path is None:
+            variants = sorted({f.parent.name for d in data_dirs("materials")
+                               for f in d.glob(f"*/{symbol}.yaml")})
+            raise FileNotFoundError(
+                f"No process variant {process!r} for '{symbol}' (looked for "
+                f"{process}/{symbol}.yaml). Variants that exist for {symbol}: "
+                f"{variants or 'none'}. Add the file, or drop the variant to "
+                f"use {symbol}.yaml.")
+    else:
         yaml_path = find_data_file("materials", f"{symbol}.yaml")
 
     if yaml_path is None:

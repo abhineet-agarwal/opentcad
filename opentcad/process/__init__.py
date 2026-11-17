@@ -85,9 +85,13 @@ def run_recipe(structure,
     # directly — faster, and keeps hand-drawn devices identical to
     # their pre-Recipe form.
     if _recipe_has_topography_steps(recipe):
+        from .structure_transfer import carry_structure
         from .topography import simulate, topography_to_meshfield
         topo = simulate(structure, recipe, grid_delta_um=grid_delta_um)
         mf = topography_to_meshfield(topo, mesh_size_um=mesh_size_um)
+        # The level-set mesh knows only materials: carry the structure's
+        # doping, contacts and metadata onto it (see structure_transfer).
+        carry_structure(structure, mf)
     else:
         topo = None
         mf = structure.to_meshfield(mesh_size_um=mesh_size_um)

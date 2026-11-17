@@ -36,6 +36,30 @@ class ContactTag:
     #: When set, the metal-on-insulator BC is Potential = bias - flat_band_shift_V.
     flat_band_shift_V: float = 0.0
 
+#: Version of the MeshField .json sidecar written by ``MeshField.save``.
+#: 1 adds every ContactTag field (flat_band_shift_V was dropped before).
+MESHFIELD_FORMAT = 1
+
+
+def _contact_to_json(c: "ContactTag") -> dict:
+    from dataclasses import fields as _fields
+    out = {}
+    for f in _fields(c):
+        v = getattr(c, f.name)
+        out[f.name] = np.asarray(v).tolist() if f.name == "boundary_nodes" else v
+    return out
+
+
+def _contact_from_json(d: dict) -> "ContactTag":
+    from dataclasses import fields as _fields
+    known = {f.name for f in _fields(ContactTag)}
+    unknown = set(d) - known
+    if unknown:
+        raise ValueError(f"contact {d.get('name')!r} has unknown fields {sorted(unknown)}")
+    kw = {k: v for k, v in d.items() if k != "boundary_nodes"}
+    return ContactTag(boundary_nodes=np.array(d["boundary_nodes"], dtype=int), **kw)
+
+
 @dataclass
 class ProcessStep:
     step_type: str
@@ -140,10 +164,11 @@ class MeshField:
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         self.grid.save(str(path.with_suffix(".vtu")))
+        # Every ContactTag field is written, so a field added later can't be
+        # dropped silently (flat_band_shift_V once was).
         meta = {
-            "contacts": [{"name": c.name, "boundary_nodes": c.boundary_nodes.tolist(),
-                          "contact_type": c.contact_type, "work_function_eV": c.work_function_eV}
-                         for c in self.contacts],
+            "meshfield_format": MESHFIELD_FORMAT,
+            "contacts": [_contact_to_json(c) for c in self.contacts],
             "process_history": [{"step_type": s.step_type, "species": s.species,
                                   "parameters": s.parameters} for s in self.process_history],
             "metadata": self.metadata,
@@ -155,9 +180,11 @@ class MeshField:
         path = Path(path)
         grid = pv.read(str(path.with_suffix(".vtu")))
         meta = json.loads(path.with_suffix(".json").read_text())
-        contacts = [ContactTag(name=c["name"], boundary_nodes=np.array(c["boundary_nodes"], dtype=int),
-                               contact_type=c["contact_type"], work_function_eV=c["work_function_eV"])
-                    for c in meta["contacts"]]
+        version = meta.get("meshfield_format", 0)       # 0: files written before versioning
+        if version > MESHFIELD_FORMAT:
+            raise ValueError(f"{path.with_suffix('.json')} uses MeshField format {version}; "
+                             f"this OpenTCAD reads up to {MESHFIELD_FORMAT}")
+        contacts = [_contact_from_json(c) for c in meta["contacts"]]
         history = [ProcessStep(step_type=s["step_type"], species=s.get("species"),
                                parameters=s.get("parameters", {})) for s in meta["process_history"]]
         return cls(grid=grid, contacts=contacts, process_history=history,

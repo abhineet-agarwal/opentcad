@@ -104,3 +104,34 @@ def test_species_fields_survive_save_load(tmp_path):
     assert mf2.species_names() == ["boron"]
     np.testing.assert_allclose(mf2.get_species("boron"), [1e15, 2e15, 3e15, 4e15])
     assert "boron" in mf2.summary()
+
+
+# ---- save / load keeps every contact field ------------------------------------
+def test_save_load_keeps_all_contact_fields(tmp_path):
+    import json
+    from opentcad.geometry.structure import Structure
+    from opentcad.geometry.formats import MESHFIELD_FORMAT, Material, MeshField
+    mf = (Structure(width_um=1.0, name="rt")
+          .add_substrate("b", 0.5, Material.SI, doping_Na=1e17)
+          .add_layer("ox", 0.005, Material.SIO2)
+          .add_contact("gate", 0.2, 0.8, "ox", flat_band_shift_V=-0.564)
+          .add_contact("body", 0, 1, "b", surface="bottom", contact_type="schottky",
+                       work_function_eV=4.8)).to_meshfield(mesh_size_um=0.1)
+    mf.save(tmp_path / "m")
+    back = MeshField.load(tmp_path / "m")
+    for a, b in zip(mf.contacts, back.contacts):
+        assert (a.name, a.contact_type, a.work_function_eV, a.flat_band_shift_V) == \
+               (b.name, b.contact_type, b.work_function_eV, b.flat_band_shift_V)
+        assert np.array_equal(a.boundary_nodes, b.boundary_nodes)
+    meta = json.loads((tmp_path / "m.json").read_text())
+    assert meta["meshfield_format"] == MESHFIELD_FORMAT
+    # Files written before versioning (no format, no flat_band_shift_V) still load.
+    for c in meta["contacts"]:
+        del c["flat_band_shift_V"]
+    del meta["meshfield_format"]
+    (tmp_path / "m.json").write_text(json.dumps(meta))
+    assert MeshField.load(tmp_path / "m").contacts[0].flat_band_shift_V == 0.0
+    meta["meshfield_format"] = MESHFIELD_FORMAT + 1
+    (tmp_path / "m.json").write_text(json.dumps(meta))
+    with pytest.raises(ValueError, match="MeshField format"):
+        MeshField.load(tmp_path / "m")

@@ -350,17 +350,16 @@ example. Acceptance requires both variants reproduce within stated tolerances, u
 data round-trips with provenance/units, and an unsupported request (for example quantum
 confinement) reports the missing capability without substituting classical transport.
 
-Before accepting that slice, fix metadata fidelity: `MeshField.save/load` currently
-omits `ContactTag.flat_band_shift_V`, and `load_material` may fall back from a
-requested process variant to the base file without saying so. Require explicit
-resolution or failure for these cases. (Already resolved, 2026-11-06: `load_material`
-now propagates `mobility_constant.uncertainty_percent` and
-`recombination.B_rad_cm3_per_s`; a material file missing required fields is an error
-rather than taking silicon's values; optional model blocks left to the defaults are
-listed in `MaterialParams.defaulted`, and models that need them refuse to run.) Topography-containing `run_recipe` also does not restore
-the initial structure's doping, contacts and region metadata; the doping-only path is
-unaffected. Require lossless accepted-field persistence, transfer checks and versioned
-migration evidence. These are prerequisites, not fixes delivered here.
+The metadata-fidelity prerequisites for that slice are resolved (2026-11-17):
+`MeshField.save/load` writes every `ContactTag` field (including
+`flat_band_shift_V`) with a format version; `load_material` errors on a missing
+process variant instead of falling back, errors on missing required fields instead
+of taking silicon's values, propagates `uncertainty_percent` and `B_rad_cm3_per_s`,
+and lists defaulted optional blocks so models that need them refuse to run; and a
+topography-containing `run_recipe` carries the structure's doping, contacts and
+metadata onto a conformal mesh (it previously returned a mesh with materials only,
+disconnected at material interfaces). Region material overrides still apply only on
+the doping-only path (a warning says so).
 
 **2. Reviewable community contributions and federated discovery.** Acceptance:
 independently maintained collections can publish compatible manifests; immutable

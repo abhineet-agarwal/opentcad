@@ -29,7 +29,7 @@ Format, version 1 (units as everywhere in OpenTCAD: µm, cm⁻³, K, eV, V)::
     device:                           # optional; omit to stop after meshing
       temperature_K: 300
       physics: {mobility: {model: lombardi, base: klaassen}, recombination: [srh]}
-      material_process: {Si: hackerfab}               # optional parameter variants
+      material_process: {Si: mylab}                   # optional: mylab/Si.yaml must exist
       interface_Qf: [{region: SI, Qf_C_per_cm2: 1e-8, y_um: 0.5}]
     analyses:                         # run in order on one solver
       - {name: idvg, type: iv, anode_contact: gate, cathode_contact: src,

@@ -286,6 +286,21 @@ def topography_to_meshfield(state: TopographyState,
             ys_clamped_full = np.maximum(ys_full, stack_top_running)
             stack_top_running = np.maximum(stack_top_running, ys_clamped_full)
 
+        # Each chunk was built from its own copies of the boundary points,
+        # so neighbouring materials would get coincident but separate nodes
+        # (a mesh disconnected at every interface: no Si/SiO2 coupling in
+        # the device solver). Fragmenting makes touching surfaces share
+        # their boundary curves; remap the resulting surfaces to materials.
+        inputs = [(2, s) for s in surface_material]
+        if len(inputs) > 1:
+            _, out_map = gmsh.model.occ.fragment(inputs[:1], inputs[1:])
+            remapped: dict[int, Material] = {}
+            for (_, old_tag), pieces in zip(inputs, out_map):
+                for dim, new_tag in pieces:
+                    if dim == 2:
+                        remapped[new_tag] = surface_material[old_tag]
+            surface_material = remapped
+
         gmsh.model.occ.synchronize()
 
         for stag, material in surface_material.items():

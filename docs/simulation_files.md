@@ -54,7 +54,7 @@ device:                                    # optional; without it the run stops 
     recombination: [srh, auger]
     bgn: slotboom
     statistics: boltzmann
-  material_process: {Si: hackerfab}        # optional parameter-file variants
+  material_process: {Si: mylab}            # optional: params/mylab/Si.yaml must exist
   interface_Qf: [{region: SI, Qf_C_per_cm2: 1e-8, y_um: 0.5}]
 analyses:                                  # run in order on one solver
   - {name: idvg, type: iv, anode_contact: gate, cathode_contact: src,
