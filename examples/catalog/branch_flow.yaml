@@ -1,0 +1,61 @@
+schema_version: 1
+id: demo:resist-split
+kind: process_flow
+title: Descriptive resist split with thickness checkpoints
+license: CC0-1.0
+sources:
+  - uri: README.md
+    locator: Descriptive example
+payload:
+  route_status: planned
+  samples:
+    - {id: wafer-0, state_status: assumed}
+    - {id: coated-0, parent_ids: [wafer-0], state_status: unknown}
+    - {id: sample-a, parent_ids: [coated-0], state_status: unknown}
+    - {id: sample-b, parent_ids: [coated-0], state_status: unknown}
+  steps:
+    - id: coat
+      operation: spin_coat
+      intent: Record an illustrative coating plan; no thickness is predicted.
+      tool_ref: {id: 'demo:spinner'}
+      material_refs: [{id: 'demo:resist-lot'}]
+      input_samples: [wafer-0]
+      output_samples: [coated-0]
+      parameters:
+        speed: {value: 3000.0, unit: rpm}
+        duration: {value: 30.0, unit: s}
+    - id: bake-a
+      operation: bake
+      tool_ref: {id: 'demo:hotplate'}
+      input_samples: [coated-0]
+      output_samples: [sample-a]
+      parameters:
+        temperature: {value: 90.0, unit: degC}
+        duration: {value: 60.0, unit: s}
+    - id: bake-b
+      operation: bake
+      tool_ref: {id: 'demo:hotplate'}
+      input_samples: [coated-0]
+      output_samples: [sample-b]
+      parameters:
+        temperature: {value: 100.0, unit: degC}
+        duration: {value: null, unit: s}
+      unresolved: [The handwritten duration for branch B is ambiguous; ask the contributor.]
+    - id: measure-a
+      operation: measure_thickness
+      tool_ref: {id: 'demo:metrology'}
+      input_samples: [sample-a]
+      intent: Record a future thickness measurement; no observation supplied.
+    - id: measure-b
+      operation: measure_thickness
+      tool_ref: {id: 'demo:metrology'}
+      input_samples: [sample-b]
+      intent: Record a future thickness measurement; no observation supplied.
+  edges:
+    - {source: coat, target: bake-a, kind: split}
+    - {source: coat, target: bake-b, kind: split}
+    - {source: bake-a, target: measure-a, kind: metrology}
+    - {source: bake-b, target: measure-b, kind: metrology}
+unresolved:
+  - Installed tools have no calibration evidence or declared material constraints.
+  - Parameters are illustrative assumptions, not approved equipment settings.

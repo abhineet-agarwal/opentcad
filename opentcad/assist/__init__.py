@@ -8,7 +8,17 @@ vLLM). Optional: the core never imports it.
                        client=ChatClient())
 """
 from .client import ChatClient, LLMError
-from .draft import Draft, Flag, draft_deck, request_numbers, unstated_values
 
 __all__ = ["ChatClient", "LLMError", "Draft", "Flag", "draft_deck",
-           "request_numbers", "unstated_values"]
+           "request_numbers", "unstated_values", "CatalogDraft", "draft_catalog"]
+
+
+def __getattr__(name):
+    # Catalog drafting does not need geometry, deck plugins or solver imports.
+    if name in {"Draft", "Flag", "draft_deck", "request_numbers", "unstated_values"}:
+        from . import draft
+        return getattr(draft, name)
+    if name in {"CatalogDraft", "draft_catalog"}:
+        from . import catalog
+        return getattr(catalog, name)
+    raise AttributeError(name)

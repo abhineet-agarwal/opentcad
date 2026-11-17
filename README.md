@@ -19,6 +19,17 @@ The goal is to provide an end-to-end Python API where a single script can
 define a structure, simulate fabrication, extract a device mesh, and
 produce IV / CV / Vth characteristics.
 
+The [proposed open materials platform direction](docs/open_materials_platform.md)
+describes a shared catalog and prompt-assisted contributions and simulation contracts,
+with explicit assumptions, capability limits and reproducible evidence. It is a design
+proposal, separate from the capabilities implemented below.
+
+A first [private local catalog](docs/catalog.md) now imports JSON/YAML records and
+CSV inventories, preserves descriptive process branches and sample lineage, exports
+pinned snapshots/runsheets, and offers optional model-assisted drafts for review.
+It does not simulate process graphs or publish records. Try the
+[equipment/resist/flow example](examples/catalog/README.md).
+
 ---
 
 ## Status
@@ -60,8 +71,8 @@ roadmap.
 | 2a    | Transient DC + small-signal AC, Avalanche, Joyce-Dixon, Lombardi E-normal, Fair anneal, physical Qf | **Complete** |
 | 3     | Materials calibration vs. SKY130 / IHP       | Planned (SKY130 targets extracted) |
 
-**Executed test count (2026-11-06)**: 473 passing (process 148,
-integration 133, device 94, plugins 14, io 21, assist 12, viz 12, validation 7, geometry 15,
+**Executed test count (2026-11-17)**: 485 passing (process 148,
+integration 133, device 94, plugins 14, io 21, assist 12, catalog 12, viz 12, validation 7, geometry 15,
 materials 12, bridge 5), plus 2 GUI-page tests that run where Streamlit is installed. The Phase 2a additions —
 transient DC sweeps, small-signal AC (`ac_sweep` via DEVSIM circuit
 nodes, gated MOS HF-CV path), Avalanche impact ionization, Joyce-Dixon
@@ -813,7 +824,7 @@ validation/sky130/ Phase 2 exit check against SkyWater's nfet_01v8 model card
 docs/              Simulation files, assistant, plugins, releasing, optical generation, compact PV notes
 examples/          Runnable tutorial scripts (01–11) + generated PNG plots;
                    examples/decks/ has simulation files
-tests/             Pytest suite — 473 tests (+2 GUI)
+tests/             Pytest suite — 485 tests (+2 GUI)
                    (markers: slow, requires_devsim, requires_viennaps, integration)
 PHASES.md          Phased roadmap with exit criteria per phase
 ```
@@ -823,7 +834,7 @@ PHASES.md          Phased roadmap with exit criteria per phase
 ## Testing
 
 ```bash
-pytest tests/ -v                         # full suite (473 tests, ~8 min)
+pytest tests/ -v                         # full suite (485 tests, ~8 min)
 pytest tests/geometry/ -v                # geometry-only (no DEVSIM/ViennaLS)
 pytest tests/process/ -v                 # topography (requires viennals) + doping
 pytest tests/device/ -v                  # DEVSIM device physics, transient, AC

@@ -188,6 +188,8 @@ def build_parser() -> argparse.ArgumentParser:
     sw.set_defaults(func=_cmd_sweep)
     pl = sub.add_parser("plugins", help="list registered extensions")
     pl.set_defaults(func=_cmd_plugins)
+    from opentcad.catalog_cli import add_catalog_parser
+    add_catalog_parser(sub)
     return p
 
 

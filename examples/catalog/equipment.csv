@@ -1,0 +1,7 @@
+kind,id,title,manufacturer,model,operations,facility,model_id
+equipment_model,demo:spinner-model,Example spin coater,Example Instruments,SC-DEMO,spin_coat,,
+equipment_instance,demo:spinner,Teaching lab spinner,,,,Teaching lab,demo:spinner-model
+equipment_model,demo:hotplate-model,Example hotplate,Example Instruments,HP-DEMO,bake,,
+equipment_instance,demo:hotplate,Teaching lab hotplate,,,,Teaching lab,demo:hotplate-model
+equipment_model,demo:metrology-model,Example thickness instrument,Example Instruments,TH-DEMO,measure_thickness,,
+equipment_instance,demo:metrology,Teaching lab thickness instrument,,,,Teaching lab,demo:metrology-model

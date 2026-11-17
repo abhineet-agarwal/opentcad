@@ -1,0 +1,35 @@
+schema_version: 1
+records:
+  - id: demo:resist-product
+    kind: material_product
+    title: Example positive photoresist formulation
+    license: CC0-1.0
+    sources:
+      - uri: resist_datasheet.md
+        locator: Example properties table
+        description: Fictional teaching fixture; not manufacturer evidence
+    payload:
+      generic_material: Photoresist
+      vendor: Example Materials
+      product: PR-DEMO
+      datasheets:
+        - uri: resist_datasheet.md
+          locator: Revision demo-1
+      properties:
+        nominal_viscosity:
+          value: 10.0
+          unit: mPa*s
+          sources:
+            - uri: resist_datasheet.md
+              locator: Example properties table, viscosity
+    unresolved:
+      - Composition is unspecified.
+      - No measured spin curve or exposure model is supplied.
+  - id: demo:resist-lot
+    kind: material_lot
+    title: Example resist teaching lot
+    license: CC0-1.0
+    payload:
+      product_ref: {id: 'demo:resist-product'}
+      lot: DEMO-001
+      history: [Fictional teaching lot; storage history unknown]
