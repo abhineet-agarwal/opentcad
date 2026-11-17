@@ -1,0 +1,14 @@
+# GitBook site configuration for Git Sync. The manual is the docs/ folder;
+# docs/SUMMARY.md is its sidebar. Keep the space key: GitBook matches the space by it.
+$schema: https://api.gitbook.com/gitbook-docs.yaml
+site:
+  title: OpenTCAD
+  structure:
+    - type: space
+      key: space-docs
+      title: OpenTCAD
+      path: docs
+      default: true
+      content:
+        directory: ./docs
+        language: en

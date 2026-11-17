@@ -137,13 +137,14 @@ Real gaps, roughly from smallest to largest. Each is documented in the relevant
 - **ViennaPS backend** for physical etch and deposition. It needs a working
   build: test the Linux wheels, or build from source against one VTK/OpenMP on
   macOS.
-- **Import and docs:** GDS layout import; Sphinx API docs.
+- **GDS layout import:** build a `Structure` and masks from a layout file.
 
 ## Documentation
 
 The documentation is the `docs/` folder. It is written for GitBook, which reads
-it through Git Sync: `.gitbook.yaml` at the repository root points GitBook at
-`docs/`, and `docs/SUMMARY.md` is the sidebar. Every page is plain Markdown, so it
+it through Git Sync. `gitbook-docs.yaml` at the repository root maps the site's
+one space to `docs/` (`.gitbook.yaml` does the same for a sync set up from a
+single space), and `docs/SUMMARY.md` is the sidebar. Every page is plain Markdown, so it
 also reads on GitHub.
 
 - **Where pages go:**

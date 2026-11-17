@@ -76,8 +76,17 @@ def test_every_page_is_in_the_sidebar():
 
 
 def test_gitbook_config_points_at_docs():
+    import yaml
+
+    # Site-level Git Sync reads gitbook-docs.yaml; a single-space sync reads .gitbook.yaml.
+    site = yaml.safe_load((ROOT / "gitbook-docs.yaml").read_text())["site"]
+    spaces = [n for n in site["structure"] if n["type"] == "space"]
+    assert len(spaces) == 1 and spaces[0]["default"] is True
+    assert spaces[0]["content"]["directory"] == "./docs"
+    assert spaces[0]["key"] == "space-docs", "GitBook matches the space by its key; don't change it"
     config = (ROOT / ".gitbook.yaml").read_text()
     assert "root: ./docs/" in config and "summary: SUMMARY.md" in config
+    assert (DOCS_DIR / "README.md").exists() and (DOCS_DIR / "SUMMARY.md").exists()
 
 
 RUNNABLE = [DOCS_DIR / "getting_started.md", *sorted((DOCS_DIR / "tutorials").glob("0*.md")),
