@@ -15,6 +15,9 @@ class Model(BaseModel):
 
 
 class SourceRef(Model):
+    """Where a value came from: a URI (``attachment:sha256:…`` for stored
+    files), an optional locator within it (page, table), its hash and a
+    description."""
     uri: Text
     locator: str | None = None
     sha256: Hash | None = None
@@ -22,11 +25,16 @@ class SourceRef(Model):
 
 
 class RecordRef(Model):
+    """A reference to record ``id``, pinned to a content-hash ``revision``
+    or, if None, following the browsing head."""
     id: Text
     revision: Hash | None = None
 
 
 class Quantity(Model):
+    """A measured or specified value with its unit, uncertainty (same unit,
+    ≥ 0), sources and the conditions it holds under. Any part may be
+    unknown (None); checks report what is missing."""
     value: float | None = Field(default=None, allow_inf_nan=False)
     unit: Text | None = None
     uncertainty: float | None = Field(default=None, ge=0, allow_inf_nan=False)
@@ -176,18 +184,23 @@ CatalogRecord = Annotated[
 
 
 def record_from_dict(data: dict) -> CatalogRecord:
+    """Validate ``data`` as a catalog record of any kind (chosen by its
+    ``kind`` field). Raises pydantic.ValidationError if it is not one."""
     from pydantic import TypeAdapter
 
     return TypeAdapter(CatalogRecord).validate_python(data)
 
 
 def record_schema() -> dict:
+    """JSON Schema for catalog records, covering every kind."""
     from pydantic import TypeAdapter
 
     return TypeAdapter(CatalogRecord).json_schema()
 
 
 class Issue(Model):
+    """One finding: a machine-readable ``code``, a ``message``, where in the
+    record it applies (``path``) and its ``severity``."""
     code: str
     message: str
     path: str = ""
@@ -195,6 +208,8 @@ class Issue(Model):
 
 
 class ImportResult(Model):
+    """What an import produced: the records, any issues, the source file's
+    hash, and (after ``Catalog.import_file``) the stored ``refs``."""
     records: list[CatalogRecord] = Field(default_factory=list)
     issues: list[Issue] = Field(default_factory=list)
     source_sha256: Hash | None = None
@@ -203,10 +218,13 @@ class ImportResult(Model):
 
     @property
     def ok(self) -> bool:
+        """True if no issue is an error."""
         return not any(issue.severity == "error" for issue in self.issues)
 
 
 class Assessment(Model):
+    """The result of ``check_record``. ``simulation`` is always
+    ``"unsupported"``: catalog records are not yet run as simulations."""
     structural_valid: bool
     compatibility: Literal[
         "needs_information", "incompatible", "no_declared_conflicts"

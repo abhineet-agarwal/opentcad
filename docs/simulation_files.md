@@ -28,7 +28,7 @@ voltages, currents = result.analyses["forward"]
 ## Format (version 1)
 
 Units are OpenTCAD's everywhere: µm, cm⁻³, K, eV, V. Two complete
-examples are in [`examples/decks/`](../examples/decks/).
+examples are in [`examples/decks/`](https://github.com/abhineet-agarwal/opentcad/tree/main/examples/decks).
 
 ```yaml
 version: 1

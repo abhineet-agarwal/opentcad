@@ -701,6 +701,8 @@ class Deck:
     analyses: list[AnalysisSpec] = field(default_factory=list)
 
     def to_dict(self) -> dict:
+        """The simulation file as plain data (what ``save_deck`` writes).
+        ``deck_from_dict`` turns it back into an equal Deck."""
         out: dict = {"version": FORMAT_VERSION, "name": self.name}
         if self.description:
             out["description"] = self.description

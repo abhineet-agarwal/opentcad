@@ -13,6 +13,10 @@ import pyvista as pv
 
 
 class Material(IntEnum):
+    """Region materials. The integer value is what a MeshField stores as
+    ``material_id``; ``MATERIAL_NAMES`` gives the display name used to look
+    up material parameters (e.g. ``"Silicon"``). A material needs a
+    parameter file before the device solver can use it."""
     VACUUM=0; SI=1; SIO2=2; SI3N4=3; POLY_SI=4; AL=5
     PHOTORESIST=6; SIGE=7; GAN=8; SIC=9; SUBSTRATE=10
 
@@ -25,6 +29,12 @@ MATERIAL_NAMES = {
 
 @dataclass
 class ContactTag:
+    """A named electrical contact on a MeshField.
+
+    ``boundary_nodes`` are the mesh node indices the contact covers.
+    ``contact_type`` is ``"ohmic"`` or ``"schottky"`` (which needs
+    ``work_function_eV``); a contact on an insulator acts as a metal gate,
+    and ``flat_band_shift_V`` then offsets its potential (see below)."""
     name: str
     boundary_nodes: np.ndarray
     contact_type: str = "ohmic"
@@ -62,6 +72,9 @@ def _contact_from_json(d: dict) -> "ContactTag":
 
 @dataclass
 class ProcessStep:
+    """One entry of a MeshField's process history: what was done
+    (``step_type``, e.g. ``"implant"``), to which dopant ``species`` if
+    any, and the step's ``parameters``."""
     step_type: str
     species: Optional[str] = None
     parameters: dict = field(default_factory=dict)
@@ -92,21 +105,37 @@ class MeshField:
             raise ValueError("MeshField grid must have 'material_id' cell data.")
 
     @property
-    def n_points(self): return self.grid.n_points
+    def n_points(self):
+        """Number of mesh nodes."""
+        return self.grid.n_points
+
     @property
-    def n_cells(self): return self.grid.n_cells
+    def n_cells(self):
+        """Number of mesh cells (triangles)."""
+        return self.grid.n_cells
+
     @property
-    def points(self): return self.grid.points
+    def points(self):
+        """Node coordinates [um], shape (n_points, 3); z is 0."""
+        return self.grid.points
+
     @property
-    def bounds(self): return self.grid.bounds
+    def bounds(self):
+        """(x_min, x_max, y_min, y_max, z_min, z_max) [um]."""
+        return self.grid.bounds
+
     @property
-    def material_ids(self): return self.grid.cell_data["material_id"]
+    def material_ids(self):
+        """``Material`` value of each cell, shape (n_cells,)."""
+        return self.grid.cell_data["material_id"]
 
     def get_cells_for_material(self, material: Material) -> np.ndarray:
+        """Indices of the cells made of ``material``."""
         return np.where(self.material_ids == int(material))[0]
 
     @property
     def has_doping(self):
+        """True if both ``Nd`` and ``Na`` fields are present."""
         return "Nd" in self.grid.point_data and "Na" in self.grid.point_data
 
     @property
@@ -132,7 +161,9 @@ class MeshField:
         self.grid.point_data["Na"] = values.astype(np.float64)
 
     @property
-    def net_doping(self): return self.Nd - self.Na
+    def net_doping(self):
+        """Nd − Na [cm^-3] at each node: positive where n-type."""
+        return self.Nd - self.Na
 
     def species_names(self) -> list[str]:
         """Dopant species with a tracked 'C_<species>' field, sorted."""
@@ -152,15 +183,21 @@ class MeshField:
         self.grid.point_data[SPECIES_PREFIX + name] = values.astype(np.float64)
 
     def get_contact(self, name: str) -> ContactTag:
+        """The contact called ``name``. Raises KeyError, listing the
+        contacts that exist, if there is none."""
         for c in self.contacts:
             if c.name == name: return c
         raise KeyError(f"Contact '{name}' not found. Available: {[c.name for c in self.contacts]}")
 
     def add_contact(self, contact: ContactTag):
+        """Add ``contact``, replacing any existing contact of the same name."""
         self.contacts = [c for c in self.contacts if c.name != contact.name]
         self.contacts.append(contact)
 
     def save(self, path: str | Path):
+        """Write the mesh to ``<path>.vtu`` and everything else (contacts,
+        process history, metadata, ``meshfield_format``) to ``<path>.json``.
+        Parent folders are created. ``load`` reads both back unchanged."""
         path = Path(path)
         path.parent.mkdir(parents=True, exist_ok=True)
         self.grid.save(str(path.with_suffix(".vtu")))
@@ -177,6 +214,9 @@ class MeshField:
 
     @classmethod
     def load(cls, path: str | Path) -> "MeshField":
+        """Read a MeshField written by ``save`` (the ``.vtu`` and ``.json``
+        pair). Files from before ``meshfield_format`` existed still load;
+        a newer format than this version understands raises ValueError."""
         path = Path(path)
         grid = pv.read(str(path.with_suffix(".vtu")))
         meta = json.loads(path.with_suffix(".json").read_text())
@@ -191,6 +231,8 @@ class MeshField:
                    metadata=meta.get("metadata", {}))
 
     def summary(self) -> str:
+        """A short text description: size, bounds, cells per material,
+        peak Nd / Na (and per tracked species) and contact names."""
         lines = [f"MeshField: {self.n_points} points, {self.n_cells} cells",
                  f"  Bounds [um]: x=[{self.bounds[0]:.3f},{self.bounds[1]:.3f}] "
                  f"y=[{self.bounds[2]:.3f},{self.bounds[3]:.3f}]"]

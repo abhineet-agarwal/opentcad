@@ -212,6 +212,7 @@ def step_handler(step) -> StepHandler:
 
 
 def registered_steps() -> dict[str, StepHandler]:
+    """Every registered process step: ``{class name: StepHandler}``."""
     _ensure_loaded()
     return {cls.__name__: h for cls, h in _steps.items()}
 
@@ -235,6 +236,8 @@ def register_analysis(name: str, fn: Callable, *, replace: bool = False) -> None
 
 
 def get_analysis(name: str) -> Callable:
+    """The function registered as analysis ``name``. Raises KeyError,
+    listing the available names, if there is none."""
     _ensure_loaded()
     try:
         return _analyses[name][0]
@@ -244,6 +247,7 @@ def get_analysis(name: str) -> Callable:
 
 
 def available_analyses() -> list[str]:
+    """Names of all registered analyses, sorted."""
     _ensure_loaded()
     return sorted(_analyses)
 
@@ -273,6 +277,9 @@ def register_model(category: str, name: str, cls: type, *,
 
 
 def get_model(category: str, name: str) -> type:
+    """The model class registered as ``name`` in ``category`` (one of
+    ``MODEL_CATEGORIES``). Raises ValueError for an unknown category and
+    KeyError, listing the available names, for an unknown model."""
     _ensure_loaded()
     if category not in MODEL_CATEGORIES:
         raise ValueError(f"category must be one of {MODEL_CATEGORIES}, "
@@ -295,6 +302,7 @@ def model_name(category: str, model) -> str:
 
 
 def available_models(category: str) -> list[str]:
+    """Names of the models registered in ``category``, sorted."""
     _ensure_loaded()
     return sorted(_models[category])
 
@@ -317,6 +325,8 @@ def register_metric(name: str, fn: Callable, *, replace: bool = False) -> None:
 
 
 def get_metric(name: str) -> Callable:
+    """The function registered as metric ``name``. Raises KeyError,
+    listing the available names, if there is none."""
     _ensure_loaded()
     try:
         return _metrics[name][0]
@@ -326,6 +336,7 @@ def get_metric(name: str) -> Callable:
 
 
 def available_metrics() -> list[str]:
+    """Names of all registered metrics, sorted."""
     _ensure_loaded()
     return sorted(_metrics)
 

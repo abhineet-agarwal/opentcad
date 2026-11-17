@@ -1,0 +1,7 @@
+# GitBook Git Sync: the documentation lives in docs/.
+# docs/README.md is the landing page and docs/SUMMARY.md is the sidebar.
+root: ./docs/
+
+structure:
+  readme: README.md
+  summary: SUMMARY.md

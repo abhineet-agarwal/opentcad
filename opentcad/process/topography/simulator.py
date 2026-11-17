@@ -78,6 +78,7 @@ class TopographyState:
 
     @property
     def top(self) -> Layer:
+        """The uppermost layer. Raises RuntimeError if there are none."""
         if not self.layers:
             raise RuntimeError("TopographyState has no layers yet.")
         return self.layers[-1]

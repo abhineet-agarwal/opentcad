@@ -82,6 +82,8 @@ include = [
     "/validation/",
     "/README.md",
     "/PHASES.md",
+    "/CHANGELOG.md",
+    "/CONTRIBUTING.md",
     "/LICENSE",
     "/pyproject.toml",
 ]

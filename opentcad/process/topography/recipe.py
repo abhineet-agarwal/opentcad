@@ -285,6 +285,8 @@ class Recipe:
 
     def deposit(self, material: Material, thickness_um: float,
                 model: str = "conformal") -> "Recipe":
+        """Append a ``Deposit`` step: ``thickness_um`` of ``material`` over the
+        current surface. Returns the recipe."""
         self.steps.append(Deposit(material, thickness_um, model))
         return self
 
@@ -295,6 +297,8 @@ class Recipe:
              sidewall_ratio: float = 0.0,
              rates: Optional[Dict[Material, float]] = None,
              default_rate: float = 0.0) -> "Recipe":
+        """Append an ``Etch`` step; the models, masks and selectivity options
+        are described under ``Etch``. Returns the recipe."""
         self.steps.append(Etch(depth_um, model, window_x_um, mask_material,
                                 direction, sidewall_ratio,
                                 rates, default_rate))
@@ -304,6 +308,7 @@ class Recipe:
                 ambient: str = "dry",
                 window_x_um: Optional[Tuple[float, float]] = None,
                 bird_beak_length_um: float = 0.0) -> "Recipe":
+        """Append a Deal–Grove ``Oxidize`` step. Returns the recipe."""
         self.steps.append(Oxidize(temperature_C, time_s, ambient,
                                    window_x_um, bird_beak_length_um))
         return self
@@ -312,6 +317,9 @@ class Recipe:
                 window_x_um: Optional[Tuple[float, float]] = None,
                 tilt_deg: float = 0.0,
                 profile: str = "pearson") -> "Recipe":
+        """Append an ``Implant`` step. The species and energy are checked
+        now, so an unknown species or an energy outside its table raises
+        ValueError here rather than at run time. Returns the recipe."""
         self.steps.append(Implant(species=species,
                                    energy_keV=energy_keV,
                                    dose_cm2=dose_cm2,
@@ -324,6 +332,8 @@ class Recipe:
                species_Nd: str = "As",
                species_Na: str = "B",
                model: str = "intrinsic") -> "Recipe":
+        """Append an ``Anneal`` step (``model`` is ``"intrinsic"`` or
+        ``"fair"``). Returns the recipe."""
         self.steps.append(Anneal(temperature_C=temperature_C,
                                   time_s=time_s,
                                   species_Nd=species_Nd,
@@ -347,6 +357,7 @@ class Recipe:
         return iter(self.steps)
 
     def summary(self) -> str:
+        """The recipe as text: a header line, then one numbered line per step."""
         from opentcad.plugins import step_handler
         lines = [f"Recipe {self.name!r}: {len(self.steps)} step(s)"]
         for i, step in enumerate(self.steps, 1):

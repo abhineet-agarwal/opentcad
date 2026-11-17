@@ -150,16 +150,18 @@ Milestone 3.3 — Calibration infrastructure (scipy optimizer, SKY130 target met
 Exit: NMOS Vth/Ion/SS within 10% of SKY130. All parameters cited.
 
 ## Phase 4 — Community (Ongoing)
-Sphinx docs, tutorial notebooks, NEGF extension (NanoTCAD ViDES), GDS import.
-GDS import, Sphinx docs, a plugin system, a CLI and packaging are planned
-earlier, as a tooling track right after Phase 2 (see the README roadmap).
+Documentation and tutorials, NEGF extension (NanoTCAD ViDES), GDS import.
+GDS import, documentation, a plugin system, a CLI and packaging were brought
+forward as a tooling track right after Phase 2.
 Tooling progress: plugin system ✓ (opentcad.plugins, docs/plugins.md);
 ViennaLS made an optional extra, so doping and device work without it;
 simulation files + `opentcad check | run` CLI ✓ (opentcad.io.deck,
 docs/simulation_files.md); parameter sweeps with metrics ✓
 (`opentcad sweep`, opentcad.io.sweep); promptable GUI page with a local
 open-weights model (opentcad.assist, gui/pages/assistant.py,
-docs/assistant.md) and Plotly figures (opentcad.viz) ✓. Next: GDS
-import, Sphinx docs, the first PyPI upload. Packaging ready ✓ (clean
+docs/assistant.md) and Plotly figures (opentcad.viz) ✓. Documentation ✓
+(a GitBook manual in docs/: tutorials, user guide, contributor guide and an
+API reference generated from the docstrings by tools/gen_api_docs.py; checked
+by tests/docs). Next: GDS import, the first PyPI upload. Packaging ready ✓ (clean
 wheel install passes its tests; docs/releasing.md). Solution-field maps ✓
 (DeviceSolver.snapshot, `fields` analysis).

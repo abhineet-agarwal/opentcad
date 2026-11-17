@@ -24,6 +24,9 @@ from .formats import ContactTag, Material, MeshField, ProcessStep
 
 @dataclass
 class LayerSpec:
+    """One layer of a Structure's stack: uniform material and doping
+    [cm^-3] over the full width. ``y_bottom`` [um] is filled in as the
+    stack is built."""
     name: str
     thickness_um: float
     material: Material
@@ -45,6 +48,9 @@ class RegionSpec:
 
 @dataclass
 class ContactSpec:
+    """A contact declared on a Structure: an x-span [um] on the ``"top"``
+    or ``"bottom"`` surface of layer ``layer_name``. The other fields are
+    copied to the meshed ``ContactTag``."""
     name: str
     x_start: float; x_end: float
     layer_name: str
@@ -137,6 +143,7 @@ class Structure:
 
     @property
     def total_height_um(self) -> float:
+        """Sum of the layer thicknesses [um]."""
         return sum(l.thickness_um for l in self._layers)
 
     def to_meshfield(self, mesh_size_um: float = 0.05) -> MeshField:

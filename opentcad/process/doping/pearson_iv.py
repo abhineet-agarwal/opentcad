@@ -127,6 +127,8 @@ def canonicalize_species(name: str) -> str:
 
 
 def available_species() -> List[str]:
+    """Canonical names of every implant species with a range table, from
+    the built-in data and registered data folders, sorted."""
     return sorted(set(_species_index().aliases.values()))
 
 

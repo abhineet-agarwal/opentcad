@@ -46,9 +46,13 @@ class SingleDiodePV:
 
     @property
     def diode_voltage_V(self):
+        """Ns·n·kT/q [V]: the voltage scale of the diode exponential."""
         return self.series_cells * self.ideality * KB_J_K * self.temperature_K / Q_C
 
     def current_A(self, voltage_V, irradiance_W_m2=1000.0):
+        """Delivered current [A] at terminal voltage ``voltage_V`` and
+        irradiance [W/m²] (scalars or arrays). Raises ValueError for
+        non-finite inputs or negative irradiance."""
         voltage = np.asarray(voltage_V, dtype=float)
         light = np.asarray(irradiance_W_m2, dtype=float)
         if np.any(~np.isfinite(voltage)) or np.any(~np.isfinite(light)) or np.any(light < 0):
@@ -57,6 +61,7 @@ class SingleDiodePV:
                 - self.saturation_A * np.expm1(voltage / self.diode_voltage_V))
 
     def open_circuit_V(self, irradiance_W_m2=1000.0):
+        """Open-circuit voltage [V] at the given irradiance [W/m²]."""
         if not np.isfinite(irradiance_W_m2) or irradiance_W_m2 < 0:
             raise ValueError("Non-negative finite irradiance required")
         return float(self.diode_voltage_V * np.log1p(self.photocurrent_A

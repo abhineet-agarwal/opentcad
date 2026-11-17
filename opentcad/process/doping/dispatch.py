@@ -44,10 +44,12 @@ class DopingRecipeResult:
 
     @property
     def n_implants(self) -> int:
+        """Number of implants applied."""
         return len(self.implants)
 
     @property
     def n_anneals(self) -> int:
+        """Number of anneals applied."""
         return len(self.anneals)
 
 

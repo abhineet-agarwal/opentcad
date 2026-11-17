@@ -303,10 +303,13 @@ def _run_point(index: int, deck_dict: dict, metrics: list[MetricSpec]) -> dict:
 
 @dataclass
 class SweepResult:
+    """A finished sweep: the output folder (``table.csv`` plus each point's
+    file and results) and one row per point."""
     outdir: Path
     rows: list[dict]
 
     def table(self) -> list[dict]:
+        """The rows of ``table.csv``: each point's varied values and metrics."""
         return self.rows
 
 

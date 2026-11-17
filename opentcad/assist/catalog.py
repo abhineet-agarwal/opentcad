@@ -26,6 +26,10 @@ class Proposal(BaseModel):
 
 @dataclass
 class CatalogDraft:
+    """The outcome of ``draft_catalog``: the proposed records with their
+    stated assumptions and questions, remaining ``problems``, a check of each
+    record, and the raw reply. Nothing is stored; ``to_dict`` writes a review
+    file."""
     proposal: Proposal | None = None
     problems: list[str] = field(default_factory=list)
     assessments: list[dict] = field(default_factory=list)
@@ -35,9 +39,12 @@ class CatalogDraft:
 
     @property
     def ok(self) -> bool:
+        """True if there is a proposal and it has no remaining problems."""
         return self.proposal is not None and not self.problems
 
     def to_dict(self) -> dict:
+        """The draft as a review file: marked unaccepted and private, with
+        every generated value flagged as unverified."""
         data = self.proposal.model_dump(mode="json") if self.proposal else {}
         return {"draft_schema": "opentcad.catalog-draft/v1", "status": "unaccepted",
                 "request": self.request,

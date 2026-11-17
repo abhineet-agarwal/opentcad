@@ -36,6 +36,14 @@ class Flag:
 
 @dataclass
 class Draft:
+    """The outcome of ``draft_deck``.
+
+    ``deck`` is the checked simulation file, or None if every attempt
+    failed; ``data`` is the file as the model last wrote it. ``flags`` lists
+    every value the request did not state; ``questions`` are the model's
+    questions for you; ``problems`` are the remaining check failures as
+    (path, message). ``attempts`` counts replies, ``transcript`` holds the
+    whole conversation."""
     deck: Optional[Deck]
     data: Optional[dict]                     # the file as the model wrote it
     flags: list[Flag] = field(default_factory=list)
@@ -46,6 +54,7 @@ class Draft:
 
     @property
     def ok(self) -> bool:
+        """True if the model produced a simulation file that passed the checks."""
         return self.deck is not None
 
 

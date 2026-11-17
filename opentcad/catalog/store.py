@@ -12,6 +12,8 @@ from .models import CatalogRecord, Issue, RecordRef, SourceRef, record_from_dict
 
 
 def record_revision(record: CatalogRecord) -> str:
+    """Content hash of a record: the digest of its canonical JSON. Equal
+    records have equal revisions."""
     return digest(canonical_bytes(record.model_dump(mode="json")))
 
 
@@ -51,6 +53,8 @@ class Catalog:
                 f"or import into it first")
 
     def init(self):
+        """Create the folders of an empty collection (owner-only
+        permissions). Safe to call on an existing one. Returns the catalog."""
         self.root.mkdir(parents=True, exist_ok=True, mode=0o700)
         for name in ("records", "heads", "attachments"):
             (self.root / name).mkdir(exist_ok=True, mode=0o700)
@@ -60,6 +64,9 @@ class Catalog:
         return digest(entity_id.encode("utf-8"))
 
     def put(self, record: CatalogRecord) -> RecordRef:
+        """Validate and store ``record`` as an immutable revision named by its
+        content hash, and make it the browsing head for its id. Returns the
+        pinned reference."""
         # Revalidate nested mutable containers too, then detach caller-owned data.
         record = record_from_dict(record.model_dump(mode="json"))
         revision = record_revision(record)
@@ -90,6 +97,9 @@ class Catalog:
         return ref
 
     def get(self, entity_id: str, revision: str | None = None) -> CatalogRecord:
+        """The record ``entity_id`` at ``revision``, or at its head if
+        ``revision`` is None. Raises KeyError for an unknown revision and
+        ValueError if the stored bytes fail their integrity check."""
         import json
 
         if revision is None:
@@ -107,6 +117,8 @@ class Catalog:
         return record
 
     def list_records(self, kind: str | None = None) -> list[RecordRef]:
+        """References to the head revision of every record, optionally only
+        those of one ``kind`` (e.g. ``"process_flow"``)."""
         import json
 
         refs = []
@@ -120,6 +132,9 @@ class Catalog:
         return sorted(refs, key=lambda ref: ref.id)
 
     def import_file(self, path: str | Path):
+        """Import a supported file (see ``import_file``) and store its records
+        and attachments. Nothing is stored if the import has errors. Returns
+        the ``ImportResult`` with ``refs`` set to the stored revisions."""
         from .importers import import_file
 
         result = import_file(path)
@@ -131,6 +146,8 @@ class Catalog:
         return result.model_copy(update={"refs": refs})
 
     def check_flow(self, entity_id: str, revision: str | None = None):
+        """``check_record`` for a stored process flow, resolving its references
+        in this catalog. Raises ValueError if the record is not a process flow."""
         from .checks import check_record
 
         record = self.get(entity_id, revision)
@@ -148,6 +165,13 @@ class Catalog:
                          description=source.name)
 
     def export_bundle(self, refs: list[RecordRef], *, include_attachments: bool = False) -> dict:
+        """A self-contained snapshot of ``refs`` and everything they reference,
+        with every reference pinned to an exact revision.
+
+        The bundle lists the records, their revisions, the roots and the
+        resolutions made. ``complete`` is False, with ``issues`` saying why,
+        if a reference is missing or cyclic. With ``include_attachments``
+        the referenced attachment files are embedded (base64)."""
         records = {}
         resolved = {}
         visiting = set()

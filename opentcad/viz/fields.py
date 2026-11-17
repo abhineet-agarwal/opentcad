@@ -28,10 +28,13 @@ SEMICONDUCTORS = frozenset({Material.SI, Material.POLY_SI, Material.SIGE,
 
 
 def points_um(mf: MeshField) -> np.ndarray:
+    """Node coordinates as an (n_points, 2) array of (x, y) in µm."""
     return np.asarray(mf.grid.points, dtype=float)[:, :2]
 
 
 def triangles(mf: MeshField) -> np.ndarray:
+    """Triangle connectivity as an (n_cells, 3) array of node indices, in
+    cell order. Raises ValueError if the mesh is not all triangles."""
     tris = mf.grid.cells_dict.get(5)          # VTK_TRIANGLE
     if tris is None or len(tris) != mf.n_cells:
         raise ValueError("MeshField must consist of triangles only")

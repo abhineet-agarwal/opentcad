@@ -29,6 +29,13 @@ class LLMError(RuntimeError):
 
 @dataclass
 class ChatClient:
+    """A client for any OpenAI-compatible chat server (llama-server, Ollama,
+    LM Studio, vLLM), using only the standard library.
+
+    The defaults come from the environment when the client is created:
+    ``OPENTCAD_LLM_URL`` (else ``DEFAULT_URL``, a llama-server on this
+    machine), ``OPENTCAD_LLM_MODEL`` (else ``"local"``) and
+    ``OPENTCAD_LLM_API_KEY`` (else none). Nothing is sent anywhere else."""
     base_url: str = field(default_factory=lambda: os.environ.get(
         "OPENTCAD_LLM_URL", DEFAULT_URL))
     model: str = field(default_factory=lambda: os.environ.get(

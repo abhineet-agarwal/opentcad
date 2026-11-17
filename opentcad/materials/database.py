@@ -20,6 +20,10 @@ PARAMS_DIR = Path(__file__).parent / "params"
 
 
 class MobilityConstant(BaseModel):
+    """Constant low-field mobilities [cm²/V/s] and their uncertainty [%].
+
+    Field defaults are silicon's values; the required fields (see
+    ``load_material``) must still be given in a material file."""
     electron_cm2_Vs: float = 1350.0
     hole_cm2_Vs: float = 480.0
     uncertainty_percent: float = 5.0
@@ -61,6 +65,11 @@ class MobilityKlaassen(BaseModel):
 
 
 class Recombination(BaseModel):
+    """SRH lifetimes [s], trap energy relative to mid-gap [eV], Auger
+    coefficients [cm⁶/s] and the radiative coefficient [cm³/s].
+
+    Field defaults are silicon's values; the required fields (see
+    ``load_material``) must still be given in a material file."""
     tau_n_s: float = 1e-5       # [s] electron SRH lifetime
     tau_p_s: float = 1e-5       # [s] hole SRH lifetime
     Et_eV: float = 0.0          # trap energy re mid-gap [eV]
@@ -70,6 +79,11 @@ class Recombination(BaseModel):
 
 
 class BandStructure(BaseModel):
+    """Band gap [eV], electron affinity [eV], effective densities of states
+    and intrinsic density at 300 K [cm⁻³], and relative permittivity.
+
+    Field defaults are silicon's values; the required fields (see
+    ``load_material``) must still be given in a material file."""
     Eg_eV_300K: float = 1.124
     electron_affinity_eV: float = 4.05
     Nc_cm3_300K: float = 2.86e19
@@ -79,6 +93,11 @@ class BandStructure(BaseModel):
 
 
 class VelocitySaturation(BaseModel):
+    """Saturation velocities [cm/s] and Caughey–Thomas exponents β used by
+    the ``Canali`` high-field model.
+
+    Field defaults are silicon's values; the required fields (see
+    ``load_material``) must still be given in a material file."""
     vsat_e_cm_s: float = 1.02e7
     vsat_h_cm_s: float = 0.72e7
     beta_e: float = 2.0

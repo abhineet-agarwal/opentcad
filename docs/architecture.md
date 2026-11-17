@@ -1,0 +1,121 @@
+# Architecture
+
+## Design principles
+
+These shape every module and are what reviewers check:
+
+1. **One data contract.** Every module boundary passes a `MeshField`. Geometry,
+   doping, contacts and provenance travel together; no raw arrays cross layers.
+2. **Fixed units.** µm for space, cm⁻³ for concentration, K for device temperature,
+   °C for process temperatures, eV for energy, V for voltage. Conversions (e.g. to
+   DEVSIM's cm) happen inside the module that needs them.
+3. **No silent defaults.** Missing inputs are errors or flagged assumptions.
+   Unknown keys in files are errors. Material files must give the fields a
+   simulation needs, and models refuse parameters that were filled in for them.
+   When something is approximated, the code and docs say so.
+4. **Evidence for physics.** A physics feature comes with a quantitative check
+   against an analytic result, a published table or a reference model
+   ([validation.md](validation.md)).
+5. **Extensible from outside.** Built-in steps, analyses, models, metrics and data
+   go through the same registries that plugins use. The core never imports
+   applications (`examples/`) or optional front ends (`gui/`, `assist/`).
+6. **Local and private by default.** No network access unless configured: the
+   assistant talks to a model server you choose, and the catalog has no publish
+   path.
+
+## Data flow
+
+```
+ Structure ─┐                       ┌─► topography_to_meshfield ─► carry_structure ─┐
+            ├─► run_recipe ─ simulate (ViennaLS level sets)                         ├─► MeshField
+ Recipe ────┘      │                                                                │
+                   └─ (no topography) Structure.to_meshfield ───────────────────────┘
+                                                                                     │
+                       apply_doping_recipe (implant / anneal, on the mesh) ◄─────────┘
+                                                                                     │
+                                                    DeviceSolver (DEVSIM) ◄──────────┘
+                                                     iv · cv · transient · ac · fields
+```
+
+The file layer sits on top of the same objects:
+- `opentcad.io.deck` turns a YAML/JSON simulation file into a `Structure`, a
+  `Recipe`, mesh settings, a `PhysicsConfig` and analyses, and `run_deck` runs it.
+- `opentcad.io.sweep` varies fields of such a file and extracts metrics.
+- The CLI (`opentcad.cli`) and the GUI (`opentcad.gui`) are thin front ends over
+  them.
+
+## The MeshField contract
+
+Defined in [`opentcad/geometry/formats.py`](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/geometry/formats.py): a
+`pyvista.UnstructuredGrid` of triangles plus:
+
+| Field | Where | Meaning |
+|---|---|---|
+| `material_id` | cell data | `Material` enum value |
+| `Nd`, `Na` | point data, cm⁻³ | Total donors / acceptors (what the solver reads) |
+| `C_<species>` | point data, cm⁻³ | Per-species concentration from implants (`mf.get_species("boron")`) |
+| `Potential`, `Electrons`, `Holes` | point data | Present on solver snapshots |
+| `contacts` | list of `ContactTag` | Name, boundary nodes, type, work function, flat-band shift |
+| `process_history` | list of `ProcessStep` | Provenance |
+| `metadata` | dict | Structure name, contact materials, solution biases… |
+
+`mf.save(path)` writes `.vtu` plus a `.json` sidecar with every contact field and a
+`meshfield_format` version. `MeshField.load` reads older files, and refuses newer
+formats rather than misreading them.
+
+## Modules
+
+```
+opentcad/
+├── geometry/     Structure DSL, Gmsh meshing, MeshField
+├── process/      run_recipe; structure_transfer (structure → processed mesh)
+│   ├── topography/  Recipe DSL, ViennaLS simulator, level-set → mesh bridge, Deal–Grove
+│   └── doping/      Pearson implant, intrinsic + Fair anneal, data tables
+├── device/       DeviceSolver (DEVSIM), physics models, extraction, built-in analyses/metrics
+├── materials/    Material parameter files and loader
+├── io/           Simulation files (deck.py) and sweeps (sweep.py)
+├── plugins.py    Registries: steps, analyses, physics models, metrics, data folders
+├── cli.py        opentcad check | run | sweep | plugins | catalog
+├── viz/          Figure data on the mesh (fields.py), palette, Plotly figures
+├── catalog/      Private process catalog (records, store, checks, import/export)
+├── assist/       Drafting files / catalog records with a local open-weights model (optional)
+├── gui/          Streamlit builder + assistant pages (optional)
+└── bridge/       Interpolating doping between separate meshes
+```
+
+Outside the package:
+- `tests/` has one folder per area.
+- `examples/` holds tutorial scripts, simulation files and catalog fixtures.
+- `validation/` holds reference checks such as SKY130.
+- `docs/` holds this documentation (GitBook; `docs/api/` is generated by
+  `tools/gen_api_docs.py`).
+
+## Extension points
+
+`opentcad.plugins` holds the registries ([plugins.md](plugins.md)):
+
+| Registry | Adds | Used by |
+|---|---|---|
+| `register_step` | Recipe steps (topography or doping stage) | `run_recipe`, `Recipe.add`, simulation files |
+| `register_analysis` | Solver analyses `fn(solver, **kw)` | `DeviceSolver.run`, simulation files |
+| `register_model` | Mobility / recombination / BGN / statistics models | `PhysicsConfig`, simulation files |
+| `register_metric` | Numbers from analysis results | Sweeps |
+| `register_data_dir` | Material files, implant and diffusion tables | `load_material`, species lookup |
+
+Installed packages declare an `opentcad.plugins` entry point and are loaded on the
+first registry lookup. A name defined twice is an error, never an override.
+`OPENTCAD_DISABLE_PLUGINS=1` runs the core alone.
+
+## Optional dependencies
+
+The core needs numpy, scipy, pyvista, pydantic, gmsh, devsim, matplotlib and pyyaml.
+The extras are:
+
+| Extra | Adds | Without it |
+|---|---|---|
+| `topography` | ViennaLS | Topography steps raise an error naming ViennaLS; everything else works |
+| `gui` | Streamlit, Plotly | No GUI or interactive figures |
+| `dev` | pytest, ruff, mypy | — |
+
+Tests that need an optional backend skip without it. A clean wheel install with no
+extras passes the test suite ([releasing.md](releasing.md)).

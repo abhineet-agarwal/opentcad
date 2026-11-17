@@ -54,7 +54,16 @@ class MobilityModel(ABC):
 
     @abstractmethod
     def attach(self, ds, device: str, region: str, params, T_K: float) -> None:
-        ...
+        """Register this model's DEVSIM parameters and node/edge models on
+        one semiconductor region. The solver calls it once per region.
+
+        Args:
+            ds: the ``devsim`` module.
+            device: DEVSIM device name.
+            region: DEVSIM region name.
+            params: the region's ``MaterialParams``.
+            T_K: lattice temperature [K].
+        """
 
     @abstractmethod
     def mu_n_expr(self) -> str:
@@ -96,7 +105,10 @@ class RecombinationModel(ABC):
     @abstractmethod
     def attach(self, ds, device: str, region: str, params, T_K: float,
                n_i_expr: str = "n_i") -> None:
-        ...
+        """Register the node model named ``term_name`` and its derivatives
+        with respect to Electrons and Holes on one semiconductor region.
+        Arguments are as for ``MobilityModel.attach``; ``n_i_expr`` is the
+        expression to use for the (effective) intrinsic density."""
 
 
 class BandgapNarrowingModel(ABC):
@@ -119,7 +131,8 @@ class BandgapNarrowingModel(ABC):
 
     @abstractmethod
     def attach(self, ds, device: str, region: str, params, T_K: float) -> None:
-        ...
+        """Register ``n_i_eff`` (or nothing, for ``NoBGN``) on one
+        semiconductor region. Arguments are as for ``MobilityModel.attach``."""
 
     @abstractmethod
     def n_i_expr(self) -> str:

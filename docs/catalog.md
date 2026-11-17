@@ -28,7 +28,7 @@ opentcad catalog --root /tmp/my-catalog export --flow demo:resist-split --format
 relative to the current directory. Only `init`, `import` and `attach` create a
 collection; `list`, `show`, `check` and `export` on a missing one report an error
 instead of leaving an empty directory behind. Every record is private. The fictional CC0
-[fixtures](../examples/catalog/README.md) preserve a split, sample parents, planned
+[fixtures](https://github.com/abhineet-agarwal/opentcad/blob/main/examples/catalog/README.md) preserve a split, sample parents, planned
 metrology and an intentionally ambiguous bake duration. They supply no calibration
 or measured result. Adapt their structure to your own records; their values are not
 approved tool settings.
@@ -65,7 +65,7 @@ CSV columns are `kind,id,title,manufacturer,model,operations,facility,model_id,v
 product,generic_material,lot,product_id`. Operations use semicolons. Blank optional
 cells remain unspecified. Rich properties, conditions, sources, calibration and
 process graphs belong in JSON or YAML. Unknown schema fields are errors, rather
-than silently discarded. See [equipment.csv](../examples/catalog/equipment.csv).
+than silently discarded. See [equipment.csv](https://github.com/abhineet-agarwal/opentcad/blob/main/examples/catalog/equipment.csv).
 
 The current kinds are `material`, `material_product`, `material_lot`,
 `equipment_model`, `equipment_instance` and `process_flow`. All have `schema_version`,

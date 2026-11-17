@@ -5,7 +5,7 @@ The first [private local catalog slice](catalog.md) is implemented: typed
 materials/products/lots, equipment models/instances and descriptive process graphs;
 JSON/YAML and inventory CSV imports; opaque local attachment snapshots; revisioned
 storage and pinned JSON/runsheet exports; and optional model-generated private drafts
-for explicit review. The [teaching fixture](../examples/catalog/README.md) includes
+for explicit review. The [teaching fixture](https://github.com/abhineet-agarwal/opentcad/blob/main/examples/catalog/README.md) includes
 a split, planned metrology and an unresolved setting. This is not the bounded
 process-import acceptance gate below: PDF/OCR extraction, public contribution,
 calibrated propagation and automatic calibration proposals remain unimplemented.
@@ -30,7 +30,7 @@ exact; outputs remain conditional on data, approximations and validation evidenc
 | Gmsh geometry, ViennaLS topography, DEVSIM device path | Additional backends with declared support and conversion losses |
 
 See [simulation files](simulation_files.md), [plugins](plugins.md) and
-[architecture](../README.md#architecture). Current deck checks are not full scientific
+[architecture](architecture.md). Current deck checks are not full scientific
 capability validation. Material enum entries exceed shipped parameter files; plugins
 cannot yet add enum members. Recipes stage all topography before doping, so arbitrary
 process interleaving is unsupported. Installed plugin discovery imports Python code;

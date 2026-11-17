@@ -38,6 +38,15 @@ def _cyclic(nodes, edges):
 
 
 def check_record(record, catalog=None) -> Assessment:
+    """Assess a record: is it structurally valid, and what is missing?
+
+    Gaps go into ``Assessment.issues``: unpinned or unresolvable
+    references, the wrong kind of referenced record, missing or out-of-date
+    calibration, and similar. ``compatibility`` is ``"incompatible"`` if a
+    declared conflict was found, ``"needs_information"`` if any issue is
+    above ``info``, and ``"no_declared_conflicts"`` otherwise. References
+    are resolved in ``catalog`` when one is given; without one they are
+    reported as unresolved."""
     issues = []
     incompatible = False
 
