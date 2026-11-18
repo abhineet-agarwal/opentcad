@@ -10,10 +10,12 @@ opentcad run   examples/decks/nmos_implanted.yaml        # → nmos_implanted.re
 opentcad run   deck.yaml -o out.json --vtu mesh.vtu      # also save the final MeshField
 opentcad sweep examples/decks/nmos_tox_sweep.yaml        # parameter sweep → table.csv
 opentcad plugins                                         # what steps/analyses/models exist
+opentcad design run examples/design/pn_current.yaml -o out/   # search doping for a target
 ```
 
 `python -m opentcad ...` works the same; `pip install -e .` installs the
-`opentcad` command. Exit status: 0 success, 1 the file has problems, 2 the
+`opentcad` command. `opentcad design` has its own page:
+[Device design from specifications](design.md). Exit status: 0 success, 1 the file has problems, 2 the
 run failed. DEVSIM's per-iteration output is hidden unless `--verbose`.
 
 From Python:

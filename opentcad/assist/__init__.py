@@ -10,7 +10,8 @@ vLLM). Optional: the core never imports it.
 from .client import ChatClient, LLMError
 
 __all__ = ["ChatClient", "LLMError", "Draft", "Flag", "draft_deck",
-           "request_numbers", "unstated_values", "CatalogDraft", "draft_catalog"]
+           "request_numbers", "unstated_values", "CatalogDraft", "draft_catalog",
+           "DesignDraft", "draft_design"]
 
 
 def __getattr__(name):
@@ -21,4 +22,7 @@ def __getattr__(name):
     if name in {"CatalogDraft", "draft_catalog"}:
         from . import catalog
         return getattr(catalog, name)
+    if name in {"DesignDraft", "draft_design"}:
+        from . import design
+        return getattr(design, name)
     raise AttributeError(name)

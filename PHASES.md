@@ -175,4 +175,12 @@ docs/assistant.md) and Plotly figures (opentcad.viz) ✓. Documentation ✓
 API reference generated from the docstrings by tools/gen_api_docs.py; checked
 by tests/docs). Next: GDS import, the first PyPI upload. Packaging ready ✓ (clean
 wheel install passes its tests; docs/releasing.md). Solution-field maps ✓
-(DeviceSolver.snapshot, `fields` analysis).
+(DeviceSolver.snapshot, `fields` analysis). Device design from
+specifications, first slice ✓ (opentcad.design, `opentcad design check | run |
+draft`, docs/design.md): adaptive coordinate search over existing numeric
+geometry, doping and recipe fields of one file, with its physics, mesh and
+analyses fixed and every candidate kept as evidence. A local model can draft
+the plan; drafting never runs it, and the model's open questions block a run
+until they are resolved. Not in this slice:
+changing topology, new process models. Open: a global or gradient-based
+search, candidates in parallel.

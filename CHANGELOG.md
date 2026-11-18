@@ -61,6 +61,15 @@
   end within 10 % of SkyWater's model card; Ion is 38 % low. The fitted
   mobility values are effective, not physical. The SKY130 reference now also
   has Id–Vgs curves and a body-effect table.
+- **Device design.** `opentcad design check | run | draft` (`opentcad.design`):
+  a plan names existing numeric geometry, doping or recipe fields of one
+  simulation file, with bounds, and targets on its IV/CV analyses.
+  `run` is a bounded adaptive coordinate search with real simulations; the
+  file's physics, mesh and analyses stay fixed. Every candidate, failed ones
+  included, is kept as evidence. `draft` asks a configured model for a plan
+  in a schema narrowed to the file. The plan is checked but never run, and the
+  model's questions block a run until resolved. Example:
+  `examples/design/pn_current.yaml`; guide: docs/design.md.
 - **Figures and GUI.**
   - Figures computed exactly on the mesh (`opentcad.viz`).
   - Interactive Plotly figures.

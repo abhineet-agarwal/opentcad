@@ -50,7 +50,8 @@ V, I = solver.iv_sweep("anode", "cathode", v_start=0.0, v_end=0.7, v_step=0.05)
   - Analyses: I–V, C–V, transient, small-signal AC and field snapshots.
 - **Workflow:**
   - Plain-text simulation files that are checked before they run; parameter
-    sweeps with extracted metrics.
+    sweeps with extracted metrics; a bounded design search that meets metric
+    targets by varying existing fields of a file.
   - A plugin system; a browser GUI; a drafting assistant on a local open-weights
     model; a private process catalog.
 

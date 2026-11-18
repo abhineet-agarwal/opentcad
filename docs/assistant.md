@@ -89,3 +89,7 @@ On an M4 with 16 GB, Qwen2.5-3B-Instruct (Q4_K_M, about 2 GB) does well at
 
 Writing a whole MOSFET from scratch needs a larger model (7B or more,
 e.g. Qwen2.5-7B-Instruct, about 5 GB at Q4). Or start from a template.
+
+The same model and server also draft design plans from a specification
+(`opentcad design draft`): what to vary in an existing file, and the
+targets to meet. See [Device design from specifications](design.md).

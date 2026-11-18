@@ -48,6 +48,7 @@ first slice, a [private local catalog](docs/catalog.md), already exists.
 | Analyses: I–V, C–V, transient, small-signal AC, field snapshots | Working | Equilibrium snapshot matches pn analytics to 1 mV |
 | SKY130 NMOS threshold check | Passes (Phase 2 exit) | Vth +17.7 % (max-gm), +9.6 % (100 nA·W/L) vs SkyWater's model card |
 | Simulation files, CLI, parameter sweeps | Working | Every point checked before running |
+| Device design from specifications (`opentcad design`) | First slice | Bounded search over existing fields of a file; every candidate kept as evidence; a local model can draft plans, which never run by themselves |
 | Plugins (steps, analyses, models, metrics, data) | Working | Entry-point discovery; clashes are errors |
 | GUI with a local open-weights assistant | Working | Drafts are checked, repaired and every assumed value flagged |
 | Private process catalog | First slice | Import, check, pinned export, runsheets |
@@ -68,6 +69,7 @@ pip install -e ".[gui]"                 # optional: Streamlit + Plotly GUI
 opentcad check examples/decks/nmos_implanted.yaml     # validate a simulation file
 opentcad run   examples/decks/nmos_implanted.yaml     # run it → results JSON (+ field .vtu)
 opentcad sweep examples/decks/nmos_tox_sweep.yaml     # Vth and Id vs oxide → table.csv
+opentcad design run examples/design/pn_current.yaml -o out/   # doping that meets a current target
 streamlit run opentcad/gui/app.py                     # GUI; "assistant" page in the sidebar
 ```
 
@@ -101,7 +103,7 @@ isolation flow.
          implant, anneal, plugins…) ─────┘   + meshing      doping, species, Poisson + DD)  field maps
                                              + doping        contacts,
                                                              provenance)
- Simulation file (YAML) = Structure + Recipe + mesh + physics + analyses  →  opentcad check / run / sweep
+ Simulation file (YAML) = Structure + Recipe + mesh + physics + analyses  →  opentcad check / run / sweep / design
 ```
 
 Every module boundary passes a **`MeshField`**: a triangle mesh with per-cell
@@ -119,7 +121,7 @@ manual and published with GitBook:
 |---|---|
 | Getting started | [Installation](docs/installation.md), [Quickstart](docs/getting_started.md) |
 | Tutorials | [Five tutorials](docs/tutorials/README.md), from a p-n junction to LOCOS, and an [example gallery](docs/tutorials/examples.md) |
-| User guide | [Concepts](docs/concepts.md), [Simulation files](docs/simulation_files.md), [Process](docs/process.md), [Device physics](docs/device_physics.md), [Visualization](docs/visualization.md), [Assistant](docs/assistant.md), [Process catalog](docs/catalog.md) |
+| User guide | [Concepts](docs/concepts.md), [Simulation files](docs/simulation_files.md), [Device design](docs/design.md), [Process](docs/process.md), [Device physics](docs/device_physics.md), [Visualization](docs/visualization.md), [Assistant](docs/assistant.md), [Process catalog](docs/catalog.md) |
 | API reference | [Every public class and function](docs/api/README.md), generated from the docstrings |
 | Development | [Contributing](docs/contributing.md), [Architecture](docs/architecture.md), [Plugins](docs/plugins.md), [Validation](docs/validation.md), [Releasing](docs/releasing.md) |
 

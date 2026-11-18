@@ -1,0 +1,31 @@
+# Workflow illustration, not a measured or calibrated device specification.
+# Baseline existing PN deck: |I(0.5 V)| = 2.092617072191966e-6 A/cm.
+# Target is 80% of that baseline, with a +/-5% relative acceptance interval.
+version: 1
+name: pn_current_design
+description: Tune p-body doping in the existing abrupt PN diode family.
+base: ../decks/pn_diode.yaml
+variables:
+  - path: structure.layers[0].doping_Na
+    lower: 1e16
+    upper: 1e18
+    initial: 1e17
+    scale: log
+targets:
+  - name: forward_current
+    analysis: forward
+    metric: value_at
+    options: {x: 0.5}
+    lower: 1.590388974865894e-6
+    upper: 1.7577983406412515e-6
+    scale: 1.674093657753573e-6
+    unit: A/cm
+search: {max_evaluations: 8, initial_step: 0.25, min_step: 0.01}
+assumptions:
+  - The target is an illustrative 20% reduction from a numerical baseline, not a measurement.
+  - Only p-body acceptor doping varies; all other deck settings remain fixed.
+limitations:
+  - This is a bounded parameter-search demonstration within one PN diode topology.
+  - Current is the two-dimensional solver current per out-of-plane width in A/cm.
+  - Fixed mesh and physics have not been independently calibrated or convergence certified.
+unresolved: []
