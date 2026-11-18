@@ -809,10 +809,31 @@ def deck_from_dict(data: dict) -> Deck:
                     if c not in contact_names:
                         probs.add(f"analyses[{i}].{k}.{c}", f"no contact named {c!r}")
 
+    if device is not None and struct is not None:
+        _check_device_materials(struct, device, probs)
+
     probs.raise_if_any()
     return Deck(name=name, structure=struct, recipe=recipe,
                 description=description, mesh_size_um=mesh_size,
                 grid_delta_um=grid_delta, device=device, analyses=analyses)
+
+
+def _check_device_materials(struct: Structure, device: DeviceSettings, probs) -> None:
+    """Every layer and region material needs a parameter file before the
+    device solver can use it; say so now rather than when the run starts.
+    (Deposited recipe materials aren't checked: they may be etched away.)"""
+    from opentcad.plugins import data_dirs, find_data_file
+    have = sorted({f.stem for d in data_dirs("materials") for f in d.glob("*.yaml")})
+    for kind, items in (("layers", struct.layers), ("regions", struct.regions)):
+        for i, item in enumerate(items):
+            sym = material_symbol(item.material)
+            process = device.material_process.get(sym)
+            relative = f"{process}/{sym}.yaml" if process else f"{sym}.yaml"
+            if find_data_file("materials", relative) is None:
+                probs.add(f"structure.{kind}[{i}].material",
+                          f"{sym!r} has no material parameter file ({relative}), so the "
+                          f"device solver can't use it; materials with one: {have}. "
+                          "A metal electrode is a contact on a surface, not a layer.")
 
 
 def example_decks_dir() -> Path:

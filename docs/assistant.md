@@ -2,8 +2,10 @@
 
 Describe a device, or a change to one, in plain language. A model running
 on your own machine drafts the [simulation file](simulation_files.md), and
-OpenTCAD checks it. You then review every value the model chose, edit,
-and run it. Nothing leaves your machine.
+OpenTCAD checks it. It's a conversation: the reply says what changed, which
+values the model chose and what it wants to know. You answer, correct or ask
+for the next change, and run results come back into it. You review every
+value, edit, and run the file. Nothing leaves your machine.
 
 ## Start a model server
 
@@ -32,21 +34,28 @@ streamlit run opentcad/gui/app.py      # then "assistant" in the sidebar
 
 1. **Start from** a template (pn diode, implanted NMOS), the file in the
    editor, or nothing.
-2. **Describe** the device or the change, e.g. *"Make the gate oxide 4 nm
-   and sweep Vgs to 1.8 V"*.
-3. **Review.**
-   - The page lists every value in the file that wasn't in your request,
-     with the model's reason where it gave one.
-   - When you started from a file, it also lists every change from that
-     file.
-   - Questions the model asks are shown, as are any problems left after
-     the automatic repair rounds.
-4. **Edit** the YAML if needed. It's re-checked as you go, and you can
-   download it or load your own.
-5. **Run.** You get the structure, a net-doping map with the p-n junction,
+2. **Describe** the device or the change in the chat box, e.g. *"Make the
+   gate oxide 4 nm and sweep Vgs to 1.8 V"*.
+3. **Read the reply.** OpenTCAD writes it from the checked file, not from
+   the model's prose:
+   - what changed, with old and new values;
+   - any problems left after the automatic repair rounds;
+   - how many values weren't in your messages (the Review table lists
+     each, with the model's reason where it gave one);
+   - the model's questions, numbered.
+4. **Answer in the next message**: answers to its questions, corrections
+   (*"use 5e17 on the p side"*) or the next change. The model gets the
+   conversation so far and the current file; a value you gave in any
+   earlier message isn't flagged again. **New conversation** starts over
+   and lets you pick a template again.
+5. **Edit** the YAML if needed. It's re-checked as you go, and you can
+   download it or load your own. The next message works on your edited file.
+6. **Run.** You get the structure, a net-doping map with the p-n junction,
    a doping profile at any x, and the analysis results. A `fields`
    analysis adds maps of the potential, electron and hole densities and
-   |E| at its bias.
+   |E| at its bias. A summary of the results, or the error if the run
+   failed, is added to the conversation, so you can reply to it (*"the
+   current is too low"*).
 
 From Python:
 
@@ -55,7 +64,18 @@ from opentcad.assist import ChatClient, draft_deck
 draft = draft_deck("Make the gate oxide 4 nm", client=ChatClient(),
                    current=load_deck("examples/decks/nmos_implanted.yaml").to_dict())
 draft.deck, draft.flags, draft.questions, draft.problems
+# The next turn: the conversation so far as context, the current file as the base.
+draft = draft_deck("Sweep Vgs to 1.8 V", client=ChatClient(), current=draft.deck.to_dict(),
+                   history=[{"role": "user", "content": "Make the gate oxide 4 nm"},
+                            {"role": "assistant", "content": "Changed the oxide to 4 nm."}])
 ```
+
+The model can only simulate what OpenTCAD models. A device that needs
+resistive switching (RRAM), phase change, ferroelectrics, tunnelling through
+an insulator, or metal layers is out of scope. The model is told to say so
+in its first question. The checker also refuses a device layer whose
+material has no parameter file. Today only Si and SiO₂ have one; a metal
+electrode is a contact on a surface, not a layer.
 
 ## How a draft is kept honest
 

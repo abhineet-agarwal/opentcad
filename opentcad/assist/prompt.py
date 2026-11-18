@@ -38,6 +38,13 @@ def _materials() -> list[str]:
     return [MATERIAL_SYMBOLS[m] for m in Material if m is not Material.VACUUM]
 
 
+def _device_materials() -> list[str]:
+    """Materials with a parameter file: the only ones a device layer can use."""
+    from opentcad.plugins import data_dirs
+    have = {f.stem for d in data_dirs("materials") for f in d.glob("*.yaml")}
+    return [m for m in _materials() if m in have]
+
+
 def _species_ranges() -> dict[str, tuple[str, float, float]]:
     """canonical species → (symbol, min keV, max keV) from the implant tables."""
     from opentcad.process.doping.pearson_iv import _read_yaml, _species_index
@@ -225,7 +232,9 @@ def reference_sheet() -> str:
     out = ["UNITS: lengths µm (1 nm = 0.001 µm), doping cm^-3, implant energy keV, "
            "dose cm^-2, process temperatures °C, times s, device temperature K, "
            "voltages V.",
-           f"MATERIALS: {', '.join(_materials())}.",
+           f"MATERIALS: {', '.join(_materials())}. Only {', '.join(_device_materials())} "
+           "have parameter files, so only they can be layers or regions of a file with a "
+           "device section; the others are for process steps (masks, deposits).",
            f"CONTACTS: surface top|bottom; type {'|'.join(CONTACT_TYPES)} "
            "(a contact on an insulator layer is a gate: metal on oxide).",
            "RECIPE STEPS (field: type = default):"]
@@ -293,6 +302,13 @@ Rules:
    source, hold_contacts {"drain": Vds}, measure_contact drain.
 7. When editing an existing file, change only what the user asks for and keep
    everything else identical.
+8. OpenTCAD solves Poisson and drift-diffusion in semiconductors, with
+   insulators as dielectrics. It has no resistive switching (RRAM, filaments),
+   phase change, ferroelectrics, magnetism, tunnelling through insulators or
+   metal layers (a metal electrode is a contact on a surface). If the request
+   needs any of these, the first entry of "questions" must say which part
+   OpenTCAD can't simulate, and the file must not pretend to model it.
+9. Layer, region, contact and analysis names must each be unique.
 """
 
 

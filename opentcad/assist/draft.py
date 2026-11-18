@@ -165,13 +165,41 @@ def _parse_reply(text: str) -> dict:
     return data
 
 
+HISTORY_CHARS = 12000          # conversation context kept for the model
+
+
 def draft_deck(request: str, *, client, current: Optional[dict] = None,
+               history: Optional[list[dict]] = None,
                max_repairs: int = 2, constrained: bool = True) -> Draft:
     """Turn ``request`` into a checked simulation file using ``client``
     (anything with ``chat(messages, json_schema=...) -> str``). With
-    ``current`` (a simulation-file dict) the request edits that file."""
+    ``current`` (a simulation-file dict) the request edits that file.
+
+    ``history`` is the conversation so far, oldest first, as
+    ``{"role": "user" | "assistant", "content": text}``: earlier requests,
+    the answers to the model's questions, summaries of earlier drafts and run
+    results. The model reads it as context; the newest turns are kept when it
+    is longer than ``HISTORY_CHARS``. The file itself always comes from
+    ``current``, never from the history."""
     schema = response_schema(deck_json_schema() if constrained else None)
     messages = [{"role": "system", "content": system_prompt()}]
+    kept: list[dict] = []
+    used = 0
+    for turn in reversed(history or []):
+        if turn.get("role") not in ("user", "assistant") or not isinstance(
+                turn.get("content"), str):
+            continue
+        used += len(turn["content"])
+        if used > HISTORY_CHARS:
+            break
+        kept.append({"role": turn["role"], "content": turn["content"]})
+    if kept:
+        messages.append({"role": "user", "content":
+                         "Our conversation so far (context only; the current file "
+                         "follows separately):\n" + "\n".join(
+                             f"{t['role']}: {t['content']}" for t in reversed(kept))})
+        messages.append({"role": "assistant", "content":
+                         "Understood. I'll use it as context for the next change."})
     if current is not None:
         messages.append({"role": "user", "content":
                          "Current simulation file:\n"
@@ -221,7 +249,11 @@ def draft_deck(request: str, *, client, current: Optional[dict] = None,
     # "declared" that the request did state is not flagged.
     if draft.data is not None:
         source = draft.deck.to_dict() if draft.deck is not None else draft.data
-        for path, value in unstated_values(request, source, previous=current):
+        # Everything the user has said counts as stated, not just this message.
+        said = " ".join([t["content"] for t in history or []
+                         if t.get("role") == "user" and isinstance(t.get("content"), str)]
+                        + [request])
+        for path, value in unstated_values(said, source, previous=current):
             a = declared.get(path, {})
             reason = a.get("reason", "") if isinstance(a.get("reason"), str) else ""
             draft.flags.append(Flag(path, value, reason, declared=path in declared))

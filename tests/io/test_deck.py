@@ -207,3 +207,20 @@ def test_cli_plugins_lists_registries(capsys):
     assert cli_main(["plugins"]) == 0
     out = capsys.readouterr().out
     assert "implant" in out and "lombardi" in out and "Entry-point plugins: none" in out
+
+
+def test_device_layers_need_a_material_parameter_file():
+    """An Al layer is fine as geometry but the device solver has no Al
+    parameters, so a file with a device section is refused at check time."""
+    from opentcad.io.deck import DeckError, deck_from_dict
+    data = {"version": 1, "name": "mim", "structure": {"width_um": 1.0, "layers": [
+                {"name": "bottom", "thickness_um": 0.1, "material": "Al"},
+                {"name": "ox", "thickness_um": 0.05, "material": "SiO2"}],
+            "contacts": [{"name": "a", "x_um": [0, 1], "layer": "bottom",
+                          "surface": "bottom"}]}}
+    deck_from_dict(data)                                  # geometry only: fine
+    data["device"] = {"physics": {"mobility": "constant"}}
+    with pytest.raises(DeckError, match=r"structure\.layers\[0\]\.material.*parameter file"):
+        deck_from_dict(data)
+    data["structure"]["layers"][0]["material"] = "Si"
+    deck_from_dict(data)

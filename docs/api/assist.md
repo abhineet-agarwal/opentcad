@@ -14,6 +14,7 @@ opentcad.assist.draft_deck(
     *,
     client,
     current: Optional[dict] = None,
+    history: Optional[list[dict]] = None,
     max_repairs: int = 2,
     constrained: bool = True,
 ) -> Draft
@@ -23,7 +24,14 @@ Turn ``request`` into a checked simulation file using ``client``
 (anything with ``chat(messages, json_schema=...) -> str``). With
 ``current`` (a simulation-file dict) the request edits that file.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/assist/draft.py#L168)
+``history`` is the conversation so far, oldest first, as
+``{"role": "user" | "assistant", "content": text}``: earlier requests,
+the answers to the model's questions, summaries of earlier drafts and run
+results. The model reads it as context; the newest turns are kept when it
+is longer than ``HISTORY_CHARS``. The file itself always comes from
+``current``, never from the history.
+
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/assist/draft.py#L171)
 
 ## Draft
 

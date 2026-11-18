@@ -15,7 +15,7 @@ opentcad.io.load_deck(source) -> Deck
 Read and check a simulation file (``.yaml``/``.yml``/``.json`` path),
 or a dict already parsed. Raises DeckError listing every problem.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L827)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L848)
 
 ## run_deck
 
@@ -27,7 +27,7 @@ Run a deck: build the structure, run the recipe (topography, mesh,
 doping), then — if the deck has a ``device`` section — create one
 DeviceSolver and run the analyses on it in order.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L911)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L932)
 
 ## save_deck
 
@@ -37,7 +37,7 @@ opentcad.io.save_deck(deck: Deck, path) -> Path
 
 Write ``deck`` as YAML (or JSON for a ``.json`` path).
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L865)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L886)
 
 ## dumps_deck
 
@@ -47,7 +47,7 @@ opentcad.io.dumps_deck(deck: Deck) -> str
 
 The deck as YAML text.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L859)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L880)
 
 ## deck_from_dict
 
@@ -101,7 +101,7 @@ class opentcad.io.DeckResult(
 
 What ``run_deck`` produced.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L878)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L899)
 
 ### DeckResult.analyses_to_dict
 
@@ -200,4 +200,4 @@ The bundled example simulation files (also the assistant's
 templates): inside the package when installed from a wheel,
 ``examples/decks`` in a source checkout.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L818)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L839)

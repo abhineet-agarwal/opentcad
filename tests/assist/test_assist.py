@@ -209,3 +209,39 @@ def test_client_reports_an_unreachable_server():
                    timeout_s=2)
     with pytest.raises(LLMError, match="cannot reach the model server"):
         c.chat([{"role": "user", "content": "hi"}])
+
+
+def test_reference_sheet_says_which_materials_a_device_can_use():
+    from opentcad.assist.prompt import _INSTRUCTIONS, reference_sheet
+    line = next(l for l in reference_sheet().splitlines() if l.startswith("MATERIALS"))
+    assert "Only Si, SiO2 have parameter files" in line
+    assert "resistive switching" in _INSTRUCTIONS and "must each be unique" in _INSTRUCTIONS
+
+
+def test_conversation_history_is_context_and_counts_as_stated():
+    """Earlier turns go to the model as context; a value the user gave in an
+    earlier message isn't flagged as assumed when the model applies it now."""
+    from opentcad.assist import draft_deck
+    from opentcad.io.deck import example_decks_dir, load_deck
+    current = load_deck(example_decks_dir() / "pn_diode.yaml").to_dict()
+    changed = json.loads(json.dumps(current))
+    changed["structure"]["layers"][0]["doping_Na"] = 3e17
+
+    class Scripted:
+        def __init__(self):
+            self.messages = None
+
+        def chat(self, messages, **kw):
+            self.messages = messages
+            return json.dumps({"deck": changed, "assumptions": [], "questions": []})
+
+    client = Scripted()
+    history = [{"role": "user", "content": "Raise the p-side doping to 3e17"},
+               {"role": "assistant", "content": "Questions for you:\n1. Which side?"}]
+    d = draft_deck("the p side, as I said", client=client, current=current, history=history)
+    assert not d.problems
+    context = client.messages[1]["content"]
+    assert "Raise the p-side doping to 3e17" in context and "Which side?" in context
+    assert not [f for f in d.flags if f.path.endswith("doping_Na")]
+    d = draft_deck("the p side, as I said", client=Scripted(), current=current)
+    assert [f for f in d.flags if f.path.endswith("doping_Na")]

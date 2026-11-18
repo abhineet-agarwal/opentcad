@@ -92,8 +92,10 @@ class Structure:
     def _add(self, name, thickness_um, material, doping_Na, doping_Nd):
         if thickness_um <= 0:
             raise ValueError(f"Layer '{name}' thickness must be > 0, got {thickness_um}")
-        if any(l.name == name for l in self._layers):
-            raise ValueError(f"Duplicate layer name '{name}'")
+        for i, other in enumerate(self._layers):
+            if other.name == name:
+                raise ValueError(f"Duplicate layer name '{name}' (layers[{i}] has it too); "
+                                 "layer names must be unique")
         self._layers.append(LayerSpec(name, thickness_um, material, doping_Na, doping_Nd))
         return self
 

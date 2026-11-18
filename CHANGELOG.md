@@ -49,6 +49,9 @@
   regions (a resistor) are unchanged. Convergence is slower (about 3× on the
   example NMOS) because the force's density dependence is left out of the
   Jacobian.
+- **Simulation files with a device section** must use layer and region
+  materials that have a parameter file; `opentcad check` now says so instead
+  of the run failing. Duplicate layer names name both layers.
 - **Chained analyses.** Each analysis on a solver starts from zero bias, so a
   second sweep on the same solver converges and gives the same answer as the
   first.
@@ -74,6 +77,14 @@
   quasi-Fermi driving force). The fitted
   mobility values are effective, not physical. The SKY130 reference now also
   has Id–Vgs curves and a body-effect table.
+- **Assistant conversation.** The GUI assistant is a chat about one
+  simulation file. Each reply is written from the checked file: what changed,
+  problems left, values the model chose, and its questions. You answer in the
+  next message, and run results come back into the chat. `draft_deck(...,
+  history=...)` passes the conversation so far as context; a value from any
+  earlier user message isn't flagged as assumed. The model is told which
+  materials have parameter files and that RRAM, phase change, ferroelectrics,
+  tunnelling and metal layers are out of scope.
 - **Device design.** `opentcad design check | run | draft` (`opentcad.design`):
   a plan names existing numeric geometry, doping or recipe fields of one
   simulation file, with bounds, and targets on its IV/CV analyses.
