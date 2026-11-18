@@ -46,7 +46,11 @@ so Newton on the continuity equations converges.
 ## Canali
 
 ```python
-class opentcad.device.models.Canali(base: Optional[MobilityModel] = None)
+class opentcad.device.models.Canali(
+    base: Optional[MobilityModel] = None,
+    driving_force: str = 'quasi_fermi',
+    density_ref_cm3: float = 1e15,
+)
 ```
 
 Canali high-field velocity-saturation mobility (1975).
@@ -54,13 +58,38 @@ Canali high-field velocity-saturation mobility (1975).
 Wraps an underlying low-field bulk model:
 
 ```
-mu_eff = mu_bulk / (1 + (mu_bulk*|E| / vsat)^beta)^(1/beta)
+mu_eff = mu_bulk / (1 + (mu_bulk*F / vsat)^beta)^(1/beta)
 ```
 
-where |E| is the field magnitude along the edge. In the low-field
-limit mu_eff -> mu_bulk; at high field the drift velocity saturates
-at vsat regardless of mu_bulk. Reference: Canali, Majni, Minder,
-Ottaviani, IEEE TED 22, 1045 (1975).
+In the low-field limit mu_eff -> mu_bulk; at high driving force F the
+drift velocity saturates at vsat regardless of mu_bulk. Reference:
+Canali, Majni, Minder, Ottaviani, IEEE TED 22, 1045 (1975).
+
+The driving force F on each mesh edge is one of:
+
+* ``"quasi_fermi"`` (default): the gradient of the carrier's quasi-Fermi
+  potential along the edge, phi_n = psi - V_t*ln(n/n_i) (the Boltzmann
+  form). Only the field that drives the current counts: across an
+  inversion layer the quasi-Fermi level is flat, so the gate field
+  doesn't slow carriers moving along the channel.
+* ``"efield"``: the electric field along the edge (the earlier
+  default). On a mesh whose edges are not aligned with the current, oblique
+  edges in a MOSFET channel pick up the vertical gate field, so
+  saturation is overstated: in the SKY130 NMOS check Ion is 38 % low
+  with it and 3.6 % low with ``"quasi_fermi"``.
+
+For ``"quasi_fermi"`` both densities in the logarithm are offset by
+``density_ref_cm3``. Where the carrier density is well above it the
+force is the quasi-Fermi gradient; well below, it tends to the electric
+field. Without the offset, minority carriers that drop by orders of
+magnitude over the last mesh edge before an ohmic contact see a large
+quasi-Fermi step there, and their diffusion is throttled (a forward p-n
+diode's current halves). The offset is a numerical choice, not a
+material parameter. In the Jacobian the force's density dependence is
+left out (its potential dependence is kept): with it, Newton's first
+update after a bias step diverges. The converged solution is unchanged.
+
+In a uniform resistor the two forces are the same.
 
 Composes with any MobilityModel:
 
@@ -160,7 +189,7 @@ derivative wrt ``Potential`` at each node is finite but
 averaging to edges smooths out the step; Newton converges.
 ```
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L244)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L307)
 
 ### Lombardi.requires_carriers
 

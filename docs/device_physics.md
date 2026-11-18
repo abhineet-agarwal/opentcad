@@ -41,7 +41,7 @@ complements the compact `flat_band_shift_V`.
 |---|---|---|
 | Mobility | `ConstantMobility` | Default; the file's `mobility_constant` |
 | Mobility | `Klaassen` | Unified low-field bulk mobility (1992), clustering and carrier–carrier scattering |
-| Mobility | `Canali` | High-field velocity saturation; wraps any base model |
+| Mobility | `Canali` | High-field velocity saturation; wraps any base model. `driving_force="quasi_fermi"` (default): the quasi-Fermi-potential gradient along each mesh edge, so a MOSFET's vertical gate field doesn't count; it tends to the field where the carrier density is far below `density_ref_cm3` (default 10¹⁵, a numerical choice). `"efield"`: the field along each edge, which overstates saturation on oblique channel edges (SKY130 Ion −38 % vs −3.6 %) |
 | Mobility | `Lombardi` | Surface mobility at Si/SiO₂ (bulk + acoustic phonon + surface roughness). `e_normal_axis="y"` (default), `"x"` or `"magnitude"`. Coefficients from the material file's `mobility_lombardi` block (Si.yaml: Darwish 1997) |
 | Recombination | `SRH` | Default; lifetimes from the file; mid-gap trap (n₁ = p₁ = n_i). The file's `Et_eV` is not used yet |
 | Recombination | `Auger` | Dominates above ~10¹⁸ cm⁻³ |

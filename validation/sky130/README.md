@@ -193,7 +193,8 @@ as effective values. It is not a physical calibration of surface mobility.
 
 L = 1 µm, against SkyWater's tt model card. "Electrostatics" is the device
 after stage 1 with literature mobility; "calibrated" adds the fitted mobility.
-Ion is at Vgs = Vds = 1.8 V with Canali velocity saturation.
+Ion is at Vgs = Vds = 1.8 V with Canali velocity saturation driven by the
+quasi-Fermi gradient (Canali's default).
 
 | | Phase 2 stand-in | Electrostatics | Calibrated | SkyWater |
 |---|---|---|---|---|
@@ -202,20 +203,29 @@ Ion is at Vgs = Vds = 1.8 V with Canali velocity saturation.
 | Subthreshold swing | 89.0 (+5.0 %) | 80.4 (−5.1 %) | 80.9 (−4.5 %) | 84.7 mV/dec |
 | Peak gm (50 mV) | 10.2 (−25.7 %) | 10.6 (−22.3 %) | 14.3 (+4.3 %) | 13.7 µS/µm |
 | Vgs at peak gm | 1.64 V | 1.20 V | 1.08 V | 0.82 V |
-| Ion | 85.5 (−38.8 %) | 86.5 (−38.1 %) | 86.7 (−37.9 %) | 139.6 µA/µm |
+| Ion | 84.5 (−39.5 %) | 116.7 (−16.4 %) | 134.5 (−3.6 %) | 139.6 µA/µm |
 | Linear Id–Vgs, rms vs SkyWater | 0.296 | 0.247 | 0.092 | — |
 
-Against the Phase 3 exit criterion (Vth, Ion and SS within 10 %), threshold and
-subthreshold swing now pass and Ion does not.
+Against the Phase 3 exit criterion (Vth, Ion and SS within 10 %), all three
+pass for the calibrated device. The saturation threshold at 100 nA·W/L is
+0.489 V against 0.529 V (−7.5 %).
 
-**Why Ion stays low.** Ion doesn't move with the low-field mobility at all:
-86.5 µA/µm before the mobility fit, 86.7 after. Without velocity saturation the
-same calibrated device gives 156 µA/µm, so Canali cuts the current by a factor
-of 1.8. For a 1 µm channel at these fields a long-channel estimate gives about
-1.2–1.4, and SkyWater's 139.6 µA/µm implies 1.1. Our hypothesis, not yet
-tested: Canali's driving force is the electric field along each mesh edge. In
-an inversion layer on a triangular mesh, diagonal edges also see the large
-vertical gate field, so velocity saturation clamps their mobility even where
-the current is low-field. Production simulators drive velocity saturation with
-the quasi-Fermi-level gradient instead, which points along the current. That
-change, not more fitting, is the next step for Ion.
+**Ion and Canali's driving force.** Canali used to drive velocity saturation
+with the electric field along each mesh edge. Ion was then 86.5 µA/µm before
+the mobility fit and 86.7 after, so it didn't respond to mobility at all.
+Without velocity saturation the calibrated device gives 156 µA/µm, so Canali cut
+the current by a factor of 1.8. A long-channel estimate for 1 µm at these fields
+gives about 1.2–1.4, and SkyWater's 139.6 µA/µm implies 1.1. The cause: in an
+inversion layer on a triangular mesh, oblique edges also see the large vertical
+gate field, so velocity saturation clamped their mobility even where the current
+is low-field. Canali now uses the quasi-Fermi-potential gradient by default.
+Across an inversion layer the quasi-Fermi level is flat, so only the field
+driving the current counts. Ion becomes 134.5 µA/µm, the factor 1.16, and it
+follows the mobility fit (116.7 → 134.5 µA/µm).
+
+Where carrier densities are far below a reference density (`density_ref_cm3`,
+default 10¹⁵ cm⁻³) the force tends to the electric field. Without that offset,
+minority carriers that fall by orders of magnitude over the last mesh edge
+before an ohmic contact see a large quasi-Fermi step, and a forward p-n diode's
+current halves. The reference is a numerical choice: 10¹⁴ and 10¹⁶ give Ion
+134.7 and 132.4 µA/µm (−3.5 % and −5.2 %).

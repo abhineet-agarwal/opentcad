@@ -52,7 +52,7 @@ first slice, a [private local catalog](docs/catalog.md), already exists.
 | Plugins (steps, analyses, models, metrics, data) | Working | Entry-point discovery; clashes are errors |
 | GUI with a local open-weights assistant | Working | Drafts are checked, repaired and every assumed value flagged |
 | Private process catalog | First slice | Import, check, pinned export, runsheets |
-| Calibration against PDKs (Phase 3) | In progress | SKY130 at L = 1 µm: Vth and SS within 10 % of SkyWater's model card; Ion 38 % low; mobility values effective |
+| Calibration against PDKs (Phase 3) | In progress | SKY130 at L = 1 µm: Vth, SS and Ion within 10 % of SkyWater's model card (Ion −3.6 %); mobility values effective |
 
 The full record, with numbers and the tests behind them, is in
 [docs/validation.md](docs/validation.md). The roadmap is in [PHASES.md](PHASES.md).

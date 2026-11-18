@@ -165,30 +165,91 @@ class Canali(MobilityModel):
 
     Wraps an underlying low-field bulk model:
 
-        mu_eff = mu_bulk / (1 + (mu_bulk*|E| / vsat)^beta)^(1/beta)
+        mu_eff = mu_bulk / (1 + (mu_bulk*F / vsat)^beta)^(1/beta)
 
-    where |E| is the field magnitude along the edge. In the low-field
-    limit mu_eff -> mu_bulk; at high field the drift velocity saturates
-    at vsat regardless of mu_bulk. Reference: Canali, Majni, Minder,
-    Ottaviani, IEEE TED 22, 1045 (1975).
+    In the low-field limit mu_eff -> mu_bulk; at high driving force F the
+    drift velocity saturates at vsat regardless of mu_bulk. Reference:
+    Canali, Majni, Minder, Ottaviani, IEEE TED 22, 1045 (1975).
+
+    The driving force F on each mesh edge is one of:
+
+    * ``"quasi_fermi"`` (default): the gradient of the carrier's quasi-Fermi
+      potential along the edge, phi_n = psi - V_t*ln(n/n_i) (the Boltzmann
+      form). Only the field that drives the current counts: across an
+      inversion layer the quasi-Fermi level is flat, so the gate field
+      doesn't slow carriers moving along the channel.
+    * ``"efield"``: the electric field along the edge (the earlier
+      default). On a mesh whose edges are not aligned with the current, oblique
+      edges in a MOSFET channel pick up the vertical gate field, so
+      saturation is overstated: in the SKY130 NMOS check Ion is 38 % low
+      with it and 3.6 % low with ``"quasi_fermi"``.
+
+    For ``"quasi_fermi"`` both densities in the logarithm are offset by
+    ``density_ref_cm3``. Where the carrier density is well above it the
+    force is the quasi-Fermi gradient; well below, it tends to the electric
+    field. Without the offset, minority carriers that drop by orders of
+    magnitude over the last mesh edge before an ohmic contact see a large
+    quasi-Fermi step there, and their diffusion is throttled (a forward p-n
+    diode's current halves). The offset is a numerical choice, not a
+    material parameter. In the Jacobian the force's density dependence is
+    left out (its potential dependence is kept): with it, Newton's first
+    update after a bias step diverges. The converged solution is unchanged.
+
+    In a uniform resistor the two forces are the same.
 
     Composes with any MobilityModel:
         Canali(base=Klaassen())       — full CMOS mobility
         Canali(base=ConstantMobility()) — simple high-field
     """
 
+    DRIVING_FORCES = ("quasi_fermi", "efield")
+
     def required_params(self) -> tuple[str, ...]:
         return ("velocity_saturation",) + self.base.required_params()
 
-    def __init__(self, base: Optional[MobilityModel] = None):
+    def __init__(self, base: Optional[MobilityModel] = None,
+                 driving_force: str = "quasi_fermi", density_ref_cm3: float = 1e15):
+        if driving_force not in self.DRIVING_FORCES:
+            raise ValueError(f"driving_force must be one of {self.DRIVING_FORCES}, "
+                             f"not {driving_force!r}")
+        if not density_ref_cm3 > 0:
+            raise ValueError("density_ref_cm3 must be positive")
         self.base = base if base is not None else ConstantMobility()
+        self.driving_force = driving_force
+        self.density_ref_cm3 = float(density_ref_cm3)
 
     @property
     def requires_carriers(self) -> bool:
+        # Cross-carrier coupling comes only from the base: the quasi-Fermi
+        # force's own density dependence is left out of the Jacobian (attach).
         return self.base.requires_carriers
+
+    def _forces(self, ni: str) -> tuple[str, str]:
+        """Smoothed edge driving force for electrons and holes, in V/cm.
+
+        sqrt(F^2 + 1): a smoothed magnitude so the derivative has no kink at
+        F = 0 (which would break Newton during the initial ramp). 1 V/cm is
+        negligible next to any field of interest (1e3 - 1e6 V/cm).
+        """
+        if self.driving_force == "efield":
+            e_mag = "((EField*EField) + 1)^(0.5)"
+            return e_mag, e_mag
+        # phi_n@n0 - phi_n@n1 = dpsi - V_t*ln(n0/n1) + V_t*ln(ni0/ni1), and
+        # phi_p@n0 - phi_p@n1 = dpsi + V_t*ln(p0/p1) - V_t*ln(ni0/ni1).
+        dpsi = "(Potential@n0 - Potential@n1)"
+        dni = "" if ni == "n_i" else f" + V_t*log({ni}@n0/{ni}@n1)"
+        nf = f"{self.density_ref_cm3:.6g}"
+        dphi_n = (f"({dpsi} - V_t*log((Electrons@n0 + {nf})/(Electrons@n1 + {nf}))"
+                  f"{dni})")
+        dphi_p = (f"({dpsi} + V_t*log((Holes@n0 + {nf})/(Holes@n1 + {nf}))"
+                  f"{dni.replace(' + ', ' - ', 1)})")
+        return tuple(f"((({d})*EdgeInverseLength)^2 + 1)^(0.5)" for d in (dphi_n, dphi_p))
 
     def attach(self, ds, device, region, params, T_K):
         self.base.attach(ds, device, region, params, T_K)
+        # Bandgap narrowing (attached before mobility) registers n_i_eff.
+        ni = ("n_i_eff" if "n_i_eff" in ds.get_node_model_list(device=device, region=region)
+              else "n_i")
         vs = params.velocity_saturation
         for name, val in (("vsat_e", vs.vsat_e_cm_s),
                           ("vsat_h", vs.vsat_h_cm_s),
@@ -197,45 +258,47 @@ class Canali(MobilityModel):
             ds.set_parameter(device=device, region=region, name=name,
                              value=float(val))
 
-        # |EField| as sqrt(EField^2 + eps^2) — a smoothed magnitude so
-        # the derivative doesn't have a kink at E=0 (which would break
-        # Newton during the initial ramp when the field is small). eps=1
-        # V/cm is negligible compared to any field of physical interest
-        # (typical relevant fields are 1e3 - 1e6 V/cm).
         mu_bulk_e = self.base.mu_n_expr()
         mu_bulk_h = self.base.mu_p_expr()
-        e_mag = "((EField*EField) + 1)^(0.5)"
+        f_e, f_h = self._forces(ni)
+        if self.driving_force == "quasi_fermi":
+            # The force is its own edge model with only its potential
+            # derivatives. Newton then treats its density dependence as
+            # frozen within an iteration: with the exact density derivatives
+            # (~V_t/n on edges where n spans orders of magnitude) the first
+            # update after a bias step diverges, even on a reverse-biased
+            # p-n diode. The converged solution is the same; only the
+            # Jacobian is approximate.
+            for name, eq in (("CanaliForceElectrons", f_e), ("CanaliForceHoles", f_h)):
+                ds.edge_model(device=device, region=region, name=name, equation=eq)
+                for var in ("Potential@n0", "Potential@n1"):
+                    ds.edge_model(device=device, region=region, name=f"{name}:{var}",
+                                  equation=f"simplify(diff({eq}, {var}))")
+            f_e, f_h = "CanaliForceElectrons", "CanaliForceHoles"
 
         mu_e = (f"({mu_bulk_e}) / "
-                f"(1 + ((({mu_bulk_e})*{e_mag}) / vsat_e)^beta_e)^(1/beta_e)")
+                f"(1 + ((({mu_bulk_e})*{f_e}) / vsat_e)^beta_e)^(1/beta_e)")
         mu_h = (f"({mu_bulk_h}) / "
-                f"(1 + ((({mu_bulk_h})*{e_mag}) / vsat_h)^beta_h)^(1/beta_h)")
+                f"(1 + ((({mu_bulk_h})*{f_h}) / vsat_h)^beta_h)^(1/beta_h)")
 
         ds.edge_model(device=device, region=region,
                       name="ElectronMobilityCanali", equation=mu_e)
         ds.edge_model(device=device, region=region,
                       name="HoleMobilityCanali", equation=mu_h)
 
-        # Field-derivative always needed (Potential appears via EField).
-        for var in ("Potential@n0", "Potential@n1"):
+        # Potential always appears (EField or the quasi-Fermi difference).
+        variables = ["Potential@n0", "Potential@n1"]
+        if self.requires_carriers:
+            # Klaassen-type bases depend on both carriers; expose those
+            # derivatives to Newton.
+            variables += ["Electrons@n0", "Electrons@n1", "Holes@n0", "Holes@n1"]
+        for var in variables:
             ds.edge_model(device=device, region=region,
                           name=f"ElectronMobilityCanali:{var}",
                           equation=f"simplify(diff({mu_e}, {var}))")
             ds.edge_model(device=device, region=region,
                           name=f"HoleMobilityCanali:{var}",
                           equation=f"simplify(diff({mu_h}, {var}))")
-
-        # If the base model depends on carriers (Klaassen), the wrapped
-        # expression does too — expose those derivatives to Newton.
-        if self.requires_carriers:
-            for var in ("Electrons@n0", "Electrons@n1",
-                        "Holes@n0",     "Holes@n1"):
-                ds.edge_model(device=device, region=region,
-                              name=f"ElectronMobilityCanali:{var}",
-                              equation=f"simplify(diff({mu_e}, {var}))")
-                ds.edge_model(device=device, region=region,
-                              name=f"HoleMobilityCanali:{var}",
-                              equation=f"simplify(diff({mu_h}, {var}))")
 
     def mu_n_expr(self): return "ElectronMobilityCanali"
     def mu_p_expr(self): return "HoleMobilityCanali"

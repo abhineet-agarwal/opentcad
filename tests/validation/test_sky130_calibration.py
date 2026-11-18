@@ -131,3 +131,11 @@ def test_calibrated_device_reproduces_the_recorded_fit():
     fitted = {p["name"]: p["fitted"] for p in rec["mobility"]["fit"]["parameters"]}
     r = cal.mobility_residuals(fitted)
     assert np.sqrt(np.mean(r ** 2)) == pytest.approx(rec["mobility"]["fit"]["rms"], abs=2e-3)
+
+
+def test_recorded_report_meets_the_phase3_exit_metrics():
+    """calibration.json's report: the calibrated device's Vth, SS and Ion are
+    within 10 % of SkyWater (Phase 3 exit), with the default Canali force."""
+    report = json.loads(cal.RESULT_JSON.read_text())["report"]["calibrated"]["metrics"]
+    for key in ("Vth_lin_ELR_V", "Vth_lin_cc_V", "SS_min_mV_per_dec", "Ion_sat_A_per_um"):
+        assert abs(report[key]["rel_error"]) < 0.10, key

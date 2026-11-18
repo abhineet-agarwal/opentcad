@@ -239,7 +239,8 @@ def _physics(saturation: bool):
     from opentcad.device.models import Canali, Klaassen, Lombardi
     from opentcad.device.physics import PhysicsConfig
     if saturation:   # velocity saturation acts on the full (surface) mobility
-        return PhysicsConfig(mobility=Canali(base=Lombardi(base=Klaassen())))
+        return PhysicsConfig(mobility=Canali(base=Lombardi(base=Klaassen()),
+                                             driving_force="quasi_fermi"))
     return PhysicsConfig(mobility=Lombardi(base=Klaassen()))
 
 

@@ -216,3 +216,59 @@ def _diode_structure():
     ratio = Ik[ok] / Ic[ok]
     assert np.all(ratio > 0.1) and np.all(ratio < 2.0), (
         f"Klaassen/constant current ratios should be in [0.1, 2.0], got {ratio}")
+
+
+def test_canali_driving_force_is_checked():
+    assert Canali().driving_force == "quasi_fermi"
+    assert Canali(driving_force="efield").driving_force == "efield"
+    with pytest.raises(ValueError, match="driving_force"):
+        Canali(driving_force="parallel")
+    with pytest.raises(ValueError, match="density_ref_cm3"):
+        Canali(driving_force="quasi_fermi", density_ref_cm3=0)
+
+
+def test_canali_driving_force_round_trips_through_a_simulation_file():
+    from opentcad.io.deck import deck_from_dict, example_decks_dir, load_deck
+    data = load_deck(example_decks_dir() / "pn_diode.yaml").to_dict()
+    for spec in ({"model": "canali", "base": "klaassen", "driving_force": "efield"},
+                 {"model": "canali", "base": "klaassen", "density_ref_cm3": 1e14},
+                 {"model": "canali", "base": "klaassen"}):
+        data["device"]["physics"]["mobility"] = spec
+        deck = deck_from_dict(data)
+        assert deck.to_dict()["device"]["physics"]["mobility"] == spec
+    assert deck.device.physics.mobility.driving_force == "quasi_fermi"
+
+
+@pytest.mark.requires_devsim
+def test_canali_driving_forces_agree_in_a_uniform_resistor():
+    """With uniform n the quasi-Fermi gradient is the field, so both forces
+    give the same saturated current."""
+    V_q, I_q = _resistor_iv(PhysicsConfig(mobility=Canali(ConstantMobility())),
+                            v_end=2.0, v_step=0.4)
+    V_e, I_e = _resistor_iv(PhysicsConfig(mobility=Canali(ConstantMobility(),
+                                                          driving_force="efield")),
+                            v_end=2.0, v_step=0.4)
+    np.testing.assert_allclose(I_q[1:], I_e[1:], rtol=0.01)
+
+
+@pytest.mark.requires_devsim
+def test_canali_quasi_fermi_converges_and_spares_minority_diffusion():
+    """A p-n diode in reverse and forward bias. The field is low in the
+    neutral regions, so both forces agree; without the density reference the
+    quasi-Fermi step at the contacts halved the forward current, and with the
+    exact density Jacobian the first reverse step diverged."""
+    from opentcad.io.deck import example_decks_dir, load_deck
+    deck = load_deck(example_decks_dir() / "pn_diode.yaml")
+    out = {}
+    for force in ("efield", "quasi_fermi"):
+        solver = DeviceSolver(deck.structure.to_meshfield(mesh_size_um=0.05),
+                              {"Silicon": load_material("Si")},
+                              physics=PhysicsConfig(mobility=Canali(Klaassen(),
+                                                                    driving_force=force)))
+        try:
+            _, rev = solver.iv_sweep("anode", "cathode", 0.0, -2.0, -0.5)
+            _, fwd = solver.iv_sweep("anode", "cathode", 0.0, 0.8, 0.2)
+        finally:
+            solver.close()
+        out[force] = (rev[-1], fwd[-2], fwd[-1])
+    np.testing.assert_allclose(out["quasi_fermi"], out["efield"], rtol=0.02)

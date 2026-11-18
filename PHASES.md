@@ -145,9 +145,11 @@ Milestone 3.1 — Materials database (Klaassen, Lombardi, Canali, SRH, Auger)  �
 Milestone 3.2 — Advanced DEVSIM physics (surface mobility, interface traps, BGN)  ◐
       Lombardi surface mobility and Slotboom BGN done; interface traps only
       as a compact mid-gap Dit term in flat_band_shift_V (no dynamic traps).
-      Next: drive Canali velocity saturation with the quasi-Fermi-level
-      gradient. With the edge electric field, Ion is 38 % low and doesn't
-      respond to mobility (validation/sky130/README.md).
+      Canali velocity saturation is driven by the quasi-Fermi-potential
+      gradient by default (driving_force="quasi_fermi"). With the electric
+      field along each mesh edge, oblique channel edges picked up the gate
+      field and Ion was 38 % low; now it is 3.6 % low and follows the
+      mobility fit (validation/sky130/README.md).
 Milestone 3.3 — Calibration infrastructure (scipy optimizer, SKY130 target metrics)  ✓
       opentcad.calibrate: bounded least squares with parallel device
       simulations, calibrated material files. SKY130 targets: thresholds,
@@ -156,7 +158,10 @@ Milestone 3.3 — Calibration infrastructure (scipy optimizer, SKY130 target met
       five biases 248 → 19 mV) before mobility is fitted.
 
 Status against the exit, at L = 1 µm: Vth −0.1 % (max-gm) and −8.8 %
-(100 nA·W/L), SS −4.5 %, Ion −37.9 %. Vth and SS pass; Ion does not.
+(100 nA·W/L), SS −4.5 %, Ion −3.6 %. All three are within 10 %. Not yet
+met: "all parameters cited". The fitted Lombardi coefficients are effective
+values (a systematic residual remains), and the reference is a compact model
+at one gate length and 300 K, not measured silicon.
 
 Exit: NMOS Vth/Ion/SS within 10% of SKY130. All parameters cited.
 

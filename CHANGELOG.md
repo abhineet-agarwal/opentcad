@@ -37,6 +37,18 @@
   `mobility_lombardi` block instead of being built into the model. Si.yaml
   carries the same values, so silicon results don't change; a material file
   without the block is refused by `Lombardi`.
+- **Canali velocity saturation** is driven by the gradient of the carrier's
+  quasi-Fermi potential by default (`driving_force="quasi_fermi"`), instead
+  of the electric field along each mesh edge (`driving_force="efield"`, still
+  available). On meshes whose edges aren't aligned with the current, oblique
+  edges in a MOSFET channel picked up the vertical gate field. In the SKY130
+  NMOS, Ion goes from 86.7 to 134.5 µA/µm (SkyWater: 139.6). Where carrier
+  densities are far below `density_ref_cm3` (default 10¹⁵ cm⁻³) the force
+  tends to the field, so minority diffusion at ohmic contacts isn't
+  throttled. Results change for every simulation that uses Canali. Uniform
+  regions (a resistor) are unchanged. Convergence is slower (about 3× on the
+  example NMOS) because the force's density dependence is left out of the
+  Jacobian.
 - **Chained analyses.** Each analysis on a solver starts from zero bias, so a
   second sweep on the same solver converges and gives the same answer as the
   first.
@@ -57,8 +69,9 @@
   parameters with parallel device simulations, and calibrated material files
   (process variants with a `calibration` block). The first use is the SKY130
   calibration (`validation/sky130/calibrate.py`): the stand-in channel implant
-  from SkyWater's body effect, then the Lombardi surface mobility. Vth and SS
-  end within 10 % of SkyWater's model card; Ion is 38 % low. The fitted
+  from SkyWater's body effect, then the Lombardi surface mobility. Vth, SS
+  and Ion end within 10 % of SkyWater's model card (Ion −3.6 % with Canali's
+  quasi-Fermi driving force). The fitted
   mobility values are effective, not physical. The SKY130 reference now also
   has Id–Vgs curves and a body-effect table.
 - **Device design.** `opentcad design check | run | draft` (`opentcad.design`):
