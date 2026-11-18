@@ -13,6 +13,11 @@ Per gate length (W = 10 um, tt corner, 26.85 C = 300 K, body = source = 0):
     minimum subthreshold swing.
   * saturation Id-Vgs at Vds = 1.8 V -> constant-current Vth_sat, Ion at
     Vgs = 1.8 V, DIBL from the two constant-current Vths.
+  * body effect, for L in BODY_EFFECT_L_UM: the constant-current Vth at
+    Vds = 50 mV for each body bias in VBS.
+
+The curves themselves, every CURVE_STEP volts, go to nfet_01v8_tt_curves.json
+(the target of the mobility calibration, ``calibrate_mobility.py``).
 """
 from __future__ import annotations
 
@@ -30,6 +35,7 @@ import numpy as np
 from opentcad.device.extract import vth_constant_current, vth_max_gm
 
 OUT_JSON = Path(__file__).resolve().parent / "nfet_01v8_tt_reference.json"
+OUT_CURVES = Path(__file__).resolve().parent / "nfet_01v8_tt_curves.json"
 PDK = Path(os.environ.get("PDK_ROOT", "/usr/local/share/pdk")) / "sky130A"
 LIB = PDK / "libs.tech/ngspice/sky130.lib.spice"
 SPINIT = PDK / "libs.tech/ngspice/spinit"
@@ -40,16 +46,22 @@ L_UM = [0.15, 0.18, 0.25, 0.5, 1.0, 2.0, 4.0, 8.0, 20.0]
 VDS_LIN = 0.05
 VDS_SAT = 1.8
 VG_STEP = 0.002
+VBS = [0.0, -0.45, -0.9, -1.35, -1.8]   # body bias for the body-effect table
+BODY_EFFECT_L_UM = [1.0, 20.0]
+CURVE_STEP = 0.01             # V; spacing of the saved curves
 
 
-def run_sweep(work: Path, l_um: float, vds: float) -> tuple[np.ndarray, np.ndarray]:
-    tag = f"L{l_um:g}_Vd{vds:g}".replace(".", "p")
-    deck = f"""* SKY130 nfet_01v8 Id-Vgs, W={W_UM} L={l_um} Vds={vds}
+def run_sweep(work: Path, l_um: float, vds: float,
+              vbs: float = 0.0) -> tuple[np.ndarray, np.ndarray]:
+    tag = f"L{l_um:g}_Vd{vds:g}" + (f"_Vb{vbs:g}" if vbs else "")
+    tag = tag.replace(".", "p").replace("-", "m")
+    deck = f"""* SKY130 nfet_01v8 Id-Vgs, W={W_UM} L={l_um} Vds={vds} Vbs={vbs}
 .lib "{LIB}" {CORNER}
 .temp {TEMP_C}
 Vd d 0 {vds}
 Vg g 0 0
-XM1 d g 0 0 sky130_fd_pr__nfet_01v8 w={W_UM} l={l_um} nf=1
+Vb b 0 {vbs}
+XM1 d g 0 b sky130_fd_pr__nfet_01v8 w={W_UM} l={l_um} nf=1
 .control
 set wr_vecnames
 set wr_singlescale
@@ -92,6 +104,7 @@ def main(work_dir: str | None = None) -> None:
     nodeinfo = json.loads((PDK / ".config/nodeinfo.json").read_text())
 
     rows = []
+    curves = []
     for l_um in L_UM:
         i_crit = 100e-9 * W_UM / l_um
         vg, il = run_sweep(work, l_um, VDS_LIN)
@@ -111,11 +124,26 @@ def main(work_dir: str | None = None) -> None:
             "Ion_sat_A_per_um": float(isat[-1] / W_UM),
             "Ioff_sat_A_per_um": float(isat[0] / W_UM),
         })
+        every = round(CURVE_STEP / VG_STEP)
+        curves.append({"L_um": l_um,
+                       "Id_lin_A": [float(f"{x:.6e}") for x in il[::every]],
+                       "Id_sat_A": [float(f"{x:.6e}") for x in isat[::every]]})
         r = rows[-1]
         print(f"L={l_um:6.2f} um  Vth_ELR={r['Vth_lin_ELR_V']:.3f}  "
               f"Vth_cc,lin={r['Vth_lin_cc_V']:.3f}  Vth_cc,sat={r['Vth_sat_cc_V']:.3f}  "
               f"DIBL={r['DIBL_mV_per_V']:6.1f} mV/V  SS={r['SS_min_mV_per_dec']:5.1f} mV/dec  "
               f"Ion={r['Ion_sat_A_per_um']*1e6:7.1f} uA/um  Ioff={r['Ioff_sat_A_per_um']:.2e} A/um")
+
+    body = []
+    for l_um in BODY_EFFECT_L_UM:
+        i_crit = 100e-9 * W_UM / l_um
+        vths = []
+        for vbs in VBS:
+            vg, il = run_sweep(work, l_um, VDS_LIN, vbs)
+            vths.append(round(vth_constant_current(vg, il, i_crit), 4))
+        body.append({"L_um": l_um, "Vbs_V": VBS, "Vth_lin_cc_V": vths})
+        print(f"L={l_um:6.2f} um  body effect: Vth_cc,lin " + ", ".join(
+            f"{vt:.3f} V @ {vb:+.2f}" for vt, vb in zip(vths, VBS)))
 
     ref = {
         "device": "sky130_fd_pr__nfet_01v8",
@@ -137,11 +165,20 @@ def main(work_dir: str | None = None) -> None:
             "Vth_cc": "Vgs where Id = 100 nA * W/L (log-interpolated)",
             "DIBL": "(Vth_lin_cc - Vth_sat_cc) / (Vds_sat - Vds_lin)",
             "SS_min": "min dVgs/dlog10(Id) for 1e-13 A < Id < 100 nA*W/L at Vds_lin",
+            "body_effect": "Vth_cc at Vds_lin for each body bias Vbs (source at 0 V)",
         },
         "results": rows,
+        "body_effect": body,
     }
     OUT_JSON.write_text(json.dumps(ref, indent=2) + "\n")
-    print(f"\nwrote {OUT_JSON}  (decks and logs in {work})")
+    OUT_CURVES.write_text(json.dumps({
+        "device": ref["device"], "source": ref["source"], "pdk": ref["pdk"],
+        "simulator": ref["simulator"], "conditions": ref["conditions"],
+        "units": {"Vgs": "V", "Id": "A, drain current for W = W_um (body and source at 0 V)"},
+        "Vgs_V": [round(float(v), 4) for v in vg[::every]],
+        "curves": curves,
+    }) + "\n")
+    print(f"\nwrote {OUT_JSON} and {OUT_CURVES.name}  (decks and logs in {work})")
 
 
 if __name__ == "__main__":

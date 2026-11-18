@@ -22,6 +22,14 @@ Nd = untracked + Σ donor species, Na likewise. In the Fair model each
 species' D_eff sees the total same-type concentration (all donors for
 n, all acceptors for p) as its carrier density.
 
+Where dopants diffuse: in silicon, the only material with diffusion data.
+Every other material, and empty space (an etched trench, the ambient), is a
+no-flux wall, and the doping there is left as it is. When silicon fills the
+mesh's bounding box, both models work on the Cartesian grid as described
+above. Otherwise they diffuse on the mesh's silicon triangles with linear
+finite elements: the mesh follows the material interfaces, so the walls sit
+exactly on the silicon boundary, and the dose in the silicon is conserved.
+
 Not modelled: oxidation-enhanced diffusion (OED), implant-damage
 transient-enhanced diffusion (TED), segregation across material
 interfaces, out-diffusion to the ambient.
@@ -188,6 +196,68 @@ def _resample_grid_to_mesh(xs: np.ndarray, ys: np.ndarray,
     return interp(np.column_stack([points_um[:, 1], points_um[:, 0]]))
 
 
+#: Materials dopants diffuse in: those with diffusion data. Every other
+#: material, and empty space, is a no-flux wall.
+DIFFUSING_MATERIALS = frozenset({Material.SI})
+
+
+class _SiliconFEM:
+    """Linear finite elements on the mesh's silicon triangles.
+
+    The mesh follows the material interfaces, so the no-flux walls sit
+    exactly on the silicon boundary (the natural boundary condition). Lumped
+    mass, so ``M @ C`` (the dose) is conserved exactly by every step.
+    Coordinates in µm, D in µm²/s.
+    """
+
+    def __init__(self, mf: MeshField):
+        from scipy import sparse
+        tris = mf.grid.cells_dict.get(5)                       # VTK_TRIANGLE
+        if tris is None or len(tris) != mf.n_cells:
+            raise ValueError("annealing needs a mesh of triangles only")
+        tris = np.asarray(tris, dtype=np.int64)
+        si = np.isin(np.asarray(mf.material_ids), [int(m) for m in DIFFUSING_MATERIALS])
+        self.any = bool(si.any())
+        pts = np.asarray(mf.grid.points, dtype=float)[:, :2]
+        self.nodes = np.unique(tris[si])                        # nodes the anneal updates
+        local = np.full(mf.n_points, -1, dtype=np.int64)
+        local[self.nodes] = np.arange(len(self.nodes))
+        T = local[tris[si]]                                     # (m, 3) local indices
+        x, y = pts[self.nodes, 0][T], pts[self.nodes, 1][T]
+        b = np.stack([y[:, 1] - y[:, 2], y[:, 2] - y[:, 0], y[:, 0] - y[:, 1]], axis=1)
+        c = np.stack([x[:, 2] - x[:, 1], x[:, 0] - x[:, 2], x[:, 1] - x[:, 0]], axis=1)
+        area = 0.5 * np.abs(b[:, 0] * c[:, 1] - b[:, 1] * c[:, 0])
+        keep = area > 0
+        T, b, c, area = T[keep], b[keep], c[keep], area[keep]
+        self._T = T
+        self._ke = (b[:, :, None] * b[:, None, :] + c[:, :, None] * c[:, None, :]) / (4 * area)[:, None, None]
+        self._rows = np.repeat(T, 3, axis=1).ravel()
+        self._cols = np.tile(T, (1, 3)).ravel()
+        n = len(self.nodes)
+        self.mass = np.bincount(T.ravel(), weights=np.repeat(area / 3.0, 3), minlength=n)
+        self._sparse = sparse
+
+    def stiffness(self, D_tri_um2_s: np.ndarray):
+        vals = (self._ke * D_tri_um2_s[:, None, None]).ravel()
+        n = len(self.nodes)
+        return self._sparse.csc_matrix((vals, (self._rows, self._cols)), shape=(n, n))
+
+    def tri_mean(self, nodal: np.ndarray) -> np.ndarray:
+        """Per-triangle mean of a field given on the silicon nodes."""
+        return nodal[self._T].mean(axis=1)
+
+    def diffuse(self, C: np.ndarray, D_um2_s: float, time_s: float, n_steps: int = 50) -> np.ndarray:
+        """Constant-D diffusion of silicon-node values ``C`` by backward Euler."""
+        from scipy.sparse.linalg import splu
+        dt = time_s / n_steps
+        A = self._sparse.diags(self.mass, format="csc") + dt * self.stiffness(
+            np.full(len(self._T), D_um2_s))
+        lu = splu(A)
+        for _ in range(n_steps):
+            C = lu.solve(self.mass * C)
+        return C
+
+
 @dataclass
 class _DopantField:
     name: str            # tracked species name, or "untracked_donor/acceptor"
@@ -247,9 +317,14 @@ def apply_anneal(mf: MeshField,
                  ) -> AnnealResult:
     """Diffuse every dopant field in place per intrinsic Fick's law.
 
-    Each field is resampled onto a Cartesian grid, convolved with a
-    Gaussian of σ = √(2 D t) using its own species' D, and resampled back
-    to the mesh. Mutates the MeshField in place; returns an AnnealResult.
+    Each field diffuses with its own species' D. When silicon fills the
+    mesh's bounding box, the field is resampled onto a Cartesian grid,
+    convolved with a Gaussian of σ = √(2 D t) (exact for this equation) and
+    resampled back. Otherwise it diffuses on the mesh's silicon triangles
+    (linear finite elements, backward Euler), whose edges are no-flux walls
+    exactly on the silicon boundary: dopant stays in the silicon, its dose
+    is conserved, and doping in other materials is left as it is. Mutates
+    the MeshField in place; returns an AnnealResult.
 
     Args:
         mf: MeshField with doping to anneal. Nd and Na in cm⁻³.
@@ -281,9 +356,20 @@ def apply_anneal(mf: MeshField,
     D_by_field = {f.name: diffusivity_intrinsic(f.d_species, T_K) for f in fields}
     sigma_by_field = {n: math.sqrt(2.0 * D * time_s) / _UM_TO_CM
                       for n, D in D_by_field.items()}
+    fem = None if _silicon_fills_box(mf) else _SiliconFEM(mf)
 
     for f in fields:
         sigma_um = sigma_by_field[f.name]
+        if fem is not None:
+            # Silicon doesn't fill the box: diffuse on the silicon triangles,
+            # whose edges are the no-flux walls (a convolution over the box
+            # would carry dopant into the oxide or into empty space).
+            if fem.any and float(np.max(f.values[fem.nodes])) > 0.0 and time_s > 0:
+                v = np.array(f.values, dtype=float, copy=True)
+                v[fem.nodes] = fem.diffuse(v[fem.nodes], D_by_field[f.name] / _UM_TO_CM ** 2,
+                                           time_s)
+                f.values = v
+            continue
         # σ far below a grid cell (or an empty field): identity convolution.
         if float(np.max(f.values)) <= 0.0 or sigma_um <= 0.1 * grid_resolution_um:
             continue
@@ -426,7 +512,10 @@ def apply_anneal_fair(mf: MeshField,
     ``opentcad/process/doping/data/{P,As,B}_diffusion.yaml``.
 
     Numerical details:
-      * Explicit Euler on a Cartesian grid, Neumann (no-flux) walls.
+      * Explicit Euler on a Cartesian grid, Neumann (no-flux) walls, when
+        silicon fills the mesh's bounding box. Otherwise linear finite
+        elements on the silicon triangles (no-flux walls exactly on the
+        silicon boundary), backward Euler with D_eff lagged one step.
       * Harmonic-mean D at cell faces — preserves flux across sharp
         concentration gradients where D jumps by orders of magnitude.
       * Sub-step dt = ``stability_factor`` · dx² / max(D_eff) over all
@@ -461,6 +550,9 @@ def apply_anneal_fair(mf: MeshField,
     coefs = [fair_diffusivity_components(f.d_species, T_K) for f in fields]
     is_donor = [f.kind == "donor" for f in fields]
 
+    if not _silicon_fills_box(mf):
+        return _fair_on_silicon(mf, fields, coefs, is_donor, n_i_T, temperature_C,
+                                time_s, species_Nd, species_Na)
     xs, ys, stack = _resample_mesh_to_grid(
         pts, np.column_stack([f.values for f in fields]),
         xmin, xmax, ymin, ymax, grid_resolution_um)
@@ -514,6 +606,67 @@ def apply_anneal_fair(mf: MeshField,
         D_i_Na_cm2_s=float(coefs[i_a]["D_i"]),
         D_eff_Na_peak_cm2_s=float(D_peak[i_a]),
         grid_cell_um=float(grid_resolution_um),
+        species_D_eff_peak_cm2_s={f.name: float(D_peak[k])
+                                  for k, f in enumerate(fields) if f.tracked},
+        model="fair",
+    )
+
+
+def _silicon_fills_box(mf: MeshField) -> bool:
+    """True when every cell is silicon and the cells tile the bounding box,
+    so the box edges are the only walls."""
+    mats = np.asarray(mf.material_ids)
+    if not np.all(np.isin(mats, [int(m) for m in DIFFUSING_MATERIALS])):
+        return False
+    xmin, xmax, ymin, ymax = mf.bounds[:4]
+    tris = mf.grid.cells_dict.get(5)
+    if tris is None:
+        return False
+    p = np.asarray(mf.grid.points, dtype=float)[:, :2][np.asarray(tris)]
+    area = 0.5 * np.abs((p[:, 1, 0] - p[:, 0, 0]) * (p[:, 2, 1] - p[:, 0, 1])
+                        - (p[:, 2, 0] - p[:, 0, 0]) * (p[:, 1, 1] - p[:, 0, 1]))
+    return bool(abs(area.sum() - (xmax - xmin) * (ymax - ymin)) <= 1e-9 * (xmax - xmin) * (ymax - ymin))
+
+
+def _fair_on_silicon(mf, fields, coefs, is_donor, n_i_T, temperature_C, time_s,
+                     species_Nd, species_Na, n_steps: int = 200) -> FairAnnealResult:
+    """The Fair anneal on the silicon triangles (see apply_anneal_fair)."""
+    from scipy.sparse.linalg import splu
+    fem = _SiliconFEM(mf)
+    D_peak = [0.0] * len(fields)
+    if fem.any and time_s > 0:
+        Cs = [np.asarray(f.values, dtype=float)[fem.nodes].copy() for f in fields]
+        dt = time_s / n_steps
+        M = fem._sparse.diags(fem.mass, format="csc")
+        for _ in range(n_steps):
+            n_tot = sum(c for c, d in zip(Cs, is_donor) if d)
+            p_tot = sum(c for c, d in zip(Cs, is_donor) if not d)
+            for k, (coef, d) in enumerate(zip(coefs, is_donor)):
+                if not np.any(Cs[k] > 0):
+                    continue
+                D = _fair_D_eff_field(coef, n_tot if d else p_tot, n_i_T)   # cm²/s, nodal
+                D_peak[k] = max(D_peak[k], float(np.max(D)))
+                A = M + dt * fem.stiffness(fem.tri_mean(D) / _UM_TO_CM ** 2)
+                Cs[k] = splu(A).solve(fem.mass * Cs[k])
+        for f, c in zip(fields, Cs):
+            v = np.array(f.values, dtype=float, copy=True)
+            v[fem.nodes] = c
+            f.values = v
+    _write_fields(mf, fields)
+    names = [f.name for f in fields]
+    i_d, i_a = names.index("untracked_donor"), names.index("untracked_acceptor")
+    return FairAnnealResult(
+        temperature_C=float(temperature_C),
+        time_s=float(time_s),
+        species_Nd=canonicalize_species(species_Nd),
+        species_Na=canonicalize_species(species_Na),
+        n_sub_steps=int(n_steps if time_s > 0 else 0),
+        dt_sub_mean_s=float(time_s / n_steps),
+        D_i_Nd_cm2_s=float(coefs[i_d]["D_i"]),
+        D_eff_Nd_peak_cm2_s=float(D_peak[i_d]),
+        D_i_Na_cm2_s=float(coefs[i_a]["D_i"]),
+        D_eff_Na_peak_cm2_s=float(D_peak[i_a]),
+        grid_cell_um=0.0,
         species_D_eff_peak_cm2_s={f.name: float(D_peak[k])
                                   for k, f in enumerate(fields) if f.tracked},
         model="fair",

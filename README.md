@@ -46,12 +46,12 @@ first slice, a [private local catalog](docs/catalog.md), already exists.
 | Process → device in one call (`run_recipe`) | Working | Deposited MOS cap C–V matches the layered one within 10 % |
 | Device physics: Klaassen, Canali, Lombardi, SRH, Auger, avalanche, BGN, Fermi–Dirac, fixed charge | Working; avalanche qualitative | Unit and analytic tests per model |
 | Analyses: I–V, C–V, transient, small-signal AC, field snapshots | Working | Equilibrium snapshot matches pn analytics to 1 mV |
-| SKY130 NMOS threshold check | Passes (Phase 2 exit) | Vth +14.8 % (max-gm), +7.5 % (100 nA·W/L) vs SkyWater's model card |
+| SKY130 NMOS threshold check | Passes (Phase 2 exit) | Vth +17.7 % (max-gm), +9.6 % (100 nA·W/L) vs SkyWater's model card |
 | Simulation files, CLI, parameter sweeps | Working | Every point checked before running |
 | Plugins (steps, analyses, models, metrics, data) | Working | Entry-point discovery; clashes are errors |
 | GUI with a local open-weights assistant | Working | Drafts are checked, repaired and every assumed value flagged |
 | Private process catalog | First slice | Import, check, pinned export, runsheets |
-| Calibration against PDKs (Phase 3) | Not started | Targets extracted; optimizer pending |
+| Calibration against PDKs (Phase 3) | In progress | SKY130 at L = 1 µm: Vth and SS within 10 % of SkyWater's model card; Ion 38 % low; mobility values effective |
 
 The full record, with numbers and the tests behind them, is in
 [docs/validation.md](docs/validation.md). The roadmap is in [PHASES.md](PHASES.md).

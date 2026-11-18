@@ -75,6 +75,7 @@ opentcad/
 ├── materials/    Material parameter files and loader
 ├── io/           Simulation files (deck.py) and sweeps (sweep.py)
 ├── plugins.py    Registries: steps, analyses, physics models, metrics, data folders
+├── calibrate.py  Least-squares fits of model parameters; calibrated material files
 ├── cli.py        opentcad check | run | sweep | plugins | catalog
 ├── viz/          Figure data on the mesh (fields.py), palette, Plotly figures
 ├── catalog/      Private process catalog (records, store, checks, import/export)

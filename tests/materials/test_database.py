@@ -103,6 +103,34 @@ def test_solver_refuses_models_on_defaulted_parameters(simple_si_meshfield):
     ok.solve_equilibrium()                   # constant mobility + SRH: all given
 
 
+@pytest.mark.requires_devsim
+def test_lombardi_reads_its_coefficients_from_the_material_file(simple_si_meshfield):
+    import devsim as ds
+
+    from opentcad.device.models import Klaassen, Lombardi
+    from opentcad.device.physics import PhysicsConfig
+    from opentcad.device.solver import DeviceSolver
+    physics = PhysicsConfig(mobility=Lombardi(base=Klaassen()))
+    raw = _si_raw()
+    del raw["mobility_lombardi"]
+    s = DeviceSolver(simple_si_meshfield, {"Silicon": params_from_dict(raw, "Si")},
+                     physics=physics)
+    with pytest.raises(ValueError, match="Lombardi needs mobility_lombardi"):
+        s.solve_equilibrium()
+    s.close()
+
+    raw = _si_raw()
+    raw["mobility_lombardi"]["delta_e"] = 1.25e18
+    s = DeviceSolver(simple_si_meshfield, {"Silicon": params_from_dict(raw, "Si")},
+                     physics=physics)
+    s.solve_equilibrium()
+    device = ds.get_device_list()[-1]
+    region = ds.get_region_list(device=device)[0]
+    assert ds.get_parameter(device=device, region=region, name="Lb_delta_e") == 1.25e18
+    assert ds.get_parameter(device=device, region=region, name="Lb_B_e") == 3.61e7
+    s.close()
+
+
 def test_missing_process_variant_is_an_error(tmp_path, monkeypatch):
     from opentcad import plugins
     monkeypatch.setattr(plugins, "_iter_entry_points", lambda: [])

@@ -31,6 +31,9 @@ it was recorded. A model being present is not the same as it being calibrated; s
 | Pearson profiles reproduce the tabulated moments | R_p, ΔR_p, γ, β tables | 0.1 % (R_p, ΔR_p), 0.01 (γ), 1 % (β) | — | `tests/process/test_pearson.py` |
 | Implant dose conserved at any tilt and mask | dose per wafer area | — | — | `tests/process/test_implant_geometry.py` |
 | Anneal: dose conservation; spread ⟨d²⟩ = 2Dt | Fick's law | — | — | `tests/process/test_anneal.py`, `test_fair_anneal.py`, `test_species_anneal.py` |
+| Anneal next to an oxide: dose stays in the Si, oxide doping untouched | no-flux wall at the interface | 10⁻⁹ | 10⁻¹⁵ | `tests/process/test_anneal_walls.py` |
+| Anneal profile at a Si/SiO₂ wall | reflecting-wall (image) solution | 3 % | — | `tests/process/test_anneal_walls.py` |
+| Fair junction depth behind a wall vs bare Si | the same column without the cap (grid refined to 2.5 nm) | 2 % | 0.8 % | `tests/process/test_anneal_walls.py` |
 | Junction depth independent of the device mesh (20 nm vs 5 nm) | itself | 5 % | 1.4 % intrinsic, 0.3 % Fair | `tests/process/test_junction_refinement.py` |
 | Deposited MOS cap vs layered MOS cap | C–V of the same device built two ways | 10 % | 2–6 % | `tests/process/test_structure_transfer.py` |
 | Per-material etch selectivity | rate ratios | — | — | `tests/process/test_selectivity.py` |
@@ -48,15 +51,42 @@ Its threshold voltage is compared with the same extraction applied to SkyWater's
 
 | | OpenTCAD | SKY130 | Difference |
 |---|---|---|---|
-| Vth, max-gm extrapolation | 0.679 V | 0.592 V | +14.8 % |
-| Vth, 100 nA·W/L | 0.588 V | 0.547 V | +7.5 % |
-| S/D junction depth | 100.3 nm | 100 nm | +0.3 % |
+| Vth, max-gm extrapolation | 0.697 V | 0.592 V | +17.7 % |
+| Vth, 100 nA·W/L | 0.599 V | 0.547 V | +9.6 % |
+| S/D junction depth | 99.9 nm | 100 nm | −0.1 % |
 
-Pass band ±20 %, converged to < 10 mV between 10 nm and 7 nm meshes. Passing shows
+Pass band ±20 %. Between 10 nm and 7 nm meshes Vth changes by 10 mV (max-gm) and 2 mV (constant current). Passing shows
 the process-to-device chain agrees with first-order design and lands in SkyWater's
 range. It does not show that OpenTCAD predicts SkyWater's unpublished process.
 Details, inputs and caveats: [`validation/sky130/README.md`](https://github.com/abhineet-agarwal/opentcad/blob/main/validation/sky130/README.md);
 test: `tests/validation/test_sky130_vth.py`.
+
+## SKY130 calibration (Phase 3)
+
+The same 1 µm NMOS, calibrated against SkyWater's model card in two stages
+([Calibration](calibration.md)):
+
+1. **Electrostatics.** The stand-in channel implant's dose and drive-in are fitted
+   to SkyWater's threshold at five body biases. The Phase 2 stand-in had twice
+   SkyWater's body effect; the rms error over the biases drops from 248 mV to
+   19 mV.
+2. **Mobility.** The Lombardi electron coefficients are fitted to the linear
+   Id–Vgs at equal overdrive. The curve's rms error drops from 0.247 to 0.092,
+   but only by pushing the phonon coefficient to 24× its literature value. The
+   remaining error is systematic (−15 % to +12 % across the overdrive range), so
+   the fitted values are effective, not a physical calibration.
+
+| | Phase 2 stand-in | Calibrated | SkyWater |
+|---|---|---|---|
+| Vth, max-gm | +17.7 % | −0.1 % | 0.592 V |
+| Vth, 100 nA·W/L | +9.6 % | −8.8 % | 0.547 V |
+| Subthreshold swing | +5.0 % | −4.5 % | 84.7 mV/dec |
+| Peak gm | −25.7 % | +4.3 % | 13.7 µS/µm |
+| Ion (Vgs = Vds = 1.8 V) | −38.8 % | −37.9 % | 139.6 µA/µm |
+
+Threshold and subthreshold swing meet the Phase 3 target of 10 %; Ion does not.
+Details: [`validation/sky130/README.md`](https://github.com/abhineet-agarwal/opentcad/blob/main/validation/sky130/README.md#calibration-phase-3);
+tests: `tests/validation/test_sky130_calibration.py`.
 
 ## Packaging and data integrity
 
@@ -69,10 +99,9 @@ test: `tests/validation/test_sky130_vth.py`.
 
 ## What is not validated
 
-- **Calibration:** no physics parameter has been fitted to measured or PDK data
-  (Phase 3). Lombardi's literature coefficients leave the simulated
-  transconductance of the SKY130-like NMOS plateauing, with its peak about 25 %
-  below SkyWater's.
+- **Calibration:** the SKY130 calibration above is against a compact model, not
+  measured silicon, at one gate length and 300 K. Its mobility values are
+  effective (a systematic residual remains), and Ion is 38 % low.
 - **Avalanche breakdown voltage:** qualitative only (~2–3× high), because the
   current is a v_sat·n proxy.
 - **Topography:** the geometric etch and deposition models aren't compared with

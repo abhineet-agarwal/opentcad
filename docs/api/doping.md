@@ -203,9 +203,14 @@ opentcad.process.doping.apply_anneal(
 
 Diffuse every dopant field in place per intrinsic Fick's law.
 
-Each field is resampled onto a Cartesian grid, convolved with a
-Gaussian of σ = √(2 D t) using its own species' D, and resampled back
-to the mesh. Mutates the MeshField in place; returns an AnnealResult.
+Each field diffuses with its own species' D. When silicon fills the
+mesh's bounding box, the field is resampled onto a Cartesian grid,
+convolved with a Gaussian of σ = √(2 D t) (exact for this equation) and
+resampled back. Otherwise it diffuses on the mesh's silicon triangles
+(linear finite elements, backward Euler), whose edges are no-flux walls
+exactly on the silicon boundary: dopant stays in the silicon, its dose
+is conserved, and doping in other materials is left as it is. Mutates
+the MeshField in place; returns an AnnealResult.
 
 **Parameters**
 
@@ -220,7 +225,7 @@ to the mesh. Mutates the MeshField in place; returns an AnnealResult.
 
 AnnealResult with the diffusivities and σ actually applied.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L240)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L310)
 
 ## AnnealResult
 
@@ -248,7 +253,7 @@ remainder, i.e. all of Nd / Na when no species fields are tracked.
 `species_sigma_um` / `species_D_cm2_s` give the same per tracked
 species. σ(t) = √(2 D t).
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L132)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L140)
 
 ## apply_anneal_fair
 
@@ -286,7 +291,14 @@ one. Coefficients come from
 ``opentcad/process/doping/data/{P,As,B}_diffusion.yaml``.
 
 Numerical details:
-  * Explicit Euler on a Cartesian grid, Neumann (no-flux) walls.
+  * Explicit Euler on a Cartesian grid, Neumann (no-flux) walls, when
+
+```
+silicon fills the mesh's bounding box. Otherwise linear finite
+elements on the silicon triangles (no-flux walls exactly on the
+silicon boundary), backward Euler with D_eff lagged one step.
+```
+
   * Harmonic-mean D at cell faces — preserves flux across sharp
 
 ```
@@ -310,7 +322,7 @@ MeshField in place. Use :func:`apply_anneal` when the profile stays
 well below n_i at the anneal temperature — it is exact there and
 much cheaper.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L401)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L487)
 
 ## FairAnnealResult
 
@@ -339,7 +351,7 @@ species_Na's coefficients; `species_D_eff_peak_cm2_s` gives the peak
 effective diffusivity per tracked species — the one-number summary of
 how much concentration enhancement mattered.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L320)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L406)
 
 ## moments_for
 
@@ -419,7 +431,7 @@ concentration-dependent ones.
 - `T_K`: anneal temperature in Kelvin.
 - `target`: substrate material. Only Si has tables today.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L65)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L73)
 
 ## available_species
 

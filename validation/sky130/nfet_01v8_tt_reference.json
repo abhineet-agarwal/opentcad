@@ -21,7 +21,8 @@
     "Vth_lin_ELR": "max-gm linear extrapolation at Vds_lin: Vg* - Id*/gm* - Vds/2",
     "Vth_cc": "Vgs where Id = 100 nA * W/L (log-interpolated)",
     "DIBL": "(Vth_lin_cc - Vth_sat_cc) / (Vds_sat - Vds_lin)",
-    "SS_min": "min dVgs/dlog10(Id) for 1e-13 A < Id < 100 nA*W/L at Vds_lin"
+    "SS_min": "min dVgs/dlog10(Id) for 1e-13 A < Id < 100 nA*W/L at Vds_lin",
+    "body_effect": "Vth_cc at Vds_lin for each body bias Vbs (source at 0 V)"
   },
   "results": [
     {
@@ -122,6 +123,42 @@
       "gm_max_lin_S": 6.945917499999975e-06,
       "Ion_sat_A_per_um": 8.37987632e-06,
       "Ioff_sat_A_per_um": 1.9482670299999998e-13
+    }
+  ],
+  "body_effect": [
+    {
+      "L_um": 1.0,
+      "Vbs_V": [
+        0.0,
+        -0.45,
+        -0.9,
+        -1.35,
+        -1.8
+      ],
+      "Vth_lin_cc_V": [
+        0.5468,
+        0.6448,
+        0.7247,
+        0.7928,
+        0.8525
+      ]
+    },
+    {
+      "L_um": 20.0,
+      "Vbs_V": [
+        0.0,
+        -0.45,
+        -0.9,
+        -1.35,
+        -1.8
+      ],
+      "Vth_lin_cc_V": [
+        0.4999,
+        0.6028,
+        0.6879,
+        0.7616,
+        0.8271
+      ]
     }
   ]
 }

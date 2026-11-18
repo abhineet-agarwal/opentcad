@@ -98,12 +98,13 @@ Milestone 2.4 — Process→device mesh translator (THE CORE PIECE)  ✓
 
 Exit: ✓ Full NMOS process flow simulated (examples/06_nmos_implanted.py);
       ✓ Vth within 20% of SKY130 (validation/sky130/). At L = 1 µm the
-        max-gm Vth is 0.679 V against 0.592 V from SkyWater's nfet_01v8 tt
-        model card (+14.8 %); at 100 nA·W/L it is 0.588 V against 0.547 V
-        (+7.5 %). Oxide, p-well and junction depth are SkyWater's published
+        max-gm Vth is 0.697 V against 0.592 V from SkyWater's nfet_01v8 tt
+        model card (+17.7 %); at 100 nA·W/L it is 0.599 V against 0.547 V
+        (+9.6 %). (0.679 V and 0.588 V before anneals stopped carrying
+        boron into the gate oxide.) Oxide, p-well and junction depth are SkyWater's published
         values. The threshold implant is a stand-in, sized once by a 1-D
-        design formula and then simulated untuned. Converged to < 10 mV
-        between 10 nm and 7 nm meshes.
+        design formula and then simulated untuned. Between 10 nm and 7 nm
+        meshes Vth changes by 10 mV (max-gm) and 2 mV (constant current).
 
 ## Phase 2a — Device physics paydown — COMPLETE
 Goal: close the device-side known issues that blocked process-coupled
@@ -133,19 +134,29 @@ Exit: ✓ each item tested (tests/device, tests/process); ✓ worked examples
 Goal: Quantitative agreement with real fab data.
 
 Milestone 3.1 — Materials database (Klaassen, Lombardi, Canali, SRH, Auger)  ◐
-      Models implemented with YAML parameters; values not yet fit to data.
-      First target from the Phase 2 check: with the literature Lombardi
-      coefficients, gm plateaus instead of peaking, and peak gm is ~25 %
-      below SKY130's (validation/sky130/README.md).
+      Models implemented with YAML parameters, Lombardi's now in the
+      material file too (mobility_lombardi). The Lombardi electron
+      coefficients are fitted to SKY130 (validation/sky130/calibrate.py,
+      materials/sky130/Si.yaml): peak gm goes from −26 % to +4 % and the
+      linear Id–Vgs rms error from 0.25 to 0.09. The values are effective,
+      not physical: the phonon coefficient goes to 24× its literature value
+      and a systematic residual remains (−15 % to +12 % across overdrive).
+      Next: a surface Coulomb term screened by the inversion layer.
 Milestone 3.2 — Advanced DEVSIM physics (surface mobility, interface traps, BGN)  ◐
       Lombardi surface mobility and Slotboom BGN done; interface traps only
       as a compact mid-gap Dit term in flat_band_shift_V (no dynamic traps).
-Milestone 3.3 — Calibration infrastructure (scipy optimizer, SKY130 target metrics)  ◐
-      Targets exist: validation/sky130/nfet_01v8_tt_reference.json has Vth,
-      DIBL, SS and Ion for L = 0.15–20 µm from the tt model card, and
-      opentcad.device.extract gives the matching Vth extraction. Sweeps
-      over simulation files with named metrics (opentcad.io.sweep) give
-      the evaluation loop an optimizer needs. The optimizer is not started.
+      Next: drive Canali velocity saturation with the quasi-Fermi-level
+      gradient. With the edge electric field, Ion is 38 % low and doesn't
+      respond to mobility (validation/sky130/README.md).
+Milestone 3.3 — Calibration infrastructure (scipy optimizer, SKY130 target metrics)  ✓
+      opentcad.calibrate: bounded least squares with parallel device
+      simulations, calibrated material files. SKY130 targets: thresholds,
+      a body-effect table and Id–Vgs curves from the tt model card. The
+      stand-in channel implant is fitted to SkyWater's body effect (rms over
+      five biases 248 → 19 mV) before mobility is fitted.
+
+Status against the exit, at L = 1 µm: Vth −0.1 % (max-gm) and −8.8 %
+(100 nA·W/L), SS −4.5 %, Ion −37.9 %. Vth and SS pass; Ion does not.
 
 Exit: NMOS Vth/Ion/SS within 10% of SKY130. All parameters cited.
 

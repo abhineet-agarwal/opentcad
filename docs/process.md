@@ -82,15 +82,22 @@ the `Nd`/`Na` totals the device solver reads. More species are added by dropping
 `Recipe.anneal(temperature_C, time_s, model="intrinsic" | "fair")`. Every tracked
 species diffuses with its own coefficients.
 
-- **`intrinsic`:** an analytic Gaussian spread with the Arrhenius D_i(T). It is
-  exact while the doping stays below n_i(T).
+- **`intrinsic`:** diffusion with the Arrhenius D_i(T). It is exact while the
+  doping stays below n_i(T).
 - **`fair`:** Fair's concentration-coupled diffusivity,
   D_eff = D_i + D⁻·(n/n_i) + D⁻⁻·(n/n_i)² for donors (D⁺, D⁺⁺ with p/n_i for
-  acceptors). n and p are the total donor and acceptor concentrations. It is
-  stepped explicitly on a Cartesian grid within the 2-D stability limit, and
+  acceptors). n and p are the total donor and acceptor concentrations. It
   captures the concentration-enhanced spreading at S/D-level doping.
-- **Dose:** both kernels conserve each species' dose (no-flux walls on the
-  boundary samples).
+- **Where dopants move:** only in silicon, the one material with diffusion
+  data. Every other material, and empty space such as an etched trench, is a
+  no-flux wall, and doping there is left as it is. Segregation into the oxide
+  is not modelled.
+- **How:** when silicon fills the mesh's bounding box, the intrinsic model is a
+  Gaussian convolution on a Cartesian grid and Fair is stepped explicitly on
+  it. Otherwise, as in any MOS structure, both diffuse on the mesh's silicon
+  triangles with linear finite elements (backward Euler), so the walls sit
+  exactly on the silicon boundary.
+- **Dose:** both kernels conserve each species' dose in the silicon.
 
 ## From structure to processed device
 

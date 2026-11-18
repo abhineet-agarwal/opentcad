@@ -42,7 +42,7 @@ complements the compact `flat_band_shift_V`.
 | Mobility | `ConstantMobility` | Default; the file's `mobility_constant` |
 | Mobility | `Klaassen` | Unified low-field bulk mobility (1992), clustering and carrier–carrier scattering |
 | Mobility | `Canali` | High-field velocity saturation; wraps any base model |
-| Mobility | `Lombardi` | Surface mobility at Si/SiO₂ (bulk + acoustic phonon + surface roughness). `e_normal_axis="y"` (default), `"x"` or `"magnitude"`. Coefficients built in (Darwish 1997) |
+| Mobility | `Lombardi` | Surface mobility at Si/SiO₂ (bulk + acoustic phonon + surface roughness). `e_normal_axis="y"` (default), `"x"` or `"magnitude"`. Coefficients from the material file's `mobility_lombardi` block (Si.yaml: Darwish 1997) |
 | Recombination | `SRH` | Default; lifetimes from the file; mid-gap trap (n₁ = p₁ = n_i). The file's `Et_eV` is not used yet |
 | Recombination | `Auger` | Dominates above ~10¹⁸ cm⁻³ |
 | Recombination | `Radiative` | Negligible in Si; for direct-gap materials |
@@ -68,11 +68,15 @@ register. Each file cites its sources.
 
   A missing one is an error, never filled with silicon's value.
 - **Model-specific blocks** may be omitted: `mobility_klaassen`,
-  `velocity_saturation`, the Auger/radiative coefficients and `avalanche`. The
+  `mobility_lombardi`, `velocity_saturation`, the Auger/radiative coefficients and `avalanche`. The
   loader records them in `MaterialParams.defaulted`. A model that needs one then
   refuses to run on that material and says what to add.
 - **Process variants:** `load_material("Si", process="mylab")` loads
   `mylab/Si.yaml`. A missing variant is an error, not a silent fallback.
+- **Calibrated variants** are process variants too. `opentcad.calibrate` fits
+  parameters to reference data and writes the result as one, with a
+  `calibration` block saying what was fitted and to what
+  ([Calibration](calibration.md)).
 
 Shipped today: `Si.yaml` (complete) and `SiO2.yaml` (insulator). The `Material`
 enum has more entries (Si₃N₄, poly-Si, GaN, SiC, …) than there are parameter

@@ -12,6 +12,7 @@ reference is for looking up exact signatures and behaviour.
 | [Device solver](device.md) | The DEVSIM drift–diffusion solver, physics configuration, extraction and optics. | `DeviceSolver`, `PhysicsConfig`, `MobilityModel`, `RecombinationModel` |
 | [Physics models](models.md) | Mobility, recombination, bandgap-narrowing and carrier-statistics models. | `ConstantMobility`, `Klaassen`, `Canali`, `Lombardi` |
 | [Materials](materials.md) | Material parameter files and the objects they load into. | `load_material`, `MaterialParams`, `MaterialFileError`, `params_from_dict` |
+| [Calibration](calibrate.md) | Fitting model parameters to reference data, and writing the result as a material file. | `fit`, `Parameter`, `FitResult`, `Evaluation` |
 | [Simulation files and sweeps](io.md) | Loading, checking, running and saving simulation files; parameter sweeps. | `load_deck`, `run_deck`, `save_deck`, `dumps_deck` |
 | [Plugin registries](plugins.md) | Registering and looking up process steps, analyses, models, metrics and data folders. | `register_step`, `StepHandler`, `step_handler`, `step_class` |
 | [Visualization](viz.md) | Figure data on the mesh, interactive Plotly figures and the colour palette. | `sample_on_grid`, `GridField`, `cells_on_grid`, `cell_values_on_grid` |

@@ -21,6 +21,22 @@
   used to be dropped) and a `meshfield_format` version. Older files still load.
 - **Implants** are checked when the step is created: an unknown species or an
   energy outside its table is an error immediately.
+- **Anneals keep dopant in the silicon.** Both anneal models used to diffuse
+  over the mesh's whole bounding box, so dopant crossed into the gate oxide
+  (with silicon's diffusivity) and into empty space such as an etched
+  trench, and that dose was lost from the silicon. Now silicon is the only
+  material dopants move in, and every other material is a no-flux wall. On
+  meshes that aren't all silicon, the anneal runs on the silicon triangles
+  with linear finite elements, so the wall sits exactly on the interface and
+  the dose is conserved to rounding. Results change for every annealed
+  structure that isn't all silicon. In the SKY130 NMOS the boron at the Si
+  surface goes from 3.5×10¹⁷ to 4.8×10¹⁷ cm⁻³ (the 1-D design value is
+  5.0×10¹⁷), and the threshold from 0.679 to 0.697 V (max-gm) and from
+  0.588 to 0.599 V (constant current). All-silicon meshes are unchanged.
+- **Lombardi coefficients** are read from the material file's
+  `mobility_lombardi` block instead of being built into the model. Si.yaml
+  carries the same values, so silicon results don't change; a material file
+  without the block is refused by `Lombardi`.
 - **Chained analyses.** Each analysis on a solver starts from zero bias, so a
   second sweep on the same solver converges and gives the same answer as the
   first.
@@ -37,6 +53,14 @@
 - **Extraction.** Threshold-voltage extraction (`opentcad.device.extract`).
 - **SKY130 check.** The Phase 2 threshold check against SKY130 `nfet_01v8`
   (`validation/sky130/`).
+- **Calibration.** `opentcad.calibrate`: bounded least-squares fits of model
+  parameters with parallel device simulations, and calibrated material files
+  (process variants with a `calibration` block). The first use is the SKY130
+  calibration (`validation/sky130/calibrate.py`): the stand-in channel implant
+  from SkyWater's body effect, then the Lombardi surface mobility. Vth and SS
+  end within 10 % of SkyWater's model card; Ion is 38 % low. The fitted
+  mobility values are effective, not physical. The SKY130 reference now also
+  has Id–Vgs curves and a body-effect table.
 - **Figures and GUI.**
   - Figures computed exactly on the mesh (`opentcad.viz`).
   - Interactive Plotly figures.

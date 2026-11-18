@@ -1,0 +1,108 @@
+# Silicon — a calibrated variant of Si.yaml, written by opentcad.calibrate.write_material_variant.
+# The fitted values are listed under calibration.fitted; every other value, and its citation,
+# is the base file's.
+material: Silicon
+symbol: Si
+bandgap:
+  Eg_eV_300K: 1.124
+  varshni_alpha: 0.000473
+  varshni_beta_K: 636
+electron_affinity_eV: 4.05
+Nc_cm3_300K: 2.86e19
+Nv_cm3_300K: 3.10e19
+ni_cm3_300K: 9.65e9
+permittivity_relative: 11.7
+mobility_constant:
+  electron_cm2_Vs: 1350.0
+  hole_cm2_Vs: 480.0
+  uncertainty_percent: 5
+mobility_klaassen:
+  mu_min_e: 52.2
+  mu_max_e: 1417.0
+  theta1_e: 2.285
+  m_e: 1.0
+  Nref_1_e: 9.68e16
+  alpha_1_e: 0.68
+  mu_min_h: 44.9
+  mu_max_h: 470.5
+  theta1_h: 2.247
+  m_h: 1.258
+  Nref_1_h: 2.2e17
+  alpha_1_h: 0.719
+  f_BH: 3.828
+  f_CW: 2.459
+  c_D: 0.21
+  c_A: 0.5
+  Nref_D: 4.0e20
+  Nref_A: 7.2e20
+  r1: 0.7643
+  r2: 2.2999
+  r3: 6.5502
+  r4: 2.367
+  r5: -0.01552
+  r6: 0.6478
+  s1: 0.892333
+  s2: 0.41372
+  s3: 0.19778
+  s4: 0.28227
+  s5: 0.005978
+  s6: 1.80618
+  s7: 0.72169
+mobility_lombardi:
+  B_e: 3.61e7
+  C_e: 417364.7183869161
+  tau_e: 0.0233
+  kappa_e: 1.7
+  A_e: 2.594488950997648
+  alpha_e: 6.85e-21
+  eta_e: 0.0767
+  delta_e: 5.939001540840966e+17
+  B_h: 1.51e7
+  C_h: 4.18e3
+  tau_h: 0.0119
+  kappa_h: 0.9
+  A_h: 2.18
+  alpha_h: 7.82e-21
+  eta_h: 0.123
+  delta_h: 4.10e15
+recombination:
+  tau_n_s: 1.0e-05
+  tau_p_s: 1.0e-05
+  Et_eV: 0.0
+  Cn_cm6_per_s: 2.8e-31
+  Cp_cm6_per_s: 9.9e-32
+  B_rad_cm3_per_s: 9.5e-15
+velocity_saturation:
+  vsat_e_cm_s: 1.02e7
+  vsat_h_cm_s: 0.72e7
+  beta_e: 2.0
+  beta_h: 1.0
+avalanche:
+  a_n_per_cm: 7.03e5
+  b_n_V_per_cm: 1.231e6
+  a_p_per_cm: 1.582e6
+  b_p_V_per_cm: 2.036e6
+calibration:
+  status: fitted
+  calibrated_against: SkyWater sky130_fd_pr__nfet_01v8, tt model card (BSIM4 in ngspice),
+    L = 1 µm, W = 10 µm, Vds = 50 mV, 300 K
+  fitted:
+    mobility_lombardi.C_e:
+      value: 417400.0
+      literature: 17000.0
+      fit_started_at: 51000.0
+    mobility_lombardi.delta_e:
+      value: 5.939e+17
+      literature: 3.58e+18
+      fit_started_at: 7.16e+17
+    mobility_lombardi.A_e:
+      value: 2.594
+      literature: 2.58
+      fit_started_at: 2.58
+  fitted_with: validation/sky130/calibrate.py
+  result: validation/sky130/calibration.json
+  valid_for: Lombardi(base=Klaassen()) on the calibrated NMOS of validation/sky130/calibrate.py
+    (B 10 keV, 4.99e+12 cm-2, 204 s at 1000 C), 10 nm mesh, 300 K
+  notes: 'Effective values: they absorb poly depletion, quantum confinement, the real
+    implant and thermal history and series-resistance differences, which the simulation
+    leaves out.'

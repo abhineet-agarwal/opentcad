@@ -4,7 +4,7 @@ Material parameter files and the objects they load into.
 
 For an introduction, see the [user guide](../device_physics.md#materials). This page is generated from the docstrings by `tools/gen_api_docs.py`.
 
-Import from `opentcad.materials.database`: `load_material`, `MaterialParams`, `MaterialFileError`, `params_from_dict`, `BandStructure`, `MobilityConstant`, `MobilityKlaassen`, `VelocitySaturation`, `Recombination`, `Avalanche`.
+Import from `opentcad.materials.database`: `load_material`, `MaterialParams`, `MaterialFileError`, `params_from_dict`, `BandStructure`, `MobilityConstant`, `MobilityKlaassen`, `MobilityLombardi`, `VelocitySaturation`, `Recombination`, `Avalanche`.
 
 ## load_material
 
@@ -34,7 +34,7 @@ MaterialParams pydantic object.
 
 - `FileNotFoundError`: If no YAML file found for the given symbol.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L150)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L176)
 
 ## MaterialParams
 
@@ -47,6 +47,7 @@ class opentcad.materials.database.MaterialParams(
     band_structure: BandStructure = BandStructure(Eg_eV_300K=1.124, electron_affinity_eV=4.05, Nc_cm3_300K=2.86e+19, Nv_cm3_300K=3.1e+19, ni_cm3_300K=9650000000.0, permittivity_relative=11.7),
     mobility_constant: MobilityConstant = MobilityConstant(electron_cm2_Vs=1350.0, hole_cm2_Vs=480.0, uncertainty_percent=5.0),
     mobility_klaassen: MobilityKlaassen = MobilityKlaassen(mu_min_e=52.2, mu_max_e=1417.0, theta1_e=2.285, m_e=1.0, Nref_1_e=9.68e+16, alpha_1_e=0.68, mu_min_h=44.9, mu_max_h=470.5, theta1_h=2.247, m_h=1.258, Nref_1_h=2.2e+17, alpha_1_h=0.719, f_BH=3.828, f_CW=2.459, c_D=0.21, c_A=0.5, Nref_D=4e+20, Nref_A=7.2e+20, r1=0.7643, r2=2.2999, r3=6.5502, r4=2.367, r5=-0.01552, r6=0.6478, s1=0.892333, s2=0.41372, s3=0.19778, s4=0.28227, s5=0.005978, s6=1.80618, s7=0.72169),
+    mobility_lombardi: MobilityLombardi = MobilityLombardi(B_e=36100000.0, C_e=17000.0, tau_e=0.0233, kappa_e=1.7, A_e=2.58, alpha_e=6.85e-21, eta_e=0.0767, delta_e=3.58e+18, B_h=15100000.0, C_h=4180.0, tau_h=0.0119, kappa_h=0.9, A_h=2.18, alpha_h=7.82e-21, eta_h=0.123, delta_h=4100000000000000.0),
     recombination: Recombination = Recombination(tau_n_s=1e-05, tau_p_s=1e-05, Et_eV=0.0, Cn_cm6_per_s=2.8e-31, Cp_cm6_per_s=9.9e-32, B_rad_cm3_per_s=9.5e-15),
     velocity_saturation: VelocitySaturation = VelocitySaturation(vsat_e_cm_s=10200000.0, vsat_h_cm_s=7200000.0, beta_e=2.0, beta_h=1.0),
     avalanche: Avalanche = Avalanche(a_n_per_cm=703000.0, b_n_V_per_cm=1231000.0, a_p_per_cm=1582000.0, b_p_V_per_cm=2036000.0),
@@ -58,7 +59,7 @@ class opentcad.materials.database.MaterialParams(
 
 Validated material parameter set for one material.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L116)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L141)
 
 ## MaterialFileError
 
@@ -68,7 +69,7 @@ class opentcad.materials.database.MaterialFileError
 
 A material file lacks fields every simulation needs.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L136)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L162)
 
 ## params_from_dict
 
@@ -86,12 +87,12 @@ Build MaterialParams from a parsed material file.
 Fields every simulation needs (REQUIRED_ALL, plus REQUIRED_SEMICONDUCTOR
 unless ``is_insulator: true``) must be present: a missing one raises
 MaterialFileError instead of silently taking silicon's value. Optional
-model blocks (Klaassen, velocity saturation, Auger/radiative, avalanche)
+model blocks (Klaassen, Lombardi, velocity saturation, Auger/radiative, avalanche)
 fall back to the code defaults, which are silicon's; every field filled
 that way is listed in ``MaterialParams.defaulted`` so the models that
 need it can refuse to run.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L211)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L237)
 
 ## BandStructure
 
@@ -113,7 +114,7 @@ and intrinsic density at 300 K [cm⁻³], and relative permittivity.
 Field defaults are silicon's values; the required fields (see
 ``load_material``) must still be given in a material file.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L81)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L106)
 
 ## MobilityConstant
 
@@ -180,6 +181,39 @@ block, these defaults are used.
 
 [source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L32)
 
+## MobilityLombardi
+
+```python
+class opentcad.materials.database.MobilityLombardi(
+    *,
+    B_e: float = 3.61e07,
+    C_e: float = 17000.0,
+    tau_e: float = 0.0233,
+    kappa_e: float = 1.7,
+    A_e: float = 2.58,
+    alpha_e: float = 6.85e-21,
+    eta_e: float = 0.0767,
+    delta_e: float = 3.58e18,
+    B_h: float = 1.51e07,
+    C_h: float = 4180.0,
+    tau_h: float = 0.0119,
+    kappa_h: float = 0.9,
+    A_h: float = 2.18,
+    alpha_h: float = 7.82e-21,
+    eta_h: float = 0.123,
+    delta_h: float = 4.1e15,
+) -> None
+```
+
+Lombardi surface-mobility coefficients (CGS units, see the model).
+
+Reference: Lombardi et al., IEEE Trans. CAD 7, 1164 (1988); values from
+Darwish et al., IEEE TED 44, 1529 (1997), as in DEVSIM's Klaassen.py
+``Philips_Surface_Mobility``. Field defaults are silicon's values; a
+material file that omits the block is refused by the ``Lombardi`` model.
+
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L67)
+
 ## VelocitySaturation
 
 ```python
@@ -198,7 +232,7 @@ the ``Canali`` high-field model.
 Field defaults are silicon's values; the required fields (see
 ``load_material``) must still be given in a material file.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L95)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L120)
 
 ## Recombination
 
@@ -220,7 +254,7 @@ coefficients [cm⁶/s] and the radiative coefficient [cm³/s].
 Field defaults are silicon's values; the required fields (see
 ``load_material``) must still be given in a material file.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L67)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L92)
 
 ## Avalanche
 
@@ -237,4 +271,4 @@ class opentcad.materials.database.Avalanche(
 Impact-ionisation Chynoweth coefficients, Si defaults are the
 van Overstraeten-de Man single-regime fit.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L107)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L132)

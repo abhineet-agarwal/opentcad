@@ -110,8 +110,9 @@ gamma        = A + alpha*(n+p) / NI^eta
 
 NI = |Donors| + |Acceptors| is the total ionised impurity density.
 Reference: Lombardi, Manzini, Saporito, Vanzi, IEEE TCAD 7, 1164 (1988).
-Coefficients follow the DEVSIM Klaassen.py `Philips_Surface_Mobility`
-reference (extracted from Darwish 1997 / Sentaurus defaults).
+The coefficients come from the material file's ``mobility_lombardi``
+block (Si.yaml carries Darwish 1997's values, as in DEVSIM's Klaassen.py
+``Philips_Surface_Mobility``); a file without the block is refused.
 
 Composes with any bulk model. Typical MOS use:
 

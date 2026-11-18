@@ -64,6 +64,31 @@ class MobilityKlaassen(BaseModel):
     s7: float = 0.72169
 
 
+class MobilityLombardi(BaseModel):
+    """Lombardi surface-mobility coefficients (CGS units, see the model).
+
+    Reference: Lombardi et al., IEEE Trans. CAD 7, 1164 (1988); values from
+    Darwish et al., IEEE TED 44, 1529 (1997), as in DEVSIM's Klaassen.py
+    ``Philips_Surface_Mobility``. Field defaults are silicon's values; a
+    material file that omits the block is refused by the ``Lombardi`` model."""
+    B_e: float = 3.61e7
+    C_e: float = 1.70e4
+    tau_e: float = 0.0233
+    kappa_e: float = 1.7
+    A_e: float = 2.58
+    alpha_e: float = 6.85e-21
+    eta_e: float = 0.0767
+    delta_e: float = 3.58e18
+    B_h: float = 1.51e7
+    C_h: float = 4.18e3
+    tau_h: float = 0.0119
+    kappa_h: float = 0.9
+    A_h: float = 2.18
+    alpha_h: float = 7.82e-21
+    eta_h: float = 0.123
+    delta_h: float = 4.10e15
+
+
 class Recombination(BaseModel):
     """SRH lifetimes [s], trap energy relative to mid-gap [eV], Auger
     coefficients [cm⁶/s] and the radiative coefficient [cm³/s].
@@ -121,6 +146,7 @@ class MaterialParams(BaseModel):
     band_structure: BandStructure = BandStructure()
     mobility_constant: MobilityConstant = MobilityConstant()
     mobility_klaassen: MobilityKlaassen = MobilityKlaassen()
+    mobility_lombardi: MobilityLombardi = MobilityLombardi()
     recombination: Recombination = Recombination()
     velocity_saturation: VelocitySaturation = VelocitySaturation()
     avalanche: Avalanche = Avalanche()
@@ -214,7 +240,7 @@ def params_from_dict(raw: dict, symbol: str = "", *, source: str = "") -> Materi
     Fields every simulation needs (REQUIRED_ALL, plus REQUIRED_SEMICONDUCTOR
     unless ``is_insulator: true``) must be present: a missing one raises
     MaterialFileError instead of silently taking silicon's value. Optional
-    model blocks (Klaassen, velocity saturation, Auger/radiative, avalanche)
+    model blocks (Klaassen, Lombardi, velocity saturation, Auger/radiative, avalanche)
     fall back to the code defaults, which are silicon's; every field filled
     that way is listed in ``MaterialParams.defaulted`` so the models that
     need it can refuse to run.
@@ -267,6 +293,7 @@ def params_from_dict(raw: dict, symbol: str = "", *, source: str = "") -> Materi
         band_structure=band,
         mobility_constant=block("mobility_constant", MobilityConstant),
         mobility_klaassen=block("mobility_klaassen", MobilityKlaassen),
+        mobility_lombardi=block("mobility_lombardi", MobilityLombardi),
         recombination=block("recombination", Recombination),
         velocity_saturation=block("velocity_saturation", VelocitySaturation),
         avalanche=block("avalanche", Avalanche),

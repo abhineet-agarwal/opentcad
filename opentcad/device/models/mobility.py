@@ -258,8 +258,9 @@ class Lombardi(MobilityModel):
 
     NI = |Donors| + |Acceptors| is the total ionised impurity density.
     Reference: Lombardi, Manzini, Saporito, Vanzi, IEEE TCAD 7, 1164 (1988).
-    Coefficients follow the DEVSIM Klaassen.py `Philips_Surface_Mobility`
-    reference (extracted from Darwish 1997 / Sentaurus defaults).
+    The coefficients come from the material file's ``mobility_lombardi``
+    block (Si.yaml carries Darwish 1997's values, as in DEVSIM's Klaassen.py
+    ``Philips_Surface_Mobility``); a file without the block is refused.
 
     Composes with any bulk model. Typical MOS use:
 
@@ -289,7 +290,7 @@ class Lombardi(MobilityModel):
     """
 
     def required_params(self) -> tuple[str, ...]:
-        return self.base.required_params()   # own coefficients are built in (Darwish 1997)
+        return ("mobility_lombardi",) + self.base.required_params()
 
     def __init__(self, base: Optional[MobilityModel] = None,
                  e_normal_axis: str = "y"):
@@ -304,21 +305,10 @@ class Lombardi(MobilityModel):
     def requires_carriers(self) -> bool:
         return True   # Lombardi mu_sr's gamma depends on (n+p)
 
-    _params = {
-        "Lb_B_e": 3.61e7, "Lb_C_e": 1.70e4,
-        "Lb_tau_e": 0.0233, "Lb_kappa_e": 1.7,
-        "Lb_A_e": 2.58, "Lb_alpha_e": 6.85e-21,
-        "Lb_eta_e": 0.0767, "Lb_delta_e": 3.58e18,
-        "Lb_B_h": 1.51e7, "Lb_C_h": 4.18e3,
-        "Lb_tau_h": 0.0119, "Lb_kappa_h": 0.9,
-        "Lb_A_h": 2.18, "Lb_alpha_h": 7.82e-21,
-        "Lb_eta_h": 0.123, "Lb_delta_h": 4.10e15,
-    }
-
     def attach(self, ds, device, region, params, T_K):
         self.base.attach(ds, device, region, params, T_K)
-        for name, val in self._params.items():
-            ds.set_parameter(device=device, region=region, name=name,
+        for name, val in vars(params.mobility_lombardi).items():
+            ds.set_parameter(device=device, region=region, name=f"Lb_{name}",
                              value=float(val))
         ds.set_parameter(device=device, region=region, name="T",
                          value=float(T_K))

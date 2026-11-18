@@ -83,9 +83,15 @@ PAGES = [
          "Material parameter files and the objects they load into.",
          [("opentcad.materials.database", ["load_material", "MaterialParams", "MaterialFileError",
                                            "params_from_dict", "BandStructure", "MobilityConstant",
-                                           "MobilityKlaassen", "VelocitySaturation",
+                                           "MobilityKlaassen", "MobilityLombardi",
+                                           "VelocitySaturation",
                                            "Recombination", "Avalanche"])],
          guide="../device_physics.md#materials"),
+    Page("calibrate", "Calibration",
+         "Fitting model parameters to reference data, and writing the result as a material file.",
+         [("opentcad.calibrate", ["fit", "Parameter", "FitResult", "Evaluation",
+                                  "apply_overrides", "write_material_variant"])],
+         guide="../calibration.md"),
     Page("io", "Simulation files and sweeps",
          "Loading, checking, running and saving simulation files; parameter sweeps.",
          [("opentcad.io", ["load_deck", "run_deck", "save_deck", "dumps_deck", "deck_from_dict",
@@ -192,7 +198,7 @@ def _default(value) -> str:
         inner = ", ".join(_default(v) for v in value)
         return f"({inner},)" if isinstance(value, tuple) and len(value) == 1 else (
             f"({inner})" if isinstance(value, tuple) else f"[{inner}]")
-    if inspect.isfunction(value) or inspect.isclass(value):
+    if inspect.isfunction(value) or inspect.isclass(value) or inspect.isbuiltin(value):
         return value.__name__
     text = repr(value)
     return f"{type(value).__name__}(…)" if " at 0x" in text else _short(text)
