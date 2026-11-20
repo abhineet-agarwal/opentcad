@@ -95,11 +95,37 @@ def coefficients(ambient: str) -> DealGroveArrhenius:
     """
     key = ambient.strip().lower()
     if key == "dry":
+        _note_coefficients(key, _DRY_O2_100_SI)
         return _DRY_O2_100_SI
     if key == "wet":
+        _note_coefficients(key, _WET_H2O_100_SI)
         return _WET_H2O_100_SI
     raise ValueError(
         f"Unknown oxidation ambient {ambient!r} — expected 'dry' or 'wet'.")
+
+
+def _note_coefficients(ambient: str, c: DealGroveArrhenius) -> None:
+    """Note the Deal-Grove coefficients and the Si-consumption ratio used."""
+    from opentcad.provenance import CODATA_2018, Source, active, note_model, note_value
+    if active() is None:
+        return
+    note_model("oxidation", "Deal-Grove linear-parabolic law", (Source(
+        "B. E. Deal, A. S. Grove, General relationship for the thermal oxidation "
+        "of silicon, J. Appl. Phys. 36, 3770 (1965)", doi="10.1063/1.1713945"),))
+    plummer = Source("J. D. Plummer, M. D. Deal, P. B. Griffin, Silicon VLSI "
+                     "Technology (Prentice Hall, 2000)",
+                     note="ch. 6, <100> Si at 1 atm, as the code cites it; "
+                          "pre-exponents converted from per hour to per second")
+    group = "Oxidation: Deal-Grove, <100> Si, 1 atm"
+    note_value(group, f"{ambient} ambient",
+               {"B_C_um2_per_s": c.B_C, "B_Ea_eV": c.B_Ea,
+                "B_over_A_C_um_per_s": c.LN_C, "B_over_A_Ea_eV": c.LN_Ea},
+               (plummer,), file=__file__)
+    note_value(group, "Si consumed per unit oxide grown", ALPHA_SI_CONSUMED_PER_OXIDE,
+               (), file=__file__,
+               note="computed in the code from N_Si/N_SiO2 = 5.0e22/2.2e22 and "
+                    "described as 'per Sze'; no edition or page recorded")
+    note_value("Physical constants", "k_B [eV/K]", _K_BOLTZMANN_EV_PER_K, (CODATA_2018,))
 
 
 def oxide_thickness(x0_um: float, t_s: float,

@@ -159,7 +159,12 @@ Milestone 3.3 — Calibration infrastructure (scipy optimizer, SKY130 target met
 
 Status against the exit, at L = 1 µm: Vth −0.1 % (max-gm) and −8.8 %
 (100 nA·W/L), SS −4.5 %, Ion −3.6 %. All three are within 10 %. Not yet
-met: "all parameters cited". The fitted Lombardi coefficients are effective
+met: "all parameters cited". Citations are now machine-read
+(opentcad.provenance) and every run lists the values it used without one:
+12 in Si.yaml, 1 in SiO2.yaml, and four constants in the code
+(docs/provenance.md; tests/provenance keeps the list from growing). The
+citations carried over from the files' comments still need checking against
+the papers. The fitted Lombardi coefficients are effective
 values (a systematic residual remains), and the reference is a compact model
 at one gate length and 300 K, not measured silicon.
 

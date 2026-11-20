@@ -20,10 +20,11 @@ the open alternative, built on four commitments:
 - **Reproducible.** A whole simulation is a plain-text file (structure, process
   recipe, mesh, physics, analyses) that anyone can check, rerun and diff. Sweeps
   are files too.
-- **Honest about what it knows.** Every number is either given by you, taken from
-  a cited source, or flagged as an assumption. Missing information is an error or
-  a question, never a silent default. Physics features land with a quantitative
-  check against an analytic result or a published reference.
+- **Honest about what it knows.** Every run lists each number it used and the
+  source its file or code cites for it, and says which have none
+  (`opentcad sources`). Missing information is an error or a question, never a
+  silent default. Physics features land with a quantitative check against an
+  analytic result or a published reference.
 - **Extensible.** New process steps, device analyses, physics models, metrics,
   materials and dopant tables plug in from outside the core, through the same
   registries the built-ins use.
@@ -48,6 +49,7 @@ first slice, a [private local catalog](docs/catalog.md), already exists.
 | Analyses: I–V, C–V, transient, small-signal AC, field snapshots | Working | Equilibrium snapshot matches pn analytics to 1 mV |
 | SKY130 NMOS threshold check | Passes (Phase 2 exit) | Vth +17.7 % (max-gm), +9.6 % (100 nA·W/L) vs SkyWater's model card |
 | Simulation files, CLI, parameter sweeps | Working | Every point checked before running |
+| Provenance of every value a run uses | Working | Each value read from data files and code is listed with its source, the models with their papers, files with SHA-256; 13 shipped values have no source yet and are listed |
 | Device design from specifications (`opentcad design`) | First slice | Bounded search over existing fields of a file; every candidate kept as evidence; a local model can draft plans, which never run by themselves |
 | Plugins (steps, analyses, models, metrics, data) | Working | Entry-point discovery; clashes are errors |
 | GUI with a local open-weights assistant | Working | Drafts are checked, repaired and every assumed value flagged |
@@ -121,7 +123,7 @@ manual and published with GitBook:
 |---|---|
 | Getting started | [Installation](docs/installation.md), [Quickstart](docs/getting_started.md) |
 | Tutorials | [Five tutorials](docs/tutorials/README.md), from a p-n junction to LOCOS, and an [example gallery](docs/tutorials/examples.md) |
-| User guide | [Concepts](docs/concepts.md), [Simulation files](docs/simulation_files.md), [Device design](docs/design.md), [Process](docs/process.md), [Device physics](docs/device_physics.md), [Visualization](docs/visualization.md), [Assistant](docs/assistant.md), [Process catalog](docs/catalog.md) |
+| User guide | [Concepts](docs/concepts.md), [Simulation files](docs/simulation_files.md), [Sources and provenance](docs/provenance.md), [Device design](docs/design.md), [Process](docs/process.md), [Device physics](docs/device_physics.md), [Visualization](docs/visualization.md), [Assistant](docs/assistant.md), [Process catalog](docs/catalog.md) |
 | API reference | [Every public class and function](docs/api/README.md), generated from the docstrings |
 | Development | [Contributing](docs/contributing.md), [Architecture](docs/architecture.md), [Plugins](docs/plugins.md), [Validation](docs/validation.md), [Releasing](docs/releasing.md) |
 

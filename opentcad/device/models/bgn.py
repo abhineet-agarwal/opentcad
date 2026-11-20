@@ -16,6 +16,7 @@ Models:
 """
 from __future__ import annotations
 from ..physics import BandgapNarrowingModel
+from .references import SLOTBOOM_DE_GRAAFF_1976
 
 
 class NoBGN(BandgapNarrowingModel):
@@ -45,6 +46,8 @@ class Slotboom(BandgapNarrowingModel):
     Reference: Slotboom & de Graaff, Solid-State Electron. 19, 857 (1976).
     """
 
+    references = (SLOTBOOM_DE_GRAAFF_1976,)
+
     #: Reference bandgap-narrowing prefactor [eV]. Common Si fits use
     #: 6.92 meV (del Alamo/Klaassen unified) or 9 meV (original Slotboom);
     #: 6.92 gives closer agreement with modern SIMS-calibrated data.
@@ -53,6 +56,13 @@ class Slotboom(BandgapNarrowingModel):
     N_ref_cm3: float = 1.0e17
 
     def attach(self, ds, device, region, params, T_K):
+        from opentcad.provenance import note_value
+        why = ("set in the model code; the code describes 6.92 meV as the updated "
+               "del Alamo / Klaassen unified fit but cites no paper for the values")
+        note_value("Model: Slotboom bandgap narrowing", "E_ref_eV", float(self.E_ref_eV),
+                   (), file=__file__, note=why)
+        note_value("Model: Slotboom bandgap narrowing", "N_ref_cm3", float(self.N_ref_cm3),
+                   (), file=__file__, note=why)
         ds.set_parameter(device=device, region=region, name="BGN_Eref",
                          value=float(self.E_ref_eV))
         ds.set_parameter(device=device, region=region, name="BGN_Nref",

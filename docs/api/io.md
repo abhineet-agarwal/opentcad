@@ -27,7 +27,10 @@ Run a deck: build the structure, run the recipe (topography, mesh,
 doping), then — if the deck has a ``device`` section — create one
 DeviceSolver and run the analyses on it in order.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L932)
+The run is recorded (``opentcad.provenance``): ``result.provenance``
+lists every value read from data files and code with its source.
+
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L935)
 
 ## save_deck
 
@@ -96,10 +99,13 @@ class opentcad.io.DeckResult(
     meshfield: Any,
     recipe_result: Any,
     analyses: dict[str, Any] = dict(),
+    provenance: Any = None,
 ) -> None
 ```
 
-What ``run_deck`` produced.
+What ``run_deck`` produced. ``provenance`` is the run's
+``opentcad.provenance.Record``: every value it read from data files and
+code, with sources, plus the models, files and versions.
 
 [source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/deck.py#L899)
 
@@ -141,7 +147,7 @@ opentcad.io.run_sweep(sweep: Sweep, outdir, *, jobs: int = 1, log=None) -> Sweep
 
 Run every point and write the output folder. Returns the rows.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/sweep.py#L316)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/sweep.py#L318)
 
 ## Sweep
 
@@ -178,7 +184,7 @@ class opentcad.io.SweepResult(outdir: Path, rows: list[dict]) -> None
 A finished sweep: the output folder (``table.csv`` plus each point's
 file and results) and one row per point.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/sweep.py#L304)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/io/sweep.py#L306)
 
 ### SweepResult.table
 

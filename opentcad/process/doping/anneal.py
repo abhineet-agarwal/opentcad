@@ -70,6 +70,23 @@ def _load_diffusion_yaml(canonical: str) -> dict:
     return table
 
 
+def _note_diffusion(canonical: str, table: dict, keys) -> None:
+    """Note the diffusion coefficients used, with the table's sources."""
+    from opentcad.plugins import find_data_file
+    from opentcad.provenance import active, note_value, parse_sources, sources_for
+    from .pearson_iv import _symbol_for
+    if active() is None:
+        return
+    path = find_data_file("dopants", f"{_symbol_for(canonical)}_diffusion.yaml")
+    cited = parse_sources(table, str(path))
+    for key in keys:
+        block = table["intrinsic"] if key == "intrinsic" else table["fair"][key]
+        where = "intrinsic" if key == "intrinsic" else f"fair.{key}"
+        note_value(f"Diffusion: {canonical} in Si", f"{where} (D0, Ea)",
+                   {"D0_cm2s": float(block["D0_cm2s"]), "Ea_eV": float(block["Ea_eV"])},
+                   sources_for(cited, where), file=path)
+
+
 def diffusivity_intrinsic(species: str, T_K: float,
                            target: Material = Material.SI) -> float:
     """Intrinsic Fick diffusivity D_i(T) in cm²/s per Arrhenius fit.
@@ -89,6 +106,7 @@ def diffusivity_intrinsic(species: str, T_K: float,
         raise ValueError(f"temperature must be > 0 K; got {T_K}")
     canonical = canonicalize_species(species)
     table = _load_diffusion_yaml(canonical)
+    _note_diffusion(canonical, table, ["intrinsic"])
     D0 = float(table["intrinsic"]["D0_cm2s"])
     Ea = float(table["intrinsic"]["Ea_eV"])
     return D0 * math.exp(-Ea / (_K_BOLTZMANN_EV_PER_K * T_K))
@@ -116,6 +134,7 @@ def fair_diffusivity_components(species: str, T_K: float
     for key in ("D_minus", "D_minus_minus", "D_plus", "D_plus_plus"):
         if key in fair:
             out[key] = _arrhenius(fair[key], T_K)
+    _note_diffusion(canonical, table, ["intrinsic", *(k for k in out if k != "D_i")])
     return out
 
 
@@ -129,8 +148,27 @@ def _intrinsic_carrier_density_cm3(T_K: float) -> float:
     Fair-regime crossover for dopant D(n/n_i) saturates for
     doping below this.
     """
-    return 3.1e16 * (T_K ** 1.5) * math.exp(
-        -0.603 / (_K_BOLTZMANN_EV_PER_K * T_K))
+    _note_ni_T()
+    return _NI_PREFACTOR * (T_K ** 1.5) * math.exp(
+        -_NI_ACTIVATION_EV / (_K_BOLTZMANN_EV_PER_K * T_K))
+
+
+_NI_PREFACTOR = 3.1e16        # [cm^-3 K^-1.5]
+_NI_ACTIVATION_EV = 0.603     # [eV]
+
+
+def _note_ni_T() -> None:
+    from opentcad.provenance import CODATA_2018, Source, active, note_value
+    if active() is None:
+        return
+    note_value("Diffusion: silicon n_i(T) for Fair's model",
+               "n_i = A·T^1.5·exp(-E/kT)",
+               {"A_cm3_K-1.5": _NI_PREFACTOR, "E_eV": _NI_ACTIVATION_EV},
+               (Source("J. D. Plummer, M. D. Deal, P. B. Griffin, Silicon VLSI "
+                       "Technology (Prentice Hall, 2000)",
+                       note="eq. 1.4.13, as the code cites it"),),
+               file=__file__)
+    note_value("Physical constants", "k_B [eV/K]", _K_BOLTZMANN_EV_PER_K, (CODATA_2018,))
 
 
 def temperature_celsius_to_kelvin(T_C: float) -> float:

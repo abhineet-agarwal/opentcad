@@ -180,7 +180,32 @@ def moments_for(species: str, energy_keV: float,
     table = _load_species(canonical)
     rows = sorted(table["moments"], key=lambda r: r["energy_keV"])
     energies = [r["energy_keV"] for r in rows]
+    moments = _moments_for(canonical, table, rows, energies, energy_keV)
+    _note_moments(canonical, table, energy_keV, moments, rows, energies)
+    return moments
 
+
+def _note_moments(canonical, table, energy_keV, m, rows, energies) -> None:
+    """Note the moments used, and the table's sources, in a provenance record."""
+    from opentcad.provenance import active, note_value, parse_sources, sources_for
+    if active() is None:
+        return
+    path = _species_index().files[canonical]
+    exact = energy_keV in energies
+    if exact:
+        how = "table row"
+    else:
+        lo = max(e for e in energies if e <= energy_keV)
+        hi = min(e for e in energies if e >= energy_keV)
+        how = f"interpolated between the {lo:g} and {hi:g} keV rows"
+    note_value(f"Implant: {canonical} in Si", f"moments at {energy_keV:g} keV",
+               {"Rp_um": m.Rp_um, "dRp_um": m.dRp_um, "gamma": m.gamma, "beta": m.beta},
+               sources_for(parse_sources(table, str(path)), "moments"),
+               file=path, note=how)
+
+
+def _moments_for(canonical, table, rows, energies, energy_keV) -> PearsonMoments:
+    """The moments at ``energy_keV`` from the sorted table rows."""
     if not (energies[0] <= energy_keV <= energies[-1]):
         raise ValueError(
             f"Energy {energy_keV} keV outside tabulated range for "

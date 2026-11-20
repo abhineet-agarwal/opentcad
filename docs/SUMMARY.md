@@ -21,6 +21,7 @@
 
 * [Concepts](concepts.md)
 * [Simulation files and the CLI](simulation_files.md)
+* [Sources and provenance](provenance.md)
 * [Device design from specifications](design.md)
 * [Process simulation](process.md)
 * [Device physics](device_physics.md)
@@ -42,6 +43,7 @@
   * [Materials](api/materials.md)
   * [Calibration](api/calibrate.md)
   * [Simulation files and sweeps](api/io.md)
+  * [Provenance](api/provenance.md)
   * [Device design](api/design.md)
   * [Plugin registries](api/plugins.md)
   * [Visualization](api/viz.md)

@@ -15,7 +15,8 @@ records the result as a material file you can load by name.
 - **[`apply_overrides`](api/calibrate.md#apply_overrides):** a copy of a
   `MaterialParams` with fitted values set, checked like a file.
 - **[`write_material_variant`](api/calibrate.md#write_material_variant):** the
-  result as a process-variant material file, with a `calibration` block saying
+  result as a process-variant material file (the fitted values cite the fit as
+  their source), with a `calibration` block saying
   what was fitted, to what and from which starting values.
 
 ## A fit in outline

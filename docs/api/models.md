@@ -17,7 +17,7 @@ Constant mobility from MaterialParams.mobility_constant.
 No doping or carrier dependence. This is the Phase 0 default and
 reproduces the original DeviceSolver behavior exactly.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L21)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L22)
 
 ## Klaassen
 
@@ -41,7 +41,7 @@ Output edge models `ElectronMobilityEdge` / `HoleMobilityEdge` are
 geometric means of node values; carrier derivatives are registered
 so Newton on the continuity equations converges.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L41)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L42)
 
 ## Canali
 
@@ -98,7 +98,7 @@ Canali(base=Klaassen())       — full CMOS mobility
 Canali(base=ConstantMobility()) — simple high-field
 ```
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L163)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L166)
 
 ### Canali.requires_carriers
 
@@ -189,7 +189,7 @@ derivative wrt ``Potential`` at each node is finite but
 averaging to edges smooths out the step; Newton converges.
 ```
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L307)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/mobility.py#L316)
 
 ### Lombardi.requires_carriers
 
@@ -215,7 +215,7 @@ Parameters tau_n_s, tau_p_s come from MaterialParams.recombination.
 n1 = p1 = n_i for a mid-gap trap (Et = 0 in the YAML default).
 `n_i_expr` is substituted for the bare n_i wherever BGN is active.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/recombination.py#L37)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/recombination.py#L38)
 
 ## Auger
 
@@ -233,7 +233,7 @@ Coefficients C_n, C_p for Si: Dziewior & Schmid, APL 31, 346 (1977).
 Auger dominates over SRH for carrier densities > ~1e18 cm^-3, i.e.
 in the n+ emitter / source-drain regions of bipolar and MOS devices.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/recombination.py#L62)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/recombination.py#L65)
 
 ## Radiative
 
@@ -249,7 +249,7 @@ Coefficient B from MaterialParams.recombination.B_rad_cm3_per_s.
 Negligible in indirect-gap Si (B ~ 1e-14 cm^3/s); dominant in direct-
 gap GaAs/GaN (B ~ 1e-10).
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/recombination.py#L89)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/recombination.py#L94)
 
 ## Avalanche
 
@@ -307,7 +307,7 @@ omitted from the Newton Jacobian — frozen-field each outer
 iteration. Newton still converges; slower near the knee.
 ```
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/recombination.py#L111)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/recombination.py#L116)
 
 ## NoBGN
 
@@ -318,7 +318,7 @@ class opentcad.device.models.NoBGN()
 No bandgap narrowing. n_i stays constant. Used as the default so
 existing callers get identical behavior to Phase 0.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/bgn.py#L21)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/bgn.py#L22)
 
 ## Slotboom
 
@@ -341,7 +341,7 @@ n_i_eff = n_i * exp(dEg / (2*V_t))
 
 Reference: Slotboom & de Graaff, Solid-State Electron. 19, 857 (1976).
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/bgn.py#L33)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/bgn.py#L34)
 
 ## Boltzmann
 
@@ -355,7 +355,7 @@ n = N_c * exp((E_F - E_c) / kT) — valid when E_F is at least a few
 kT below E_c. Breaks down at doping > ~1e19 cm^-3 in Si where
 degeneracy becomes important.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/statistics.py#L26)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/statistics.py#L27)
 
 ## FermiDirac
 
@@ -385,7 +385,7 @@ so the built-in potential and Vth extraction shift by 10-100 mV
 compared to Boltzmann.
 ```
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/statistics.py#L43)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/statistics.py#L44)
 
 ## JoyceDixon
 
@@ -431,4 +431,4 @@ in practice since Newton iterates in the carrier variables.
 Use case: this is the right class to pick for Si sources/drains at
 1e20+ doping where Blakemore distorts the contact BC noticeably.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/statistics.py#L93)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/statistics.py#L99)

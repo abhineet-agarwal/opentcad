@@ -24,3 +24,25 @@ mobility_constant:
 recombination:
   tau_n_s: 1.0e-12
   tau_p_s: 1.0e-12
+
+# --- Sources ----------------------------------------------------------------
+# A value not listed under `cite` has no recorded source.
+sources:
+  szeng2007:
+    cite: S. M. Sze, K. K. Ng, Physics of Semiconductor Devices, 3rd ed. (Wiley, 2007)
+    note: thermal oxide
+  dimaria1995:
+    cite: DiMaria (1995); the file gives no fuller reference
+  unused:
+    kind: placeholder
+    cite: Nominal value; carriers are not solved in an insulator, so the solver
+      doesn't use it
+
+cite:
+  permittivity_relative: szeng2007
+  bandgap.Eg_eV_300K: dimaria1995
+  Nc_cm3_300K: unused
+  Nv_cm3_300K: unused
+  ni_cm3_300K: unused
+  mobility_constant: unused
+  recombination: unused

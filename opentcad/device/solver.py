@@ -944,6 +944,11 @@ class DeviceSolver:
                 f"choose models that don't need them.")
 
     def _setup_equations(self) -> None:
+        from opentcad.provenance import CODATA_2018, note_value
+        self.physics.note_provenance()
+        for name, value in (("q [C]", Q_C), ("k_B [J/K]", KB_J),
+                            ("eps0 [F/cm]", EPS0_F_CM)):
+            note_value("Physical constants", name, value, (CODATA_2018,))
         for region, mat in self._region_materials.items():
             params = self._params_for_region(mat)
             if not self._region_is_insulator.get(region, False):

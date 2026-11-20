@@ -9,6 +9,7 @@ opentcad check examples/decks/nmos_implanted.yaml        # list every problem, o
 opentcad run   examples/decks/nmos_implanted.yaml        # → nmos_implanted.results.json
 opentcad run   deck.yaml -o out.json --vtu mesh.vtu      # also save the final MeshField
 opentcad sweep examples/decks/nmos_tox_sweep.yaml        # parameter sweep → table.csv
+opentcad sources nmos_implanted.results.json             # every value the run used, with its source
 opentcad plugins                                         # what steps/analyses/models exist
 opentcad design run examples/design/pn_current.yaml -o out/   # search doping for a target
 ```
@@ -17,6 +18,10 @@ opentcad design run examples/design/pn_current.yaml -o out/   # search doping fo
 `opentcad` command. `opentcad design` has its own page:
 [Device design from specifications](design.md). Exit status: 0 success, 1 the file has problems, 2 the
 run failed. DEVSIM's per-iteration output is hidden unless `--verbose`.
+
+The results file has a `provenance` block. It lists every value the run read
+from data files and code with its source, plus the models, files and code
+version; see [Sources and provenance](provenance.md).
 
 From Python:
 

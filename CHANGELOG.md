@@ -55,9 +55,33 @@
 - **Chained analyses.** Each analysis on a solver starts from zero bias, so a
   second sweep on the same solver converges and gives the same answer as the
   first.
+- **Canali with bandgap narrowing.** The quasi-Fermi driving force read
+  `n_i_eff` at both edge ends without creating that edge model, so Canali
+  with Slotboom stopped with "n_i_eff@n0 not available". It now runs, within
+  2 % of the field-driven force on a diode.
+- **Material file citations are checked.** A `cite` entry for a value the
+  file doesn't have, or naming a missing source, stops the file loading.
 
 ### Added
 
+- **Provenance** (`opentcad.provenance`). Every run records each value it
+  read from data files and code, with the source the file or code cites.
+  That covers material parameters, implant moments, diffusivities, oxidation
+  rates, model constants and physical constants. The record also lists the
+  models and their papers, the files read with SHA-256, the simulation's
+  hash, and the code and package versions. It goes in the results file
+  (`provenance` block), each sweep point's and design candidate's JSON, and
+  the GUI (a Sources tab). `opentcad sources RESULTS.json [--missing]` lists
+  it.
+  - Data files cite values in `sources` and `cite` sections. The citations in
+    the shipped files' comments were moved there as written; DOIs, authors
+    and titles were checked against Crossref.
+  - Silicon's n_i (9.65e9 cm⁻³) now cites Altermatt et al. (2003), whose
+    abstract gives that value; the file cited Green (1990), whose abstract
+    gives 1.08e10.
+  - 13 shipped values, and four constants in the code, have no recorded
+    source yet; runs list them (docs/provenance.md).
+  - Fitted variants cite the fit, and `apply_overrides` marks what it sets.
 - **Simulation files and CLI.** YAML/JSON simulation files, checked before they
   run (`opentcad check | run`). Parameter sweeps with extracted metrics
   (`opentcad sweep`).

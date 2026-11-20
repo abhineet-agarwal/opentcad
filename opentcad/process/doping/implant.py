@@ -196,6 +196,12 @@ def apply_implant(mf: MeshField,
                 f"on {dopant}: {e}") from e
         raise
     sigma_lat_um = float(sigma_lat_frac) * moments.dRp_um
+    from opentcad.provenance import note_value
+    note_value(f"Implant: {dopant} in Si", "lateral straggle σ_lat / ΔRp",
+               float(sigma_lat_frac), (), file=__file__,
+               note=("OpenTCAD's default; the code calls it a first-order "
+                     "literature value but records no source"
+                     if sigma_lat_frac == 0.7 else "set by the caller"))
     f = _range_density_per_cm(moments, profile)
 
     pts_um = np.asarray(mf.grid.points, dtype=float)[:, :2]

@@ -58,10 +58,11 @@ V, I = solver.iv_sweep("anode", "cathode", v_start=0.0, v_end=0.7, v_step=0.05)
 ## Principles
 
 - **Reproducible.** A whole simulation is a text file anyone can rerun and diff.
-- **Honest.** Every number is given by you, taken from a cited source, or flagged
-  as an assumption. Missing information is an error, not a silent default. Physics
-  is checked against analytic results and published references
-  ([Validation](validation.md)).
+- **Honest.** Every run lists each number it used and the source its file or
+  code cites for it; a value without one is listed as such
+  ([Sources and provenance](provenance.md)). Missing information is an error, not
+  a silent default. Physics is checked against analytic results and published
+  references ([Validation](validation.md)).
 - **Extensible.** Built-in steps, analyses and models use the same registries
   that plugins do.
 - **Local and open.** Apache-2.0. Nothing leaves your machine unless you
@@ -75,5 +76,6 @@ OpenTCAD is pre-release (0.1.0.dev0) and not yet on PyPI. Phases 0–2 of the
 - process topography;
 - doping, checked against SkyWater SKY130's NMOS threshold.
 
-Calibration against PDK data (Phase 3) is next.
+Phase 3, calibration against PDK data, is in progress: the calibrated SKY130
+NMOS matches the model card's threshold, swing and on-current within 10 %.
 [Validation](validation.md) lists what is checked and what is not.

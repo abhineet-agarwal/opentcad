@@ -37,6 +37,7 @@ import multiprocessing
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 import yaml
@@ -280,22 +281,48 @@ def _split(name: str) -> tuple[str, str]:
     return block, key
 
 
-def apply_overrides(params: MaterialParams, values: Mapping[str, float]) -> MaterialParams:
+#: The source a value set by ``apply_overrides`` cites unless told otherwise.
+OVERRIDE_SOURCE = {"kind": "override",
+                   "cite": "Set in code with opentcad.calibrate.apply_overrides"}
+
+
+def apply_overrides(params: MaterialParams, values: Mapping[str, float], *,
+                    source: Optional[Mapping] = None) -> MaterialParams:
     """A copy of ``params`` with ``values`` (``{"block.field": value}``) set.
 
     Every name must be an existing field of a material block, e.g.
     ``"mobility_lombardi.delta_e"`` or ``"velocity_saturation.vsat_e_cm_s"``.
     The copy is rebuilt through the material-file loader, so it is checked the
     same way a file is, and its ``raw`` dict carries the new values.
+
+    Each new value cites ``source`` (a source in file form, see
+    ``opentcad.provenance``) instead of the file's citation, which was for the
+    old value. The default says the value was set in code.
     """
     raw = copy.deepcopy(params.raw)
+    src = dict(source or OVERRIDE_SOURCE)
+    key = _source_key(raw, "fit" if src.get("kind") == "fit" else "override", src)
     for name, value in values.items():
-        block, key = _split(name)
+        block, field = _split(name)
         model = getattr(params, block, None)
-        if model is None or key not in getattr(type(model), "model_fields", {}):
+        if model is None or field not in getattr(type(model), "model_fields", {}):
             raise KeyError(f"{name!r} is not a material parameter")
-        raw.setdefault(block, {})[key] = float(value)
+        raw.setdefault(block, {})[field] = float(value)
+        raw.setdefault("cite", {})[name] = key
+    if values:
+        raw.setdefault("sources", {})[key] = src
     return params_from_dict(raw, params.symbol, source=params.source)
+
+
+def _source_key(raw: dict, base: str, src: dict) -> str:
+    """A key for ``src`` in ``raw['sources']``: ``base``, or ``base2``... if
+    ``base`` is taken by a different source."""
+    have = raw.get("sources") or {}
+    key, n = base, 1
+    while key in have and have[key] != src:
+        n += 1
+        key = f"{base}{n}"
+    return key
 
 
 def write_material_variant(path: str | Path, base: MaterialParams,
@@ -314,7 +341,14 @@ def write_material_variant(path: str | Path, base: MaterialParams,
             base file's. Say what the values were fitted to and how
             (``status``, ``calibrated_against``, ``notes``...).
     """
-    fitted = apply_overrides(base, values)
+    against = calibration.get("calibrated_against")
+    how = "; ".join(f"{k}: {calibration[k]}" for k in ("fitted_with", "result")
+                    if calibration.get(k))
+    fit = {"kind": "fit",
+           "cite": f"Fitted to {against}" if against else "Fitted; the data is not recorded"}
+    if how:
+        fit["note"] = how
+    fitted = apply_overrides(base, values, source=fit)
     raw = copy.deepcopy(fitted.raw)
     raw["calibration"] = dict(calibration)
     path = Path(path)
@@ -322,7 +356,7 @@ def write_material_variant(path: str | Path, base: MaterialParams,
     header = (f"# {raw.get('material', base.symbol)} — a calibrated variant of "
               f"{Path(base.source).name or base.symbol}, written by "
               f"opentcad.calibrate.write_material_variant.\n"
-              "# The fitted values are listed under calibration.fitted; every other "
-              "value, and its citation,\n# is the base file's.\n")
+              "# The fitted values are listed under calibration.fitted and cite the fit "
+              "(sources.fit);\n# every other value keeps the base file's source.\n")
     path.write_text(header + yaml.safe_dump(raw, sort_keys=False, allow_unicode=True))
     return path

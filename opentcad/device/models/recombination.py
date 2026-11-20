@@ -21,6 +21,7 @@ Models implemented:
 """
 from __future__ import annotations
 from ..physics import RecombinationModel
+from .references import DZIEWIOR_SCHMID_1977, HALL_1952, SHOCKLEY_READ_1952, VAN_OVERSTRAETEN_DE_MAN_1970
 
 
 def _node_with_carrier_derivs(ds, device, region, name, eq):
@@ -42,6 +43,8 @@ class SRH(RecombinationModel):
     Parameters tau_n_s, tau_p_s come from MaterialParams.recombination.
     n1 = p1 = n_i for a mid-gap trap (Et = 0 in the YAML default).
     `n_i_expr` is substituted for the bare n_i wherever BGN is active."""
+
+    references = (SHOCKLEY_READ_1952, HALL_1952,)
 
     term_name = "USRH"
 
@@ -70,6 +73,8 @@ class Auger(RecombinationModel):
     Auger dominates over SRH for carrier densities > ~1e18 cm^-3, i.e.
     in the n+ emitter / source-drain regions of bipolar and MOS devices.
     """
+
+    references = (DZIEWIOR_SCHMID_1977,)
 
     term_name = "UAuger"
 
@@ -144,6 +149,8 @@ class Avalanche(RecombinationModel):
         omitted from the Newton Jacobian — frozen-field each outer
         iteration. Newton still converges; slower near the knee.
     """
+
+    references = (VAN_OVERSTRAETEN_DE_MAN_1970,)
 
     term_name = "UAvalanche"
 

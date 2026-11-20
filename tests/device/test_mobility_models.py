@@ -272,3 +272,25 @@ def test_canali_quasi_fermi_converges_and_spares_minority_diffusion():
             solver.close()
         out[force] = (rev[-1], fwd[-2], fwd[-1])
     np.testing.assert_allclose(out["quasi_fermi"], out["efield"], rtol=0.02)
+
+
+@pytest.mark.requires_devsim
+def test_canali_quasi_fermi_with_bandgap_narrowing():
+    """With Slotboom the force reads n_i_eff at both edge ends; that edge
+    model must exist (the run used to stop with 'n_i_eff@n0 not available')."""
+    from opentcad.device.models.bgn import Slotboom
+    from opentcad.io.deck import example_decks_dir, load_deck
+    deck = load_deck(example_decks_dir() / "pn_diode.yaml")
+    out = {}
+    for force in ("efield", "quasi_fermi"):
+        solver = DeviceSolver(deck.structure.to_meshfield(mesh_size_um=0.05),
+                              {"Silicon": load_material("Si")},
+                              physics=PhysicsConfig(mobility=Canali(Klaassen(),
+                                                                    driving_force=force),
+                                                    bgn=Slotboom()))
+        try:
+            _, fwd = solver.iv_sweep("anode", "cathode", 0.0, 0.6, 0.2)
+        finally:
+            solver.close()
+        out[force] = fwd[-1]
+    np.testing.assert_allclose(out["quasi_fermi"], out["efield"], rtol=0.02)

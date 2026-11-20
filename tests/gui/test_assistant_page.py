@@ -74,10 +74,14 @@ def test_conversation_draft_answer_run(fake_model):
 
     _button(at, "Run").click().run()
     assert not at.exception and not at.error
-    assert [t.label for t in at.tabs] == ["Structure", "Doping", "Results"]
+    assert [t.label for t in at.tabs] == ["Structure", "Doping", "Results", "Sources"]
     assert len(at.get("plotly_chart")) == 6        # + the inversion field map
     assert _chat(at)[-1][1].startswith("Ran the file:")
     assert "idvg (iv): 16 points from 0 to 1.5 V" in _chat(at)[-1][1]
+    assert "have no recorded source. The Sources tab lists each one." in _chat(at)[-1][1]
+    values = next(d.value for d in at.dataframe if "Where" in d.value.columns)  # Sources tab
+    assert {"Silicon", "Physical constants"} <= set(values["Where"])
+    assert "none recorded" in set(values["Source"])
 
 
 def test_editor_reports_problems():

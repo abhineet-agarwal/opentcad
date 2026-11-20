@@ -33,6 +33,8 @@ from opentcad.device.models import (
 from opentcad.geometry.formats import Material, MATERIAL_NAMES
 from opentcad.geometry.structure import Structure
 from opentcad.materials.database import load_material
+from opentcad.provenance import recording
+from opentcad.gui.sources_view import show_sources
 from opentcad.process.topography import (
     Recipe, extract_surface_polyline,
     initial_state_from_structure, simulate, topography_to_meshfield,
@@ -447,7 +449,7 @@ with col1:
                  disabled=(not ss.recipe_steps and
                             not ss.structure._layers)):
         try:
-            with st.spinner("Simulating topography…"):
+            with st.spinner("Simulating topography…"), recording() as proc_rec:
                 state = initial_state_from_structure(
                     ss.structure, grid_delta_um=float(grid_delta))
                 for s in ss.recipe_steps:
@@ -480,6 +482,7 @@ with col1:
                                 s.get("bird_beak_length_um", 0.0)),
                         ))
                 ss.topography_state = state
+                ss.recipe_provenance = proc_rec
                 ss.meshfield = None; ss.device_result = None
             st.success(f"Ran {len(ss.recipe_steps)} step(s).")
         except Exception as e:
@@ -536,9 +539,11 @@ with col1:
                         st.stop()
                     ss.meshfield = topography_to_meshfield(
                         ss.topography_state, mesh_size_um=float(mesh_size_um))
+                    ss.mesh_provenance = ss.get("recipe_provenance")
                 else:
                     ss.meshfield = ss.structure.to_meshfield(
                         mesh_size_um=float(mesh_size_um))
+                    ss.mesh_provenance = None
                 ss.device_result = None
             st.success(f"MeshField: {ss.meshfield.n_cells} triangles.")
         except Exception as e:
@@ -650,7 +655,9 @@ with col1:
 
                 solver = None
                 try:
-                    with st.spinner("Running device solve…"):
+                    with st.spinner("Running device solve…"), recording() as dev_rec:
+                        if ss.get("mesh_provenance") is not None:
+                            dev_rec.merge(ss.mesh_provenance)
                         solver = DeviceSolver(ss.meshfield, mat_params,
                                                physics=cfg)
                         if analysis_kind == "iv_sweep":
@@ -669,6 +676,7 @@ with col1:
                                 v_end=float(v_end), v_step=float(v_step))
                             ss.device_result = {"kind": "cv", "V": V, "C": C,
                                                  "A": cA, "B": cB}
+                    ss.device_result["provenance"] = dev_rec.to_dict()
                     st.success("Done.")
                 finally:
                     # Always drop the DEVSIM device, even on error. If
@@ -711,3 +719,5 @@ with col2:
             fig = plot_cv(result["V"], result["C"],
                            title=f"CV: {result['A']} → {result['B']}")
         st.pyplot(fig, clear_figure=True)
+        with st.expander("Sources: every value this solve used"):
+            show_sources(result.get("provenance"), key="main_sources")

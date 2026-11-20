@@ -898,10 +898,13 @@ def save_deck(deck: Deck, path) -> Path:
 # =============================================================================
 @dataclass
 class DeckResult:
-    """What ``run_deck`` produced."""
+    """What ``run_deck`` produced. ``provenance`` is the run's
+    ``opentcad.provenance.Record``: every value it read from data files and
+    code, with sources, plus the models, files and versions."""
     meshfield: Any
     recipe_result: Any
     analyses: dict[str, Any] = field(default_factory=dict)
+    provenance: Any = None
 
     def analyses_to_dict(self) -> dict:
         """Analysis results as JSON-friendly values (complex → [re, im])."""
@@ -932,7 +935,21 @@ class DeckResult:
 def run_deck(deck: Deck, *, log=None) -> DeckResult:
     """Run a deck: build the structure, run the recipe (topography, mesh,
     doping), then — if the deck has a ``device`` section — create one
-    DeviceSolver and run the analyses on it in order."""
+    DeviceSolver and run the analyses on it in order.
+
+    The run is recorded (``opentcad.provenance``): ``result.provenance``
+    lists every value read from data files and code with its source."""
+    from opentcad.provenance import recording, text_sha256
+
+    with recording() as rec:
+        rec.add_input("simulation", name=deck.name, content_sha256=text_sha256(
+            json.dumps(deck.to_dict(), sort_keys=True, default=str)))
+        result = _run_deck(deck, log)
+    result.provenance = rec
+    return result
+
+
+def _run_deck(deck: Deck, log) -> DeckResult:
     import numpy as np
 
     from opentcad.process import run_recipe

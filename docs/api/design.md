@@ -62,7 +62,7 @@ file and result, ``design.json`` and ``best.yaml``.
 - `DeckError`: The plan still has ``unresolved`` questions, or fails its checks.
 - `FileExistsError`: ``outdir`` already exists.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/design.py#L516)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/design.py#L522)
 
 ## variable_paths
 
@@ -224,7 +224,7 @@ What :func:`run_design` did.
 - `attempts`: One row per attempted candidate, failures included: values, metrics, violations, status, error and the files written for it.
 - `best`: The valid candidate with the smallest total violation, or ``None``.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/design.py#L493)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/design.py#L495)
 
 ### DesignResult.to_dict
 
@@ -232,7 +232,8 @@ What :func:`run_design` did.
 DesignResult.to_dict()
 ```
 
-JSON-safe summary; non-finite numbers become ``None``.
+JSON-safe summary; non-finite numbers become ``None``. Each
+candidate's provenance record stays in its own JSON file.
 
 Import from `opentcad.assist.design`: `draft_design`, `DesignDraft`.
 

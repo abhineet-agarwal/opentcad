@@ -43,6 +43,10 @@ class MobilityModel(ABC):
     #: solver to decide whether to register carrier cross-derivatives in
     #: the current-density expressions.
     requires_carriers: bool = False
+    #: Papers the model's equations come from (``opentcad.provenance.Source``),
+    #: listed in a run's provenance record. Parameter values cite their own
+    #: sources in the material file.
+    references: tuple = ()
 
     def required_params(self) -> tuple[str, ...]:
         """Material-file fields this model needs beyond the required core
@@ -89,6 +93,9 @@ class RecombinationModel(ABC):
     formulas contain n_i^2 which must use the effective value.
     """
 
+    #: Papers the model's equations come from (see ``MobilityModel``).
+    references: tuple = ()
+
     def required_params(self) -> tuple[str, ...]:
         """Material-file fields this model needs beyond the required core
         (block names like ``"mobility_klaassen"`` or keys like
@@ -121,6 +128,9 @@ class BandgapNarrowingModel(ABC):
     returns the plain parameter name "n_i".
     """
 
+    #: Papers the model's equations come from (see ``MobilityModel``).
+    references: tuple = ()
+
     def required_params(self) -> tuple[str, ...]:
         """Material-file fields this model needs beyond the required core
         (block names like ``"mobility_klaassen"`` or keys like
@@ -148,6 +158,9 @@ class StatisticsModel(ABC):
     built-in potential offset. Boltzmann is a no-op identity; FermiDirac
     applies the Blakemore approximation.
     """
+
+    #: Papers the model's equations come from (see ``MobilityModel``).
+    references: tuple = ()
 
     def required_params(self) -> tuple[str, ...]:
         """Material-file fields this model needs beyond the required core
@@ -208,3 +221,42 @@ class PhysicsConfig:
         if self.statistics is None:
             from .models.statistics import Boltzmann
             self.statistics = Boltzmann()
+
+    def note_provenance(self) -> None:
+        """Note each model, its settings and its references in the active
+        provenance record (a no-op outside ``opentcad.provenance.recording``)."""
+        from opentcad.provenance import note_model
+        note_model("mobility", model_spec(self.mobility), model_sources(self.mobility))
+        note_model("recombination", [model_spec(m) for m in self.recombination],
+                   tuple(s for m in self.recombination for s in model_sources(m)))
+        note_model("bgn", model_spec(self.bgn), model_sources(self.bgn))
+        note_model("statistics", model_spec(self.statistics),
+                   model_sources(self.statistics))
+
+
+def model_spec(model):
+    """A model's class name and constructor settings (``base`` models
+    nested), e.g. ``{"model": "Canali", "base": "Klaassen",
+    "driving_force": "quasi_fermi", ...}``; just the name if it has none."""
+    import inspect
+    cls = type(model)
+    try:
+        params = list(inspect.signature(cls.__init__).parameters.values())[1:]
+    except (TypeError, ValueError):
+        return cls.__name__
+    opts = {}
+    for p in params:
+        if p.kind in (p.VAR_POSITIONAL, p.VAR_KEYWORD) or not hasattr(model, p.name):
+            continue
+        v = getattr(model, p.name)
+        opts[p.name] = model_spec(v) if p.name == "base" and v is not None else v
+    return {"model": cls.__name__, **opts} if opts else cls.__name__
+
+
+def model_sources(model) -> tuple:
+    """``references`` of a model and of the ``base`` models it wraps."""
+    out = []
+    while model is not None:
+        out.extend(getattr(model, "references", ()))
+        model = getattr(model, "base", None)
+    return tuple(dict.fromkeys(out))

@@ -455,6 +455,8 @@ def _evaluate(deck_dict, targets, row):
     deck = deck_from_dict(deck_dict)
     result = run_deck(deck)
     row["analyses"] = result.analyses_to_dict()
+    prov = getattr(result, "provenance", None)
+    row["provenance"] = prov.to_dict() if prov is not None else None
     analyses = {a.name: a for a in deck.analyses}
     for name in dict.fromkeys(t.analysis for t in targets):
         actual = result.analyses.get(name)
@@ -508,9 +510,13 @@ class DesignResult:
     best: dict | None
 
     def to_dict(self):
-        """JSON-safe summary; non-finite numbers become ``None``."""
+        """JSON-safe summary; non-finite numbers become ``None``. Each
+        candidate's provenance record stays in its own JSON file."""
+        def lean(row):
+            return None if row is None else {k: v for k, v in row.items() if k != "provenance"}
         return _json_safe({"outdir": str(self.outdir), "stop_reason": self.stop_reason,
-                           "evaluations": len(self.attempts), "attempts": self.attempts, "best": self.best})
+                           "evaluations": len(self.attempts),
+                           "attempts": [lean(a) for a in self.attempts], "best": lean(self.best)})
 
 
 def run_design(design: Design, outdir, *, log=None) -> DesignResult:

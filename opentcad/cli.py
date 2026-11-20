@@ -6,6 +6,8 @@ opentcad.cli — command-line interface.
                       [--vtu MESH.vtu]  also save the final MeshField
                       [--verbose]       show DEVSIM's solver output
     opentcad sweep FILE [-o DIR] [-j N] run a sweep; table.csv + per-point results
+    opentcad sources RESULTS.json       list every value a run used and its source
+                      [--missing]       only the values with no recorded source
     opentcad plugins                    list registered steps, analyses, models,
                                         metrics, data folders and plugins
 
@@ -119,16 +121,22 @@ def _cmd_run(args) -> int:
         if args.verbose:
             raise
         return 2
+    from opentcad.provenance import display_path, file_sha256, summarize
     mf = result.meshfield
+    result.provenance.add_input("simulation file", path=display_path(args.file),
+                                sha256=file_sha256(args.file))
+    prov = result.provenance.to_dict()
     payload = {
         "deck": deck.name,
         "source": str(args.file),
         "elapsed_s": round(time.time() - t0, 2),
         "mesh": {"cells": int(mf.n_cells), "nodes": int(mf.n_points)},
         "analyses": result.analyses_to_dict(),
+        "provenance": prov,
     }
     out_path.write_text(json.dumps(payload, indent=2) + "\n")
     _err(f"results → {out_path}")
+    _err(f"sources: {summarize(prov)}. List them with: opentcad sources {out_path}")
     from opentcad.geometry.formats import MeshField
     for name, res in result.analyses.items():
         if isinstance(res, MeshField):            # "fields" snapshots
@@ -138,6 +146,22 @@ def _cmd_run(args) -> int:
     if args.vtu:
         saved = mf.save(args.vtu)
         _err(f"mesh → {saved if saved else args.vtu}")
+    return 0
+
+
+def _cmd_sources(args) -> int:
+    from opentcad.provenance import format_table
+    try:
+        data = json.loads(Path(args.file).read_text())
+    except (OSError, ValueError) as exc:
+        _err(f"{args.file}: can't read it as JSON ({exc})")
+        return 1
+    prov = data.get("provenance") if isinstance(data, dict) else None
+    if not prov:
+        _err(f"{args.file}: no provenance block. Results written by OpenTCAD "
+             f"before provenance was recorded don't have one; run the file again.")
+        return 1
+    print(format_table(prov, only_missing=args.missing))
     return 0
 
 
@@ -186,6 +210,12 @@ def build_parser() -> argparse.ArgumentParser:
                     help="points to run in parallel (separate processes)")
     sw.add_argument("--verbose", action="store_true", help="show solver output")
     sw.set_defaults(func=_cmd_sweep)
+    so = sub.add_parser("sources", help="list the values a run used and their sources")
+    so.add_argument("file", help="a results JSON written by opentcad run (or a sweep "
+                                 "point's JSON)")
+    so.add_argument("--missing", action="store_true",
+                    help="only the values with no recorded source")
+    so.set_defaults(func=_cmd_sources)
     pl = sub.add_parser("plugins", help="list registered extensions")
     pl.set_defaults(func=_cmd_plugins)
     from opentcad.catalog_cli import add_catalog_parser

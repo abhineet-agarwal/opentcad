@@ -24,6 +24,7 @@ from opentcad.assist import ChatClient, LLMError, draft_deck
 from opentcad.assist.client import DEFAULT_URL
 from opentcad.io.deck import (DeckError, _Loader, deck_from_dict, dumps_deck,
                               example_decks_dir, run_deck)
+from opentcad.gui.sources_view import show_sources
 from opentcad.viz import interactive as figs
 
 st.set_page_config(page_title="OpenTCAD assistant", layout="wide")
@@ -128,8 +129,9 @@ def draft_reply(d, before: dict | None) -> str:
     return "\n".join(lines)
 
 
-def run_reply(analyses: dict, specs) -> str:
-    """The assistant's chat turn after a run: what came out, in numbers."""
+def run_reply(analyses: dict, specs, prov: dict | None = None) -> str:
+    """The assistant's chat turn after a run: what came out, in numbers, and
+    how many of the values it used have a recorded source."""
     lines = ["Ran the file:"]
     for name, atype, args in specs:
         out = analyses.get(name)
@@ -141,6 +143,12 @@ def run_reply(analyses: dict, specs) -> str:
                          f"largest {y.max():.3g} {unit}")
         else:
             lines.append(f"- {name} ({atype}): done")
+    if prov:
+        gaps = prov.get("without_source", 0)
+        lines.append(f"- It used {len(prov.get('values', []))} values from data files "
+                     f"and code, citing {len(prov.get('sources', {}))} sources"
+                     + (f"; {gaps} have no recorded source" if gaps else "")
+                     + ". The Sources tab lists each one.")
     lines.append("Tell me what to change, e.g. a higher current or another sweep range.")
     return "\n".join(lines)
 
@@ -268,10 +276,12 @@ if deck is not None and st.button("Run", type="primary"):
         try:
             res = run_deck(copy.deepcopy(deck))
             ss.result = {"mf": res.meshfield, "analyses": res.analyses,
-                         "specs": [(a.name, a.type, a.args) for a in deck.analyses]}
+                         "specs": [(a.name, a.type, a.args) for a in deck.analyses],
+                         "provenance": res.provenance.to_dict()}
             ss.result_key = hashlib.sha1(ss.deck_yaml.encode()).hexdigest()
             ss.chat.append({"role": "assistant",
-                            "content": run_reply(res.analyses, ss.result["specs"])})
+                            "content": run_reply(res.analyses, ss.result["specs"],
+                                                 ss.result["provenance"])})
             ss.run_error = None
         except Exception as exc:
             ss.run_error = f"Run failed: {type(exc).__name__}: {exc}"
@@ -289,7 +299,9 @@ if r:
         st.caption("These results are from an earlier version of the file.")
     t = theme()
     mf = r["mf"]
-    tab_s, tab_d, tab_r = st.tabs(["Structure", "Doping", "Results"])
+    tab_s, tab_d, tab_r, tab_p = st.tabs(["Structure", "Doping", "Results", "Sources"])
+    with tab_p:
+        show_sources(r.get("provenance"), key="assistant_sources")
     with tab_s:
         mesh = st.toggle("Show mesh", value=False)
         st.plotly_chart(figs.structure_map(mf, theme=t, show_mesh=mesh),

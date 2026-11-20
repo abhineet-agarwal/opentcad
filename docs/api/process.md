@@ -439,7 +439,7 @@ Closed form:
 x(t) = -A/2 + sqrt( (A/2 + x0)² + B·t )
 ```
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/topography/oxidation.py#L105)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/topography/oxidation.py#L131)
 
 Import from `opentcad.process.structure_transfer`: `carry_structure`.
 

@@ -47,8 +47,9 @@ people contribute.
    modules. If the contract needs a new field, extend `formats.py` deliberately
    and keep `save`/`load` lossless.
 3. **Never invent values.**
-   - A parameter in a data file needs its unit and a citation (author, year,
-     source); add an uncertainty where known.
+   - A parameter in a data file needs its unit and a source in the file's
+     `sources` and `cite` sections ([Sources and provenance](provenance.md));
+     add an uncertainty where known. Runs list every value without one.
    - Missing inputs are an error or a flagged assumption, never a silent
      default. Loaders and checkers fail loudly with a message that says what to
      add.
@@ -79,7 +80,9 @@ people contribute.
 ### A material
 
 1. Add `opentcad/materials/params/<Symbol>.yaml`, following `Si.yaml`: units in
-   comments, a `Ref:` for every non-obvious value.
+   comments, and a source for each value in the `sources` and `cite` sections
+   (with a DOI where there is one). Leave a value uncited rather than guess;
+   runs report it.
 2. Give the required fields: `permittivity_relative`; for a semiconductor also
    the band structure, constant mobilities and SRH lifetimes. Add the model blocks
    (Klaassen, velocity saturation, Auger/radiative, avalanche) you have sources

@@ -21,6 +21,7 @@ References:
 """
 from __future__ import annotations
 from ..physics import StatisticsModel
+from .references import BLAKEMORE_1982, JOYCE_DIXON_1977
 
 
 class Boltzmann(StatisticsModel):
@@ -59,6 +60,8 @@ class FermiDirac(StatisticsModel):
         compared to Boltzmann.
     """
 
+    references = (BLAKEMORE_1982,)
+
     #: Blakemore fit coefficient (dimensionless).
     xi: float = 0.27
 
@@ -69,6 +72,9 @@ class FermiDirac(StatisticsModel):
                          value=float(params.band_structure.Nv_cm3_300K))
         ds.set_parameter(device=device, region=region, name="FD_xi",
                          value=float(self.xi))
+        from opentcad.provenance import note_value
+        note_value("Model: Fermi-Dirac (Blakemore)", "xi", float(self.xi),
+                   (BLAKEMORE_1982,), file=__file__)
 
     def wrap_electron_density(self, expr, params):
         return f"({expr}) / (1 + FD_xi * ({expr}) / N_c)"
@@ -120,6 +126,8 @@ class JoyceDixon(FermiDirac):
     Use case: this is the right class to pick for Si sources/drains at
     1e20+ doping where Blakemore distorts the contact BC noticeably.
     """
+
+    references = (BLAKEMORE_1982, JOYCE_DIXON_1977,)
     # Series coefficients (Joyce & Dixon 1977). Include through 2nd
     # order — accurate to < 1 % for u ≤ 10 which covers all practical
     # Si doping ranges. Register as DEVSIM parameters alongside N_c / N_v.
@@ -128,6 +136,10 @@ class JoyceDixon(FermiDirac):
 
     def attach(self, ds, device, region, params, T_K):
         super().attach(ds, device, region, params, T_K)
+        from opentcad.provenance import note_value
+        for k in ("jd_a1", "jd_a2"):
+            note_value("Model: Joyce-Dixon", k, float(getattr(self, k)),
+                       (JOYCE_DIXON_1977,), file=__file__)
         ds.set_parameter(device=device, region=region, name="JD_a1",
                          value=float(self.jd_a1))
         ds.set_parameter(device=device, region=region, name="JD_a2",

@@ -27,3 +27,15 @@ fair:
   D_minus_minus:
     D0_cm2s: 44.2
     Ea_eV:   4.37
+
+# --- Sources (as the header above gives them; not re-checked) -------------
+sources:
+  fair1981:
+    cite: R. B. Fair, Concentration-Dependent Diffusion of Dopants in Silicon (1981)
+  plummer2000:
+    cite: J. D. Plummer, M. D. Deal, P. B. Griffin, Silicon VLSI Technology
+      (Prentice Hall, 2000)
+    note: Table 7.2
+cite:
+  intrinsic: [fair1981, plummer2000]
+  fair: [fair1981, plummer2000]

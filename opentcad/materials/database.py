@@ -9,17 +9,86 @@ Usage:
     si = load_material("Si")
     print(si.mobility_constant.electron_cm2_Vs)   # 1350.0
     print(si.recombination.tau_n_s)                # 1e-5
+    print(si.sources_of("bandgap.Eg_eV_300K"))     # (Source(cite='M. A. Green…'),)
+
+Each file cites its values in ``sources`` and ``cite`` sections (see
+``opentcad.provenance``). While a provenance recording is active, reading a
+value from a ``MaterialParams`` notes it with its source, so a run's record
+lists the values the solver actually used.
 """
 from __future__ import annotations
 from pathlib import Path
-from typing import Optional
+from typing import Any, Optional
 import yaml
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, PrivateAttr
+
+from opentcad.provenance import Source, active, note_value, parse_sources, sources_for
 
 PARAMS_DIR = Path(__file__).parent / "params"
 
+#: Top-level keys of a material file that are not parameter values.
+META_KEYS = ("material", "symbol", "is_insulator", "sources", "cite", "calibration")
+#: Keys inside a block that describe a value rather than being one.
+NOT_VALUES = ("uncertainty_percent", "uncertainty_abs")
 
-class MobilityConstant(BaseModel):
+#: The source given to a value the file left to the built-in default.
+DEFAULT_SOURCE = Source(
+    "OpenTCAD's built-in value for this field (silicon's), in "
+    "opentcad/materials/database.py", kind="default",
+    note="the material file doesn't give this value")
+
+
+class _ReadTag:
+    """Where a block's values came from, for provenance notes."""
+    __slots__ = ("group", "block", "file", "paths", "cited", "defaulted")
+
+    def __init__(self, group, block, file, paths, cited, defaulted):
+        self.group, self.block, self.file = group, block, file
+        self.paths, self.cited, self.defaulted = paths, cited, defaulted
+
+    def note(self, field: str, value) -> None:
+        if field in NOT_VALUES:
+            return
+        path = self.paths.get(field, f"{self.block}.{field}")
+        if any(path == d or path.startswith(d + ".") for d in self.defaulted):
+            note_value(self.group, path, value, (DEFAULT_SOURCE,), file=self.file or None)
+        else:
+            note_value(self.group, path, value, sources_for(self.cited, path),
+                       file=self.file or None)
+
+
+class _Block(BaseModel):
+    """A block of material values. While a provenance recording is active,
+    reading a value notes it, with the source its file cites."""
+    _tag: Optional[_ReadTag] = PrivateAttr(default=None)
+
+    def __getattribute__(self, name: str) -> Any:
+        value = object.__getattribute__(self, name)
+        if name[:1] != "_" and active() is not None and name in type(self).model_fields:
+            private = object.__getattribute__(self, "__pydantic_private__")
+            tag = private.get("_tag") if private else None
+            if tag is not None:
+                tag.note(name, value)
+        return value
+
+    def __eq__(self, other: object) -> bool:
+        # Compare values only; the provenance tag differs between two loads
+        # of the same file.
+        if type(other) is not type(self):
+            return NotImplemented
+        return (object.__getattribute__(self, "__dict__")
+                == object.__getattribute__(other, "__dict__"))
+
+    __hash__ = None   # like any pydantic model
+
+    def items(self) -> list[tuple[str, Any]]:
+        """``(name, value)`` for every field, read (and so recorded) the same
+        way as ``block.name``. Use it instead of ``vars(block)``, which reads
+        the values without recording them."""
+        return [(n, getattr(self, n)) for n in type(self).model_fields]
+
+
+class MobilityConstant(_Block):
     """Constant low-field mobilities [cm²/V/s] and their uncertainty [%].
 
     Field defaults are silicon's values; the required fields (see
@@ -29,7 +98,7 @@ class MobilityConstant(BaseModel):
     uncertainty_percent: float = 5.0
 
 
-class MobilityKlaassen(BaseModel):
+class MobilityKlaassen(_Block):
     """Klaassen unified low-field bulk mobility coefficients.
 
     Reference: Klaassen, Solid-State Electron. 35, 953 (1992).
@@ -64,7 +133,7 @@ class MobilityKlaassen(BaseModel):
     s7: float = 0.72169
 
 
-class MobilityLombardi(BaseModel):
+class MobilityLombardi(_Block):
     """Lombardi surface-mobility coefficients (CGS units, see the model).
 
     Reference: Lombardi et al., IEEE Trans. CAD 7, 1164 (1988); values from
@@ -89,7 +158,7 @@ class MobilityLombardi(BaseModel):
     delta_h: float = 4.10e15
 
 
-class Recombination(BaseModel):
+class Recombination(_Block):
     """SRH lifetimes [s], trap energy relative to mid-gap [eV], Auger
     coefficients [cm⁶/s] and the radiative coefficient [cm³/s].
 
@@ -103,7 +172,7 @@ class Recombination(BaseModel):
     B_rad_cm3_per_s: float = 9.5e-15  # Radiative
 
 
-class BandStructure(BaseModel):
+class BandStructure(_Block):
     """Band gap [eV], electron affinity [eV], effective densities of states
     and intrinsic density at 300 K [cm⁻³], and relative permittivity.
 
@@ -117,7 +186,7 @@ class BandStructure(BaseModel):
     permittivity_relative: float = 11.7
 
 
-class VelocitySaturation(BaseModel):
+class VelocitySaturation(_Block):
     """Saturation velocities [cm/s] and Caughey–Thomas exponents β used by
     the ``Canali`` high-field model.
 
@@ -129,7 +198,7 @@ class VelocitySaturation(BaseModel):
     beta_h: float = 1.0
 
 
-class Avalanche(BaseModel):
+class Avalanche(_Block):
     """Impact-ionisation Chynoweth coefficients, Si defaults are the
     van Overstraeten-de Man single-regime fit."""
     a_n_per_cm: float = 7.03e5
@@ -140,6 +209,8 @@ class Avalanche(BaseModel):
 
 class MaterialParams(BaseModel):
     """Validated material parameter set for one material."""
+    model_config = ConfigDict(arbitrary_types_allowed=True)
+
     material: str
     symbol: str
     is_insulator: bool = False   # True for SiO2/Si3N4 (Poisson only, no carriers)
@@ -157,6 +228,18 @@ class MaterialParams(BaseModel):
     #: check this so they never run on silicon numbers by accident.
     defaulted: list[str] = []
     source: str = ""  # the YAML file it came from
+    #: The file's ``cite`` entries: ``{dotted path: sources}``. A value's
+    #: sources are its own entry's or its block's (``sources_of``).
+    cited: dict[str, tuple[Source, ...]] = {}
+
+    def sources_of(self, path: str) -> tuple[Source, ...]:
+        """The sources the file cites for a value (dotted path as in the
+        file, e.g. ``"bandgap.Eg_eV_300K"``); empty if it cites none."""
+        return sources_for(self.cited, path)
+
+    def uncited(self) -> list[str]:
+        """Dotted paths of the file's values that cite no source."""
+        return [p for p in value_paths(self.raw) if not self.sources_of(p)]
 
 
 class MaterialFileError(ValueError):
@@ -222,7 +305,47 @@ def load_material(symbol: str, process: Optional[str] = None) -> MaterialParams:
         )
 
     raw = yaml.safe_load(yaml_path.read_text()) or {}
-    return params_from_dict(raw, symbol, source=str(yaml_path))
+    params = params_from_dict(raw, symbol, source=str(yaml_path))
+    from opentcad.provenance import note_file
+    note_file(yaml_path, params.material)
+    return params
+
+
+def value_paths(raw: dict) -> list[str]:
+    """Dotted paths of every parameter value in a material file: numbers
+    outside ``META_KEYS``, other than ``NOT_VALUES`` keys."""
+    out: list[str] = []
+
+    def walk(node, prefix):
+        for k, v in node.items():
+            path = f"{prefix}{k}"
+            if isinstance(v, dict):
+                walk(v, path + ".")
+            elif _is_number(v) and k not in NOT_VALUES:
+                out.append(path)
+
+    walk({k: v for k, v in raw.items() if k not in META_KEYS}, "")
+    return out
+
+
+def _is_number(v) -> bool:
+    # PyYAML reads 2.86e19 (no exponent sign) as a string; the loader
+    # converts it, so it counts as a value here too.
+    if isinstance(v, bool):
+        return False
+    if isinstance(v, (int, float)):
+        return True
+    if isinstance(v, str):
+        try:
+            float(v)
+            return True
+        except ValueError:
+            return False
+    return False
+
+
+#: Where each BandStructure field sits in a material file.
+_BAND_PATHS = {"Eg_eV_300K": "bandgap.Eg_eV_300K"}
 
 
 def _has(raw: dict, dotted: str) -> bool:
@@ -239,7 +362,11 @@ def params_from_dict(raw: dict, symbol: str = "", *, source: str = "") -> Materi
 
     Fields every simulation needs (REQUIRED_ALL, plus REQUIRED_SEMICONDUCTOR
     unless ``is_insulator: true``) must be present: a missing one raises
-    MaterialFileError instead of silently taking silicon's value. Optional
+    MaterialFileError instead of silently taking silicon's value. The
+    ``sources`` and ``cite`` sections are checked too: a ``cite`` entry for a
+    value the file doesn't have, or naming a missing source, is an error.
+    A value with no ``cite`` entry loads, and is reported as having no
+    source (``MaterialParams.uncited`` and run records). Optional
     model blocks (Klaassen, Lombardi, velocity saturation, Auger/radiative, avalanche)
     fall back to the code defaults, which are silicon's; every field filled
     that way is listed in ``MaterialParams.defaulted`` so the models that
@@ -255,6 +382,8 @@ def params_from_dict(raw: dict, symbol: str = "", *, source: str = "") -> Materi
             f"required field(s) {missing}; give them in the file (OpenTCAD "
             f"does not fill them with silicon's values)")
 
+    cited = parse_sources(raw, source or str(raw.get("symbol", symbol)),
+                          error=MaterialFileError)
     defaulted: list[str] = []
 
     def block(name: str, model):
@@ -286,7 +415,7 @@ def params_from_dict(raw: dict, symbol: str = "", *, source: str = "") -> Materi
     if "Eg_eV_300K" not in bandgap:
         defaulted.append("bandgap.Eg_eV_300K")
 
-    return MaterialParams(
+    params = MaterialParams(
         material=raw.get("material", symbol),
         symbol=raw.get("symbol", symbol),
         is_insulator=is_insulator,
@@ -300,4 +429,12 @@ def params_from_dict(raw: dict, symbol: str = "", *, source: str = "") -> Materi
         raw=raw,
         defaulted=defaulted,
         source=source,
+        cited=cited,
     )
+    for name, info in type(params).model_fields.items():
+        if isinstance(info.annotation, type) and issubclass(info.annotation, _Block):
+            paths = ({f: _BAND_PATHS.get(f, f) for f in BandStructure.model_fields}
+                     if name == "band_structure" else {})
+            getattr(params, name)._tag = _ReadTag(
+                params.material, name, source, paths, cited, tuple(defaulted))
+    return params

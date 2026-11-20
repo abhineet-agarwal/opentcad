@@ -1,6 +1,6 @@
 # Silicon — a calibrated variant of Si.yaml, written by opentcad.calibrate.write_material_variant.
-# The fitted values are listed under calibration.fitted; every other value, and its citation,
-# is the base file's.
+# The fitted values are listed under calibration.fitted and cite the fit (sources.fit);
+# every other value keeps the base file's source.
 material: Silicon
 symbol: Si
 bandgap:
@@ -106,3 +106,63 @@ calibration:
   notes: 'Effective values: they absorb poly depletion, quantum confinement, the real
     implant and thermal history and series-resistance differences, which the simulation
     leaves out.'
+sources:
+  green1990:
+    cite: M. A. Green, Intrinsic concentration, effective densities of states, and
+      effective mass in silicon, J. Appl. Phys. 67, 2944 (1990)
+    doi: 10.1063/1.345414
+  altermatt2003:
+    cite: P. P. Altermatt, A. Schenk, F. Geelhaar, G. Heiser, Reassessment of the
+      intrinsic carrier density in crystalline silicon in view of band-gap narrowing,
+      J. Appl. Phys. 93, 1598 (2003)
+    doi: 10.1063/1.1529297
+    note: The abstract gives n_i = 9.65e9 cm^-3 at 300 K. This file used to cite Green
+      (1990) for n_i, whose abstract gives 1.08e10.
+  sze1981:
+    cite: S. M. Sze, Physics of Semiconductor Devices, 2nd ed. (Wiley, 1981)
+  szeng2007:
+    cite: S. M. Sze, K. K. Ng, Physics of Semiconductor Devices, 3rd ed. (Wiley, 2007)
+  klaassen1992:
+    cite: D. B. M. Klaassen, A unified mobility model for device simulation - I. Model
+      equations and concentration dependence, Solid-State Electron. 35, 953 (1992)
+    doi: 10.1016/0038-1101(92)90325-7
+  darwish1997:
+    cite: M. N. Darwish, J. L. Lentz, M. R. Pinto, P. M. Zeitzoff, T. J. Krutsick,
+      H. H. Vuong, An improved electron and hole mobility model for general purpose
+      device simulation, IEEE Trans. Electron Devices 44, 1529 (1997)
+    doi: 10.1109/16.622611
+    note: Coefficients as in DEVSIM's Klaassen.py Philips_Surface_Mobility; the model
+      form is Lombardi et al. (1988).
+  dziewior1977:
+    cite: J. Dziewior, W. Schmid, Auger coefficients for highly doped and highly excited
+      silicon, Appl. Phys. Lett. 31, 346 (1977)
+    doi: 10.1063/1.89694
+  canali1975:
+    cite: C. Canali, G. Majni, R. Minder, G. Ottaviani, Electron and hole drift velocity
+      measurements in silicon and their empirical relation to electric field and temperature,
+      IEEE Trans. Electron Devices 22, 1045 (1975)
+    doi: 10.1109/T-ED.1975.18267
+  vanoverstraeten1970:
+    cite: R. Van Overstraeten, H. De Man, Measurement of the ionization rates in diffused
+      silicon p-n junctions, Solid-State Electron. 13, 583 (1970)
+    doi: 10.1016/0038-1101(70)90139-5
+  fit:
+    kind: fit
+    cite: Fitted to SkyWater sky130_fd_pr__nfet_01v8, tt model card (BSIM4 in ngspice),
+      L = 1 µm, W = 10 µm, Vds = 50 mV, 300 K
+    note: 'fitted_with: validation/sky130/calibrate.py; result: validation/sky130/calibration.json'
+cite:
+  bandgap.Eg_eV_300K: green1990
+  Nv_cm3_300K: green1990
+  ni_cm3_300K: altermatt2003
+  electron_affinity_eV: sze1981
+  permittivity_relative: szeng2007
+  mobility_klaassen: klaassen1992
+  mobility_lombardi: darwish1997
+  recombination.Cn_cm6_per_s: dziewior1977
+  recombination.Cp_cm6_per_s: dziewior1977
+  velocity_saturation.vsat_e_cm_s: canali1975
+  avalanche: vanoverstraeten1970
+  mobility_lombardi.C_e: fit
+  mobility_lombardi.delta_e: fit
+  mobility_lombardi.A_e: fit

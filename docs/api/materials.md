@@ -4,7 +4,7 @@ Material parameter files and the objects they load into.
 
 For an introduction, see the [user guide](../device_physics.md#materials). This page is generated from the docstrings by `tools/gen_api_docs.py`.
 
-Import from `opentcad.materials.database`: `load_material`, `MaterialParams`, `MaterialFileError`, `params_from_dict`, `BandStructure`, `MobilityConstant`, `MobilityKlaassen`, `MobilityLombardi`, `VelocitySaturation`, `Recombination`, `Avalanche`.
+Import from `opentcad.materials.database`: `load_material`, `MaterialParams`, `MaterialFileError`, `params_from_dict`, `value_paths`, `BandStructure`, `MobilityConstant`, `MobilityKlaassen`, `MobilityLombardi`, `VelocitySaturation`, `Recombination`, `Avalanche`.
 
 ## load_material
 
@@ -34,7 +34,7 @@ MaterialParams pydantic object.
 
 - `FileNotFoundError`: If no YAML file found for the given symbol.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L176)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L259)
 
 ## MaterialParams
 
@@ -54,12 +54,30 @@ class opentcad.materials.database.MaterialParams(
     raw: dict = {},
     defaulted: list[str] = [],
     source: str = '',
+    cited: dict[str, tuple[Source, ...]] = {},
 ) -> None
 ```
 
 Validated material parameter set for one material.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L141)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L210)
+
+### MaterialParams.sources_of
+
+```python
+MaterialParams.sources_of(path: str) -> tuple[Source, ...]
+```
+
+The sources the file cites for a value (dotted path as in the
+file, e.g. ``"bandgap.Eg_eV_300K"``); empty if it cites none.
+
+### MaterialParams.uncited
+
+```python
+MaterialParams.uncited() -> list[str]
+```
+
+Dotted paths of the file's values that cite no source.
 
 ## MaterialFileError
 
@@ -69,7 +87,7 @@ class opentcad.materials.database.MaterialFileError
 
 A material file lacks fields every simulation needs.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L162)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L245)
 
 ## params_from_dict
 
@@ -86,13 +104,28 @@ Build MaterialParams from a parsed material file.
 
 Fields every simulation needs (REQUIRED_ALL, plus REQUIRED_SEMICONDUCTOR
 unless ``is_insulator: true``) must be present: a missing one raises
-MaterialFileError instead of silently taking silicon's value. Optional
+MaterialFileError instead of silently taking silicon's value. The
+``sources`` and ``cite`` sections are checked too: a ``cite`` entry for a
+value the file doesn't have, or naming a missing source, is an error.
+A value with no ``cite`` entry loads, and is reported as having no
+source (``MaterialParams.uncited`` and run records). Optional
 model blocks (Klaassen, Lombardi, velocity saturation, Auger/radiative, avalanche)
 fall back to the code defaults, which are silicon's; every field filled
 that way is listed in ``MaterialParams.defaulted`` so the models that
 need it can refuse to run.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L237)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L360)
+
+## value_paths
+
+```python
+opentcad.materials.database.value_paths(raw: dict) -> list[str]
+```
+
+Dotted paths of every parameter value in a material file: numbers
+outside ``META_KEYS``, other than ``NOT_VALUES`` keys.
+
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L314)
 
 ## BandStructure
 
@@ -114,7 +147,22 @@ and intrinsic density at 300 K [cm⁻³], and relative permittivity.
 Field defaults are silicon's values; the required fields (see
 ``load_material``) must still be given in a material file.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L106)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L175)
+
+### BandStructure.model_post_init
+
+```python
+BandStructure.model_post_init(context: Any, /) -> None
+```
+
+This function is meant to behave like a BaseModel method to initialize private attributes.
+
+It takes context as an argument since that's what pydantic-core passes when calling it.
+
+**Parameters**
+
+- `self`: The BaseModel instance.
+- `context`: The context.
 
 ## MobilityConstant
 
@@ -132,7 +180,22 @@ Constant low-field mobilities [cm²/V/s] and their uncertainty [%].
 Field defaults are silicon's values; the required fields (see
 ``load_material``) must still be given in a material file.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L22)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L91)
+
+### MobilityConstant.model_post_init
+
+```python
+MobilityConstant.model_post_init(context: Any, /) -> None
+```
+
+This function is meant to behave like a BaseModel method to initialize private attributes.
+
+It takes context as an argument since that's what pydantic-core passes when calling it.
+
+**Parameters**
+
+- `self`: The BaseModel instance.
+- `context`: The context.
 
 ## MobilityKlaassen
 
@@ -179,7 +242,22 @@ Reference: Klaassen, Solid-State Electron. 35, 953 (1992).
 Default values are the published Si fit. If the YAML omits this
 block, these defaults are used.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L32)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L101)
+
+### MobilityKlaassen.model_post_init
+
+```python
+MobilityKlaassen.model_post_init(context: Any, /) -> None
+```
+
+This function is meant to behave like a BaseModel method to initialize private attributes.
+
+It takes context as an argument since that's what pydantic-core passes when calling it.
+
+**Parameters**
+
+- `self`: The BaseModel instance.
+- `context`: The context.
 
 ## MobilityLombardi
 
@@ -212,7 +290,22 @@ Darwish et al., IEEE TED 44, 1529 (1997), as in DEVSIM's Klaassen.py
 ``Philips_Surface_Mobility``. Field defaults are silicon's values; a
 material file that omits the block is refused by the ``Lombardi`` model.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L67)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L136)
+
+### MobilityLombardi.model_post_init
+
+```python
+MobilityLombardi.model_post_init(context: Any, /) -> None
+```
+
+This function is meant to behave like a BaseModel method to initialize private attributes.
+
+It takes context as an argument since that's what pydantic-core passes when calling it.
+
+**Parameters**
+
+- `self`: The BaseModel instance.
+- `context`: The context.
 
 ## VelocitySaturation
 
@@ -232,7 +325,22 @@ the ``Canali`` high-field model.
 Field defaults are silicon's values; the required fields (see
 ``load_material``) must still be given in a material file.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L120)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L189)
+
+### VelocitySaturation.model_post_init
+
+```python
+VelocitySaturation.model_post_init(context: Any, /) -> None
+```
+
+This function is meant to behave like a BaseModel method to initialize private attributes.
+
+It takes context as an argument since that's what pydantic-core passes when calling it.
+
+**Parameters**
+
+- `self`: The BaseModel instance.
+- `context`: The context.
 
 ## Recombination
 
@@ -254,7 +362,22 @@ coefficients [cm⁶/s] and the radiative coefficient [cm³/s].
 Field defaults are silicon's values; the required fields (see
 ``load_material``) must still be given in a material file.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L92)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L161)
+
+### Recombination.model_post_init
+
+```python
+Recombination.model_post_init(context: Any, /) -> None
+```
+
+This function is meant to behave like a BaseModel method to initialize private attributes.
+
+It takes context as an argument since that's what pydantic-core passes when calling it.
+
+**Parameters**
+
+- `self`: The BaseModel instance.
+- `context`: The context.
 
 ## Avalanche
 
@@ -271,4 +394,19 @@ class opentcad.materials.database.Avalanche(
 Impact-ionisation Chynoweth coefficients, Si defaults are the
 van Overstraeten-de Man single-regime fit.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L132)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/materials/database.py#L201)
+
+### Avalanche.model_post_init
+
+```python
+Avalanche.model_post_init(context: Any, /) -> None
+```
+
+This function is meant to behave like a BaseModel method to initialize private attributes.
+
+It takes context as an argument since that's what pydantic-core passes when calling it.
+
+**Parameters**
+
+- `self`: The BaseModel instance.
+- `context`: The context.

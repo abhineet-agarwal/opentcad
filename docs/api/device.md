@@ -340,7 +340,16 @@ class opentcad.device.physics.PhysicsConfig(
 Container of physics models used by DeviceSolver. New model classes
 (avalanche, ...) will be added as additional fields here.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/physics.py#L188)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/physics.py#L201)
+
+### PhysicsConfig.note_provenance
+
+```python
+PhysicsConfig.note_provenance() -> None
+```
+
+Note each model, its settings and its references in the active
+provenance record (a no-op outside ``opentcad.provenance.recording``).
 
 ## MobilityModel
 
@@ -423,7 +432,7 @@ density — "n_i" (a parameter) when no BGN model is active, or the
 node model registered by the BGN model when BGN is on. Recombination
 formulas contain n_i^2 which must use the effective value.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/physics.py#L77)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/physics.py#L81)
 
 ### RecombinationModel.required_params
 
@@ -477,7 +486,7 @@ name the solver substitutes for `n_i` in Poisson, contact BCs,
 and recombination terms. The default (`NoBGN`) is a no-op and
 returns the plain parameter name "n_i".
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/physics.py#L114)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/physics.py#L121)
 
 ### BandgapNarrowingModel.required_params
 
@@ -522,7 +531,7 @@ wrapped forms into IntrinsicElectrons/Holes and the ohmic contact
 built-in potential offset. Boltzmann is a no-op identity; FermiDirac
 applies the Blakemore approximation.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/physics.py#L142)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/physics.py#L152)
 
 ### StatisticsModel.required_params
 

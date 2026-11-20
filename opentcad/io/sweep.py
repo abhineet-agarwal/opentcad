@@ -290,6 +290,8 @@ def _run_point(index: int, deck_dict: dict, metrics: list[MetricSpec]) -> dict:
     row["mesh"] = {"cells": int(res.meshfield.n_cells),
                    "nodes": int(res.meshfield.n_points)}
     row["analyses"] = res.analyses_to_dict()
+    prov = getattr(res, "provenance", None)
+    row["provenance"] = prov.to_dict() if prov is not None else None
     for m in metrics:
         try:
             row["metrics"][m.name] = float(get_metric(m.metric)(
@@ -349,7 +351,8 @@ def run_sweep(sweep: Sweep, outdir, *, jobs: int = 1, log=None) -> SweepResult:
         (outdir / "points" / f"point_{k:03d}.json").write_text(json.dumps(
             {"point": k, "values": sweep.points[k], "status": r["status"],
              "mesh": r["mesh"], "metrics": r["metrics"],
-             "analyses": r["analyses"]}, indent=2) + "\n")
+             "analyses": r["analyses"], "provenance": r.get("provenance")},
+            indent=2) + "\n")
         rows.append({"point": k, **sweep.points[k], **r["metrics"],
                      "status": r["status"], "elapsed_s": r["elapsed_s"],
                      "notes": "; ".join(r["notes"])})

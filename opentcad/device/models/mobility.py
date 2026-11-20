@@ -16,6 +16,7 @@ Composition:
 from __future__ import annotations
 from typing import Optional
 from ..physics import MobilityModel
+from .references import CANALI_1975, KLAASSEN_1992, LOMBARDI_1988
 
 
 class ConstantMobility(MobilityModel):
@@ -56,6 +57,8 @@ class Klaassen(MobilityModel):
     so Newton on the continuity equations converges.
     """
 
+    references = (KLAASSEN_1992,)
+
     requires_carriers = True
 
     def required_params(self) -> tuple[str, ...]:
@@ -71,7 +74,7 @@ class Klaassen(MobilityModel):
 
     def _set_parameters(self, ds, device, region, params, T_K):
         k = params.mobility_klaassen
-        for name, value in vars(k).items():
+        for name, value in k.items():
             ds.set_parameter(device=device, region=region, name=name,
                              value=float(value))
         ds.set_parameter(device=device, region=region, name="T",
@@ -202,6 +205,8 @@ class Canali(MobilityModel):
         Canali(base=ConstantMobility()) — simple high-field
     """
 
+    references = (CANALI_1975,)
+
     DRIVING_FORCES = ("quasi_fermi", "efield")
 
     def required_params(self) -> tuple[str, ...]:
@@ -250,6 +255,10 @@ class Canali(MobilityModel):
         # Bandgap narrowing (attached before mobility) registers n_i_eff.
         ni = ("n_i_eff" if "n_i_eff" in ds.get_node_model_list(device=device, region=region)
               else "n_i")
+        if (ni == "n_i_eff" and self.driving_force == "quasi_fermi"
+                and "n_i_eff@n0" not in ds.get_edge_model_list(device=device, region=region)):
+            # The quasi-Fermi force reads n_i_eff at both edge ends.
+            ds.edge_from_node_model(device=device, region=region, node_model="n_i_eff")
         vs = params.velocity_saturation
         for name, val in (("vsat_e", vs.vsat_e_cm_s),
                           ("vsat_h", vs.vsat_h_cm_s),
@@ -352,6 +361,8 @@ class Lombardi(MobilityModel):
         averaging to edges smooths out the step; Newton converges.
     """
 
+    references = (LOMBARDI_1988,)
+
     def required_params(self) -> tuple[str, ...]:
         return ("mobility_lombardi",) + self.base.required_params()
 
@@ -370,7 +381,7 @@ class Lombardi(MobilityModel):
 
     def attach(self, ds, device, region, params, T_K):
         self.base.attach(ds, device, region, params, T_K)
-        for name, val in vars(params.mobility_lombardi).items():
+        for name, val in params.mobility_lombardi.items():
             ds.set_parameter(device=device, region=region, name=f"Lb_{name}",
                              value=float(val))
         ds.set_parameter(device=device, region=region, name="T",

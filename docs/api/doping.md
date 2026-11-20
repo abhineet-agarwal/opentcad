@@ -225,7 +225,7 @@ the MeshField in place; returns an AnnealResult.
 
 AnnealResult with the diffusivities and σ actually applied.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L310)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L348)
 
 ## AnnealResult
 
@@ -253,7 +253,7 @@ remainder, i.e. all of Nd / Na when no species fields are tracked.
 `species_sigma_um` / `species_D_cm2_s` give the same per tracked
 species. σ(t) = √(2 D t).
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L140)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L178)
 
 ## apply_anneal_fair
 
@@ -322,7 +322,7 @@ MeshField in place. Use :func:`apply_anneal` when the profile stays
 well below n_i at the anneal temperature — it is exact there and
 much cheaper.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L487)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L525)
 
 ## FairAnnealResult
 
@@ -351,7 +351,7 @@ species_Na's coefficients; `species_D_eff_peak_cm2_s` gives the peak
 effective diffusivity per tracked species — the one-number summary of
 how much concentration enhancement mattered.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L406)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L444)
 
 ## moments_for
 
@@ -408,7 +408,7 @@ standard deviation ΔRp, skewness γ and kurtosis β, and integrates to
 decides what happens above the surface). Arrays are read-only and
 cached per moment set.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/pearson_iv.py#L279)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/pearson_iv.py#L304)
 
 ## diffusivity_intrinsic
 
@@ -431,7 +431,7 @@ concentration-dependent ones.
 - `T_K`: anneal temperature in Kelvin.
 - `target`: substrate material. Only Si has tables today.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L73)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/process/doping/anneal.py#L90)
 
 ## available_species
 

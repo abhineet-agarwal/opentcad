@@ -22,3 +22,15 @@ moments:
   -  {energy_keV: 100, Rp_um: 0.124, dRp_um: 0.043, gamma: 0.40, beta: 3.40}
   -  {energy_keV: 150, Rp_um: 0.185, dRp_um: 0.058, gamma: 0.30, beta: 3.20}
   -  {energy_keV: 200, Rp_um: 0.246, dRp_um: 0.070, gamma: 0.25, beta: 3.00}
+
+# --- Sources (as the header above gives them; not re-checked) -------------
+sources:
+  szeng2007:
+    cite: S. M. Sze, K. K. Ng, Physics of Semiconductor Devices, 3rd ed. (Wiley, 2007)
+    note: Table 14.4, as this file's header cites it
+  plummer2000:
+    cite: J. D. Plummer, M. D. Deal, P. B. Griffin, Silicon VLSI Technology
+      (Prentice Hall, 2000)
+    note: ch. 8, used as a cross-check
+cite:
+  moments: [szeng2007, plummer2000]

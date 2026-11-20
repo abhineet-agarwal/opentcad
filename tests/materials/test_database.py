@@ -66,6 +66,7 @@ def test_insulator_needs_only_permittivity():
 def test_optional_blocks_are_recorded_when_filled_in():
     raw = _si_raw()
     del raw["mobility_klaassen"]
+    del raw["cite"]["mobility_klaassen"]     # a citation for a removed value is an error
     del raw["recombination"]["B_rad_cm3_per_s"]
     raw["avalanche"] = {"a_n_per_cm": 1.0}
     p = params_from_dict(raw, "X")
@@ -90,6 +91,8 @@ def test_solver_refuses_models_on_defaulted_parameters(simple_si_meshfield):
     raw = _si_raw()
     del raw["mobility_klaassen"]
     del raw["recombination"]["Cn_cm6_per_s"]
+    for path in ("mobility_klaassen", "recombination.Cn_cm6_per_s"):
+        del raw["cite"][path]                # citations for removed values are errors
     params = params_from_dict(raw, "Si", source="test")
     s = DeviceSolver(simple_si_meshfield, {"Silicon": params},
                      physics=PhysicsConfig(mobility=Klaassen(), recombination=[Auger()]))
@@ -113,6 +116,7 @@ def test_lombardi_reads_its_coefficients_from_the_material_file(simple_si_meshfi
     physics = PhysicsConfig(mobility=Lombardi(base=Klaassen()))
     raw = _si_raw()
     del raw["mobility_lombardi"]
+    del raw["cite"]["mobility_lombardi"]
     s = DeviceSolver(simple_si_meshfield, {"Silicon": params_from_dict(raw, "Si")},
                      physics=physics)
     with pytest.raises(ValueError, match="Lombardi needs mobility_lombardi"):

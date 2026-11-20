@@ -38,7 +38,7 @@ least-squares sense.
 
 A :class:`FitResult`.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L155)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L156)
 
 ## Parameter
 
@@ -64,7 +64,7 @@ One parameter a calibration may change.
 - `log`: Fit ``log10(value)`` instead of the value. Use it for positive coefficients that can move by factors rather than by amounts.
 - `step`: Finite-difference step: in log10 units when ``log``, in the parameter's own units otherwise. ``None`` uses ``fit``'s ``rel_step``. Give one for a parameter the result is very sensitive to, such as an exponent.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L49)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L50)
 
 ### Parameter.to_internal
 
@@ -112,7 +112,7 @@ The outcome of :func:`fit`.
 - `correlation`: Correlation of the fitted parameters, from the Jacobian at the solution (in the fitted, possibly log, scale). Values near ±1 mean the data cannot tell those parameters apart.
 - `at_bound`: Names of parameters that ended on a bound.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L102)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L103)
 
 ### FitResult.to_dict
 
@@ -134,7 +134,7 @@ class opentcad.calibrate.Evaluation(
 
 One run of the residual function.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L94)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L95)
 
 ## apply_overrides
 
@@ -142,6 +142,8 @@ One run of the residual function.
 opentcad.calibrate.apply_overrides(
     params: MaterialParams,
     values: Mapping[str, float],
+    *,
+    source: Optional[Mapping] = None,
 ) -> MaterialParams
 ```
 
@@ -152,7 +154,11 @@ Every name must be an existing field of a material block, e.g.
 The copy is rebuilt through the material-file loader, so it is checked the
 same way a file is, and its ``raw`` dict carries the new values.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L283)
+Each new value cites ``source`` (a source in file form, see
+``opentcad.provenance``) instead of the file's citation, which was for the
+old value. The default says the value was set in code.
+
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L289)
 
 ## write_material_variant
 
@@ -179,4 +185,4 @@ with ``opentcad.plugins.register_data_dir("materials", folder)``; then
 - `values`: Fitted values, ``{"block.field": value}``.
 - `calibration`: Written as the file's ``calibration`` block, replacing the base file's. Say what the values were fitted to and how (``status``, ``calibrated_against``, ``notes``...).
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L301)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/calibrate.py#L328)
