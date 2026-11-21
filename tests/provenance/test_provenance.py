@@ -13,7 +13,7 @@ import yaml
 from opentcad.materials.database import (DEFAULT_SOURCE, MaterialFileError, load_material,
                                          params_from_dict)
 from opentcad.provenance import (CODATA_2018, Record, Source, format_table, parse_sources,
-                                 recording, sources_for)
+                                 recording, sources_for, summarize)
 
 ROOT = Path(__file__).resolve().parents[2]
 DECKS = ROOT / "examples" / "decks"
@@ -23,12 +23,8 @@ DOPANTS = ROOT / "opentcad" / "process" / "doping" / "data"
 # The shipped values that cite no source. Citing one means removing it here;
 # a new uncited value fails the test. Phase 3 asks for this list to be empty.
 UNCITED = {
-    "Si": {"bandgap.varshni_alpha", "bandgap.varshni_beta_K", "Nc_cm3_300K",
-           "mobility_constant.electron_cm2_Vs", "mobility_constant.hole_cm2_Vs",
-           "recombination.tau_n_s", "recombination.tau_p_s", "recombination.Et_eV",
-           "recombination.B_rad_cm3_per_s", "velocity_saturation.vsat_h_cm_s",
-           "velocity_saturation.beta_e", "velocity_saturation.beta_h"},
-    "SiO2": {"electron_affinity_eV"},
+    "Si": {"recombination.B_rad_cm3_per_s", "velocity_saturation.vsat_h_cm_s"},
+    "SiO2": set(),
 }
 
 
@@ -91,6 +87,13 @@ def test_n_i_cites_the_paper_that_gives_its_value():
     assert src.doi == "10.1063/1.1529297" and "9.65e9" in src.note
 
 
+def test_nominal_values_say_they_are_opentcad_s_own():
+    si = load_material("Si")
+    for name in ("recombination.tau_n_s", "recombination.tau_p_s", "recombination.Et_eV"):
+        (src,) = si.sources_of(name)
+        assert src.kind == "default" and "OpenTCAD" in src.cite
+
+
 def test_code_references_have_dois():
     from opentcad.device.models import references
     tree = ast.parse(Path(references.__file__).read_text())
@@ -103,11 +106,11 @@ def test_reading_a_material_value_records_it_with_its_source():
     si = load_material("Si")
     with recording() as rec:
         si.band_structure.ni_cm3_300K
-        si.recombination.tau_n_s
+        si.recombination.B_rad_cm3_per_s
     ni = rec.values[("Silicon", "ni_cm3_300K")]
     assert ni.value == pytest.approx(9.65e9) and ni.sources[0].doi == "10.1063/1.1529297"
     assert ni.file == "opentcad/materials/params/Si.yaml"
-    assert rec.values[("Silicon", "recombination.tau_n_s")].sources == ()
+    assert rec.values[("Silicon", "recombination.B_rad_cm3_per_s")].sources == ()
     si.band_structure.Nc_cm3_300K               # outside a recording: nothing
     assert ("Silicon", "Nc_cm3_300K") not in rec.values
 
@@ -164,7 +167,29 @@ def test_process_tables_record_what_they_give():
     assert rec.values[("Diffusion: boron in Si", "intrinsic (D0, Ea)")].value == {
         "D0_cm2s": 0.76, "Ea_eV": 3.46}
     assert rec.models["oxidation"]["sources"][0].doi == "10.1063/1.1713945"
+    (radi,) = rec.values[("Oxidation: Deal-Grove, <100> Si, 1 atm",
+                          "Si consumed per unit oxide grown")].sources
+    assert "0.44" in radi.note
     assert rec.values[("Physical constants", "k_B [eV/K]")].sources == (CODATA_2018,)
+
+
+def test_slotboom_cites_only_the_values_from_slotboom_and_de_graaff():
+    from opentcad.device.models.bgn import Slotboom
+
+    class _DS:                                  # attach() only registers models
+        def __getattr__(self, name):
+            return lambda **kw: None
+
+    group = "Model: Slotboom bandgap narrowing"
+    with recording() as rec:
+        Slotboom().attach(_DS(), "d", "r", None, 300.0)
+    assert rec.values[(group, "E_ref_eV")].sources == ()
+    assert rec.values[(group, "N_ref_cm3")].sources[0].doi == "10.1016/0038-1101(76)90043-5"
+    nine = Slotboom()
+    nine.E_ref_eV = 9e-3
+    with recording() as rec:
+        nine.attach(_DS(), "d", "r", None, 300.0)
+    assert "9 mV" in rec.values[(group, "E_ref_eV")].sources[1].note
 
 
 # ---- records -----------------------------------------------------------------
@@ -174,16 +199,19 @@ def test_record_numbers_sources_and_counts_gaps():
     rec.add_value("G", "x", 1.0, (a,))
     rec.add_value("G", "y", 2.0, (a,))
     rec.add_value("G", "z", 3.0)
+    rec.add_value("G", "w", 4.0, (Source("ours", kind="default"),))
     rec.add_value("G", "x", 1.5, (a,))
     d = rec.to_dict()
-    assert d["sources"] == {"S1": {"cite": "A", "kind": "literature", "doi": "10.1/a"}}
-    assert d["without_source"] == 1
+    assert {"cite": "A", "kind": "literature", "doi": "10.1/a"} in d["sources"].values()
+    assert d["without_source"] == 1 and d["opentcad_defaults"] == 1
+    assert "1 are OpenTCAD's own values" in summarize(d)
     x = next(v for v in d["values"] if v["name"] == "x")
     assert x["value"] == 1.5 and "changed during the run" in x["note"]
     assert d["code"]["opentcad"]
     table = format_table(d)
     assert "NO SOURCE" in table and "https://doi.org/10.1/a" in table
-    assert "x = 1.5" not in format_table(d, only_missing=True)
+    missing = format_table(d, only_missing=True)
+    assert "x = 1.5" not in missing and "w = 4" in missing and "z = 3" in missing
     json.dumps(d)
 
 
@@ -212,8 +240,11 @@ def test_a_run_records_values_models_and_inputs(tmp_path, capsys):
     assert d["inputs"][0]["what"] == "simulation" and len(d["inputs"][0]["content_sha256"]) == 64
     assert any(f["path"].endswith("Si.yaml") and len(f["sha256"]) == 64 for f in d["files"])
     gaps = {(v["group"], v["name"]) for v in d["values"] if not v["sources"]}
-    assert ("Silicon", "recombination.tau_n_s") in gaps
+    assert ("Silicon", "recombination.tau_n_s") not in gaps
     assert d["without_source"] == len(gaps)
+    tau = next(v for v in d["values"] if v["name"] == "recombination.tau_n_s")
+    assert d["sources"][tau["sources"][0]]["kind"] == "default"
+    assert d["opentcad_defaults"] >= 2          # the lifetimes and the implant straggle
 
     out = tmp_path / "r.json"
     with contextlib.redirect_stdout(io.StringIO()):

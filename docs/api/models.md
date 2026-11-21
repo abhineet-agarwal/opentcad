@@ -318,7 +318,7 @@ class opentcad.device.models.NoBGN()
 No bandgap narrowing. n_i stays constant. Used as the default so
 existing callers get identical behavior to Phase 0.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/bgn.py#L22)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/bgn.py#L33)
 
 ## Slotboom
 
@@ -333,15 +333,16 @@ dEg(N) = E_ref * ( ln(N / N_ref)
                   + sqrt(ln(N / N_ref)^2 + 0.5) )   [eV]
 ```
 
-where N is |NetDoping|, N_ref = 1e17 cm^-3, E_ref = 6.92 meV in the
-updated del Alamo / Slotboom fit (Klaassen unified BGN gives similar
-results). Below N_ref, dEg is essentially 0.
+where N is |NetDoping|, N_ref = 1e17 cm^-3 and E_ref = 6.92 meV. Below
+N_ref, dEg is essentially 0. Slotboom & de Graaff's own fit uses
+E_ref = 9 mV with the same N_ref and 0.5 (as Klaassen 1991, eq. 22,
+quotes it); no paper is recorded for 6.92 meV with N_ref = 1e17.
 
 n_i_eff = n_i * exp(dEg / (2*V_t))
 
 Reference: Slotboom & de Graaff, Solid-State Electron. 19, 857 (1976).
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/bgn.py#L34)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/device/models/bgn.py#L45)
 
 ## Boltzmann
 

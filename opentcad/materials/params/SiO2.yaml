@@ -33,6 +33,14 @@ sources:
     note: thermal oxide
   dimaria1995:
     cite: DiMaria (1995); the file gives no fuller reference
+  williams1965:
+    cite: R. Williams, Photoemission of electrons from silicon into silicon dioxide,
+      Phys. Rev. 140, A569 (1965)
+    doi: 10.1103/PhysRev.140.A569
+    note: The abstract gives a 4.25 eV threshold for photoemission from silicon
+      into the SiO2 conduction band, roughly 0.9 eV below the threshold into
+      vacuum, so the SiO2 conduction band is about 0.9 eV below the vacuum level.
+      This file's 0.95 eV is silicon's 4.05 eV less a 3.1 eV band offset.
   unused:
     kind: placeholder
     cite: Nominal value; carriers are not solved in an insulator, so the solver
@@ -40,6 +48,7 @@ sources:
 
 cite:
   permittivity_relative: szeng2007
+  electron_affinity_eV: williams1965
   bandgap.Eg_eV_300K: dimaria1995
   Nc_cm3_300K: unused
   Nv_cm3_300K: unused

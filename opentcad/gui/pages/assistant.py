@@ -144,10 +144,12 @@ def run_reply(analyses: dict, specs, prov: dict | None = None) -> str:
         else:
             lines.append(f"- {name} ({atype}): done")
     if prov:
-        gaps = prov.get("without_source", 0)
+        gaps, own = prov.get("without_source", 0), prov.get("opentcad_defaults", 0)
         lines.append(f"- It used {len(prov.get('values', []))} values from data files "
                      f"and code, citing {len(prov.get('sources', {}))} sources"
                      + (f"; {gaps} have no recorded source" if gaps else "")
+                     + (f"; {own} are OpenTCAD's own values, not from a publication"
+                        if own else "")
                      + ". The Sources tab lists each one.")
     lines.append("Tell me what to change, e.g. a higher current or another sweep range.")
     return "\n".join(lines)

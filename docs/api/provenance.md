@@ -233,7 +233,7 @@ opentcad.provenance.note_value(
 
 ``Record.add_value`` on the active record; a no-op without one.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L420)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L434)
 
 ## note_model
 
@@ -247,7 +247,7 @@ opentcad.provenance.note_model(
 
 ``Record.add_model`` on the active record; a no-op without one.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L428)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L442)
 
 ## note_file
 
@@ -257,7 +257,7 @@ opentcad.provenance.note_file(path, kind: str) -> None
 
 ``Record.add_file`` on the active record; a no-op without one.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L435)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L449)
 
 ## note_input
 
@@ -267,7 +267,7 @@ opentcad.provenance.note_input(what: str, **info) -> None
 
 ``Record.add_input`` on the active record; a no-op without one.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L442)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L456)
 
 ## active
 
@@ -277,7 +277,7 @@ opentcad.provenance.active() -> Optional[Record]
 
 The record being filled, or None outside ``recording()``.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L415)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L429)
 
 ## summarize
 
@@ -287,7 +287,7 @@ opentcad.provenance.summarize(prov: Mapping) -> str
 
 One line for a provenance dict (``Record.to_dict()`` form).
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L317)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L320)
 
 ## format_table
 
@@ -296,8 +296,9 @@ opentcad.provenance.format_table(prov: Mapping, *, only_missing: bool = False) -
 ```
 
 A plain-text listing of a provenance dict, for the terminal.
+``only_missing`` lists only values with no published source.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L325)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L338)
 
 ## code_version
 
@@ -309,7 +310,7 @@ OpenTCAD's version, the git commit of the checkout (if it is one)
 and whether it has uncommitted changes, plus Python and package
 versions.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L498)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L512)
 
 ## display_path
 
@@ -320,4 +321,4 @@ opentcad.provenance.display_path(path) -> str
 ``path`` relative to the OpenTCAD checkout (or install) or to the
 working directory when it is inside one; otherwise as given.
 
-[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L455)
+[source](https://github.com/abhineet-agarwal/opentcad/blob/main/opentcad/provenance.py#L469)

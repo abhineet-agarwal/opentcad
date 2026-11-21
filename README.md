@@ -49,7 +49,7 @@ first slice, a [private local catalog](docs/catalog.md), already exists.
 | Analyses: I–V, C–V, transient, small-signal AC, field snapshots | Working | Equilibrium snapshot matches pn analytics to 1 mV |
 | SKY130 NMOS threshold check | Passes (Phase 2 exit) | Vth +17.7 % (max-gm), +9.6 % (100 nA·W/L) vs SkyWater's model card |
 | Simulation files, CLI, parameter sweeps | Working | Every point checked before running |
-| Provenance of every value a run uses | Working | Each value read from data files and code is listed with its source, the models with their papers, files with SHA-256; 13 shipped values have no source yet and are listed |
+| Provenance of every value a run uses | Working | Each value read from data files and code is listed with its source, the models with their papers, files with SHA-256; 2 shipped values and 1 code constant have no source yet, and OpenTCAD's own nominal values are labelled; both are listed |
 | Device design from specifications (`opentcad design`) | First slice | Bounded search over existing fields of a file; every candidate kept as evidence; a local model can draft plans, which never run by themselves |
 | Plugins (steps, analyses, models, metrics, data) | Working | Entry-point discovery; clashes are errors |
 | GUI with a local open-weights assistant | Working | Drafts are checked, repaired and every assumed value flagged |

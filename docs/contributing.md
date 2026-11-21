@@ -82,7 +82,9 @@ people contribute.
 1. Add `opentcad/materials/params/<Symbol>.yaml`, following `Si.yaml`: units in
    comments, and a source for each value in the `sources` and `cite` sections
    (with a DOI where there is one). Leave a value uncited rather than guess;
-   runs report it.
+   runs report it. A value you chose yourself gets a source with
+   `kind: default` saying so. Say in the source's `note` where the number
+   appears (abstract, table, equation) if you checked it.
 2. Give the required fields: `permittivity_relative`; for a semiconductor also
    the band structure, constant mobilities and SRH lifetimes. Add the model blocks
    (Klaassen, velocity saturation, Auger/radiative, avalanche) you have sources

@@ -8,7 +8,7 @@ Every run records where each number it used came from. The record lists:
 - the code version.
 
 Nothing is filled in by guessing. A value without a source is listed as having
-none.
+none, and a value OpenTCAD chose itself is labelled as OpenTCAD's own.
 
 ## What a run records
 
@@ -43,9 +43,9 @@ prints a summary:
 ```bash
 opentcad run examples/decks/pn_diode.yaml
 # results → examples/decks/pn_diode.results.json
-# sources: 38 value(s) from data files and code, citing 6 source(s); 2 have no recorded source. ...
+# sources: 38 value(s) from data files and code, citing 7 source(s); 2 are OpenTCAD's own values, not from a publication. ...
 opentcad sources examples/decks/pn_diode.results.json             # every value
-opentcad sources examples/decks/pn_diode.results.json --missing   # only those with no source
+opentcad sources examples/decks/pn_diode.results.json --missing   # only those with no published source
 ```
 
 `opentcad sources` prints each value under its material or table, the source
@@ -62,7 +62,7 @@ Values
     ...
     ni_cm3_300K = 9.65e+09  [S5]
     permittivity_relative = 11.7  [S6]
-    recombination.tau_n_s = 1e-05  [NO SOURCE]
+    recombination.tau_n_s = 1e-05  [S7]
 ...
 Sources
   S1: D. B. M. Klaassen, A unified mobility model for device simulation - I. ...,
@@ -71,7 +71,12 @@ Sources
   S5: P. P. Altermatt, A. Schenk, F. Geelhaar, G. Heiser, Reassessment of the intrinsic
       carrier density in crystalline silicon ..., J. Appl. Phys. 93, 1598 (2003)
       https://doi.org/10.1063/1.1529297
+  ...
+  S7 (default): OpenTCAD's nominal value, not from a publication — Real lifetimes
+      depend on the wafer and process ...
 ```
+
+A value with no source at all shows `[NO SOURCE]`.
 
 Elsewhere:
 - **Sweeps:** each point's JSON in `points/` has its own record.
@@ -129,7 +134,7 @@ cite:
   | `fit` | fitted to data (written by `write_material_variant`) |
   | `override` | set in code with `apply_overrides`, replacing the file's value |
   | `placeholder` | not used by the solver; kept for the file format |
-  | `default` | OpenTCAD's built-in value, used because the file doesn't give it |
+  | `default` | OpenTCAD's own value, not from a publication: a built-in value for a field the file doesn't give, or a nominal value the file or code sets |
   | `constant` | a physical constant |
   | `input` | your simulation file |
 
@@ -147,26 +152,50 @@ Calibration keeps this straight:
 
 ## What a citation does and doesn't establish
 
-A citation says where a value is published. The shipped citations were moved
+A citation says where a value is published. Most shipped citations were moved
 from the comments the files already had, as written. Their DOIs, authors and
-titles were checked against Crossref, but the values themselves were not checked
-against the papers, with two exceptions:
-- **Silicon's n_i (9.65e9 cm⁻³):** the value from Altermatt et al. (2003),
-  whose abstract gives 9.65e9. The file used to cite Green (1990), whose
-  abstract gives 1.08e10.
-- **Silicon's Nv (3.1e19 cm⁻³):** now cited to Green (1990), whose abstract
-  gives it.
+titles were checked against Crossref, but the values themselves were not
+checked against the papers.
+
+These were checked: the source's note says where the value appears.
+
+| Value | Source | Where it appears |
+|---|---|---|
+| Silicon n_i, 9.65e9 cm⁻³ | Altermatt et al. (2003) | abstract. The file used to cite Green (1990), whose abstract gives 1.08e10 |
+| Silicon Nv, 3.1e19 cm⁻³ | Green (1990) | abstract |
+| Silicon Nc, 2.86e19 cm⁻³ | Palankovski (TU Wien thesis, 2000) | Table 3.20, a fit to Green's data (−0.14 + 1.56 + 1.44 at 300 K) |
+| Varshni α = 4.73e-4 eV/K, β = 636 K | Klaassen (SISDEP 1991); Palankovski (2000) | eq. (20), which credits Thurmond (1975); Table 3.8 |
+| Constant mobilities, 1350 and 480 cm²/Vs | Ludwig & Watters (1956) | abstract: 1350 ± 100 and 480 ± 15 at 300 K |
+| High-field exponents β = 2 (electrons), 1 (holes) | Palankovski (2000) | Table 3.27 |
+| SiO₂ electron affinity, 0.95 eV | Williams (1965) | abstract: the SiO₂ conduction band is about 0.9 eV below vacuum |
+| Slotboom N_ref, 1e17 cm⁻³ | Slotboom & de Graaff (1976) | as Klaassen (1991, eq. 22) quotes it |
+| Si consumed per unit oxide, 0.44 | Radi (TU Wien thesis, 1998) | sec. 2.2 |
+
+## OpenTCAD's own values
+
+These have no publication. They are marked `default`, every run counts them,
+and `opentcad sources --missing` lists them:
+- **Silicon SRH lifetimes,** 10 µs for electrons and holes. Real lifetimes depend
+  on the wafer and process; measure or fit them.
+- **SRH trap level,** mid-gap.
+- **Implant lateral straggle,** σ_lat / ΔRp = 0.7.
 
 ## Values without a recorded source
 
-These are the shipped values with no source yet. Phase 3 of the
+Phase 3 of the
 [roadmap](https://github.com/abhineet-agarwal/opentcad/blob/main/PHASES.md)
 asks for this list to be empty; `tests/provenance` stops it from growing.
 
-| Where | Values |
-|---|---|
-| `Si.yaml` | `bandgap.varshni_alpha`, `bandgap.varshni_beta_K`, `Nc_cm3_300K`, `mobility_constant.electron_cm2_Vs`, `mobility_constant.hole_cm2_Vs`, `recombination.tau_n_s`, `recombination.tau_p_s`, `recombination.Et_eV`, `recombination.B_rad_cm3_per_s`, `velocity_saturation.vsat_h_cm_s`, `velocity_saturation.beta_e`, `velocity_saturation.beta_h` |
-| `SiO2.yaml` | `electron_affinity_eV` (the file derives it from a 3.1 eV band offset it doesn't cite) |
-| Slotboom model code | `E_ref_eV`, `N_ref_cm3` |
-| Implant code | lateral straggle σ_lat / ΔRp = 0.7 |
-| Oxidation code | Si consumed per unit oxide, 0.44 |
+| Where | Value | Why it is still uncited |
+|---|---|---|
+| `Si.yaml` | `recombination.B_rad_cm3_per_s`, 9.5e-15 cm³/s | not found in a source; the Ioffe database gives 1.1e-14 (Gerlach et al., 1972) and Trupke et al. (2003) report a lower value |
+| `Si.yaml` | `velocity_saturation.vsat_h_cm_s`, 0.72e7 cm/s | not found in a source; Palankovski (2000, Table 3.31) gives 0.704e7 |
+| Slotboom model code | `E_ref_eV`, 6.92 meV | Slotboom & de Graaff's fit uses 9 mV with N_ref = 1e17 cm⁻³ (Klaassen 1991, eq. 22); no paper is recorded for 6.92 meV with that N_ref |
+
+These carried-over citations are doubtful and need checking against the papers:
+- **Silicon vsat_e, 1.02e7 cm/s, cited to Canali et al. (1975):** Palankovski
+  (2000, Table 3.31) gives 1.0e7, and Canali's own fit could not be checked.
+- **The implant tables' "Sze & Ng, Table 14.4":** not checked; the table
+  number may be wrong.
+- **SiO₂ band gap, cited to "DiMaria (1995)":** the file gives no fuller
+  reference.

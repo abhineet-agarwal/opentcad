@@ -79,8 +79,16 @@
   - Silicon's n_i (9.65e9 cm⁻³) now cites Altermatt et al. (2003), whose
     abstract gives that value; the file cited Green (1990), whose abstract
     gives 1.08e10.
-  - 13 shipped values, and four constants in the code, have no recorded
-    source yet; runs list them (docs/provenance.md).
+  - Ten more values were cited to sources where the number was found:
+    silicon's Nc, Varshni coefficients, constant mobilities and high-field
+    exponents; SiO₂'s electron affinity; Slotboom's N_ref; and the oxidation
+    Si-consumption ratio.
+  - The silicon SRH lifetimes, the mid-gap trap level and the implant
+    lateral straggle are marked as OpenTCAD's own values (`default`), counted
+    in every run's summary and listed by `--missing`.
+  - Two shipped values (silicon's radiative coefficient and hole saturation
+    velocity) and one code constant (Slotboom's E_ref, 6.92 meV) have no
+    recorded source yet; runs list them (docs/provenance.md).
   - Fitted variants cite the fit, and `apply_overrides` marks what it sets.
 - **Simulation files and CLI.** YAML/JSON simulation files, checked before they
   run (`opentcad check | run`). Parameter sweeps with extracted metrics

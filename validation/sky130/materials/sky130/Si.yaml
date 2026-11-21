@@ -146,6 +146,37 @@ sources:
     cite: R. Van Overstraeten, H. De Man, Measurement of the ionization rates in diffused
       silicon p-n junctions, Solid-State Electron. 13, 583 (1970)
     doi: 10.1016/0038-1101(70)90139-5
+  klaassen1991:
+    cite: D. B. M. Klaassen, Physical modelling for bipolar device simulation, in
+      Simulation of Semiconductor Devices and Processes 4 (SISDEP), W. Fichtner, D.
+      Aemmer (eds.), Hartung-Gorre (1991), p. 23
+    url: https://in4.iue.tuwien.ac.at/pdfs/sisdep1991/pdfs/Klaassen_2.pdf
+    note: Eq. (20) gives Vg = 1.1700 - 4.73e-4 T^2/(T + 636) V and credits it to Thurmond,
+      J. Electrochem. Soc. 122, 1133 (1975). Checked on the scanned paper.
+  palankovski2000:
+    cite: V. Palankovski, Simulation of Heterojunction Bipolar Transistors, Dissertation,
+      Technische Universitaet Wien (2000)
+    url: https://www.iue.tuwien.ac.at/phd/palankovski/
+    note: Checked on the online text. Table 3.8 gives Varshni alpha = 4.73e-4 eV/K
+      and beta = 636 K for Si, crediting Sze (1981) and Singh (1993). Table 3.20 gives
+      a fit for Nc based on data after Green (1990); at 300 K it is -0.14 + 1.56 +
+      1.44 = 2.86e19 cm^-3. Table 3.27 gives the high-field exponents beta = 2.0 (electrons)
+      and 1.0 (holes) of the Caughey-Thomas form.
+  ludwig1956:
+    cite: G. W. Ludwig, R. L. Watters, Drift and conductivity mobility in silicon,
+      Phys. Rev. 101, 1699 (1956)
+    doi: 10.1103/PhysRev.101.1699
+    note: The abstract gives drift mobilities at 300 K of 1350 +/- 100 (electrons)
+      and 480 +/- 15 cm^2/Vs (holes), in the purest crystals measured.
+  nominal:
+    kind: default
+    cite: OpenTCAD's nominal value, not from a publication
+    note: Real lifetimes depend on the wafer and process (HackerFab's may be 100-1000x
+      shorter). Measure or fit them for quantitative work.
+  midgap:
+    kind: default
+    cite: OpenTCAD's assumption of a single trap level at mid-gap, where SRH recombination
+      is fastest; not from a measurement
   fit:
     kind: fit
     cite: Fitted to SkyWater sky130_fd_pr__nfet_01v8, tt model card (BSIM4 in ngspice),
@@ -153,15 +184,28 @@ sources:
     note: 'fitted_with: validation/sky130/calibrate.py; result: validation/sky130/calibration.json'
 cite:
   bandgap.Eg_eV_300K: green1990
+  bandgap.varshni_alpha:
+  - klaassen1991
+  - palankovski2000
+  bandgap.varshni_beta_K:
+  - klaassen1991
+  - palankovski2000
+  Nc_cm3_300K: palankovski2000
   Nv_cm3_300K: green1990
   ni_cm3_300K: altermatt2003
   electron_affinity_eV: sze1981
   permittivity_relative: szeng2007
+  mobility_constant: ludwig1956
   mobility_klaassen: klaassen1992
   mobility_lombardi: darwish1997
+  recombination.tau_n_s: nominal
+  recombination.tau_p_s: nominal
+  recombination.Et_eV: midgap
   recombination.Cn_cm6_per_s: dziewior1977
   recombination.Cp_cm6_per_s: dziewior1977
   velocity_saturation.vsat_e_cm_s: canali1975
+  velocity_saturation.beta_e: palankovski2000
+  velocity_saturation.beta_h: palankovski2000
   avalanche: vanoverstraeten1970
   mobility_lombardi.C_e: fit
   mobility_lombardi.delta_e: fit

@@ -7,7 +7,7 @@ opentcad.cli — command-line interface.
                       [--verbose]       show DEVSIM's solver output
     opentcad sweep FILE [-o DIR] [-j N] run a sweep; table.csv + per-point results
     opentcad sources RESULTS.json       list every value a run used and its source
-                      [--missing]       only the values with no recorded source
+                      [--missing]       only the values with no published source
     opentcad plugins                    list registered steps, analyses, models,
                                         metrics, data folders and plugins
 
@@ -214,7 +214,7 @@ def build_parser() -> argparse.ArgumentParser:
     so.add_argument("file", help="a results JSON written by opentcad run (or a sweep "
                                  "point's JSON)")
     so.add_argument("--missing", action="store_true",
-                    help="only the values with no recorded source")
+                    help="only the values with no published source (none recorded, or OpenTCAD's own)")
     so.set_defaults(func=_cmd_sources)
     pl = sub.add_parser("plugins", help="list registered extensions")
     pl.set_defaults(func=_cmd_plugins)

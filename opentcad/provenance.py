@@ -53,7 +53,7 @@ KINDS = {
     "fit": "fitted to data",
     "override": "set in code, replacing the file's value",
     "placeholder": "not used by the solver; kept for the file format",
-    "default": "OpenTCAD built-in value",
+    "default": "OpenTCAD's own value, not from a publication",
     "constant": "physical constant",
     "input": "your simulation file",
 }
@@ -307,6 +307,9 @@ class Record:
             "models": models,
             "values": values,
             "without_source": sum(1 for v in values if not v["sources"]),
+            "opentcad_defaults": sum(
+                1 for v in values if v["sources"]
+                and all(table[s].get("kind") == "default" for s in v["sources"])),
         }
 
     def summary(self) -> str:
@@ -317,13 +320,24 @@ class Record:
 def summarize(prov: Mapping) -> str:
     """One line for a provenance dict (``Record.to_dict()`` form)."""
     n, gaps = len(prov.get("values", [])), prov.get("without_source", 0)
+    own = prov.get("opentcad_defaults", 0)
     line = (f"{n} value(s) from data files and code, citing "
             f"{len(prov.get('sources', {}))} source(s)")
-    return line + (f"; {gaps} have no recorded source" if gaps else "")
+    if gaps:
+        line += f"; {gaps} have no recorded source"
+    if own:
+        line += f"; {own} are OpenTCAD's own values, not from a publication"
+    return line
+
+
+def unpublished(value: Mapping, sources: Mapping) -> bool:
+    """True if a value (``to_dict`` form) has no source, or only OpenTCAD's own."""
+    return all(sources.get(s, {}).get("kind") == "default" for s in value["sources"])
 
 
 def format_table(prov: Mapping, *, only_missing: bool = False) -> str:
-    """A plain-text listing of a provenance dict, for the terminal."""
+    """A plain-text listing of a provenance dict, for the terminal.
+    ``only_missing`` lists only values with no published source."""
     srcs = prov.get("sources", {})
     lines = []
     code = prov.get("code", {})
@@ -346,7 +360,7 @@ def format_table(prov: Mapping, *, only_missing: bool = False) -> str:
             files[v["group"]].append(v["file"])
     group = None
     for v in prov.get("values", []):
-        if only_missing and v["sources"]:
+        if only_missing and not unpublished(v, srcs):
             continue
         if v["group"] != group:
             group = v["group"]

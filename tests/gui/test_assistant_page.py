@@ -78,10 +78,11 @@ def test_conversation_draft_answer_run(fake_model):
     assert len(at.get("plotly_chart")) == 6        # + the inversion field map
     assert _chat(at)[-1][1].startswith("Ran the file:")
     assert "idvg (iv): 16 points from 0 to 1.5 V" in _chat(at)[-1][1]
-    assert "have no recorded source. The Sources tab lists each one." in _chat(at)[-1][1]
+    reply = _chat(at)[-1][1]
+    assert "are OpenTCAD's own values, not from a publication. The Sources tab" in reply
     values = next(d.value for d in at.dataframe if "Where" in d.value.columns)  # Sources tab
     assert {"Silicon", "Physical constants"} <= set(values["Where"])
-    assert "none recorded" in set(values["Source"])
+    assert "recombination.tau_n_s" in set(values["Value"])
 
 
 def test_editor_reports_problems():

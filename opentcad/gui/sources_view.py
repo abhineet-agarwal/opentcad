@@ -11,7 +11,7 @@ import json
 
 import streamlit as st
 
-from opentcad.provenance import KINDS, summarize
+from opentcad.provenance import KINDS, summarize, unpublished
 
 
 def _short(value) -> str:
@@ -27,15 +27,16 @@ def show_sources(prov: dict, *, key: str) -> None:
     if not prov:
         st.caption("No provenance was recorded for this run.")
         return
-    gaps = prov.get("without_source", 0)
+    gaps = prov.get("without_source", 0) + prov.get("opentcad_defaults", 0)
+    srcs = prov.get("sources", {})
     st.caption(summarize(prov) + (". Values marked “none recorded” have no source "
                                   "in their file or code yet." if gaps else "."))
-    only = st.toggle("Only values without a source", value=False, key=f"{key}_missing",
-                     disabled=not gaps)
+    only = st.toggle("Only values without a published source", value=False,
+                     key=f"{key}_missing", disabled=not gaps)
     rows = [{"Where": v["group"], "Value": v["name"], "Number": _short(v["value"]),
              "Source": ", ".join(v["sources"]) or "none recorded",
              "Note": v.get("note", ""), "File": v.get("file", "")}
-            for v in prov.get("values", []) if not (only and v["sources"])]
+            for v in prov.get("values", []) if not (only and not unpublished(v, srcs))]
     st.dataframe(rows, hide_index=True, width="stretch")
 
     if prov.get("models"):

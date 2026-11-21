@@ -15,8 +15,19 @@ Models:
   Slotboom  — Slotboom (1976) empirical fit for Si, standard workhorse
 """
 from __future__ import annotations
+from opentcad.provenance import Source
+
 from ..physics import BandgapNarrowingModel
 from .references import SLOTBOOM_DE_GRAAFF_1976
+
+#: Where Slotboom & de Graaff's fitted parameters were read.
+KLAASSEN_1991 = Source(
+    "D. B. M. Klaassen, Physical modelling for bipolar device simulation, in Simulation "
+    "of Semiconductor Devices and Processes 4 (SISDEP), W. Fichtner, D. Aemmer (eds.), "
+    "Hartung-Gorre (1991), p. 23",
+    url="https://in4.iue.tuwien.ac.at/pdfs/sisdep1991/pdfs/Klaassen_2.pdf",
+    note="eq. (22) and the text after it quote Slotboom & de Graaff's p-type fit as "
+         "V_ref = 9 mV, N_ref = 1e17 cm^-3, c = 0.5; checked on the scanned paper")
 
 
 class NoBGN(BandgapNarrowingModel):
@@ -37,9 +48,10 @@ class Slotboom(BandgapNarrowingModel):
         dEg(N) = E_ref * ( ln(N / N_ref)
                           + sqrt(ln(N / N_ref)^2 + 0.5) )   [eV]
 
-    where N is |NetDoping|, N_ref = 1e17 cm^-3, E_ref = 6.92 meV in the
-    updated del Alamo / Slotboom fit (Klaassen unified BGN gives similar
-    results). Below N_ref, dEg is essentially 0.
+    where N is |NetDoping|, N_ref = 1e17 cm^-3 and E_ref = 6.92 meV. Below
+    N_ref, dEg is essentially 0. Slotboom & de Graaff's own fit uses
+    E_ref = 9 mV with the same N_ref and 0.5 (as Klaassen 1991, eq. 22,
+    quotes it); no paper is recorded for 6.92 meV with N_ref = 1e17.
 
     n_i_eff = n_i * exp(dEg / (2*V_t))
 
@@ -48,21 +60,24 @@ class Slotboom(BandgapNarrowingModel):
 
     references = (SLOTBOOM_DE_GRAAFF_1976,)
 
-    #: Reference bandgap-narrowing prefactor [eV]. Common Si fits use
-    #: 6.92 meV (del Alamo/Klaassen unified) or 9 meV (original Slotboom);
-    #: 6.92 gives closer agreement with modern SIMS-calibrated data.
+    #: Reference bandgap-narrowing prefactor [eV]. Slotboom & de Graaff's
+    #: fit uses 9 meV; the source of 6.92 meV is not recorded.
     E_ref_eV: float = 6.92e-3
     #: Reference doping at which dEg starts to activate [cm^-3].
     N_ref_cm3: float = 1.0e17
 
     def attach(self, ds, device, region, params, T_K):
         from opentcad.provenance import note_value
-        why = ("set in the model code; the code describes 6.92 meV as the updated "
-               "del Alamo / Klaassen unified fit but cites no paper for the values")
-        note_value("Model: Slotboom bandgap narrowing", "E_ref_eV", float(self.E_ref_eV),
-                   (), file=__file__, note=why)
-        note_value("Model: Slotboom bandgap narrowing", "N_ref_cm3", float(self.N_ref_cm3),
-                   (), file=__file__, note=why)
+        group = "Model: Slotboom bandgap narrowing"
+        e_src, e_note = (), ("set in the model code; Slotboom & de Graaff's fit uses "
+                             "9 meV and no paper is recorded for 6.92 meV")
+        if self.E_ref_eV == 9e-3:
+            e_src, e_note = (SLOTBOOM_DE_GRAAFF_1976, KLAASSEN_1991), None
+        note_value(group, "E_ref_eV", float(self.E_ref_eV), e_src, file=__file__,
+                   note=e_note)
+        note_value(group, "N_ref_cm3", float(self.N_ref_cm3),
+                   (SLOTBOOM_DE_GRAAFF_1976, KLAASSEN_1991)
+                   if self.N_ref_cm3 == 1e17 else (), file=__file__)
         ds.set_parameter(device=device, region=region, name="BGN_Eref",
                          value=float(self.E_ref_eV))
         ds.set_parameter(device=device, region=region, name="BGN_Nref",

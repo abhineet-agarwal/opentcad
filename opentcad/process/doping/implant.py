@@ -13,8 +13,8 @@ Physics:
     ``profile="gaussian"`` keeps only (Rp, ΔRp).
 
   * Lateral (transverse) straggle is a Gaussian of width
-    σ_lat = ``sigma_lat_frac`` · ΔRp (0.7 by default, a first-order
-    literature value; the true ratio depends weakly on species/energy).
+    σ_lat = ``sigma_lat_frac`` · ΔRp (0.7 by default, OpenTCAD's choice
+    with no source recorded; the true ratio depends on species and energy).
 
   * Each ion enters the surface at x_s inside the mask window, travels a
     distance s along the beam and t across it. For a beam tilted by θ
@@ -196,12 +196,15 @@ def apply_implant(mf: MeshField,
                 f"on {dopant}: {e}") from e
         raise
     sigma_lat_um = float(sigma_lat_frac) * moments.dRp_um
-    from opentcad.provenance import note_value
+    from opentcad.provenance import Source, note_value
+    if sigma_lat_frac == 0.7:
+        src = Source("OpenTCAD's default lateral-straggle ratio, not from a publication",
+                     kind="default", note="the code calls it a first-order literature "
+                                          "value but records no source")
+    else:
+        src = Source("Set in the simulation", kind="input")
     note_value(f"Implant: {dopant} in Si", "lateral straggle σ_lat / ΔRp",
-               float(sigma_lat_frac), (), file=__file__,
-               note=("OpenTCAD's default; the code calls it a first-order "
-                     "literature value but records no source"
-                     if sigma_lat_frac == 0.7 else "set by the caller"))
+               float(sigma_lat_frac), (src,), file=__file__)
     f = _range_density_per_cm(moments, profile)
 
     pts_um = np.asarray(mf.grid.points, dtype=float)[:, :2]

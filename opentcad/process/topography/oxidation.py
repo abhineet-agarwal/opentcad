@@ -17,7 +17,8 @@ At each surface point of a level-set stack, the amount of SiO2 grown
     Si-SiO2 boundary   moves DOWN by   ALPHA * dx_ox   (Si consumed)
     SiO2 top surface   moves UP   by  (1 - ALPHA) * dx_ox
 
-with ALPHA = ρ_Si / ρ_SiO2 · (M_SiO2 / M_Si) ≈ 0.44 (per Sze).
+with ALPHA = (ρ_SiO2 / M_SiO2) / (ρ_Si / M_Si) = N_SiO2 / N_Si ≈ 0.44
+(Radi, TU Wien dissertation 1998, sec. 2.2).
 
 Coefficient references:
   * Deal & Grove, J. Appl. Phys. 36, 3770 (1965) — original law.
@@ -41,7 +42,7 @@ from dataclasses import dataclass
 
 
 #: Volume ratio: μm of Si consumed per μm of SiO2 grown.
-#: N_Si / N_SiO2 = 5.0e22 / 2.2e22 = 2.27 ⇒ 1 μm SiO2 uses 0.44 μm Si.
+#: N_SiO2 / N_Si = 2.2e22 / 5.0e22 = 0.44: 1 μm of SiO2 uses 0.44 μm of Si.
 ALPHA_SI_CONSUMED_PER_OXIDE = 0.44
 
 _K_BOLTZMANN_EV_PER_K = 8.617333262e-5  # eV/K
@@ -121,10 +122,14 @@ def _note_coefficients(ambient: str, c: DealGroveArrhenius) -> None:
                {"B_C_um2_per_s": c.B_C, "B_Ea_eV": c.B_Ea,
                 "B_over_A_C_um_per_s": c.LN_C, "B_over_A_Ea_eV": c.LN_Ea},
                (plummer,), file=__file__)
+    radi = Source("M. Radi, Three-Dimensional Simulation of Thermal Oxidation, "
+                  "Dissertation, Technische Universitaet Wien (1998)",
+                  url="https://www.iue.tuwien.ac.at/phd/radi/node21.html",
+                  note="sec. 2.2: the consumed silicon is 0.44 of the grown oxide's "
+                       "thickness; checked on the online text")
     note_value(group, "Si consumed per unit oxide grown", ALPHA_SI_CONSUMED_PER_OXIDE,
-               (), file=__file__,
-               note="computed in the code from N_Si/N_SiO2 = 5.0e22/2.2e22 and "
-                    "described as 'per Sze'; no edition or page recorded")
+               (radi,), file=__file__,
+               note="the code also derives it from N_SiO2/N_Si = 2.2e22/5.0e22")
     note_value("Physical constants", "k_B [eV/K]", _K_BOLTZMANN_EV_PER_K, (CODATA_2018,))
 
 
